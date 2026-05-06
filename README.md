@@ -41,6 +41,8 @@ You are responsible for legal, policy, and compliance requirements in your organ
 
 ## What AS2Go Demonstrates
 
+<img width="853" height="480" alt="attack-scenario-to-go-along-the-kill-chain_853x480_7s" src="https://github.com/user-attachments/assets/1e1ccc4b-18e4-4985-a52e-c3ddf2ee15cb" />
+
 AS2Go follows a realistic multi-phase attack chain to generate observable behavior for defenders.
 Depending on your setup and enabled phases, the simulation can include:
 
