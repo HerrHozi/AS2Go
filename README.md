@@ -8,8 +8,8 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermannn.holger@live.de
-Current Version: 2026.5.6.502
-Last Update:     2026-05-06
+Current Version: 2026.5.21.1342
+Last Update:     2026-05-21
 ```
 
 AS2Go (**Attack Scenario To Go**) is a PowerShell-based Active Directory attack simulation and training framework designed for demos, workshops, security awareness sessions, and purple team exercises.
@@ -28,8 +28,8 @@ It is designed for:
 ## Project Information
 
 - Author: Holger Zimmermann
-- Project: https://github.com/HerrHozi/AS2Go
-- Blog: https://herrhozi.com
+- Project: <https://github.com/HerrHozi/AS2Go>
+- Blog: <https://herrhozi.com>
 - License: MIT
 
 ## Important Notice
@@ -41,7 +41,7 @@ You are responsible for legal, policy, and compliance requirements in your organ
 
 ## What AS2Go Demonstrates
 
-<img width="853" height="480" alt="attack-scenario-to-go-along-the-kill-chain_853x480_7s" src="https://github.com/user-attachments/assets/1e1ccc4b-18e4-4985-a52e-c3ddf2ee15cb" />
+<img width="853" height="480" alt="attack-scenario-to-go-along-the-kill-chain_853x480_7s" src="https://github.com/user-attachments/assets/1e1ccc4b-18e4-4985-a52e-c3ddf2ee15cb"/>
 
 AS2Go follows a realistic multi-phase attack chain to generate observable behavior for defenders.
 Depending on your setup and enabled phases, the simulation can include:
@@ -87,6 +87,15 @@ Note: Tool availability and security controls in your lab influence which action
 
 ## Installation
 
+### Requirements for the initial AS2Go lab configuration
+
+- Single-domain Active Directory environment
+- At least one Domain Controller (DC)
+- At least one domain-joined victim machine, such as a server or workstation
+- Initial configuration should preferably be executed on the victim machine
+- Administrative privileges are required
+- Enterprise Admin privileges are recommended for full configuration
+
 ### Option 1: Import from local folder
 
 ```powershell
@@ -96,7 +105,7 @@ Import-Module <PathToModule>\AS2Go.psd1 -Force
 ### Option 2: Install from PSGallery
 
 ```powershell
-Install-Module -Name AS2Go -Scope CurrentUser -Force
+Install-Module -Name AS2Go -Scope AllUsers -Force
 Import-Module AS2Go -Force
 ```
 
@@ -111,17 +120,20 @@ Start-AS2GoDemo
 ### Useful startup switches
 
 ```powershell
-# Fully interactive
-Start-AS2GoDemo
+# Setup the lab
+Initialize-AS2GoLabConfiguration
 
-# Non-interactive flow
-Start-AS2GoDemo -UnAttended
+# Run a Password Spray
+Invoke-ASPhase04BruteForceAttack
 
-# Continue from saved stage
-Start-AS2GoDemo -Continue
+# Phase Privilege Escalation
+Invoke-ASPhase07PrivilegeEscalation
+
+# Last phase Domain Compromise and Persistence
+Invoke-ASPhase12DomainCompromisePersistence
 
 # Troubleshooting friendly output
-Start-AS2GoDemo -EnableLogging -SkipImages -SkipClearHost
+ASP12 -EnableLogging -SkipImages -SkipClearHost
 ```
 
 ## Typical Training Flow
@@ -135,19 +147,19 @@ Start-AS2GoDemo -EnableLogging -SkipImages -SkipClearHost
 ## Public Commands (Examples)
 
 - Start-AS2GoDemo
-- Invoke-Phase04BruteForceAttack
-- Invoke-Phase06Reconnaissance
-- Invoke-Phase07PrivilegeEscalation
-- Invoke-Phase09ReconnaissancePriviledged
-- Invoke-Phase10AccessSensitiveData
-- Invoke-Phase11ExfiltrateSensitiveData
-- Invoke-Phase12DomainCompromisePersistence
+- Invoke-ASPhase04BruteForceAttack
+- Invoke-ASPhase06Reconnaissance
+- Invoke-ASPhase07PrivilegeEscalation
+- Invoke-ASPhase09ReconnaissancePriviledged
+- Invoke-ASPhase10AccessSensitiveData
+- Invoke-ASPhase11ExfiltrateSensitiveData
+- Invoke-ASPhase12DomainCompromisePersistence
 
 Use Get-Help for command documentation:
 
 ```powershell
 Get-Help Start-AS2GoDemo -Full
-Get-Help Invoke-Phase12DomainCompromisePersistence -Full
+Get-Help Invoke-ASPhase12DomainCompromisePersistence -Full
 ```
 
 ## Logging and Artifacts
@@ -185,4 +197,3 @@ If you share improvements, include:
 ## Acknowledgments
 
 Thanks to the security community and tool authors whose research and utilities support realistic defensive training labs.
-

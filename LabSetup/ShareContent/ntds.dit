@@ -1,0 +1,550 @@
+
+
+    Directory: C:\windows
+
+
+Mode                LastWriteTime         Length Name                                                                                                                              
+----                -------------         ------ ----                                                                                                                              
+d-----       15.09.2018     09:19                ADFS                                                                                                                              
+d-----       11.07.2022     13:20                ADWS                                                                                                                              
+d-----       09.07.2022     19:06                appcompat                                                                                                                         
+d-----       31.01.2025     21:04                apppatch                                                                                                                          
+d-----       03.12.2024     13:02                AppReadiness                                                                                                                      
+d-r---       15.09.2018     11:11                assembly                                                                                                                          
+d-----       15.09.2018     09:19                bcastdvr                                                                                                                          
+d-----       26.11.2024     17:42                Boot                                                                                                                              
+d-----       15.09.2018     09:19                Branding                                                                                                                          
+d-----       25.08.2025     18:06                CbsTemp                                                                                                                           
+d-----       15.09.2018     09:19                Containers                                                                                                                        
+d-----       11.07.2022     18:08                CSC                                                                                                                               
+d-----       15.09.2018     09:19                Cursors                                                                                                                           
+d-----       15.09.2025     09:48                debug                                                                                                                             
+d-----       15.09.2018     09:19                diagnostics                                                                                                                       
+d-----       15.09.2018     11:07                DigitalLocker                                                                                                                     
+d---s-       15.09.2018     09:19                Downloaded Program Files                                                                                                          
+d-----       15.09.2018     09:19                drivers                                                                                                                           
+d-----       15.09.2018     11:07                en-US                                                                                                                             
+d-r-s-       12.03.2025     13:31                Fonts                                                                                                                             
+d-----       15.09.2018     09:19                Globalization                                                                                                                     
+d-----       15.09.2018     11:07                Help                                                                                                                              
+d-----       15.09.2018     09:19                IdentityCRL                                                                                                                       
+d-----       07.07.2021     11:05                IME                                                                                                                               
+d-r---       01.07.2025     17:44                ImmersiveControlPanel                                                                                                             
+d-----       20.08.2025     17:35                INF                                                                                                                               
+d-----       15.09.2018     09:19                InputMethod                                                                                                                       
+d-----       15.09.2018     09:19                L2Schemas                                                                                                                         
+d-----       10.10.2022     09:38                LiveKernelReports                                                                                                                 
+d-----       02.09.2025     15:34                Logs                                                                                                                              
+d-r-s-       15.09.2018     09:19                media                                                                                                                             
+d-r---       18.09.2025     15:34                Microsoft.NET                                                                                                                     
+d-----       15.09.2018     09:19                Migration                                                                                                                         
+d-----       15.09.2018     09:19                ModemLogs                                                                                                                         
+d-----       18.09.2025     13:53                NTDS                                                                                                                              
+d-----       19.07.2022     19:16                OCR                                                                                                                               
+d-r---       15.09.2018     09:19                Offline Web Pages                                                                                                                 
+d-----       08.07.2022     17:06                Panther                                                                                                                           
+d-----       15.09.2018     09:19                Performance                                                                                                                       
+d-----       15.09.2018     09:19                PLA                                                                                                                               
+d-----       26.11.2024     17:42                PolicyDefinitions                                                                                                                 
+d-----       08.07.2022     17:06                Prefetch                                                                                                                          
+d-r---       11.07.2022     18:08                PrintDialog                                                                                                                       
+d-----       15.09.2018     09:19                Provisioning                                                                                                                      
+d-----       15.09.2018     09:19                Registration                                                                                                                      
+d-----       15.09.2018     09:19                RemotePackages                                                                                                                    
+d-----       15.09.2018     09:19                rescache                                                                                                                          
+d-----       15.09.2018     09:19                Resources                                                                                                                         
+d-----       15.09.2018     09:19                SchCache                                                                                                                          
+d-----       15.09.2018     09:19                schemas                                                                                                                           
+d-----       11.07.2022     14:30                security                                                                                                                          
+d-----       08.07.2022     17:05                ServiceProfiles                                                                                                                   
+d-----       15.09.2018     09:19                ServiceState                                                                                                                      
+d-----       12.04.2024     17:39                servicing                                                                                                                         
+d-----       15.09.2018     09:21                Setup                                                                                                                             
+d-----       11.07.2022     18:08                ShellComponents                                                                                                                   
+d-----       01.07.2025     17:44                ShellExperiences                                                                                                                  
+d-----       15.09.2018     09:19                SKB                                                                                                                               
+d-----       16.02.2024     16:02                SoftwareDistribution                                                                                                              
+d-----       15.09.2018     09:19                Speech                                                                                                                            
+d-----       15.09.2018     09:19                Speech_OneCore                                                                                                                    
+d-----       15.09.2018     09:19                System                                                                                                                            
+d-----       18.09.2025     12:45                System32                                                                                                                          
+d-----       15.09.2018     09:19                SystemApps                                                                                                                        
+d-----       15.09.2018     09:19                SystemResources                                                                                                                   
+d-----       18.09.2025     15:49                SystemTemp                                                                                                                        
+d-----       11.07.2022     14:30                SYSVOL                                                                                                                            
+d-----       01.07.2025     17:44                SysWOW64                                                                                                                          
+d-----       15.09.2018     09:19                TAPI                                                                                                                              
+d-----       08.07.2022     17:06                Tasks                                                                                                                             
+d-----       18.09.2025     15:34                Temp                                                                                                                              
+d-----       26.11.2024     17:42                TextInput                                                                                                                         
+d-----       15.09.2018     09:19                tracing                                                                                                                           
+d-----       15.09.2018     09:19                twain_32                                                                                                                          
+d-----       15.09.2018     09:19                Vss                                                                                                                               
+d-----       15.09.2018     09:19                WaaS                                                                                                                              
+d-----       15.09.2018     09:19                Web                                                                                                                               
+d-----       04.07.2025     11:52                WinSxS                                                                                                                            
+-a----       25.03.2025     21:23          95744 bfsvc.exe                                                                                                                         
+-a--s-       20.08.2025     17:49          67584 bootstat.dat                                                                                                                      
+-a----       07.07.2021     11:02         232960 DfsrAdmin.exe                                                                                                                     
+-a----       07.07.2021     11:05           1315 DfsrAdmin.exe.config                                                                                                              
+-a----       12.03.2025     13:32           3891 DtcInstall.log                                                                                                                    
+-a----       30.06.2025     23:47        4384136 explorer.exe                                                                                                                      
+-a----       11.07.2022     17:41        1071616 HelpPane.exe                                                                                                                      
+-a----       15.09.2018     09:12          18432 hh.exe                                                                                                                            
+-a----       08.07.2022     17:05           1376 lsasetup.log                                                                                                                      
+-a----       15.09.2018     09:12          43131 mib.bin                                                                                                                           
+-a----       22.03.2024     16:50         254464 notepad.exe                                                                                                                       
+-a----       20.08.2025     17:31          76124 PFRO.log                                                                                                                          
+-a----       25.01.2023     15:52         187816 PSEXESVC.exe                                                                                                                      
+-a----       07.07.2021     11:02         357888 regedit.exe                                                                                                                       
+-a----       15.09.2018     09:13          30931 ServerStandard.xml                                                                                                                
+-a----       29.08.2023     10:36         133632 splwow64.exe                                                                                                                      
+-a----       15.09.2018     09:16            219 system.ini                                                                                                                        
+-a----       15.09.2018     09:13          64512 twain_32.dll                                                                                                                      
+-a----       15.09.2018     09:16             92 win.ini                                                                                                                           
+-a----       18.09.2025     15:34            276 WindowsUpdate.log                                                                                                                 
+-a----       15.09.2018     09:13          11776 winhlp32.exe                                                                                                                      
+-a----       15.09.2018     09:12         316640 WMSysPr9.prx                                                                                                                      
+-a----       15.09.2018     09:12          11264 write.exe                                                                                                                         
+
+
+
+
+    Directory: C:\windows
+
+
+Mode                LastWriteTime         Length Name                                                                                                                              
+----                -------------         ------ ----                                                                                                                              
+d-----       15.09.2018     09:19                ADFS                                                                                                                              
+d-----       11.07.2022     13:20                ADWS                                                                                                                              
+d-----       09.07.2022     19:06                appcompat                                                                                                                         
+d-----       31.01.2025     21:04                apppatch                                                                                                                          
+d-----       03.12.2024     13:02                AppReadiness                                                                                                                      
+d-r---       15.09.2018     11:11                assembly                                                                                                                          
+d-----       15.09.2018     09:19                bcastdvr                                                                                                                          
+d-----       26.11.2024     17:42                Boot                                                                                                                              
+d-----       15.09.2018     09:19                Branding                                                                                                                          
+d-----       25.08.2025     18:06                CbsTemp                                                                                                                           
+d-----       15.09.2018     09:19                Containers                                                                                                                        
+d-----       11.07.2022     18:08                CSC                                                                                                                               
+d-----       15.09.2018     09:19                Cursors                                                                                                                           
+d-----       15.09.2025     09:48                debug                                                                                                                             
+d-----       15.09.2018     09:19                diagnostics                                                                                                                       
+d-----       15.09.2018     11:07                DigitalLocker                                                                                                                     
+d---s-       15.09.2018     09:19                Downloaded Program Files                                                                                                          
+d-----       15.09.2018     09:19                drivers                                                                                                                           
+d-----       15.09.2018     11:07                en-US                                                                                                                             
+d-r-s-       12.03.2025     13:31                Fonts                                                                                                                             
+d-----       15.09.2018     09:19                Globalization                                                                                                                     
+d-----       15.09.2018     11:07                Help                                                                                                                              
+d-----       15.09.2018     09:19                IdentityCRL                                                                                                                       
+d-----       07.07.2021     11:05                IME                                                                                                                               
+d-r---       01.07.2025     17:44                ImmersiveControlPanel                                                                                                             
+d-----       20.08.2025     17:35                INF                                                                                                                               
+d-----       15.09.2018     09:19                InputMethod                                                                                                                       
+d-----       15.09.2018     09:19                L2Schemas                                                                                                                         
+d-----       10.10.2022     09:38                LiveKernelReports                                                                                                                 
+d-----       02.09.2025     15:34                Logs                                                                                                                              
+d-r-s-       15.09.2018     09:19                media                                                                                                                             
+d-r---       18.09.2025     15:34                Microsoft.NET                                                                                                                     
+d-----       15.09.2018     09:19                Migration                                                                                                                         
+d-----       15.09.2018     09:19                ModemLogs                                                                                                                         
+d-----       18.09.2025     13:53                NTDS                                                                                                                              
+d-----       19.07.2022     19:16                OCR                                                                                                                               
+d-r---       15.09.2018     09:19                Offline Web Pages                                                                                                                 
+d-----       08.07.2022     17:06                Panther                                                                                                                           
+d-----       15.09.2018     09:19                Performance                                                                                                                       
+d-----       15.09.2018     09:19                PLA                                                                                                                               
+d-----       26.11.2024     17:42                PolicyDefinitions                                                                                                                 
+d-----       08.07.2022     17:06                Prefetch                                                                                                                          
+d-r---       11.07.2022     18:08                PrintDialog                                                                                                                       
+d-----       15.09.2018     09:19                Provisioning                                                                                                                      
+d-----       15.09.2018     09:19                Registration                                                                                                                      
+d-----       15.09.2018     09:19                RemotePackages                                                                                                                    
+d-----       15.09.2018     09:19                rescache                                                                                                                          
+d-----       15.09.2018     09:19                Resources                                                                                                                         
+d-----       15.09.2018     09:19                SchCache                                                                                                                          
+d-----       15.09.2018     09:19                schemas                                                                                                                           
+d-----       11.07.2022     14:30                security                                                                                                                          
+d-----       08.07.2022     17:05                ServiceProfiles                                                                                                                   
+d-----       15.09.2018     09:19                ServiceState                                                                                                                      
+d-----       12.04.2024     17:39                servicing                                                                                                                         
+d-----       15.09.2018     09:21                Setup                                                                                                                             
+d-----       11.07.2022     18:08                ShellComponents                                                                                                                   
+d-----       01.07.2025     17:44                ShellExperiences                                                                                                                  
+d-----       15.09.2018     09:19                SKB                                                                                                                               
+d-----       16.02.2024     16:02                SoftwareDistribution                                                                                                              
+d-----       15.09.2018     09:19                Speech                                                                                                                            
+d-----       15.09.2018     09:19                Speech_OneCore                                                                                                                    
+d-----       15.09.2018     09:19                System                                                                                                                            
+d-----       18.09.2025     12:45                System32                                                                                                                          
+d-----       15.09.2018     09:19                SystemApps                                                                                                                        
+d-----       15.09.2018     09:19                SystemResources                                                                                                                   
+d-----       18.09.2025     16:10                SystemTemp                                                                                                                        
+d-----       11.07.2022     14:30                SYSVOL                                                                                                                            
+d-----       01.07.2025     17:44                SysWOW64                                                                                                                          
+d-----       15.09.2018     09:19                TAPI                                                                                                                              
+d-----       08.07.2022     17:06                Tasks                                                                                                                             
+d-----       18.09.2025     15:34                Temp                                                                                                                              
+d-----       26.11.2024     17:42                TextInput                                                                                                                         
+d-----       15.09.2018     09:19                tracing                                                                                                                           
+d-----       15.09.2018     09:19                twain_32                                                                                                                          
+d-----       15.09.2018     09:19                Vss                                                                                                                               
+d-----       15.09.2018     09:19                WaaS                                                                                                                              
+d-----       15.09.2018     09:19                Web                                                                                                                               
+d-----       04.07.2025     11:52                WinSxS                                                                                                                            
+-a----       25.03.2025     21:23          95744 bfsvc.exe                                                                                                                         
+-a--s-       20.08.2025     17:49          67584 bootstat.dat                                                                                                                      
+-a----       07.07.2021     11:02         232960 DfsrAdmin.exe                                                                                                                     
+-a----       07.07.2021     11:05           1315 DfsrAdmin.exe.config                                                                                                              
+-a----       12.03.2025     13:32           3891 DtcInstall.log                                                                                                                    
+-a----       30.06.2025     23:47        4384136 explorer.exe                                                                                                                      
+-a----       11.07.2022     17:41        1071616 HelpPane.exe                                                                                                                      
+-a----       15.09.2018     09:12          18432 hh.exe                                                                                                                            
+-a----       08.07.2022     17:05           1376 lsasetup.log                                                                                                                      
+-a----       15.09.2018     09:12          43131 mib.bin                                                                                                                           
+-a----       22.03.2024     16:50         254464 notepad.exe                                                                                                                       
+-a----       20.08.2025     17:31          76124 PFRO.log                                                                                                                          
+-a----       25.01.2023     15:52         187816 PSEXESVC.exe                                                                                                                      
+-a----       07.07.2021     11:02         357888 regedit.exe                                                                                                                       
+-a----       15.09.2018     09:13          30931 ServerStandard.xml                                                                                                                
+-a----       29.08.2023     10:36         133632 splwow64.exe                                                                                                                      
+-a----       15.09.2018     09:16            219 system.ini                                                                                                                        
+-a----       15.09.2018     09:13          64512 twain_32.dll                                                                                                                      
+-a----       15.09.2018     09:16             92 win.ini                                                                                                                           
+-a----       18.09.2025     15:34            276 WindowsUpdate.log                                                                                                                 
+-a----       15.09.2018     09:13          11776 winhlp32.exe                                                                                                                      
+-a----       15.09.2018     09:12         316640 WMSysPr9.prx                                                                                                                      
+-a----       15.09.2018     09:12          11264 write.exe                                                                                                                         
+
+
+
+
+    Directory: C:\windows
+
+
+Mode                LastWriteTime         Length Name                                                                                                                              
+----                -------------         ------ ----                                                                                                                              
+d-----       15.09.2018     09:19                ADFS                                                                                                                              
+d-----       11.07.2022     13:20                ADWS                                                                                                                              
+d-----       09.07.2022     19:06                appcompat                                                                                                                         
+d-----       31.01.2025     21:04                apppatch                                                                                                                          
+d-----       03.12.2024     13:02                AppReadiness                                                                                                                      
+d-r---       15.09.2018     11:11                assembly                                                                                                                          
+d-----       15.09.2018     09:19                bcastdvr                                                                                                                          
+d-----       26.11.2024     17:42                Boot                                                                                                                              
+d-----       15.09.2018     09:19                Branding                                                                                                                          
+d-----       25.08.2025     18:06                CbsTemp                                                                                                                           
+d-----       15.09.2018     09:19                Containers                                                                                                                        
+d-----       11.07.2022     18:08                CSC                                                                                                                               
+d-----       15.09.2018     09:19                Cursors                                                                                                                           
+d-----       15.09.2025     09:48                debug                                                                                                                             
+d-----       15.09.2018     09:19                diagnostics                                                                                                                       
+d-----       15.09.2018     11:07                DigitalLocker                                                                                                                     
+d---s-       15.09.2018     09:19                Downloaded Program Files                                                                                                          
+d-----       15.09.2018     09:19                drivers                                                                                                                           
+d-----       15.09.2018     11:07                en-US                                                                                                                             
+d-r-s-       12.03.2025     13:31                Fonts                                                                                                                             
+d-----       15.09.2018     09:19                Globalization                                                                                                                     
+d-----       15.09.2018     11:07                Help                                                                                                                              
+d-----       15.09.2018     09:19                IdentityCRL                                                                                                                       
+d-----       07.07.2021     11:05                IME                                                                                                                               
+d-r---       01.07.2025     17:44                ImmersiveControlPanel                                                                                                             
+d-----       20.08.2025     17:35                INF                                                                                                                               
+d-----       15.09.2018     09:19                InputMethod                                                                                                                       
+d-----       15.09.2018     09:19                L2Schemas                                                                                                                         
+d-----       10.10.2022     09:38                LiveKernelReports                                                                                                                 
+d-----       02.09.2025     15:34                Logs                                                                                                                              
+d-r-s-       15.09.2018     09:19                media                                                                                                                             
+d-r---       18.09.2025     15:34                Microsoft.NET                                                                                                                     
+d-----       15.09.2018     09:19                Migration                                                                                                                         
+d-----       15.09.2018     09:19                ModemLogs                                                                                                                         
+d-----       18.09.2025     13:53                NTDS                                                                                                                              
+d-----       19.07.2022     19:16                OCR                                                                                                                               
+d-r---       15.09.2018     09:19                Offline Web Pages                                                                                                                 
+d-----       08.07.2022     17:06                Panther                                                                                                                           
+d-----       15.09.2018     09:19                Performance                                                                                                                       
+d-----       15.09.2018     09:19                PLA                                                                                                                               
+d-----       26.11.2024     17:42                PolicyDefinitions                                                                                                                 
+d-----       08.07.2022     17:06                Prefetch                                                                                                                          
+d-r---       11.07.2022     18:08                PrintDialog                                                                                                                       
+d-----       15.09.2018     09:19                Provisioning                                                                                                                      
+d-----       15.09.2018     09:19                Registration                                                                                                                      
+d-----       15.09.2018     09:19                RemotePackages                                                                                                                    
+d-----       15.09.2018     09:19                rescache                                                                                                                          
+d-----       15.09.2018     09:19                Resources                                                                                                                         
+d-----       15.09.2018     09:19                SchCache                                                                                                                          
+d-----       15.09.2018     09:19                schemas                                                                                                                           
+d-----       11.07.2022     14:30                security                                                                                                                          
+d-----       08.07.2022     17:05                ServiceProfiles                                                                                                                   
+d-----       15.09.2018     09:19                ServiceState                                                                                                                      
+d-----       12.04.2024     17:39                servicing                                                                                                                         
+d-----       15.09.2018     09:21                Setup                                                                                                                             
+d-----       11.07.2022     18:08                ShellComponents                                                                                                                   
+d-----       01.07.2025     17:44                ShellExperiences                                                                                                                  
+d-----       15.09.2018     09:19                SKB                                                                                                                               
+d-----       16.02.2024     16:02                SoftwareDistribution                                                                                                              
+d-----       15.09.2018     09:19                Speech                                                                                                                            
+d-----       15.09.2018     09:19                Speech_OneCore                                                                                                                    
+d-----       15.09.2018     09:19                System                                                                                                                            
+d-----       18.09.2025     12:45                System32                                                                                                                          
+d-----       15.09.2018     09:19                SystemApps                                                                                                                        
+d-----       15.09.2018     09:19                SystemResources                                                                                                                   
+d-----       18.09.2025     16:10                SystemTemp                                                                                                                        
+d-----       11.07.2022     14:30                SYSVOL                                                                                                                            
+d-----       01.07.2025     17:44                SysWOW64                                                                                                                          
+d-----       15.09.2018     09:19                TAPI                                                                                                                              
+d-----       08.07.2022     17:06                Tasks                                                                                                                             
+d-----       18.09.2025     15:34                Temp                                                                                                                              
+d-----       26.11.2024     17:42                TextInput                                                                                                                         
+d-----       15.09.2018     09:19                tracing                                                                                                                           
+d-----       15.09.2018     09:19                twain_32                                                                                                                          
+d-----       15.09.2018     09:19                Vss                                                                                                                               
+d-----       15.09.2018     09:19                WaaS                                                                                                                              
+d-----       15.09.2018     09:19                Web                                                                                                                               
+d-----       04.07.2025     11:52                WinSxS                                                                                                                            
+-a----       25.03.2025     21:23          95744 bfsvc.exe                                                                                                                         
+-a--s-       20.08.2025     17:49          67584 bootstat.dat                                                                                                                      
+-a----       07.07.2021     11:02         232960 DfsrAdmin.exe                                                                                                                     
+-a----       07.07.2021     11:05           1315 DfsrAdmin.exe.config                                                                                                              
+-a----       12.03.2025     13:32           3891 DtcInstall.log                                                                                                                    
+-a----       30.06.2025     23:47        4384136 explorer.exe                                                                                                                      
+-a----       11.07.2022     17:41        1071616 HelpPane.exe                                                                                                                      
+-a----       15.09.2018     09:12          18432 hh.exe                                                                                                                            
+-a----       08.07.2022     17:05           1376 lsasetup.log                                                                                                                      
+-a----       15.09.2018     09:12          43131 mib.bin                                                                                                                           
+-a----       22.03.2024     16:50         254464 notepad.exe                                                                                                                       
+-a----       20.08.2025     17:31          76124 PFRO.log                                                                                                                          
+-a----       25.01.2023     15:52         187816 PSEXESVC.exe                                                                                                                      
+-a----       07.07.2021     11:02         357888 regedit.exe                                                                                                                       
+-a----       15.09.2018     09:13          30931 ServerStandard.xml                                                                                                                
+-a----       29.08.2023     10:36         133632 splwow64.exe                                                                                                                      
+-a----       15.09.2018     09:16            219 system.ini                                                                                                                        
+-a----       15.09.2018     09:13          64512 twain_32.dll                                                                                                                      
+-a----       15.09.2018     09:16             92 win.ini                                                                                                                           
+-a----       18.09.2025     15:34            276 WindowsUpdate.log                                                                                                                 
+-a----       15.09.2018     09:13          11776 winhlp32.exe                                                                                                                      
+-a----       15.09.2018     09:12         316640 WMSysPr9.prx                                                                                                                      
+-a----       15.09.2018     09:12          11264 write.exe                                                                                                                         
+
+
+
+
+    Directory: C:\windows
+
+
+Mode                LastWriteTime         Length Name                                                                                                                              
+----                -------------         ------ ----                                                                                                                              
+d-----       15.09.2018     09:19                ADFS                                                                                                                              
+d-----       11.07.2022     13:20                ADWS                                                                                                                              
+d-----       09.07.2022     19:06                appcompat                                                                                                                         
+d-----       31.01.2025     21:04                apppatch                                                                                                                          
+d-----       03.12.2024     13:02                AppReadiness                                                                                                                      
+d-r---       15.09.2018     11:11                assembly                                                                                                                          
+d-----       15.09.2018     09:19                bcastdvr                                                                                                                          
+d-----       26.11.2024     17:42                Boot                                                                                                                              
+d-----       15.09.2018     09:19                Branding                                                                                                                          
+d-----       25.08.2025     18:06                CbsTemp                                                                                                                           
+d-----       15.09.2018     09:19                Containers                                                                                                                        
+d-----       11.07.2022     18:08                CSC                                                                                                                               
+d-----       15.09.2018     09:19                Cursors                                                                                                                           
+d-----       15.09.2025     09:48                debug                                                                                                                             
+d-----       15.09.2018     09:19                diagnostics                                                                                                                       
+d-----       15.09.2018     11:07                DigitalLocker                                                                                                                     
+d---s-       15.09.2018     09:19                Downloaded Program Files                                                                                                          
+d-----       15.09.2018     09:19                drivers                                                                                                                           
+d-----       15.09.2018     11:07                en-US                                                                                                                             
+d-r-s-       12.03.2025     13:31                Fonts                                                                                                                             
+d-----       15.09.2018     09:19                Globalization                                                                                                                     
+d-----       15.09.2018     11:07                Help                                                                                                                              
+d-----       15.09.2018     09:19                IdentityCRL                                                                                                                       
+d-----       07.07.2021     11:05                IME                                                                                                                               
+d-r---       01.07.2025     17:44                ImmersiveControlPanel                                                                                                             
+d-----       20.08.2025     17:35                INF                                                                                                                               
+d-----       15.09.2018     09:19                InputMethod                                                                                                                       
+d-----       15.09.2018     09:19                L2Schemas                                                                                                                         
+d-----       10.10.2022     09:38                LiveKernelReports                                                                                                                 
+d-----       02.09.2025     15:34                Logs                                                                                                                              
+d-r-s-       15.09.2018     09:19                media                                                                                                                             
+d-r---       18.09.2025     15:34                Microsoft.NET                                                                                                                     
+d-----       15.09.2018     09:19                Migration                                                                                                                         
+d-----       15.09.2018     09:19                ModemLogs                                                                                                                         
+d-----       18.09.2025     13:53                NTDS                                                                                                                              
+d-----       19.07.2022     19:16                OCR                                                                                                                               
+d-r---       15.09.2018     09:19                Offline Web Pages                                                                                                                 
+d-----       08.07.2022     17:06                Panther                                                                                                                           
+d-----       15.09.2018     09:19                Performance                                                                                                                       
+d-----       15.09.2018     09:19                PLA                                                                                                                               
+d-----       26.11.2024     17:42                PolicyDefinitions                                                                                                                 
+d-----       08.07.2022     17:06                Prefetch                                                                                                                          
+d-r---       11.07.2022     18:08                PrintDialog                                                                                                                       
+d-----       15.09.2018     09:19                Provisioning                                                                                                                      
+d-----       15.09.2018     09:19                Registration                                                                                                                      
+d-----       15.09.2018     09:19                RemotePackages                                                                                                                    
+d-----       15.09.2018     09:19                rescache                                                                                                                          
+d-----       15.09.2018     09:19                Resources                                                                                                                         
+d-----       15.09.2018     09:19                SchCache                                                                                                                          
+d-----       15.09.2018     09:19                schemas                                                                                                                           
+d-----       11.07.2022     14:30                security                                                                                                                          
+d-----       08.07.2022     17:05                ServiceProfiles                                                                                                                   
+d-----       15.09.2018     09:19                ServiceState                                                                                                                      
+d-----       12.04.2024     17:39                servicing                                                                                                                         
+d-----       15.09.2018     09:21                Setup                                                                                                                             
+d-----       11.07.2022     18:08                ShellComponents                                                                                                                   
+d-----       01.07.2025     17:44                ShellExperiences                                                                                                                  
+d-----       15.09.2018     09:19                SKB                                                                                                                               
+d-----       16.02.2024     16:02                SoftwareDistribution                                                                                                              
+d-----       15.09.2018     09:19                Speech                                                                                                                            
+d-----       15.09.2018     09:19                Speech_OneCore                                                                                                                    
+d-----       15.09.2018     09:19                System                                                                                                                            
+d-----       18.09.2025     12:45                System32                                                                                                                          
+d-----       15.09.2018     09:19                SystemApps                                                                                                                        
+d-----       15.09.2018     09:19                SystemResources                                                                                                                   
+d-----       18.09.2025     16:10                SystemTemp                                                                                                                        
+d-----       11.07.2022     14:30                SYSVOL                                                                                                                            
+d-----       01.07.2025     17:44                SysWOW64                                                                                                                          
+d-----       15.09.2018     09:19                TAPI                                                                                                                              
+d-----       08.07.2022     17:06                Tasks                                                                                                                             
+d-----       18.09.2025     15:34                Temp                                                                                                                              
+d-----       26.11.2024     17:42                TextInput                                                                                                                         
+d-----       15.09.2018     09:19                tracing                                                                                                                           
+d-----       15.09.2018     09:19                twain_32                                                                                                                          
+d-----       15.09.2018     09:19                Vss                                                                                                                               
+d-----       15.09.2018     09:19                WaaS                                                                                                                              
+d-----       15.09.2018     09:19                Web                                                                                                                               
+d-----       04.07.2025     11:52                WinSxS                                                                                                                            
+-a----       25.03.2025     21:23          95744 bfsvc.exe                                                                                                                         
+-a--s-       20.08.2025     17:49          67584 bootstat.dat                                                                                                                      
+-a----       07.07.2021     11:02         232960 DfsrAdmin.exe                                                                                                                     
+-a----       07.07.2021     11:05           1315 DfsrAdmin.exe.config                                                                                                              
+-a----       12.03.2025     13:32           3891 DtcInstall.log                                                                                                                    
+-a----       30.06.2025     23:47        4384136 explorer.exe                                                                                                                      
+-a----       11.07.2022     17:41        1071616 HelpPane.exe                                                                                                                      
+-a----       15.09.2018     09:12          18432 hh.exe                                                                                                                            
+-a----       08.07.2022     17:05           1376 lsasetup.log                                                                                                                      
+-a----       15.09.2018     09:12          43131 mib.bin                                                                                                                           
+-a----       22.03.2024     16:50         254464 notepad.exe                                                                                                                       
+-a----       20.08.2025     17:31          76124 PFRO.log                                                                                                                          
+-a----       25.01.2023     15:52         187816 PSEXESVC.exe                                                                                                                      
+-a----       07.07.2021     11:02         357888 regedit.exe                                                                                                                       
+-a----       15.09.2018     09:13          30931 ServerStandard.xml                                                                                                                
+-a----       29.08.2023     10:36         133632 splwow64.exe                                                                                                                      
+-a----       15.09.2018     09:16            219 system.ini                                                                                                                        
+-a----       15.09.2018     09:13          64512 twain_32.dll                                                                                                                      
+-a----       15.09.2018     09:16             92 win.ini                                                                                                                           
+-a----       18.09.2025     15:34            276 WindowsUpdate.log                                                                                                                 
+-a----       15.09.2018     09:13          11776 winhlp32.exe                                                                                                                      
+-a----       15.09.2018     09:12         316640 WMSysPr9.prx                                                                                                                      
+-a----       15.09.2018     09:12          11264 write.exe                                                                                                                         
+
+
+
+
+    Directory: C:\windows
+
+
+Mode                LastWriteTime         Length Name                                                                                                                              
+----                -------------         ------ ----                                                                                                                              
+d-----       15.09.2018     09:19                ADFS                                                                                                                              
+d-----       11.07.2022     13:20                ADWS                                                                                                                              
+d-----       09.07.2022     19:06                appcompat                                                                                                                         
+d-----       31.01.2025     21:04                apppatch                                                                                                                          
+d-----       03.12.2024     13:02                AppReadiness                                                                                                                      
+d-r---       15.09.2018     11:11                assembly                                                                                                                          
+d-----       15.09.2018     09:19                bcastdvr                                                                                                                          
+d-----       26.11.2024     17:42                Boot                                                                                                                              
+d-----       15.09.2018     09:19                Branding                                                                                                                          
+d-----       25.08.2025     18:06                CbsTemp                                                                                                                           
+d-----       15.09.2018     09:19                Containers                                                                                                                        
+d-----       11.07.2022     18:08                CSC                                                                                                                               
+d-----       15.09.2018     09:19                Cursors                                                                                                                           
+d-----       15.09.2025     09:48                debug                                                                                                                             
+d-----       15.09.2018     09:19                diagnostics                                                                                                                       
+d-----       15.09.2018     11:07                DigitalLocker                                                                                                                     
+d---s-       15.09.2018     09:19                Downloaded Program Files                                                                                                          
+d-----       15.09.2018     09:19                drivers                                                                                                                           
+d-----       15.09.2018     11:07                en-US                                                                                                                             
+d-r-s-       12.03.2025     13:31                Fonts                                                                                                                             
+d-----       15.09.2018     09:19                Globalization                                                                                                                     
+d-----       15.09.2018     11:07                Help                                                                                                                              
+d-----       15.09.2018     09:19                IdentityCRL                                                                                                                       
+d-----       07.07.2021     11:05                IME                                                                                                                               
+d-r---       01.07.2025     17:44                ImmersiveControlPanel                                                                                                             
+d-----       20.08.2025     17:35                INF                                                                                                                               
+d-----       15.09.2018     09:19                InputMethod                                                                                                                       
+d-----       15.09.2018     09:19                L2Schemas                                                                                                                         
+d-----       10.10.2022     09:38                LiveKernelReports                                                                                                                 
+d-----       02.09.2025     15:34                Logs                                                                                                                              
+d-r-s-       15.09.2018     09:19                media                                                                                                                             
+d-r---       18.09.2025     15:34                Microsoft.NET                                                                                                                     
+d-----       15.09.2018     09:19                Migration                                                                                                                         
+d-----       15.09.2018     09:19                ModemLogs                                                                                                                         
+d-----       18.09.2025     13:53                NTDS                                                                                                                              
+d-----       19.07.2022     19:16                OCR                                                                                                                               
+d-r---       15.09.2018     09:19                Offline Web Pages                                                                                                                 
+d-----       08.07.2022     17:06                Panther                                                                                                                           
+d-----       15.09.2018     09:19                Performance                                                                                                                       
+d-----       15.09.2018     09:19                PLA                                                                                                                               
+d-----       26.11.2024     17:42                PolicyDefinitions                                                                                                                 
+d-----       08.07.2022     17:06                Prefetch                                                                                                                          
+d-r---       11.07.2022     18:08                PrintDialog                                                                                                                       
+d-----       15.09.2018     09:19                Provisioning                                                                                                                      
+d-----       15.09.2018     09:19                Registration                                                                                                                      
+d-----       15.09.2018     09:19                RemotePackages                                                                                                                    
+d-----       15.09.2018     09:19                rescache                                                                                                                          
+d-----       15.09.2018     09:19                Resources                                                                                                                         
+d-----       15.09.2018     09:19                SchCache                                                                                                                          
+d-----       15.09.2018     09:19                schemas                                                                                                                           
+d-----       11.07.2022     14:30                security                                                                                                                          
+d-----       08.07.2022     17:05                ServiceProfiles                                                                                                                   
+d-----       15.09.2018     09:19                ServiceState                                                                                                                      
+d-----       12.04.2024     17:39                servicing                                                                                                                         
+d-----       15.09.2018     09:21                Setup                                                                                                                             
+d-----       11.07.2022     18:08                ShellComponents                                                                                                                   
+d-----       01.07.2025     17:44                ShellExperiences                                                                                                                  
+d-----       15.09.2018     09:19                SKB                                                                                                                               
+d-----       16.02.2024     16:02                SoftwareDistribution                                                                                                              
+d-----       15.09.2018     09:19                Speech                                                                                                                            
+d-----       15.09.2018     09:19                Speech_OneCore                                                                                                                    
+d-----       15.09.2018     09:19                System                                                                                                                            
+d-----       18.09.2025     12:45                System32                                                                                                                          
+d-----       15.09.2018     09:19                SystemApps                                                                                                                        
+d-----       15.09.2018     09:19                SystemResources                                                                                                                   
+d-----       19.09.2025     11:12                SystemTemp                                                                                                                        
+d-----       11.07.2022     14:30                SYSVOL                                                                                                                            
+d-----       01.07.2025     17:44                SysWOW64                                                                                                                          
+d-----       15.09.2018     09:19                TAPI                                                                                                                              
+d-----       08.07.2022     17:06                Tasks                                                                                                                             
+d-----       19.09.2025     09:18                Temp                                                                                                                              
+d-----       26.11.2024     17:42                TextInput                                                                                                                         
+d-----       15.09.2018     09:19                tracing                                                                                                                           
+d-----       15.09.2018     09:19                twain_32                                                                                                                          
+d-----       15.09.2018     09:19                Vss                                                                                                                               
+d-----       15.09.2018     09:19                WaaS                                                                                                                              
+d-----       15.09.2018     09:19                Web                                                                                                                               
+d-----       04.07.2025     11:52                WinSxS                                                                                                                            
+-a----       25.03.2025     21:23          95744 bfsvc.exe                                                                                                                         
+-a--s-       20.08.2025     17:49          67584 bootstat.dat                                                                                                                      
+-a----       07.07.2021     11:02         232960 DfsrAdmin.exe                                                                                                                     
+-a----       07.07.2021     11:05           1315 DfsrAdmin.exe.config                                                                                                              
+-a----       12.03.2025     13:32           3891 DtcInstall.log                                                                                                                    
+-a----       30.06.2025     23:47        4384136 explorer.exe                                                                                                                      
+-a----       11.07.2022     17:41        1071616 HelpPane.exe                                                                                                                      
+-a----       15.09.2018     09:12          18432 hh.exe                                                                                                                            
+-a----       08.07.2022     17:05           1376 lsasetup.log                                                                                                                      
+-a----       15.09.2018     09:12          43131 mib.bin                                                                                                                           
+-a----       22.03.2024     16:50         254464 notepad.exe                                                                                                                       
+-a----       20.08.2025     17:31          76124 PFRO.log                                                                                                                          
+-a----       25.01.2023     15:52         187816 PSEXESVC.exe                                                                                                                      
+-a----       07.07.2021     11:02         357888 regedit.exe                                                                                                                       
+-a----       15.09.2018     09:13          30931 ServerStandard.xml                                                                                                                
+-a----       29.08.2023     10:36         133632 splwow64.exe                                                                                                                      
+-a----       15.09.2018     09:16            219 system.ini                                                                                                                        
+-a----       15.09.2018     09:13          64512 twain_32.dll                                                                                                                      
+-a----       15.09.2018     09:16             92 win.ini                                                                                                                           
+-a----       19.09.2025     11:38            276 WindowsUpdate.log                                                                                                                 
+-a----       15.09.2018     09:13          11776 winhlp32.exe                                                                                                                      
+-a----       15.09.2018     09:12         316640 WMSysPr9.prx                                                                                                                      
+-a----       15.09.2018     09:12          11264 write.exe                                                                                                                         
+
+
