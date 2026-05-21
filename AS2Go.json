@@ -1,0 +1,217 @@
+{
+  "Scripts": [
+    {
+      "Script": [
+        {
+          "Name": "Name",
+          "Value": "AS2Go"
+        },
+        {
+          "Name": "Version",
+          "Value": "2026.05.21.1034"
+        },
+        {
+          "Name": "Author",
+          "Value": "me@mrhozi.com"
+        }
+      ]
+    }
+  ],
+  "DefaultParameter": [
+    {
+      "Setting": [
+        {
+          "Name": "UseCase",
+          "Value": "Ransomware Recovery Workshop"
+        },
+        {
+          "Name": "DemoTitle",
+          "Value": "Attack scenario to GO - along the kill-chain"
+        },
+        {
+          "Name": "mydc",
+          "Value": "root-dc19-01.ws19-root.corp"
+        },
+        {
+          "Name": "myViPC",
+          "Value": "CH01-MS25-01.WS19-CHILD01.WS19-ROOT.CORP",
+          "Default": "[value can be set during the setup or now]"
+        },
+        {
+          "Name": "fqdn",
+          "Value": "WS19-ROOT.CORP"
+        },
+        {
+          "Name": "DomainSID",
+          "Value": "S-1-5-21-3434748730-880471986-746661712"
+        },
+        {
+          "Name": "mySAW",
+          "Value": "CH01-MS22-01"
+        },
+        {
+          "Name": "myAppServer",
+          "Value": "ROOT-DC19-01"
+        },
+        {
+          "Name": "BDUsersOU",
+          "Value": "CN=Users,DC=xxx,DC=xxx",
+          "Default": "CN=Users,DC=xxx,DC=xxx"
+        },
+        {
+          "Name": "MySearchBase",
+          "Value": "[value can be set during the setup or now]",
+          "Default": "[value can be set during the setup or now]"
+        },
+        {
+          "Name": "OfflineDITFile",
+          "Value": "\\\\CH01-DC19-01\\AD-Backup"
+        },
+        {
+          "Name": "globalHelpDesk",
+          "Value": "SG-AS2Go-Helpdesk"
+        },
+        {
+          "Name": "Honeytoken",
+          "Value": "[value can be set during the setup or now]",
+          "Default": "[value can be set during the setup or now]"
+        },
+        {
+          "Name": "pthntml",
+          "Value": "[value can be set during the attack]",
+          "Default": "[value can be set during the attack]"
+        },
+        {
+          "Name": "krbtgtntml",
+          "Value": "[value can be set during the attack]",
+          "Default": "[value can be set during the attack]"
+        },
+        {
+          "Name": "ticketsDir",
+          "Value": "C:\\temp\\tickets"
+        },
+        {
+          "Name": "ticketsPath",
+          "Value": "c$\\temp\\tickets"
+        },
+        {
+          "Name": "time2reboot",
+          "Value": "15"
+        },
+        {
+          "Name": "OpenSSL",
+          "Value": ""
+        },
+        {
+          "Name": "EnterpriseCA",
+          "Value": ""
+        },
+        {
+          "Name": "BadCA",
+          "Value": "Wifi"
+        },
+        {
+          "Name": "SP01",
+          "Value": "xxx"
+        },
+        {
+          "Name": "SP02",
+          "Value": "xxx"
+        },
+        {
+          "Name": "SP03",
+          "Value": "xxx"
+        },
+        {
+          "Name": "SP04",
+          "Value": "xxx"
+        },
+        {
+          "Name": "SP05",
+          "Value": "xxx"
+        },
+        {
+          "Name": "SP06",
+          "Value": "xxx"
+        },
+        {
+          "Name": "SP07",
+          "Value": "[Can be set during the attack]"
+        },
+        {
+          "Name": "Tools",
+          "Value": "C:\\Users\\Public\\AS2Go\\MaliciousTools",
+          "Default": "C:\\Users\\Public\\AS2Go\\MaliciousTools"
+        },
+        {
+          "Name": "LastStart",
+          "Value": "2026-05-06 13:06:37"
+        },
+        {
+          "Name": "LastFinished",
+          "Value": "2026-05-05 22:05:40"
+        },
+        {
+          "Name": "LastDuration",
+          "Value": "42.09:25:34 [h]"
+        },
+        {
+          "Name": "LastVictim",
+          "Value": "adsa"
+        },
+        {
+          "Name": "LastBDUser",
+          "Value": "[value can be set during the attack]"
+        },
+        {
+          "Name": "LastAltUser",
+          "Value": "[value can be set during the attack]"
+        },
+        {
+          "Name": "LastUPNSuffix",
+          "Value": "@WS19-ROOT.CORP"
+        },
+        {
+          "Name": "LastStage",
+          "Value": "Domain Compromised & Persistence"
+        },
+        {
+          "Name": "LastPW",
+          "Value": "!AS2Go-2026-is-Very-cool!"
+        },
+        {
+          "Name": "LastNumofDemoUsers",
+          "Value": "1000"
+        },
+        {
+          "Name": "PreviousBase",
+          "Value": "[value can be set during the attack]"
+        },
+        {
+          "Name": "BreakGlassAccount",
+          "Value": "[value can be set during the attack]"
+        },
+        {
+          "Name": "RandomAccountOperators",
+          "Value": "10"
+        },
+        {
+          "Name": "LastIdentifier",
+          "Value": "168128893223735"
+        },
+        {
+          "Name": "LastGTUser",
+          "Value": "[value can be set during the attack]"
+        },
+        {
+          "Name": "LastPriviledgeEscaltion",
+          "Value": "AS2GoBadCert"
+        },
+        {
+          "Name": "PriviledgeGroupRIDs",
+          "Value": "'512', '517', '518', '519', '520', '525', '526', '527', '548', '549', '550', '551', '2122'"
+        }
+      ]
+    }
+  ]
+}
