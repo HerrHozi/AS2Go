@@ -6,6 +6,12 @@ function New-HoneytokenActivity {
     #################### main code | out- host #####################
     
     $Script:ASHoneyToken = Get-ASConfig -Setting "honeytoken"
+    
+    If ($script:ASHoneyToken -eq $null -or $script:ASHoneyToken -notlike "CN=*") {
+        Write-Log -Message "No honeytoken configured. Skipping honeytoken activity."
+        return
+    }
+    
     $randowmPW = Get-RandomPassword 
 
 

@@ -10,7 +10,7 @@ function Invoke-Output {
     Param(
         [Parameter(Mandatory = $false, Position = 0)]
         [Alias('T')]
-        [ValidateSet("Info", "Input", "Success", "Warning", "Error", "CodeSnippet", "TextMaker", "Header", "Bullet", "Quit", "H1" )]
+        [ValidateSet("Info", "Input", "Success", "Warning", "Error", "CodeSnippet", "Command", "TextMaker", "Header", "Bullet", "Quit", "H1" )]
         [string] $Type = "Info",
         [Parameter(Mandatory = $false, Position = 1)]
         [Alias('M')]
@@ -18,7 +18,8 @@ function Invoke-Output {
         [Parameter(Mandatory = $false, Position = 2)]
         [Alias('TM')]
         [string] $TextMaker = "",
-        [switch] $NoExtraLines
+        [switch] $NoExtraLines,
+        [switch] $NoNewLine
     )
 
     $CurrentFunction = Get-FunctionName
@@ -41,6 +42,16 @@ function Invoke-Output {
         }
         "CodeSnippet" { 
             Write-Host "`n  [>] $Message`n"           -ForegroundColor $Script:FGCCommand 
+            $level = "INFO"
+        }
+        "Command" {
+            If ($NoNewLine) {
+                Write-Host "`n  [>] $Message"           -ForegroundColor $Script:FGCCommand -NoNewline
+            }
+            else {
+                Write-Host "`n  [>] $Message`n`n"           -ForegroundColor $Script:FGCCommand 
+            }
+
             $level = "INFO"
         }
         "Warning" { 

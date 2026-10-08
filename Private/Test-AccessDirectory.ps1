@@ -13,6 +13,8 @@ function Test-AccessDirectory {
 
     [bool]$passed = $false
 
+    
+
     Invoke-output -Type Codesnippet -Message "Command to access directory '$directory':"
 
     Write-Highlight -Text "Get-ChildItem ", "$directory ", "-filter ", "*.*" `

@@ -1,0 +1,453 @@
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:26 AM                .vscode
+l----          2026-05-06  8:26 AM                CleanUp
+l----          2026-05-06  8:42 AM                Core-Functions
+l----          2026-05-06 10:05 AM                Exfiltration
+l----          2026-05-06  8:26 AM                LabSetup
+l----          2026-05-06  8:26 AM                Microsoft
+l----          2026-05-06  8:26 AM                Phases
+l----          2026-05-06  8:42 AM                Private
+l----          2026-05-06 11:18 AM                Public
+l----          2026-05-06 12:03 PM                Tools
+la---          2026-05-06 11:43 AM           5918 _ChangeLog.md
+la---          2024-10-08  4:50 PM            528 AS2Go.code-workspace
+la---          2026-05-06  1:03 PM           4995 AS2Go.json
+la---          2026-03-19  7:08 AM            512 AS2Go.piskel
+la---          2026-05-06  8:22 AM           1526 AS2Go.psd1
+la---          2026-05-06 12:06 PM          27476 AS2Go.psm1
+la---          2026-02-03  1:42 PM            822 launch.json
+la---          2026-05-06 12:05 PM           5894 README.md
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\.vscode
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-03  1:44 PM            470 launch.json
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\CleanUp
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-05 10:24 AM            128 my-passwords.txt
+la---          2026-05-04 12:35 PM           1773 RW-20260504_123446.txt
+la---          2026-05-04 12:39 PM           1847 RW-20260504_123921.txt
+la---          2026-05-04 12:41 PM           1921 RW-20260504_124142.txt
+la---          2026-05-04 12:42 PM           1995 RW-20260504_124253.txt
+la---          2026-05-04  1:20 PM           2069 RW-20260504_132031.txt
+la---          2026-05-04  1:21 PM           2143 RW-20260504_132148.txt
+la---          2026-05-04  1:28 PM           2217 RW-20260504_132814.txt
+la---          2026-05-04  1:33 PM           2291 RW-20260504_133313.txt
+la---          2026-05-04  1:54 PM           1336 RW-20260504_135445.txt
+la---          2026-05-04  2:06 PM           1410 RW-20260504_140617.txt
+la---          2026-05-04  2:19 PM           1484 RW-20260504_141954.txt
+la---          2026-05-04  2:20 PM           1558 RW-20260504_142041.txt
+la---          2026-05-04  2:53 PM           1632 RW-20260504_145326.txt
+la---          2026-05-04  3:27 PM           1646 RW-20260504_152753.txt
+la---          2026-05-04 10:53 PM           1717 RW-20260504_225022.txt
+la---          2026-05-04 11:17 PM           1789 RW-20260504_231720.txt
+la---          2026-05-04 11:19 PM           1863 RW-20260504_231927.txt
+la---          2026-05-04 11:33 PM           1937 RW-20260504_233301.txt
+la---          2026-05-04 11:40 PM           2011 RW-20260504_234021.txt
+la---          2026-05-04 11:45 PM           2085 RW-20260504_234520.txt
+la---          2026-05-04 11:51 PM           2159 RW-20260504_235109.txt
+la---          2026-05-04 11:55 PM           2233 RW-20260504_235542.txt
+la---          2026-05-05 12:23 AM           2307 RW-20260505_002317.txt
+la---          2026-05-05 12:24 AM           2381 RW-20260505_002447.txt
+la---          2026-05-05 12:36 AM           2455 RW-20260505_003647.txt
+la---          2026-05-05 12:38 AM           2529 RW-20260505_003831.txt
+la---          2026-05-05 12:44 AM           2603 RW-20260505_004435.txt
+la---          2026-05-05 12:47 AM           2677 RW-20260505_004740.txt
+la---          2026-05-05 12:54 AM           2751 RW-20260505_005418.txt
+la---          2026-05-05  1:13 AM           2825 RW-20260505_011335.txt
+la---          2026-05-05  1:18 AM           2899 RW-20260505_011824.txt
+la---          2026-05-05  1:20 AM           2973 RW-20260505_012033.txt
+la---          2026-05-05  1:23 AM           3047 RW-20260505_012324.txt
+la---          2026-05-05  9:19 AM           3121 RW-20260505_091930.txt
+la---          2026-05-05  9:53 PM            679 RW-20260505_215346.txt
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Core-Functions
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-06  3:54 PM           1058 Test-AccessDirectory.ps1
+la---          2026-02-06  3:54 PM           6230 Add-GPOMemberToBuiltinGroups.ps1
+la---          2026-02-06  3:54 PM           3595 Add-GPOScheduleTask.ps1
+la---          2026-02-06  3:54 PM           6927 Add-GPOUserRightAssignments.ps1
+la---          2026-02-06  3:54 PM           2449 Add-GroupElementToFileGroupsXml.ps1
+la---          2026-02-06  3:54 PM           3718 Add-TaskElementToFileScheduleTaskXml.ps1
+la---          2026-02-06  3:54 PM           1653 Add-TrusteeToFileGroupsXml.ps1
+la---          2026-02-06  3:54 PM           3427 Disable-AS2GoUser.ps1
+la---          2026-02-06  3:54 PM           2903 Get-EnrollmentService.ps1
+la---          2026-02-18 10:31 AM           1796 Get-EnterpriseCAName.ps1
+la---          2025-03-08  2:36 PM            636 Get-Files.ps1
+la---          2026-02-06  3:54 PM           3752 Get-GPOLinkedOnDomain.ps1
+la---          2026-02-06  3:54 PM           1648 Get-GPOSettings.ps1
+la---          2026-02-06  3:54 PM           2150 Get-VulnerableCertificateTemplate_old.ps1
+la---          2026-02-06  3:54 PM           1039 MyTemplate.ps1
+la---          2026-02-06  3:54 PM           2497 New-CredentialTheftThroughMemoryAccess.ps1
+la---          2026-02-06  3:54 PM           8639 New-GoldenTicket.ps1
+la---          2026-02-06  3:54 PM           2563 New-GpCExtention.ps1
+la---          2026-02-06  3:54 PM           3250 New-GPOManipulation.ps1
+la---          2026-02-06  3:54 PM           1513 New-KeyValue.ps1
+la---          2026-02-06  3:54 PM           4018 Invoke-PrivilegesEscalationViaLocalSystem.ps1
+la---          2026-02-06  3:54 PM           3246 Reset-AS2GoPassword.ps1
+la---          2026-02-06  3:54 PM           3016 Set-gPCmachineExtensionNames.ps1
+la---          2025-03-08  2:18 PM            298 Set-ProgressBar.ps1
+la---          2026-02-06  3:54 PM           1266 Set-StandCommandColors.ps1
+la---          2026-02-06  3:54 PM           2122 Set-UseLogonCredential.ps1
+la---          2026-02-06  3:54 PM           3406 Start-ConvertingToPfxFromPem.ps1
+la---          2026-02-06  3:54 PM           6725 Invoke-PtHAttack.ps1
+la---          2026-02-06  3:54 PM           7652 Invoke-PassTheTicketAttack.ps1
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Exfiltration
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2022-12-01 12:02 AM           4217 AS2Go-admin.jpg
+la---          2022-12-01 12:02 AM           4582 AS2Go-helpdesk.jpg
+la---          2022-12-01 12:02 AM           4698 AS2Go-victim.jpg
+la---          2022-12-01 12:02 AM          10892 New-AS2GoOUs.ps1
+la---          2025-09-19 11:39 AM          13189 New-AS2GoUsers.ps1
+la---          2026-05-05 12:17 AM          22887 ntds.dit
+la---          2026-05-05 10:06 PM            537 RW-20260505_220601.txt
+la---          2026-05-05 10:07 PM            611 RW-20260505_220724.txt
+la---          2026-05-05 10:25 PM            685 RW-20260505_222502.txt
+la---          2026-05-05 10:25 PM            759 RW-20260505_222558.txt
+la---          2026-05-06 10:05 AM            840 RW-20260506_100531.txt
+la---          2026-05-06 10:05 AM            914 RW-20260506_100537.txt
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:27 AM                ADCSGoat
+l----          2026-05-06  8:27 AM                Encryption
+l----          2026-05-06  8:27 AM                PSCertutil
+l----          2026-05-06  8:27 AM                ShareContent
+l----          2026-05-06  8:27 AM                thumbnailPhotos
+la---          2026-02-11 10:13 PM       13948344 AS2Go-DemoUsers.csv
+la---          2026-02-05 10:24 AM            128 my-passwords.txt
+la---          2026-02-13 12:02 PM          10898 New-AS2GoOUs.ps1
+la---          2026-02-06  5:37 PM          12761 New-AS2GoUsers.ps1
+la---          2026-02-12 10:38 PM          30963 PSCertutil.zip
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\ADCSGoat
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:27 AM                en-US
+l----          2026-05-06  8:26 AM                Private
+l----          2026-05-06  8:27 AM                Public
+la---          2026-02-25  1:30 PM           4355 ADCSGoat.psd1
+la---          2026-02-25  1:30 PM            502 ADCSGoat.psm1
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\ADCSGoat\en-US
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-25  1:30 PM            474 about_Build-LocksmithLab.help.txt
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\ADCSGoat\Private
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:27 AM                Template
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\ADCSGoat\Private\Template
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-25  1:30 PM           1176 ESC1.json
+la---          2026-02-25  1:30 PM           1397 ESC1.ps1
+la---          2026-02-25  1:30 PM           3172 ESC1.xml
+la---          2026-02-25  1:30 PM            867 ESC2.json
+la---          2026-02-25  1:30 PM            993 ESC2.ps1
+la---          2026-02-25  1:30 PM           2373 ESC2.xml
+la---          2026-02-25  1:30 PM           1085 ESC3c1.json
+la---          2026-02-25  1:30 PM           1346 ESC3c1.ps1
+la---          2026-02-25  1:30 PM           2735 ESC3c1.xml
+la---          2026-02-25  1:30 PM           1083 ESC3c2.json
+la---          2026-02-25  1:30 PM           1358 ESC3c2.ps1
+la---          2026-02-25  1:30 PM           2788 ESC3c2.xml
+la---          2026-02-25  1:30 PM           1073 ESC4.json
+la---          2026-02-25  1:30 PM           1354 ESC4.ps1
+la---          2026-02-25  1:30 PM           2724 ESC4.xml
+la---          2026-02-25  1:30 PM           1163 ESC9.json
+la---          2026-02-25  1:30 PM           1390 ESC9.ps1
+la---          2026-02-25  1:30 PM           3048 ESC9.xml
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\ADCSGoat\Public
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-25  1:30 PM           7349 Deploy-AGInfrastructure.ps1
+la---          2026-02-25  1:30 PM            536 Find-AGEnrollmentService.ps1
+la---          2026-02-25 10:24 PM           3780 Install-ADCSGoat.ps1
+la---          2026-02-25  1:30 PM           1534 New-AGBlankTemplateObject.ps1
+la---          2026-02-25  1:30 PM            915 Publish-AGCertficateTemplate.ps1
+la---          2026-02-25  1:30 PM            508 Set-AGEnrollmentServiceFullName.ps1
+la---          2026-02-25  2:07 PM           4302 Set-AGTemplateAce.ps1
+la---          2026-02-25  1:30 PM           2501 Set-AGTemplateProperty.ps1
+la---          2026-02-25  1:30 PM           2442 Uninstall-ADCSGoat.ps1
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\Encryption
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-05-04 11:44 AM           2579 AS2Go.pfx
+la---          2026-05-05 12:36 AM           5586 preview.html
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\PSCertutil
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:27 AM                Research
+la---          2026-02-25  2:40 PM          26554 certutil.crescendo.config.json
+la---          2026-02-25  2:40 PM            660 parseAuditFilter.ps1
+la---          2026-02-25  2:40 PM            431 parseCAAdministrator.ps1
+la---          2026-02-25  2:40 PM            452 parseCertificateManager.ps1
+la---          2026-02-25  2:40 PM            386 parseDisableExtensionList.ps1
+la---          2026-02-25  2:40 PM            560 parseEditFlag.ps1
+la---          2026-02-25  2:40 PM           3480 parseEnrollmentAgent.ps1
+la---          2026-02-25  2:40 PM            645 parseInterfaceFlag.ps1
+la---          2026-02-25  2:40 PM            388 parseModifyFlag.ps1
+la---          2026-02-25  2:40 PM           3474 parseOfficerRight.ps1
+la---          2026-02-25  2:40 PM           4806 PSCertutil.psd1
+la---          2026-02-25  2:40 PM         191881 PSCertutil.psm1
+la---          2026-02-25  2:40 PM           3038 README.md
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\PSCertutil\Research
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-25  2:40 PM            381 Convert-EnrollmentAgentBlobToByteArray.ps1
+la---          2026-02-25  2:40 PM            725 EditFlags.txt
+la---          2026-02-25  2:40 PM           5927 EnrollmentAgentBlobFromCertutil.txt
+la---          2026-02-25  2:40 PM          35642 EnrollmentAgentRights.xml
+la---          2026-02-25  2:40 PM          17820 EnrollmentAgentRightsFromCertUtil.xml
+la---          2026-02-25  2:40 PM           2936 Get-EnrollmentAgentRights.ps1
+la---          2026-02-25  2:40 PM            635 Get-TemplateInfo.ps1
+la---          2026-02-25  2:40 PM            365 InterfaceFlags.txt
+la---          2026-02-25  2:40 PM           8287 UnparsedEnrollmentAgentOutputFromCertutil.xml
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\ShareContent
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-05 10:24 AM            128 my-passwords.txt
+la---          2025-09-19 12:39 PM          93410 ntds.dit
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\LabSetup\thumbnailPhotos
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-24  1:34 PM           2414 AS2Go_BD-User.jpg
+la---          2026-02-05 10:24 AM           4217 AS2Go-admin.jpg
+la---          2026-02-05 10:24 AM           4582 AS2Go-helpdesk.jpg
+la---          2026-02-05 10:24 AM           4698 AS2Go-victim.jpg
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Microsoft
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:26 AM                Windows
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Microsoft\Windows
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:26 AM                PowerShell
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Microsoft\Windows\PowerShell
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+l----          2026-05-06  8:27 AM                PSReadLine
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Microsoft\Windows\PowerShell\PSReadLine
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-03-23  2:15 PM             87 ConsoleHost_history.txt
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Phases
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2023-10-09 12:01 AM           5487 AS2Go_BD-User.jpg
+la---          2023-10-09 12:01 AM            434 phase_000.html
+la---          2025-10-03  8:22 PM            390 phase_004.html
+la---          2023-10-06  5:06 PM            412 phase_005.html
+la---          2023-10-09 12:01 AM            386 phase_006.html
+la---          2023-10-09 12:01 AM            387 phase_007_PtH.html
+la---          2023-10-09 12:01 AM            387 phase_007_PtT.html
+la---          2023-10-06  5:04 PM            404 phase_007.html
+la---          2023-10-09 12:01 AM            424 phase_008.html
+la---          2023-10-09 12:01 AM            386 phase_009.html
+la---          2023-10-09 12:01 AM            393 phase_010.html
+la---          2023-10-09 12:01 AM            393 phase_011.html
+la---          2023-10-09 12:01 AM            390 phase_012.html
+la---          2023-10-09 12:01 AM            405 phase_020.html
+la---          2023-10-09 12:01 AM            403 phase_poi.html
+la---          2023-10-09 12:01 AM         161780 step_000.png
+la---          2023-10-09 12:01 AM         170749 step_001.png
+la---          2023-10-09 12:01 AM         170642 step_002.png
+la---          2023-10-09 12:01 AM         171173 step_003.png
+la---          2023-10-09 12:01 AM         112140 step_004.png
+la---          2023-10-09 12:01 AM         114613 step_005.png
+la---          2023-10-09 12:01 AM         115405 step_006.png
+la---          2023-10-09 12:01 AM         145321 step_007_PtH.png
+la---          2023-10-09 12:01 AM         145388 step_007_PtT.png
+la---          2023-10-09 12:01 AM         115229 step_007.png
+la---          2023-10-09 12:01 AM         115055 step_008.png
+la---          2023-10-09 12:01 AM         115405 step_009.png
+la---          2023-10-09 12:01 AM         113847 step_010.png
+la---          2023-10-09 12:01 AM         112360 step_011.png
+la---          2023-10-09 12:01 AM         115001 step_012.png
+la---          2026-05-05  3:30 PM         245801 step_020.png
+la---          2023-10-09 12:01 AM          52873 step_poi.png
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Private
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-02-26 10:20 AM           1752 _MySandbox.ps1
+la---          2026-03-16  1:24 PM           2146 _MyTemplate.ps1
+la---          2026-02-18 11:44 AM           1748 Add-ADCSForAS2Go.ps1
+la---          2026-02-19  4:04 PM           2599 Add-RandomUsersToAccountOperators.ps1
+la---          2026-02-02  7:25 PM          63302 ChooseADOrganizationalUnit.ps1
+la---          2026-05-06 12:43 PM           1099 Confirm-PoSHModuleAvailabliy.ps1
+la---          2026-02-17 12:32 PM           2418 Convert-FromDNToCN.ps1
+la---          2026-02-06  3:54 PM           3839 Disable-ADOUInheritance.ps1
+la---          2026-02-18 12:57 PM           2337 Get-ADCSCertficateTemplates.ps1
+la---          2026-02-17 11:11 PM           4437 Get-ADCSComponents.ps1
+la---          2026-02-18 12:59 PM           2516 Get-ADCSEnrollmentServices.ps1
+la---          2026-02-18  1:00 PM           5117 Get-ADCSEnterpriseCA.ps1
+la---          2026-02-06  3:54 PM           1962 Get-ADGroupSamAccountNameBasedOnRID.ps1
+la---          2026-02-06  3:54 PM           1483 Get-AdminWithSPN.ps1
+la---          2026-05-05 10:47 PM           1691 Get-ADUserNameBasedOnRID.ps1
+la---          2026-02-06  3:54 PM           1454 Get-Answer.ps1
+la---          2026-05-06 10:20 AM          20598 Get-AS2GoSettings.ps1
+la---          2026-03-16  6:30 PM           1530 Get-BestDomainController.ps1
+la---          2026-02-23 10:41 AM           1446 Get-BreakGlassAccount.ps1
+la---          2026-02-06  3:54 PM           1340 Get-CachedKerberosTicketsClient.ps1
+la---          2026-02-06  3:54 PM           1598 Get-ComputerInformation.ps1
+la---          2026-05-04 11:33 AM           1162 Get-DCLiveMetrics.ps1
+la---          2026-02-20  3:42 PM           1895 Get-DemoAccounts.ps1
+la---          2026-02-06  3:54 PM            936 Get-DirContent.ps1
+la---          2026-02-17 11:52 PM           2414 Get-DomainPWDetails.ps1
+la---          2026-02-14 11:55 PM           2659 Get-DomainType.ps1
+la---          2026-02-06  3:54 PM           1619 Get-FileVersion.ps1
+la---          2026-02-03  2:18 PM            577 Get-FolderPath.ps1
+la---          2026-02-24  2:12 PM           5910 Get-ForestInfo.ps1
+la---          2025-03-08  2:18 PM            120 Get-FunctionName.ps1
+la---          2026-02-23 10:40 AM           1412 Get-Honeytoken.ps1
+la---          2026-05-06 10:40 AM           2873 Get-KerberosTGT.ps1
+la---          2026-02-06  3:54 PM           1196 Get-KeyValue.ps1
+la---          2026-02-06  3:54 PM           1641 Get-LogonServerFQDN.ps1
+la---          2026-02-18 12:05 AM           1962 Get-NumberOfDCs.ps1
+la---          2026-02-06  3:54 PM           1544 Get-OSBuild.ps1
+la---          2026-02-06  3:54 PM           2524 Get-OSVersion.ps1
+la---          2026-02-06  3:54 PM           1146 Get-PriviledgeGroupMember.ps1
+la---          2026-02-25 11:37 AM           1184 Get-RandomPassword.ps1
+la---          2026-02-06  3:54 PM           4076 Get-RiskyEnrolledTemplates.ps1
+la---          2026-02-06  9:56 AM            703 Get-RunTime.ps1
+la---          2026-02-23 10:29 AM           1872 Get-TieringAssets.ps1
+la---          2026-02-25 11:00 AM           3112 Get-UPNSuffix.ps1
+la---          2026-05-06 10:22 AM           5782 Get-VulnerableCertificateTemplate.ps1
+la---          2026-02-18 11:04 AM           2064 Install-ADCSCertificateAuthority.ps1
+la---          2026-02-18 11:05 AM           1709 Install-ADCSEnrollementServices.ps1
+la---          2026-02-25  2:31 PM           3465 Invoke-ADCSSetup.ps1
+la---          2026-02-19 12:02 PM           3129 Invoke-ADOUPathCheck.ps1
+la---          2026-02-19  3:33 PM           1742 Invoke-BackUpShare.ps1
+la---          2026-02-26 10:50 AM           5085 Invoke-DemoAccounts.ps1
+la---          2026-02-18  5:17 PM           3331 Invoke-DNSZoneUpdate.ps1
+la---          2026-05-05 10:26 PM           3855 Invoke-FakeRansomwarePopUp.ps1
+la---          2026-05-05  1:19 AM          10505 Invoke-FileEncryption.ps1
+la---          2026-02-26  9:46 AM           2166 Invoke-ForestOverview.ps1
+la---          2026-02-26 12:47 PM           3589 Invoke-GroupManipulation.ps1
+la---          2026-05-04  2:44 PM           1210 Invoke-LogDirectory.ps1
+la---          2026-02-23 10:53 AM           2327 Invoke-MDITriggers.ps1
+la---          2026-02-23 10:57 AM          13585 Invoke-NewAS2GoAssets.ps1
+la---          2026-02-06  3:54 PM           1122 Invoke-NextStep.ps1
+la---          2026-05-05 10:23 PM           4645 Invoke-Output.ps1
+la---          2026-02-23 10:41 AM           1627 Invoke-VerifyConfiguration.ps1
+la---          2026-05-06  8:53 AM           4255 Invoke-PrivilegeEscalationViaESC1.ps1
+la---          2026-02-26  5:04 PM           7360 New-BackDoorUser.ps1
+la---          2026-02-19  3:16 PM           2271 New-BackUpShare.ps1
+la---          2026-03-16  8:08 PM           8119 New-DemoAccount.ps1
+la---          2026-02-06  3:54 PM           1247 New-HoneytokenActivity.ps1
+la---          2026-02-06  3:54 PM           2462 Invoke-KerberoastingAttack.ps1
+la---          2026-05-04 11:41 AM           8701 New-PasswordSprayAttack.ps1
+la---          2026-05-06 12:54 PM          14315 New-PrivilegeEscalationRecommendation.ps1
+la---          2026-02-06  3:54 PM           1746 New-RandomPassword.ps1
+la---          2026-05-05 10:03 PM           2793 New-RansomwareAttack.ps1
+la---          2026-02-26 10:51 AM           2758 New-TargetBase.ps1
+la---          2026-05-05 10:11 AM           4986 New-UserManipulation.ps1
+la---          2026-05-05  4:40 PM           2885 Restart-VictimMachines.ps1
+la---          2026-05-05  5:54 PM           2156 Search-ADGroupMemberShip.ps1
+la---          2026-02-06  3:54 PM           1298 Search-ProcessForAS2GoUsers.ps1
+la---          2026-02-23  8:35 AM          15176 Select-ADObject.ps1
+la---          2026-03-17 10:50 AM           4630 Set-AttackScope.ps1
+la---          2026-05-05  3:59 PM           5139 Set-BestDomainController.ps1
+la---          2026-02-23  8:25 AM           2597 Set-BreakGlassAccount.ps1
+la---          2026-02-06  3:54 PM           3787 Set-DenyPermission.ps1
+la---          2026-02-23 10:47 AM           2633 Set-HoneyToken.ps1
+la---          2026-02-06  3:54 PM           1280 Set-KeyValue.ps1
+la---          2026-02-06  3:54 PM           1301 Set-NewBackgroundColor.ps1
+la---          2026-02-19  4:36 PM           2811 Set-NewColorSchema.ps1
+la---          2026-02-17 10:48 PM           3426 Set-TextMarker.ps1
+la---          2026-02-25 11:15 AM           2094 Set-UPNSuffix.ps1
+la---          2026-03-17 11:22 AM           2054 Show-DecisionPrompt.ps1
+la---          2026-02-24 12:20 PM           1110 Show-Phases.ps1
+la---          2026-05-05  1:34 AM           8675 Show-PiskelFile.ps1
+la---          2026-05-05  1:37 AM           2206 Show-Syntax.ps1
+la---          2026-02-26 12:46 PM           2670 Start-GroupManipulation.ps1
+la---          2026-02-06  3:54 PM           3238 Start-KerberoastingAttack.ps1
+la---          2026-02-06  3:54 PM            737 Start-NetSess.ps1
+la---          2026-03-23  8:42 PM           6582 Start-PasswordSprayAttack.ps1
+la---          2026-02-24 11:52 AM           2996 Start-Phase10DataAccess.ps1
+la---          2026-02-24 11:51 AM           1942 Start-Phase11DataExfiltration.ps1
+la---          2026-05-05  4:04 PM          13248 Start-Phase12DomainCompromise.ps1
+la---          2026-02-06  3:54 PM           4029 Start-Reconnaissance.ps1
+la---          2026-02-06  3:54 PM           3049 Start-ReconnaissanceExtended.ps1
+la---          2026-05-06 10:41 AM           4587 Request-PfxWithCertify .ps1
+la---          2026-03-23  2:59 PM           3863 Start-UserManipulation_old.ps1
+la---          2026-05-05 11:21 AM          10580 Start-UserManipulation.ps1
+la---          2026-05-05  4:43 PM           1909 Stop-AS2GoDemo.ps1
+la---          2026-03-17 10:37 AM           1333 Test-ADLogon.ps1
+la---          2026-05-05 11:07 AM           5778 Undo-UserManipulation.ps1
+la---          2026-02-24 10:44 AM            707 Update-WindowTitle.ps1
+la---          2026-02-24 10:52 AM           1323 Write-Highlight.ps1
+la---          2026-02-02  6:48 PM           1118 Write-Log.ps1
+la---          2026-05-05  1:36 AM           3761 Write-HighlightedCode.ps1
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Public
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-03-23  1:30 PM          13677 Initialize-2GoLabConfiguration.ps1
+la---          2026-03-23  7:09 PM           4889 Invoke-Phase04BruteForceAttack.ps1
+la---          2026-05-06 11:18 AM           4878 Invoke-Phase06Reconnaissance.ps1
+la---          2026-05-06 11:17 AM           7193 Invoke-Phase07PrivilegeEscalation.ps1
+la---          2026-05-06 11:16 AM           6840 Invoke-Phase09ReconnaissancePriviledged.ps1
+la---          2026-05-06 11:15 AM           3960 Invoke-Phase10AccessSensitiveData.ps1
+la---          2026-05-06 11:14 AM           3643 Invoke-Phase11ExfiltrateSensitiveData.ps1
+la---          2026-05-06 11:14 AM           5256 Invoke-Phase12DomainCompromisePersistence.ps1
+la---          2026-05-06 12:59 PM          26182 Start-AS2GoDemo.ps1
+
+    Directory: C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.05.06.502\Tools
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+la---          2026-05-06 12:03 PM            952 _readme.md
+la---          2026-05-06 10:50 AM        1723153 AS2Go-Tools_v2.7z
+la---          2026-05-06 10:54 AM        1983002 AS2Go-Tools_v2.zip
+la---          2024-09-05  5:08 PM         225280 baretail.exe
+la---          2025-03-08  3:34 PM         716176 PsExec.exe
+la---          2025-03-08  3:34 PM         833472 PsExec64.exe
+

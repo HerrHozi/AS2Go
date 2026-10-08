@@ -246,7 +246,7 @@ function Start-UserManipulation {
         Invoke-Output -Type TextMaker -Message "Successfully manipulated user accounts in the selected scope: $cname | " -TM "Total: $($succeeded.Count)"
     }
 
-    Undo-UserManipulation -TickValue $TickValue -Server $server -SearchBase $SearchBase
+    #Undo-UserManipulation -TickValue $TickValue -Server $server -SearchBase $SearchBase
 
     if ($failed) {
         Invoke-Output -Type Warning -Message "$($failed.Count) user(s) had errors:"

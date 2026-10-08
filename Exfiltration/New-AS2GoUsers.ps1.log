@@ -1,0 +1,327 @@
+sss 
+02.11.2022 10:10:42 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221102]
+
+sAMAccountName Created             userPrincipalName        name        canonicalName                                                       
+-------------- -------             -----------------        ----        -------------                                                       
+VI-20221102    02.11.2022 10:10:35 VI-20221102@HerrHozi.com 20221102-VI WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/20221102-VI
+HD-20221102    02.11.2022 10:10:36 HD-20221102@HerrHozi.com 20221102-HD WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/20221102-HD
+DA-20221102    02.11.2022 10:10:38 DA-20221102@HerrHozi.com 20221102-DA WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/20221102-DA
+
+
+ 
+02.11.2022 10:26:27 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [Lotte1]
+
+sAMAccountName Created             userPrincipalName       name      canonicalName                                                             
+-------------- -------             -----------------       ----      -------------                                                             
+VI-Lotte1      02.11.2022 10:26:20 VI-Lotte1@HerrHozi.com  Lotte1-VI WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/Lotte1-VI        
+HD-Lotte1      02.11.2022 10:26:21 HD-Lotte1@HerrHozi.com  Lotte1-HD WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/Lotte1-HD        
+SVC-Lotte1     02.11.2022 10:26:22 SVC-Lotte1@HerrHozi.com Lotte1SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/Lotte1SVC
+DA-Lotte1      02.11.2022 10:26:23 DA-Lotte1@HerrHozi.com  Lotte1-DA WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/Lotte1-DA        
+
+
+ 
+02.11.2022 10:38:57 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [Lotte2]
+
+sAMAccountName Created             userPrincipalName       name       canonicalName                                                              
+-------------- -------             -----------------       ----       -------------                                                              
+VI-Lotte2      02.11.2022 10:38:50 VI-Lotte2@HerrHozi.com  Lotte2-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/Lotte2-VI         
+HD-Lotte2      02.11.2022 10:38:51 HD-Lotte2@HerrHozi.com  Lotte2-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/Lotte2-HD         
+SVC-Lotte2     02.11.2022 10:38:52 SVC-Lotte2@HerrHozi.com Lotte2-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/Lotte2-SVC
+DA-Lotte2      02.11.2022 10:38:54 DA-Lotte2@HerrHozi.com  Lotte2-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/Lotte2-DA         
+
+
+ 
+02.11.2022 10:41:18 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [Lotte3]
+
+sAMAccountName Created             userPrincipalName       name       canonicalName                                                              
+-------------- -------             -----------------       ----       -------------                                                              
+VI-Lotte3      02.11.2022 10:41:11 VI-Lotte3@HerrHozi.com  Lotte3-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/Lotte3-VI         
+HD-Lotte3      02.11.2022 10:41:12 HD-Lotte3@HerrHozi.com  Lotte3-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/Lotte3-HD         
+SVC-Lotte3     02.11.2022 10:41:13 SVC-Lotte3@HerrHozi.com Lotte3-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/Lotte3-SVC
+DA-Lotte3      02.11.2022 10:41:14 DA-Lotte3@HerrHozi.com  Lotte3-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/Lotte3-DA         
+
+
+ 
+02.11.2022 10:50:32 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [Lotte4]
+
+sAMAccountName Created             userPrincipalName       name       canonicalName                                                              
+-------------- -------             -----------------       ----       -------------                                                              
+VI-Lotte4      02.11.2022 10:50:25 VI-Lotte4@HerrHozi.com  Lotte4-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/Lotte4-VI         
+HD-Lotte4      02.11.2022 10:50:26 HD-Lotte4@HerrHozi.com  Lotte4-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/Lotte4-HD         
+SVC-Lotte4     02.11.2022 10:50:27 SVC-Lotte4@HerrHozi.com Lotte4-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/Lotte4-SVC
+DA-Lotte4      02.11.2022 10:50:28 DA-Lotte4@HerrHozi.com  Lotte4-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/Lotte4-DA         
+
+
+ 
+02.11.2022 10:53:17 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221102]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                
+-------------- -------             -----------------         ----         -------------                                                                
+VI-20221102    02.11.2022 10:53:09 VI-20221102@HerrHozi.com  20221102-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/20221102-VI         
+HD-20221102    02.11.2022 10:53:11 HD-20221102@HerrHozi.com  20221102-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/20221102-HD         
+SVC-20221102   02.11.2022 10:53:12 SVC-20221102@HerrHozi.com 20221102-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/20221102-SVC
+DA-20221102    02.11.2022 10:53:13 DA-20221102@HerrHozi.com  20221102-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/20221102-DA         
+
+
+ 
+08.11.2022 11:39:21 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [CH01-MyDAdmin] Usecase [cert]
+
+sAMAccountName Created             userPrincipalName     name     canonicalName                                                            
+-------------- -------             -----------------     ----     -------------                                                            
+VI-cert        08.11.2022 11:39:13 VI-cert@HerrHozi.com  cert-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/cert-VI         
+HD-cert        08.11.2022 11:39:14 HD-cert@HerrHozi.com  cert-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/cert-HD         
+SVC-cert       08.11.2022 11:39:15 SVC-cert@HerrHozi.com cert-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/cert-SVC
+DA-cert        08.11.2022 11:39:16 DA-cert@HerrHozi.com  cert-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/cert-DA         
+
+
+ 
+11.11.2022 20:50:59 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221111]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                
+-------------- -------             -----------------         ----         -------------                                                                
+HD-20221111    11.11.2022 20:49:51 HD-20221111@HerrHozi.com  20221111-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/20221111-HD         
+SVC-20221111   11.11.2022 20:49:52 SVC-20221111@HerrHozi.com 20221111-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/20221111-SVC
+DA-20221111    11.11.2022 20:49:53 DA-20221111@HerrHozi.com  20221111-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/20221111-DA         
+
+
+ 
+11.11.2022 20:53:59 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221111]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                
+-------------- -------             -----------------         ----         -------------                                                                
+HD-20221111    11.11.2022 20:49:51 HD-20221111@HerrHozi.com  20221111-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/20221111-HD         
+SVC-20221111   11.11.2022 20:49:52 SVC-20221111@HerrHozi.com 20221111-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/20221111-SVC
+DA-20221111    11.11.2022 20:49:53 DA-20221111@HerrHozi.com  20221111-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/20221111-DA         
+
+
+ 
+11.11.2022 20:54:15 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221111.20541587]
+ 
+11.11.2022 20:54:51 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [HerrHozi]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                
+-------------- -------             -----------------         ----         -------------                                                                
+VI-HerrHozi    11.11.2022 20:54:44 VI-HerrHozi@HerrHozi.com  HerrHozi-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/HerrHozi-VI         
+HD-HerrHozi    11.11.2022 20:54:45 HD-HerrHozi@HerrHozi.com  HerrHozi-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/HerrHozi-HD         
+SVC-HerrHozi   11.11.2022 20:54:46 SVC-HerrHozi@HerrHozi.com HerrHozi-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/HerrHozi-SVC
+DA-HerrHozi    11.11.2022 20:54:47 DA-HerrHozi@HerrHozi.com  HerrHozi-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/HerrHozi-DA         
+
+
+ 
+14.11.2022 13:26:45 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [guido]
+
+sAMAccountName Created             userPrincipalName      name      canonicalName                                      
+-------------- -------             -----------------      ----      -------------                                      
+VI-guido       14.11.2022 13:26:37 VI-guido@HerrHozi.com  guido-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/...
+HD-guido       14.11.2022 13:26:38 HD-guido@HerrHozi.com  guido-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/...
+SVC-guido      14.11.2022 13:26:40 SVC-guido@HerrHozi.com guido-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/...
+DA-guido       14.11.2022 13:26:41 DA-guido@HerrHozi.com  guido-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/...
+
+
+ 
+29.11.2022 11:10:09 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [HerrHoZi122]
+
+sAMAccountName  Created             userPrincipalName            name            canonicalName                                                                   
+--------------  -------             -----------------            ----            -------------                                                                   
+VI-HerrHoZi122  29.11.2022 11:10:01 VI-HerrHoZi122@HerrHozi.com  HerrHoZi122-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/HerrHoZi122-VI         
+HD-HerrHoZi122  29.11.2022 11:10:03 HD-HerrHoZi122@HerrHozi.com  HerrHoZi122-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/HerrHoZi122-HD         
+SVC-HerrHoZi122 29.11.2022 11:10:04 SVC-HerrHoZi122@HerrHozi.com HerrHoZi122-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/HerrHoZi122-SVC
+DA-HerrHoZi122  29.11.2022 11:10:05 DA-HerrHoZi122@HerrHozi.com  HerrHoZi122-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/HerrHoZi122-DA         
+
+
+ 
+29.11.2022 11:10:40 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [HerrHoZi1223]
+
+sAMAccountName   Created             userPrincipalName             name             canonicalName                                                                    
+--------------   -------             -----------------             ----             -------------                                                                    
+HD-HerrHoZi1223  29.11.2022 11:10:35 HD-HerrHoZi1223@HerrHozi.com  HerrHoZi1223-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/HerrHoZi1223-HD         
+SVC-HerrHoZi1223 29.11.2022 11:10:36 SVC-HerrHoZi1223@HerrHozi.com HerrHoZi1223-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/HerrHoZi1223-SVC
+DA-HerrHoZi1223  29.11.2022 11:10:37 DA-HerrHoZi1223@HerrHozi.com  HerrHoZi1223-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/HerrHoZi1223-DA         
+
+
+ 
+29.11.2022 11:13:52 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [HerrHoZi]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                
+-------------- -------             -----------------         ----         -------------                                                                
+VI-HerrHoZi    29.11.2022 11:13:41 VI-HerrHoZi@HerrHozi.com  HerrHoZi-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/HerrHoZi-VI         
+HD-HerrHoZi    29.11.2022 11:13:42 HD-HerrHoZi@HerrHozi.com  HerrHoZi-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/HerrHoZi-HD         
+SVC-HerrHoZi   29.11.2022 11:13:43 SVC-HerrHoZi@HerrHozi.com HerrHoZi-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/HerrHoZi-SVC
+DA-HerrHoZi    29.11.2022 11:13:44 DA-HerrHoZi@HerrHozi.com  HerrHoZi-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/HerrHoZi-DA         
+
+
+ 
+29.11.2022 11:15:17 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [HerrHoZi]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                
+-------------- -------             -----------------         ----         -------------                                                                
+VI-HerrHoZi    29.11.2022 11:15:10 VI-HerrHoZi@HerrHozi.com  HerrHoZi-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/Accounts/HerrHoZi-VI         
+HD-HerrHoZi    29.11.2022 11:15:11 HD-HerrHoZi@HerrHozi.com  HerrHoZi-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/Accounts/HerrHoZi-HD         
+SVC-HerrHoZi   29.11.2022 11:15:13 SVC-HerrHoZi@HerrHozi.com HerrHoZi-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Service Accounts/HerrHoZi-SVC
+DA-HerrHoZi    29.11.2022 11:15:14 DA-HerrHoZi@HerrHozi.com  HerrHoZi-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/Accounts/HerrHoZi-DA         
+
+
+ 
+29.11.2022 18:22:05 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221129]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                
+-------------- -------             -----------------         ----         -------------                                
+VI-20221129    29.11.2022 18:21:56 VI-20221129@HerrHozi.com  20221129-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 A...
+HD-20221129    29.11.2022 18:21:57 HD-20221129@HerrHozi.com  20221129-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 A...
+SVC-20221129   29.11.2022 18:21:58 SVC-20221129@HerrHozi.com 20221129-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 A...
+DA-20221129    29.11.2022 18:21:59 DA-20221129@HerrHozi.com  20221129-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 A...
+
+
+ 
+29.11.2022 18:22:33 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221129]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                   
+-------------- -------             -----------------         ----         -------------                                   
+VI-20221129    29.11.2022 18:21:56 VI-20221129@HerrHozi.com  20221129-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Asse...
+HD-20221129    29.11.2022 18:21:57 HD-20221129@HerrHozi.com  20221129-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Asse...
+SVC-20221129   29.11.2022 18:21:58 SVC-20221129@HerrHozi.com 20221129-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Asse...
+DA-20221129    29.11.2022 18:21:59 DA-20221129@HerrHozi.com  20221129-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Asse...
+
+
+ 
+29.11.2022 18:28:07 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [20221129]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                           
+-------------- -------             -----------------         ----         -------------                           
+VI-20221129    29.11.2022 18:21:56 VI-20221129@HerrHozi.com  20221129-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tie...
+HD-20221129    29.11.2022 18:21:57 HD-20221129@HerrHozi.com  20221129-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tie...
+SVC-20221129   29.11.2022 18:21:58 SVC-20221129@HerrHozi.com 20221129-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tie...
+DA-20221129    29.11.2022 18:21:59 DA-20221129@HerrHozi.com  20221129-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tie...
+
+
+ 
+29.11.2022 18:28:45 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [ddd]
+
+sAMAccountName Created             userPrincipalName    name    canonicalName                                     
+-------------- -------             -----------------    ----    -------------                                     
+VI-ddd         29.11.2022 18:28:38 VI-ddd@HerrHozi.com  ddd-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets...
+HD-ddd         29.11.2022 18:28:39 HD-ddd@HerrHozi.com  ddd-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets...
+SVC-ddd        29.11.2022 18:28:40 SVC-ddd@HerrHozi.com ddd-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets...
+DA-ddd         29.11.2022 18:28:41 DA-ddd@HerrHozi.com  ddd-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets...
+
+
+ 
+29.11.2022 18:29:36 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [aa]
+
+sAMAccountName Created             userPrincipalName   name   canonicalName                                  
+-------------- -------             -----------------   ----   -------------                                  
+VI-aa          29.11.2022 18:29:29 VI-aa@HerrHozi.com  aa-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Ass...
+HD-aa          29.11.2022 18:29:30 HD-aa@HerrHozi.com  aa-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Ass...
+SVC-aa         29.11.2022 18:29:31 SVC-aa@HerrHozi.com aa-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Ass...
+DA-aa          29.11.2022 18:29:33 DA-aa@HerrHozi.com  aa-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Ass...
+
+
+ 
+29.11.2022 18:33:54 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [mrhozi]
+
+sAMAccountName Created             userPrincipalName       name       canonicalName                          
+-------------- -------             -----------------       ----       -------------                          
+VI-mrhozi      29.11.2022 18:33:47 VI-mrhozi@HerrHozi.com  mrhozi-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+HD-mrhozi      29.11.2022 18:33:48 HD-mrhozi@HerrHozi.com  mrhozi-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+SVC-mrhozi     29.11.2022 18:33:49 SVC-mrhozi@HerrHozi.com mrhozi-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+DA-mrhozi      29.11.2022 18:33:50 DA-mrhozi@HerrHozi.com  mrhozi-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+
+
+ 
+29.11.2022 18:37:10 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [mrhozi]
+
+sAMAccountName Created             userPrincipalName       name       canonicalName                          
+-------------- -------             -----------------       ----       -------------                          
+VI-mrhozi      29.11.2022 18:37:03 VI-mrhozi@HerrHozi.com  mrhozi-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+HD-mrhozi      29.11.2022 18:37:04 HD-mrhozi@HerrHozi.com  mrhozi-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+SVC-mrhozi     29.11.2022 18:37:05 SVC-mrhozi@HerrHozi.com mrhozi-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+DA-mrhozi      29.11.2022 18:37:07 DA-mrhozi@HerrHozi.com  mrhozi-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+
+
+ 
+29.11.2022 18:38:41 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-soc01] Usecase [mrhozi]
+
+sAMAccountName Created             userPrincipalName       name       canonicalName                          
+-------------- -------             -----------------       ----       -------------                          
+VI-mrhozi      29.11.2022 18:38:34 VI-mrhozi@HerrHozi.com  mrhozi-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+HD-mrhozi      29.11.2022 18:38:35 HD-mrhozi@HerrHozi.com  mrhozi-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+SVC-mrhozi     29.11.2022 18:38:36 SVC-mrhozi@HerrHozi.com mrhozi-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+DA-mrhozi      29.11.2022 18:38:37 DA-mrhozi@HerrHozi.com  mrhozi-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Ti...
+
+
+ 
+18.09.2025 16:07:51 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-mydadmin] Usecase [20250918]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                   
+-------------- -------             -----------------         ----         -------------                                                                   
+VI-20250918    18.09.2025 12:51:19 VI-20250918@HerrHozi.com  20250918-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/T2 Accounts/20250918-VI         
+DA-20250918    18.09.2025 12:51:35 DA-20250918@HerrHozi.com  20250918-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Accounts/20250918-DA         
+SVC-20250918   18.09.2025 12:51:29 SVC-20250918@HerrHozi.com 20250918-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Service Accounts/20250918-SVC
+HD-20250918    18.09.2025 12:51:25 HD-20250918@HerrHozi.com  20250918-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/T1 Accounts/20250918-HD         
+
+
+ 
+18.09.2025 16:15:40 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-mydadmin] Usecase [20250918]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                   
+-------------- -------             -----------------         ----         -------------                                                                   
+VI-20250918    18.09.2025 12:51:19 VI-20250918@HerrHozi.com  20250918-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/T2 Accounts/20250918-VI         
+DA-20250918    18.09.2025 16:15:37 DA-20250918@HerrHozi.com  20250918-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Accounts/20250918-DA         
+SVC-20250918   18.09.2025 12:51:29 SVC-20250918@HerrHozi.com 20250918-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Service Accounts/20250918-SVC
+HD-20250918    18.09.2025 16:15:34 HD-20250918@HerrHozi.com  20250918-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/T1 Accounts/20250918-HD         
+
+
+ 
+18.09.2025 16:21:58 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-mydadmin] Usecase [20250918]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                   
+-------------- -------             -----------------         ----         -------------                                                                   
+VI-20250918    18.09.2025 16:21:51 VI-20250918@HerrHozi.com  20250918-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/T2 Accounts/20250918-VI         
+DA-20250918    18.09.2025 16:21:54 DA-20250918@HerrHozi.com  20250918-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Accounts/20250918-DA         
+SVC-20250918   18.09.2025 16:21:53 SVC-20250918@HerrHozi.com 20250918-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Service Accounts/20250918-SVC
+HD-20250918    18.09.2025 16:21:52 HD-20250918@HerrHozi.com  20250918-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/T1 Accounts/20250918-HD         
+
+
+ 
+18.09.2025 16:28:01 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-mydadmin] Usecase [20250918]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                   
+-------------- -------             -----------------         ----         -------------                                                                   
+VI-20250918    18.09.2025 16:27:54 VI-20250918@HerrHozi.com  20250918-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/T2 Accounts/20250918-VI         
+DA-20250918    18.09.2025 16:27:57 DA-20250918@HerrHozi.com  20250918-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Accounts/20250918-DA         
+SVC-20250918   18.09.2025 16:21:53 SVC-20250918@HerrHozi.com 20250918-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Service Accounts/20250918-SVC
+HD-20250918    18.09.2025 16:27:55 HD-20250918@HerrHozi.com  20250918-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/T1 Accounts/20250918-HD         
+
+
+ 
+19.09.2025 11:39:54 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-mydadmin] Usecase [20250919]
+
+sAMAccountName Created             userPrincipalName         name         canonicalName                                                                   
+-------------- -------             -----------------         ----         -------------                                                                   
+VI-20250919    19.09.2025 11:39:46 VI-20250919@HerrHozi.com  20250919-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/T2 Accounts/20250919-VI         
+DA-20250919    19.09.2025 11:39:50 DA-20250919@HerrHozi.com  20250919-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Accounts/20250919-DA         
+SVC-20250919   19.09.2025 11:39:49 SVC-20250919@HerrHozi.com 20250919-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Service Accounts/20250919-SVC
+HD-20250919    19.09.2025 11:39:48 HD-20250919@HerrHozi.com  20250919-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/T1 Accounts/20250919-HD         
+
+
+ 
+2025-10-29 09:43:37 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-mydadmin] Usecase [20251029.08432907]
+
+sAMAccountName       Created             userPrincipalName                 name                 canonicalName                                                                   
+--------------       -------             -----------------                 ----                 -------------                                                                   
+VI-20251029.08432907 2025-10-29 09:43:29 VI-20251029.08432907@HerrHozi.com 20251029.08432907-VI WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/T2 Accounts/20251029.08432907-VI
+DA-20251029.08432907 2025-10-29 09:43:33 DA-20251029.08432907@HerrHozi.com 20251029.08432907-DA WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Accounts/20251029.08432907-DA
+HD-20251029.08432907 2025-10-29 09:43:30 HD-20251029.08432907@HerrHozi.com 20251029.08432907-HD WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/T1 Accounts/20251029.08432907-HD
+
+
+ 
+2025-10-29 09:45:36 last run: C:\temp\As2Go\New-AS2GoUsers.ps1 on server [CH01-DC19-01] by user [ch01-mydadmin] Usecase [lotte]
+
+sAMAccountName Created             userPrincipalName      name      canonicalName                                                                
+-------------- -------             -----------------      ----      -------------                                                                
+VI-lotte       2025-10-29 09:45:27 VI-lotte@HerrHozi.com  lotte-VI  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 2 Assets/T2 Accounts/lotte-VI         
+DA-lotte       2025-10-29 09:45:31 DA-lotte@HerrHozi.com  lotte-DA  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Accounts/lotte-DA         
+SVC-lotte      2025-10-29 09:45:30 SVC-lotte@HerrHozi.com lotte-SVC WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 0 Assets/T0 Service Accounts/lotte-SVC
+HD-lotte       2025-10-29 09:45:29 HD-lotte@HerrHozi.com  lotte-HD  WS19-CHILD01.WS19-ROOT.CORP/AS2Go/Tier 1 Assets/T1 Accounts/lotte-HD         
+
+

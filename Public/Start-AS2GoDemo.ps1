@@ -78,7 +78,7 @@ Runs unattended and skips selected phases.
 Use Get-Help Start-AS2GoDemo -Full to view this help content.
 #>
 
-Function Start-2GoDemo {
+Function Start-AS2GoDemo {
     Param (  
         [switch]$UnAttended,
         [switch]$Continue,

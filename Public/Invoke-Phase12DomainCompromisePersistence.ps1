@@ -61,14 +61,14 @@ Runs Phase 12 with developer defaults (logging on, images skipped, no clear-host
 Alias: P12, Compromise
 Part of: AS2Go attack phase orchestration
 #>
-function Invoke-Phase12DomainCompromisePersistence {
+function Invoke-ASPhase12DomainCompromisePersistence {
 
     ################################################################################
     #####                                                                      ##### 
     #####    Run the Attack Phase - Domain Compromise & Persistence            #####                               
     #####                                                                      #####
     ################################################################################
-    [Alias("P12", "Compromise")]
+    [Alias("ASP12", "Compromise")]
     Param (  
         [switch]$UnAttended,
         [switch]$Continue,

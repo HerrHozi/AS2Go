@@ -1,0 +1,16 @@
+2026-05-06 10:05:37  | Hi user 'vi-herrhozi', next time I will encrypt the complete Domain Controller.
+
+    Directory: \\CH01-DC19-01\AD-Backup\20260506_100537
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---           12/1/2022 12:02 AM           4217 AS2Go-admin.jpg
+-a---           12/1/2022 12:02 AM           4582 AS2Go-helpdesk.jpg
+-a---           12/1/2022 12:02 AM           4698 AS2Go-victim.jpg
+-a---            5/5/2026 12:17 AM          22887 ntds.dit
+-a---            5/5/2026 10:06 PM            537 RW-20260505_220601.txt
+-a---            5/5/2026 10:07 PM            611 RW-20260505_220724.txt
+-a---            5/5/2026 10:25 PM            685 RW-20260505_222502.txt
+-a---            5/5/2026 10:25 PM            759 RW-20260505_222558.txt
+-a---            5/6/2026 10:05 AM            840 RW-20260506_100531.txt
+

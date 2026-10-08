@@ -5,16 +5,18 @@
 ![PowerShell](https://img.shields.io/badge/PowerShell-7.1%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Maintenance](https://img.shields.io/badge/status-active-brightgreen)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HerrHozi/AS2Go)
+[![Blog](https://img.shields.io/badge/blog-herrhozi.com-blue)](https://herrhozi.com)
 
 ```Text
 Author:          Holger Zimmermann | zimmermannn.holger@live.de
-Current Version: 2026.5.21.1342
-Last Update:     2026-05-21
+Current Version: 2026.10.7.919
+Last Update:     2026-10-07
 ```
 
 AS2Go (**Attack Scenario To Go**) is a PowerShell-based Active Directory attack simulation and training framework designed for demos, workshops, security awareness sessions, and purple team exercises.
 
-The project provides a controlled lab environment that demonstrates how attackers can move through an Active Directory infrastructure by following a realistic cyber kill chain — from initial access to full domain compromise.
+The project provides a controlled lab environment that demonstrates how attackers can move through an Active Directory infrastructure by following a realistic cyber kill chain â€” from initial access to full domain compromise.
 
 AS2Go helps security professionals, consultants, and defenders better understand how common weaknesses in Active Directory can be abused in practice, while providing a safe and repeatable environment for learning and demonstrations.
 

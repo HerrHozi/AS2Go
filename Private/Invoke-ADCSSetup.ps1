@@ -26,7 +26,7 @@ function Invoke-ADCSSetup {
         $Options = @(
             [pscustomobject] @{ Label = "Install AD&CS"; Help = "Install one Certification Authority & Web Enrollment services."; Value = "ADCS" },
             [pscustomobject] @{ Label = "Add (and publish) Certificate &Templates"; Help = "Create and publish vulnerable certificate templates, e.g. ESC1"; Value = "Templates" },
-            [pscustomobject] @{ Label = "&Skip"; Help = "Skip configuring ADCS for AS2GO."; Value = "S" }
+            [pscustomobject] @{ Label = "&Skip"; Help = "Skip configuring ADCS for AS2GO."; Value = $Script:Skip }
         )
 
         $title = "AS2Go - Configure ADCS for AS2GO"
@@ -38,7 +38,33 @@ function Invoke-ADCSSetup {
             Invoke-Output -Type Success "ADCS setup completed successfully."
         }
         elseif ($answer -eq 'Templates') {
+            
             $TargetServer = $Script:BestDCs[(Get-ADForest).RootDomain]
+
+
+            $Title = "Certificate Templates - Define Prefix for misconfigured Templates"
+
+            $Options = @(
+                [pscustomobject] @{ Label = "&Use default prefix ($CTPreFix)"; Help = "Use the default prefix for certificate templates." ; Value = "Previous" },
+                [pscustomobject] @{ Label = "&Define new prefix"; Help = "Define a dedicated prefix for certificate templates."; Value = "New" }
+            )
+            $Decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $Title
+
+            If ($Decision -eq "New") {
+                do {
+                    $result = Read-Host "Enter new template prefix"
+                    if ([string]::IsNullOrWhiteSpace($result)) {
+                        Invoke-Output -Type Warning -Message "Input is required. Empty, whitespace-only or null values are not allowed."
+                    }
+                } until (-not [string]::IsNullOrWhiteSpace($result))
+
+                $CTPreFix = $result.Trim()
+                Invoke-Output -Type TextMaker -Message "New template prefix:" -Tm $CTPreFix
+            }
+            else {
+                Invoke-Output -Type Info -message "Keep default prefix ($CTPreFix) for Certificate Templates!"
+            } 
+
 
             Get-ADCSCertifcateTemplates -CTPrefix $CTPreFix -Server $TargetServer
             

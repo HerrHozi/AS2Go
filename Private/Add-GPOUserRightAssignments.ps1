@@ -21,6 +21,8 @@ function Add-GPOUserRightAssignments {
 
     If (-not $SkipClearHost) { Clear-Host }
 
+
+
     Invoke-output -Type Header -Message "Add or Update User Rights Assignment"
     Invoke-Output -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
 

@@ -14,13 +14,14 @@ function Invoke-MDITriggers {
 
     $Options = @(
         [pscustomobject] @{ Label = "DNS &Zone"; Help = "Update the DNS setting 'Zone Transfer' to 'TransferAnyServer'. Required only when Microsoft Defender for Identity is installed."; Value = "DNSZone" },
-        [pscustomobject] @{ Label = "&Select HoneyToken"; Help = "Select a honeytoken account that will be monitored by Microsoft Defender for Identity."; Value = "HoneyToken" },     
-        [pscustomobject] @{ Label = "&Quit"; Help = "Exit the AS2Go Active Directory setup."; Value = "Quit" }
+        [pscustomobject] @{ Label = "Select &HoneyToken"; Help = "Select a honeytoken account that will be monitored by Microsoft Defender for Identity."; Value = "HoneyToken" },     
+        [pscustomobject] @{ Label = "&Skip"; Help = "Skip the MDI specific detections."; Value = $Script:Skip }
     )
 
     $repeat = $Script:Yes
     do {
 
+ 
         $decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
         Clear-Host
         
@@ -37,8 +38,8 @@ function Invoke-MDITriggers {
             "HoneyToken" {
                 Set-HoneyToken
             }
-            "Quit" {
-                Write-Log -Message "Skipped AS2Go Lab Setup!"
+            $Script:Skip {
+                Write-Log -Message "Skipped MDI specific detections!"
                 $repeat = $Script:No
             }
 
@@ -52,5 +53,5 @@ function Invoke-MDITriggers {
     Write-Log -Message "    Run Time: $runtime [h] ###"
     Write-Log -Message "### End Function $CurrentFunction ###"
 
-    return $true
+    #return $true
 }

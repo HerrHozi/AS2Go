@@ -12,7 +12,7 @@ Function Set-NewColorSchema {
     $Script:FGCIInfo = [System.ConsoleColor]::Magenta    # Additional info / side details
     $Script:FGCMInfo = [System.ConsoleColor]::Yellow       # Main info (instead of Yellow → modern, easy to read)
     $Script:FGCSInfo = [System.ConsoleColor]::DarkGray   # Secondary info / less important
-    $Script:FGCCommand = [System.ConsoleColor]::White      # Commands / executions
+    $Script:FGCCommand = [System.ConsoleColor]::DarkCyan #s / executions
     $Script:FGCQuestion = [System.ConsoleColor]::Cyan
     $Script:FGCDecisionPrompt = [System.ConsoleColor]::Cyan     # Questions / user input
     $Script:FGCHighLight = [System.ConsoleColor]::Magenta      # Clear highlight text

@@ -51,7 +51,7 @@ Runs Phase 10 without phase visuals and without clearing the host.
 .NOTES
 Part of: AS2Go attack phase orchestration
 #>
-function Invoke-Phase10AccessSensitiveData {
+function Invoke-ASPhase10AccessSensitiveData {
 
     ################################################################################
     #####                                                                      ##### 

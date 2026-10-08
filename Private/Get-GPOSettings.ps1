@@ -13,10 +13,10 @@ function Get-GPOSettings {
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host ####################
 
-    if (Get-Module -ListAvailable -Name GroupPolicy) {
+    if (-not (Get-Module -ListAvailable -Name GroupPolicy)) {
         Write-Log -Message "    >> GPO Name     $name"
 
-        $htmlfile = ".\GP-$ID-$postfix.html"
+        $htmlfile = Join-Path -Path $Script:AS2GoTempDir -ChildPath "GP-$ID-$postfix.html"
         $gporeport = Get-GPOReport -Guid $id -ReportType Html
         Set-Content -Value $gporeport -Path $htmlfile
         Invoke-Item $htmlfile 
@@ -26,15 +26,14 @@ function Get-GPOSettings {
         Write-Host " settings to file $htmlfile."
 
         Write-Log -Message "    >> GPO Settings $htmlfile "
+        
         #endregion ####################### main code #########################
-
         $runtime = Get-RunTime -StartRunTime $StartRunTime
         Write-Log -Message "    Run Time: $runtime [h] ###"
         Write-Log -Message "### End Function $CurrentFunction ###"
     }
     else {
-
-        invoke-output -type Warning -Message "To display the Group Policy Settings the GroupPolicy module is required!"
+        invoke-output -type Warning -Message "To display the updated Group Policy Settings the GroupPolicy module is required!"
     }
     # return $true
 }
