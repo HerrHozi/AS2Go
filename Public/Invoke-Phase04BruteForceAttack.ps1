@@ -36,7 +36,7 @@
 
 #>
 
-function Invoke-Phase04BruteForceAttack {
+function Invoke-ASPhase04BruteForceAttack {
 
     ################################################################################
     #####                                                                      ##### 
@@ -44,7 +44,7 @@ function Invoke-Phase04BruteForceAttack {
     #####                                                                      #####
     ################################################################################
     
-    [Alias("P04", "PwSpray")]
+    [Alias("ASP04", "PwSpray")]
     Param (  
         [switch]$UnAttended,
         [switch]$Continue,

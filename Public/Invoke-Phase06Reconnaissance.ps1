@@ -51,7 +51,7 @@ Runs Phase 06 in demo mode without phase visuals and without clearing the host.
 .NOTES
 Part of: AS2Go attack phase orchestration
 #>
-function Invoke-Phase06Reconnaissance {
+function Invoke-ASPhase06Reconnaissance {
 
     ################################################################################
     #####                                                                      ##### 
@@ -79,6 +79,8 @@ function Invoke-Phase06Reconnaissance {
     }
 
     If (-not $SkipClearHost) { Clear-Host }
+
+    
 
     Update-WindowTitle -NewTitle $Script:Phase06
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06

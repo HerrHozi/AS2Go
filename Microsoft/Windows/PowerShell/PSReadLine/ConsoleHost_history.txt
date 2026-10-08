@@ -1,0 +1,6 @@
+whoami
+whoami 7groups
+whoami /groups
+Import-Module .\as2go
+whoami /groups
+whoami

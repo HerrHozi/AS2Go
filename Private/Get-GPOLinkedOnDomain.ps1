@@ -13,6 +13,11 @@ function Get-GPOLinkedOnDomain {
 
 
     $dn = Select-ADObject -DomainSelectionOnly -Title "Select Domain for GPO Manipulation"
+    
+if ([string]::IsNullOrEmpty($dn)) {
+return
+}
+    
     $server = Get-BestDomainController -domain $dn
     $cn = Convert-FromDNToCN -DistinguishedName $dn
 
@@ -60,7 +65,7 @@ function Get-GPOLinkedOnDomain {
 
     $LinkedGPOs | Sort-Object Number | Select-Object Number, Displayname, ID, GPOStatus, Description, Owner, ModificationTime | Format-Table | Out-Host
 
-    Invoke-Output -Type Success -Message "Identified $i GPOs directly linked to Domain"
+    Invoke-Output -Type Success -Message "Identified $i Group Policy Objects directly linked at the domain level."
 
     $i -= 1
 

@@ -9,7 +9,10 @@ function Update-WindowTitle {
     Write-Log -Message "### Start Function $CurrentFunction ###"
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host #####################
- 
+
+
+
+
     $host.ui.RawUI.WindowTitle = $NewTitle
     Write-Log -Message "    >> Changed window title to $NewTitle"
 

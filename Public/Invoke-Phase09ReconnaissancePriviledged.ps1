@@ -49,7 +49,7 @@ Runs Phase 09 without phase visuals and without clearing the host.
 .NOTES
 Part of: AS2Go attack phase orchestration
 #>
-function Invoke-Phase09ReconnaissancePriviledged {
+function Invoke-ASPhase09ReconnaissancePriviledged {
 
     ################################################################################
     #####                                                                      ##### 

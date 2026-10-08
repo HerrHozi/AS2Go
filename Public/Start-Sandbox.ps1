@@ -20,11 +20,6 @@ $text =  "  REPEAT ? PSExec Command  "
 $chars = [int](($total - $text.Length) / 2)
 $separator = ':' * $chars
 
-
-
-    
-
-
 #$answer = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
 $title = "$separator $text $separator"
 $answer = Show-DecisionPrompt -Default 1 -Title $title

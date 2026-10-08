@@ -33,7 +33,8 @@ function Stop-AS2GoDemo {
     Write-Log -Message "Total Time: $duration"
 
     # clean-up AS2Go Folder
-Clear-ExfiltrationFolder
+    Clear-ExfiltrationFolder
+    
     if (Test-Path $Script:ASModuleLog) {
         #Invoke-Item $Script:ASModuleLog
     }

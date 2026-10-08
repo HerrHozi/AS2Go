@@ -5,9 +5,9 @@
 #
 
 @{
-    PrivateData          = @{
+    PrivateData       = @{
         PSData = @{
-            LastUpdate = '2026-05-21'
+            LastUpdate = '2026-10-07'
             Tags         = @('ActiveDirectory', 'ADCS', 'Killchain', 'RedTeam', 'Offense', 'AttackSimulation', 'AdversaryEmulation', 'PurpleTeam', 'BlueTeam', 'DefensiveSecurity')
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
@@ -30,20 +30,20 @@ v2026.5.7.1034
  
     
 
-    RootModule           = 'AS2Go.psm1'
-    ModuleVersion = '2026.5.21.1342'
-    GUID                 = '74b1e089-b087-4e17-8ce5-311823d72bf5'
+    RootModule        = 'AS2Go.psm1'
+    ModuleVersion = '2026.10.7.919'
+    GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
-    Author               = 'Holger Zimmermann | zimmermann.holger@live.de'
-    CompanyName          = 'Community'
-    Copyright            = 'License: MIT | Copyright (c) 2026 Holger Zimmermann'
+    Author            = 'Holger Zimmermann | zimmermann.holger@live.de'
+    CompanyName       = 'Community'
+    Copyright         = 'License: MIT | Copyright (c) 2026 Holger Zimmermann'
 
-    Description          = 'AS2Go is an acronym for Attack Scenario To Go.'
+    Description       = 'AS2Go is an acronym for Attack Scenario To Go.'
 
-    PowerShellVersion    = '7.1'
-    VariablesToExport    = '*'
-    HelpInfoURI          = 'https://herrhozi.com/'
-
-    DefaultCommandPrefix = 'AS'
+    PowerShellVersion = '7.1'
+    FunctionsToExport = '*'
+    AliasesToExport   = '*'
+    VariablesToExport = '*'
+    HelpInfoURI       = 'https://herrhozi.com/'
 }
 

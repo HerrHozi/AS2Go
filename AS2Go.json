@@ -8,7 +8,7 @@
         },
         {
           "Name": "Version",
-          "Value": "2026.05.21.1034"
+          "Value": "2026.05.07.1034"
         },
         {
           "Name": "Author",
@@ -30,20 +30,19 @@
         },
         {
           "Name": "mydc",
-          "Value": "root-dc19-01.ws19-root.corp"
+          "Value": "CH01-DC19-01"
         },
         {
           "Name": "myViPC",
-          "Value": "CH01-MS25-01.WS19-CHILD01.WS19-ROOT.CORP",
-          "Default": "[value can be set during the setup or now]"
+          "Value": "CH01-MS22-01"
         },
         {
           "Name": "fqdn",
-          "Value": "WS19-ROOT.CORP"
+          "Value": "WS19-CHILD01.WS19-ROOT.CORP"
         },
         {
           "Name": "DomainSID",
-          "Value": "S-1-5-21-3434748730-880471986-746661712"
+          "Value": "S-1-5-21-18515944-1610616278-1029250612"
         },
         {
           "Name": "mySAW",
@@ -55,13 +54,11 @@
         },
         {
           "Name": "BDUsersOU",
-          "Value": "CN=Users,DC=xxx,DC=xxx",
-          "Default": "CN=Users,DC=xxx,DC=xxx"
+          "Value": "OU=AS2Go,DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
         },
         {
           "Name": "MySearchBase",
-          "Value": "[value can be set during the setup or now]",
-          "Default": "[value can be set during the setup or now]"
+          "Value": "DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
         },
         {
           "Name": "OfflineDITFile",
@@ -73,18 +70,15 @@
         },
         {
           "Name": "Honeytoken",
-          "Value": "[value can be set during the setup or now]",
-          "Default": "[value can be set during the setup or now]"
+          "Value": "CN=fake,OU=T0 Accounts,OU=Tier 0 Assets,OU=AS2Go,DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
         },
         {
           "Name": "pthntml",
-          "Value": "[value can be set during the attack]",
-          "Default": "[value can be set during the attack]"
+          "Value": "[value can be set during the attack]"
         },
         {
           "Name": "krbtgtntml",
-          "Value": "[value can be set during the attack]",
-          "Default": "[value can be set during the attack]"
+          "Value": "[value can be set during the attack]"
         },
         {
           "Name": "ticketsDir",
@@ -96,15 +90,15 @@
         },
         {
           "Name": "time2reboot",
-          "Value": "15"
+          "Value": "33"
         },
         {
           "Name": "OpenSSL",
-          "Value": ""
+          "Value": "c:\\Program Files\\OpenSSL-Win64\\start.bat"
         },
         {
           "Name": "EnterpriseCA",
-          "Value": ""
+          "Value": "ROOT-DC22-01.WS22-ROOT.CORP\\WS22-ROOT-ROOT-DC22-01-CA"
         },
         {
           "Name": "BadCA",
@@ -140,8 +134,7 @@
         },
         {
           "Name": "Tools",
-          "Value": "C:\\Users\\Public\\AS2Go\\MaliciousTools",
-          "Default": "C:\\Users\\Public\\AS2Go\\MaliciousTools"
+          "Value": "C:\\Users\\Public\\AS2Go\\MaliciousTools"
         },
         {
           "Name": "LastStart",
@@ -161,15 +154,15 @@
         },
         {
           "Name": "LastBDUser",
-          "Value": "[value can be set during the attack]"
+          "Value": "CN=BD-20260507.140058,OU=AS2Go,DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
         },
         {
           "Name": "LastAltUser",
-          "Value": "[value can be set during the attack]"
+          "Value": "CN=Administrator,OU=T0 Accounts,OU=Tier 0 Assets,OU=MyTieringModel,DC=WS19-ROOT,DC=CORP"
         },
         {
           "Name": "LastUPNSuffix",
-          "Value": "@WS19-ROOT.CORP"
+          "Value": "@mrhozi.com"
         },
         {
           "Name": "LastStage",
@@ -185,11 +178,11 @@
         },
         {
           "Name": "PreviousBase",
-          "Value": "[value can be set during the attack]"
+          "Value": "OU=Tier 2 Assets,OU=20260213,DC=WS19-ROOT,DC=CORP"
         },
         {
           "Name": "BreakGlassAccount",
-          "Value": "[value can be set during the attack]"
+          "Value": "CN=ROOT-MyT0Admin,OU=T0 Accounts,OU=Tier 0 Assets,OU=MyTieringModel,DC=WS19-ROOT,DC=CORP"
         },
         {
           "Name": "RandomAccountOperators",
@@ -201,7 +194,7 @@
         },
         {
           "Name": "LastGTUser",
-          "Value": "[value can be set during the attack]"
+          "Value": "FU-20230414.182600"
         },
         {
           "Name": "LastPriviledgeEscaltion",

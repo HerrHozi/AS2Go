@@ -43,6 +43,8 @@ function Start-PasswordSprayAttack {
     $cname = Convert-FromDNToCN -DistinguishedName $SearchBase
     Invoke-Output -Type Quit -Message "Press 'Q' at any time to abort Passwort Spray `n      for '$total' users under '$cname'!"
 
+
+
     $startTime = Get-Date
     $expectedUsers = @($users | ForEach-Object { "$domain\$($_.SamAccountName)" })
 

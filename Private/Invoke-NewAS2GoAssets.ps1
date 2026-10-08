@@ -79,11 +79,16 @@ Function Invoke-NewAS2GoAssets {
     $Options = @(
         [pscustomobject] @{ Label = "&Yes"; Help = "Using defaultNamingContext $cname"; Value = $Script:Yes },
         [pscustomobject] @{ Label = "&No"; Help = "Select a specific organizational unit or an entire domain."; Value = $Script:No }
+        [pscustomobject] @{ Label = "&Skip"; Help = "Skip this step."; Value = $Script:Skip }
     )
   
     $title = "The organizational unit '$AS2GoOU' will be created under '$Cname'." 
     $message = "Select 'Yes' to confirm, or 'No' to choose a different organizational unit.`n"
     $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title    
+
+    If ($answer -eq $Script:Skip) {
+        return
+    }
 
     If ($answer -eq $Script:No) {
         $RootOU = Select-ADObject -Title "Choose  parent OU for '$AS2GoOU'" -LocalDomainOnly
@@ -100,7 +105,17 @@ Function Invoke-NewAS2GoAssets {
         #return 
     } 
     Else {
-        New-ADOrganizationalUnit -Name $AS2GoOU  -Path "$RootOU" -Description "AS2Go Assets" -PostalCode "AS2GoDemoAccounts" -ProtectedFromAccidentalDeletion:$false -Server $Server 
+        
+        try {
+            New-ADOrganizationalUnit -Name $AS2GoOU  -Path "$RootOU" -Description "AS2Go Assets" -PostalCode "AS2GoDemoAccounts" -ProtectedFromAccidentalDeletion:$false -Server $Server    
+        }
+        catch {
+            $principal = "$env:USERDOMAIN\$env:USERNAME"
+            Invoke-Output -type Error -Message "$_ | Affecting '$principal' on '$RootOU'"
+            return
+        }
+        
+
         $Cname = Convert-FromDNToCN -DistinguishedName "OU=$AS2GoOU,$RootOU"
         Invoke-Output -T Textmaker -M "Created AS2GO OU:" -Tm $Cname
     

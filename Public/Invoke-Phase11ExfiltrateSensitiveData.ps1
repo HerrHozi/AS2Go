@@ -49,7 +49,7 @@ Runs Phase 11 without phase visuals and without clearing the host.
 .NOTES
 Part of: AS2Go attack phase orchestration
 #>
-function Invoke-Phase11ExfiltrateSensitiveData {
+function Invoke-ASPhase11ExfiltrateSensitiveData {
 
     ################################################################################
     #####                                                                      ##### 

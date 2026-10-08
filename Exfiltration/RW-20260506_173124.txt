@@ -1,0 +1,20 @@
+2026-05-06 17:31:24  | Hi user 'adsa', next time I will encrypt the complete Domain Controller.
+
+    Directory: \\CH01-DC19-01\AD-Backup\20260506_173124
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          2022-12-01 12:02 AM           4217 AS2Go-admin.jpg
+-a---          2022-12-01 12:02 AM           4582 AS2Go-helpdesk.jpg
+-a---          2022-12-01 12:02 AM           4698 AS2Go-victim.jpg
+-a---          2026-02-05 10:24 AM            128 my-passwords.txt
+-a---          2025-10-29  9:45 AM          29080 New-AS2GoUsers.ps1.log
+-a---          2026-05-06  1:03 PM          29270 ntds.dit
+-a---          2026-05-05 10:06 PM            537 RW-20260505_220601.txt
+-a---          2026-05-05 10:07 PM            611 RW-20260505_220724.txt
+-a---          2026-05-05 10:25 PM            685 RW-20260505_222502.txt
+-a---          2026-05-05 10:25 PM            759 RW-20260505_222558.txt
+-a---          2026-05-06 10:05 AM            840 RW-20260506_100531.txt
+-a---          2026-05-06 10:05 AM            914 RW-20260506_100537.txt
+-a---          2026-05-06  5:31 PM           1123 RW-20260506_173120.txt
+

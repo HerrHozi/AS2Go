@@ -11,6 +11,8 @@ function Start-Phase12DomainCompromise {
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host #####################
   
+    $nextAnswer = "B"
+
     Do {
         Invoke-Output -Type Header -Message "Domain Dominance & Persistence - Select a Final Action:"
 
@@ -24,8 +26,10 @@ function Start-Phase12DomainCompromise {
         Write-Host "   R " -ForegroundColor Yellow -NoNewline; Write-Host "- Trigger coordinated reboot across accessible Domain Controllers"
         Write-Host "`n   X " -ForegroundColor Yellow -NoNewline; Write-Host "- Exit AS2Go"
 
+
+
         If ($UnAttended) {
-            $answer = $Script:Yes 
+            $answer = $nextAnswer
         }
         else {
 
@@ -79,7 +83,6 @@ function Start-Phase12DomainCompromise {
                 }
             )
             $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
-
         }
 
         switch ($answer) {
@@ -97,15 +100,16 @@ function Start-Phase12DomainCompromise {
     
                 If ($answer -eq $Script:Yes) {
                     New-BackDoorUser
-                    If ($UnAttended) { Start-Sleep 2 } else { Pause }
+                    #If ($UnAttended) { Start-Sleep 2 } else { Pause }
                 }
-                $NextStep = "T"
+                $nextAnswer = "T"
                 $repeat = $Script:Yes 
             }
             "P" {
                 If (-not $SkipClearHost) { Clear-Host }
                 Invoke-Output -T Header -M "Purge all privileged group memberships"
                 $answer = $Script:Yes
+                
                 If ($UnAttended) {
                     $answer = $Script:Yes 
                 }
@@ -131,11 +135,14 @@ function Start-Phase12DomainCompromise {
                 If ($answer -eq $Script:Yes) {
 
                     $TargetGPO = Get-GPOLinkedOnDomain
-                    New-GPOManipulation -ID $TargetGPO.ID.Guid -name $TargetGPO.DisplayName -domainDNS $TargetGPO.DomainDNS -server $TargetGPO.Server
-
-                    #  If ($UnAttended) { Start-Sleep 2 } else { Pause }
+                    if ([string]::IsNullOrEmpty($TargetGPO)) {
+                        Invoke-Output -Type CodeSnippet -Message "Domain Selection cancled by user"
+                    }
+                    else {
+                        New-GPOManipulation -ID $TargetGPO.ID.Guid -name $TargetGPO.DisplayName -domainDNS $TargetGPO.DomainDNS -server $TargetGPO.Server
+                    }
                 }
-                $NextStep = "U"
+                $nextAnswer = "U"
                 $repeat = $Script:Yes  
             }
             "U" {
@@ -237,25 +244,11 @@ function Start-Phase12DomainCompromise {
             "R" {
                 #Pause
                 If (-not $SkipClearHost) { Clear-Host }
-
                 Invoke-Output -T Header -M "Trigger coordinated reboot across accessible Domain Controllers"
-   
-                If ($UnAttended) {
-                    $answer = $Script:Yes 
-                }
-                else {
-                    $question = "Do you want to run these steps - Y or N? Default "
-                    $answer = Get-Answer -question $question -defaultValue $Script:Yes
-                }
-
-                If ($answer -eq $Script:Yes) {
-                    #run functions
-                    Stop-AS2GoDemo -NextStepReboot $Script:Yes
-                    Restart-VictimMachines
-                }
-                $repeat = $Script:Yes  
+                Restart-VictimMachines
             }
             "X" {
+                Stop-AS2GoDemo -NextStepReboot $Script:No
                 $repeat = $Script:No
             }
 

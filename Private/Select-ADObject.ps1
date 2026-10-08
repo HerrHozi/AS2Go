@@ -80,6 +80,7 @@
         [switch]$IncludeUsers,
         [switch]$IncludeGroups,
         [switch]$IncludeComputers,
+        [switch]$IncludeGPOs,
         [switch]$MarkTier0,
         [Switch]$ShowAdvanced,
         [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)'
@@ -123,7 +124,6 @@
 
         switch ($Kind) {
             'Forest' {
-
                 # Top node (Forest root)
                 $g.FillEllipse($fill, 6, 2, 4, 4)
                 $g.DrawEllipse($stroke, 6, 2, 4, 4)
@@ -189,6 +189,33 @@
                 $g.FillPath($fill, $p)
                 $g.DrawPath($stroke, $p)
             }
+            'GPO' {
+                # Center gear
+                $g.FillEllipse($fill, 6, 6, 4, 4)
+                $g.DrawEllipse($stroke, 6, 6, 4, 4)
+                $g.FillEllipse([System.Drawing.Brushes]::White, 7, 7, 2, 2)
+                $g.DrawEllipse($stroke, 7, 7, 2, 2)
+
+                # Top tooth
+                $p = New-RoundedRectPath 7 1 2 3 1
+                $g.FillPath($fill, $p)
+                $g.DrawPath($stroke, $p)
+
+                # Right tooth
+                $p = New-RoundedRectPath 12 7 3 2 1
+                $g.FillPath($fill, $p)
+                $g.DrawPath($stroke, $p)
+
+                # Bottom tooth
+                $p = New-RoundedRectPath 7 12 2 3 1
+                $g.FillPath($fill, $p)
+                $g.DrawPath($stroke, $p)
+
+                # Left tooth
+                $p = New-RoundedRectPath 1 7 3 2 1
+                $g.FillPath($fill, $p)
+                $g.DrawPath($stroke, $p)
+            }
         }
         $g.Dispose()
         $bmp
@@ -216,9 +243,10 @@
     $imageList.Images.Add("User", (New-IconBitmap User)) | Out-Null
     $imageList.Images.Add("Computer", (New-IconBitmap Computer)) | Out-Null
     $imageList.Images.Add("Group", (New-IconBitmap Group)) | Out-Null
+    $imageList.Images.Add("GPO", (New-IconBitmap GPO)) | Out-Null
 
     if ($MarkTier0) {
-        foreach ($k in @("User", "OU", "Container", "Computer", "Group")) {
+        foreach ($k in @("User", "OU", "Container", "Computer", "Group", "GPO")) {
             $imageList.Images.Add("${k}_T0", (Add-TierOverlay $imageList.Images[$k])) | Out-Null
         }
     }
@@ -255,6 +283,7 @@
             if ($IncludeUsers) { $filters += "(objectCategory=user)" }
             if ($IncludeGroups) { $filters += "(objectCategory=group)" }
             if ($IncludeComputers) { $filters += "(objectCategory=computer)" }
+            if ($IncludeGPOs) { $filters += "(objectCategory=groupPolicyContainer)" }
 
             $orFilter = "(|" + ($filters -join "") + ")"
 
@@ -283,6 +312,7 @@
                     'user' { 'User' }
                     'group' { 'Group' }
                     'computer' { 'Computer' }
+                    'groupPolicyContainer' { 'GPO' }
                     default { 'Container' }
                 }
 

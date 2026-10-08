@@ -5,7 +5,7 @@ function Restart-VictimMachines {
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host #####################
 
-    Invoke-Output -Type Header -Message "TRY to reboot all DCs and Victim machine"
+    #Invoke-Output -Type Header -Message "TRY to reboot all DCs and Victim machine"
 
     $Script:AllDCs | Select-Object Online, Root_Domain, FQDN, RODC, OperatingSystem | ft
 
@@ -19,41 +19,52 @@ function Restart-VictimMachines {
     Write-Host  ""   
 
     If (-not $UnAttended) {
-        pause
+        $answer = show-decisionprompt
+    }
+    else {
+        $answer = $Script:Yes
     }
 
-    $commment = "$UseCase | Your network was hacked. `nAll machines will be rebooted in $Script:ASTime2Reboot seconds!!"
 
-    foreach ($computer in $Script:AllDCs) {
-        $remotemachine = $computer.FQDN
-        $os = $computer.operatingSystem
+    If ($answer -eq $Script:Yes) {
 
-        # check if the computer is online
-        IF (Test-Connection -BufferSize 32 -Count 1 -ComputerName $remotemachine -Quiet) {
+        $commment = "$UseCase | Your network was hacked. `nAll machines will be rebooted in $Script:ASTime2Reboot seconds!!"
 
-            If ($env:COMPUTERNAME -ne $computer.name) {
-                If ($os -like 'Windows 1*') {
-                    # only for Windows 10 machines
-                    Invoke-output -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
-                    net use \\$remotemachine\ipc$
-                    shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
+        foreach ($computer in $Script:AllDCs) {
+            $remotemachine = $computer.FQDN
+            $os = $computer.operatingSystem
+
+            # check if the computer is online
+            IF (Test-Connection -BufferSize 32 -Count 1 -ComputerName $remotemachine -Quiet) {
+
+                If ($env:COMPUTERNAME -ne $computer.name) {
+                    If ($os -like 'Windows 1*') {
+                        # only for Windows 10 machines
+                        Invoke-output -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
+                        net use \\$remotemachine\ipc$
+                        shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
+                    }
+                    elseif ($os -like 'Windows 7*') {
+                        Invoke-output -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
+                        shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
+                    }
+                    else {
+                        Invoke-output -Type Bullet -Message "Try to reboot Windows Server - $remotemachine"
+                        shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
+                    }
                 }
-                elseif ($os -like 'Windows 7*') {
-                    Invoke-output -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
-                    shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
-                }
-                else {
-                    Invoke-output -Type Bullet -Message "Try to reboot Windows Server - $remotemachine"
-                    Write-Host "Try to reboot Windows Server - $remotemachine"
-                    shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
-                }
-            }
-        } #end if Test-Connection
-        Else {
-            Invoke-Output -Type Warn -Message "Remote machine $remotemachine is down!"
+            } #end if Test-Connection
+            Else {
+                Invoke-Output -Type Warning -Message "Remote machine $remotemachine is down!"
+            } 
+
         } 
+    }
 
-    } 
+Set-
+
+
+
 
     # last, but not least
     #Invoke-output -Type Bullet -Message "Try to reboot Local machine - $remotemachine"

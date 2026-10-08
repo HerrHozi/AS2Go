@@ -1,4 +1,4 @@
-function Initialize-2GoLabConfiguration {
+function Initialize-AS2GoLabConfiguration {
     <#
     .SYNOPSIS
     Initializes AS2Go lab setup with tiering assets, demo users, DNS Zone, ADCS installation & creation of an smb share.
@@ -238,9 +238,11 @@ function Initialize-2GoLabConfiguration {
     Invoke-output -Type Bullet -Message "Current Logon Server: " -TM $Script:LogonServer
     Invoke-output -Type Bullet -Message "Current User:         " -TM $currentuser
 
-    Get-ADPrincipalGroupMembership -Identity $samaccountname | Select-Object @{N = 'MemberOf'; E = { $_.samaccountname } } | Out-Host
 
-    
+    $server = $Script:BestDCs[$FQDN]
+    write-Log -Message "    >> Attempting to retrieve group membership for user '$samaccountname' from server '$server' for verification..."
+    Get-ADPrincipalGroupMembership -Identity $samaccountname -Server $server | Select-Object @{N = 'MemberOf'; E = { $_.samaccountname } } | Out-Host
+
     $MoAD = Confirm-PoSHModuleAvailabliy -PSModule "ActiveDirectory"
     $MoDNS = Confirm-PoSHModuleAvailabliy -PSModule "DnsServer"
 

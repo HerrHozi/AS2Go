@@ -53,7 +53,7 @@ Runs Phase 07 without phase visuals and without clearing the host.
 Alias: P07, ESC
 Part of: AS2Go attack phase orchestration
 #>
-function Invoke-Phase07PrivilegeEscalation {
+function Invoke-ASPhase07PrivilegeEscalation {
 
     ################################################################################
     ######                                                                     #####
@@ -63,7 +63,7 @@ function Invoke-Phase07PrivilegeEscalation {
 
     #https://www.beyondtrust.com/blog/entry/privilege-escalation-attack-defense-explained
     #https://www.microsoft.com/en-us/security/blog/2019/05/09/detecting-credential-theft-through-memory-access-modelling-with-microsoft-defender-atp/
-    [Alias("P07", "ESC")]
+    [Alias("ASP07", "ESC")]
     Param (  
         [switch]$UnAttended,
         [switch]$Continue,
@@ -141,11 +141,11 @@ function Invoke-Phase07PrivilegeEscalation {
                     Help  = "Abuse PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)."
                     Value = "X"
                 },
-                #                [pscustomobject] @{
-                #                    Label = "Pt&T"
-                #                    Help  = "" #"Abuse Pass-the-Ticket Attack."
-                #                    Value = $Script:PtT
-                #                },
+                [pscustomobject] @{
+                    Label = "Pt&T"
+                    Help  = "Abuse Pass-the-Ticket Attack."
+                    Value = $Script:PtT
+                },
                 [pscustomobject] @{
                     Label = "&Skip"
                     Help  = "Skip  Privilege Escalation."
