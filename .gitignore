@@ -3,8 +3,10 @@ _MyUtilities/*
 .vscode/*
 Export/*
 Lib/*
-GCCare.code-workspace
+AS2Go.code-workspace
 launch.json
 your_data/*
 Corefunctions/*
 Claude.md
+Exfiltration/*
+_ChangeLog.md
