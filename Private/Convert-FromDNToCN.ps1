@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Converts a distinguished name to canonical Active Directory path format.
+
+.FUNCTIONALITY
+Decodes escaped DN components and returns the corresponding canonical path.
+#>
 function Convert-FromDNToCN {
 
     ################################################################################

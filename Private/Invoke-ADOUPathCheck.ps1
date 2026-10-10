@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Ensures every OU in a distinguished-name path exists.
+
+.FUNCTIONALITY
+Creates missing parent and child OUs, then returns the requested Active Directory OU.
+#>
 function Invoke-ADOUPathCheck {
 
     ################################################################################

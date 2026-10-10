@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Displays consistently formatted AS2Go console output.
+
+.FUNCTIONALITY
+Renders typed console messages and forwards them to logging.
+#>
 function Invoke-Output {
 
     ################################################################################
@@ -51,13 +58,11 @@ function Invoke-Output {
             else {
                 Write-Host "`n  [>] $Message`n`n"           -ForegroundColor $Script:FGCCommand 
             }
-
             $level = "INFO"
         }
         "Warning" { 
             $warn = [char]0x26A0
-            Write-Host "`n  [$warn] WARNING: $Message`n`n"  -ForegroundColor $Script:FGCWarning
-            #Write-Host "`n  [!] WARNING: $Message`n`n"  -ForegroundColor $Script:FGCWarning
+            Write-Host "`n  [!] WARNING: $Message`n`n"  -ForegroundColor $Script:FGCWarning
             $level = "WARN" 
         }
         "Bullet" { 
@@ -78,10 +83,10 @@ function Invoke-Output {
         }
         "Info" {
             If ($NoExtraLines) {
-                Write-host "  [i] $Message"  -ForegroundColor $Script:FGCSInfo
+                Write-host "  [i] $Message"  #-ForegroundColor $Script:FGCSInfo
             }
             Else { 
-                Write-Host "`n  [i] $Message`n`n" -ForegroundColor $Script:FGCSInfo
+                Write-Host "`n  [i] $Message`n`n" #-ForegroundColor $Script:FGCSInfo
             } 
             $level = "INFO"
         }

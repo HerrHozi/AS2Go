@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Installs an Enterprise Root Certification Authority on a remote server.
+
+.FUNCTIONALITY
+Adds AD CS Certificate Authority features and configures the AS2Go root CA.
+#>
 function Install-ADCSCertificateAuthority {
 
     ################################################################################

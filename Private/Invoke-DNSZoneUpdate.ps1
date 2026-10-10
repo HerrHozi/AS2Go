@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Configures DNS zone transfers for AS2Go training.
+
+.FUNCTIONALITY
+Reviews primary zones, previews changes, and can allow transfers to any server.
+#>
 function Invoke-DNSZoneUpdate {
 
     ################################################################################

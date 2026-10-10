@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Displays an overview of domains and domain controllers in the current forest.
+
+.FUNCTIONALITY
+Combines domain details, domain types, controller counts, and preferred DCs in a forest summary.
+#>
 function Invoke-ForestOverview {
 
     ################################################################################
@@ -23,6 +30,8 @@ function Invoke-ForestOverview {
     }
 
     invoke-output -Type Header -Message "Identified the following domains"
+    $Functionality = (Get-Help $CurrentFunction).Functionality
+    Invoke-Output -Type H1 -Message $Functionality
 
     $overview = $AllDomainsDetails |
     Select-Object `
@@ -30,6 +39,7 @@ function Invoke-ForestOverview {
     @{N = 'DomainType'; E = { $_.DomainType } },
     @{N = 'EnabledUsers'; E = { $_.EnabledUser } },
     @{N = 'DomainMode'; E = { $_.DomainMode } },
+    @{N = 'MachineAccountQuota'; E = { $_.MachineAccountQuota } },
     @{N = 'RWDCs'; E = { $Script:DCsPerDomain[$_.DomainFQDN].RWDC } },
     @{N = 'RODCs'; E = { $Script:DCsPerDomain[$_.DomainFQDN].RODC } },
     @{N = 'Best DC'; E = { $Script:BestDCs[$_.DomainFQDN] } },

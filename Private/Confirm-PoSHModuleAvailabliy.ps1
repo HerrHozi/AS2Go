@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Checks whether a PowerShell module is installed and imports it when available.
+
+.FUNCTIONALITY
+Returns passed or failed after checking and importing the requested module.
+#>
 function Confirm-PoSHModuleAvailabliy {
 
     Param([string]$PSModule)

@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Returns the preferred domain controller for a domain.
+
+.FUNCTIONALITY
+Resolves a domain name or distinguished name through the configured controller map.
+#>
 function Get-BestDomainController {
 
     ################################################################################

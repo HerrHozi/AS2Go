@@ -9,6 +9,9 @@
         tree view of the forest structure with custom icons for different object types. It supports browsing 
         across multiple domains and optionally highlights Tier 0 (high-security) objects.
 
+    .FUNCTIONALITY
+    Browses forest objects in a GUI, supports OU creation, and highlights selected Tier 0 entries.
+
     .PARAMETER Title
         This text displayed in the dialog window title. Default is "Select AD Object".
 
@@ -18,6 +21,9 @@
 
     .PARAMETER DomainSelectionOnly
         If specified, only domain objects can be selected. The tree view is not expanded to show child objects.
+
+    .PARAMETER AddOU
+        Enables a context menu for creating an organizational unit under a selected domain, OU, or container.
 
     .PARAMETER IncludeUsers
         If specified, user objects are included in the browsable tree view.
@@ -77,6 +83,7 @@
         [string]$Title = "Select AD Object",
         [switch]$LocalDomainOnly,
         [switch]$DomainSelectionOnly,
+        [switch]$AddOU,
         [switch]$IncludeUsers,
         [switch]$IncludeGroups,
         [switch]$IncludeComputers,
@@ -103,6 +110,13 @@
     # Modern Icon Creation
     # =========================
 
+    <#
+    .SYNOPSIS
+    Creates a rounded-rectangle graphics path.
+
+    .FUNCTIONALITY
+    Builds the rounded paths used to draw the object-selection icons.
+    #>
     function New-RoundedRectPath($X, $Y, $W, $H, $R) {
         $path = New-Object System.Drawing.Drawing2D.GraphicsPath
         $path.AddArc($X, $Y, $R, $R, 180, 90)
@@ -113,6 +127,13 @@
         $path
     }
 
+    <#
+    .SYNOPSIS
+    Creates an icon bitmap for a directory object type.
+
+    .FUNCTIONALITY
+    Draws a 16-by-16 bitmap for the requested forest or Active Directory object type.
+    #>
     function New-IconBitmap($Kind) {
         $bmp = New-Object System.Drawing.Bitmap 16, 16
         $g = [System.Drawing.Graphics]::FromImage($bmp)
@@ -221,6 +242,13 @@
         $bmp
     }
 
+    <#
+    .SYNOPSIS
+    Marks an icon as belonging to Tier 0.
+
+    .FUNCTIONALITY
+    Adds a red overlay to the supplied bitmap.
+    #>
     function Add-TierOverlay($bmp) {
         $clone = $bmp.Clone()
         $g = [System.Drawing.Graphics]::FromImage($clone)
@@ -255,13 +283,34 @@
     # Helpers
     # =========================
 
+    <#
+    .SYNOPSIS
+    Converts a DNS domain name to a distinguished name.
+
+    .FUNCTIONALITY
+    Converts each domain component into a DC element.
+    #>
     function Convert-DomainToDN($d) { 'DC=' + ($d -replace '\.', ',DC=') }
 
+    <#
+    .SYNOPSIS
+    Returns the domain names in the current forest.
+
+    .FUNCTIONALITY
+    Reads and returns every domain name from the current Active Directory forest.
+    #>
     function Get-ForestDomains {
         ([System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest()).Domains |
         Select-Object -ExpandProperty Name
     }
 
+    <#
+    .SYNOPSIS
+    Loads child objects for a node in the selection tree.
+
+    .FUNCTIONALITY
+    Queries LDAP for matching OUs, containers, and enabled object types on demand.
+    #>
     function Get-ChildNodes($node) {
 
         if ($DomainSelectionOnly) { return }
@@ -323,12 +372,59 @@
                 $child = New-Object System.Windows.Forms.TreeNode
                 $child.Text = $name
                 $child.Name = $dn
+                $child.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; ObjectClass = $cls }
                 $child.ImageKey = $iconKey
                 $child.SelectedImageKey = $iconKey
                 $child.Nodes.Add("dummy") | Out-Null
 
                 $node.Nodes.Add($child) | Out-Null
             }
+        }
+    }
+
+    <#
+    .SYNOPSIS
+    Prompts for a new organizational unit name.
+
+    .FUNCTIONALITY
+    Shows a small dialog and returns the entered OU name when confirmed.
+    #>
+    function Show-OUNamePrompt {
+        $dialog = New-Object System.Windows.Forms.Form
+        $dialog.Text = "New Organizational Unit"
+        $dialog.Size = '360,140'
+        $dialog.StartPosition = 'CenterParent'
+        $dialog.FormBorderStyle = 'FixedDialog'
+        $dialog.MaximizeBox = $false
+        $dialog.MinimizeBox = $false
+
+        $label = New-Object System.Windows.Forms.Label
+        $label.Text = "Organizational unit name:"
+        $label.Location = '12,12'
+        $label.Size = '320,20'
+
+        $nameTextBox = New-Object System.Windows.Forms.TextBox
+        $nameTextBox.Location = '12,36'
+        $nameTextBox.Size = '320,22'
+
+        $okButton = New-Object System.Windows.Forms.Button
+        $okButton.Text = "Create"
+        $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
+        $okButton.Location = '172,68'
+        $okButton.Size = '75,26'
+
+        $cancelButton = New-Object System.Windows.Forms.Button
+        $cancelButton.Text = "Cancel"
+        $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+        $cancelButton.Location = '257,68'
+        $cancelButton.Size = '75,26'
+
+        $dialog.AcceptButton = $okButton
+        $dialog.CancelButton = $cancelButton
+        $dialog.Controls.AddRange(@($label, $nameTextBox, $okButton, $cancelButton))
+
+        if ($dialog.ShowDialog($form) -eq [System.Windows.Forms.DialogResult]::OK) {
+            return $nameTextBox.Text.Trim()
         }
     }
 
@@ -399,6 +495,7 @@
         $domainNode = New-Object System.Windows.Forms.TreeNode
         $domainNode.Text = $d
         $domainNode.Name = $dn
+        $domainNode.Tag = [PSCustomObject]@{ Domain = $d; ObjectClass = 'domain' }
         $domainNode.ImageKey = "Domain"
         $domainNode.SelectedImageKey = "Domain"
         $domainNode.Nodes.Add("dummy") | Out-Null
@@ -413,6 +510,51 @@
     # =========================
 
     $tree.add_BeforeExpand({ Get-ChildNodes $_.Node })
+
+    if ($AddOU) {
+        $contextMenu = New-Object System.Windows.Forms.ContextMenuStrip
+        $newMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("New")
+        $addOuMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("Organizational Unit")
+        $newMenuItem.DropDownItems.Add($addOuMenuItem) | Out-Null
+        $contextMenu.Items.Add($newMenuItem) | Out-Null
+        $tree.ContextMenuStrip = $contextMenu
+
+        $tree.add_NodeMouseClick({
+                if ($_.Button -eq [System.Windows.Forms.MouseButtons]::Right) {
+                    $tree.SelectedNode = $_.Node
+                }
+            })
+
+        $addOuMenuItem.add_Click({
+                $parentNode = $tree.SelectedNode
+                if (-not $parentNode -or -not $parentNode.Tag -or $parentNode.Tag.ObjectClass -notin @('domain', 'organizationalUnit', 'container', 'builtinDomain')) {
+                    return
+                }
+
+                $ouName = Show-OUNamePrompt
+                if ([string]::IsNullOrWhiteSpace($ouName)) {
+                    return
+                }
+
+                try {
+                    $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain -PassThru -ErrorAction Stop
+                    Write-Log -Message "Created organizational unit '$($createdOU.DistinguishedName)'"
+
+                    $parentNode.Nodes.Clear()
+                    $parentNode.Nodes.Add("dummy") | Out-Null
+                    Get-ChildNodes $parentNode
+                    $newNode = $parentNode.Nodes | Where-Object { $_.Name -eq $createdOU.DistinguishedName } | Select-Object -First 1
+                    if ($newNode) {
+                        $newNode.EnsureVisible()
+                        $tree.SelectedNode = $newNode
+                    }
+                }
+                catch {
+                    Write-Log -Message "Failed to create organizational unit '$ouName' under '$($parentNode.Name)': $_"
+                    [void][System.Windows.Forms.MessageBox]::Show($form, $_.Exception.Message, "OU creation failed", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                }
+            })
+    }
 
     $tree.add_AfterSelect({
             $node = $_.Node

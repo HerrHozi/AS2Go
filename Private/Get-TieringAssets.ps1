@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Finds and displays AS2Go tiering organizational units.
+
+.FUNCTIONALITY
+Counts OUs tagged as AS2Go tier assets and displays example paths and descriptions.
+#>
 function Get-TieringAssets {
 
     ################################################################################

@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Writes a named setting to the AS2Go JSON configuration.
+
+.FUNCTIONALITY
+Updates an existing setting or adds it, then saves the JSON configuration.
+#>
 Function Set-ASConfig {
 
     ################################################################################
@@ -14,8 +21,18 @@ Function Set-ASConfig {
     #################### main code | out- host ####################
 
     $json = Get-Content -Path $Script:ConfigFile  | ConvertFrom-Json
-    ($json.DefaultParameter.Setting | Where-Object { $_.Name -eq $Setting }).Value = $Value
+    $settingEntry = $json.DefaultParameter.Setting | Where-Object { $_.Name -eq $Setting } | Select-Object -First 1
+    if ($settingEntry) {
+        $settingEntry.Value = $Value
+    }
+    else {
+        $json.DefaultParameter[0].Setting += [PSCustomObject]@{
+            Name  = $Setting
+            Value = $Value
+        }
+    }
     $json | ConvertTo-Json -Depth 10 | Set-Content -Path $Script:ConfigFile -Force
+
 
     Write-Log -Message "    >> Set '$Setting' to '$Value'"
     ######################## main code ############################
@@ -23,3 +40,4 @@ Function Set-ASConfig {
     Write-Log -Message "    Run Time: $runtime [h] ###"
     Write-Log -Message "### End Function $CurrentFunction ###"
 }
+

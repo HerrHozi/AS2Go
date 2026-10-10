@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Prepares a folder for AS2Go training tools.
+
+.FUNCTIONALITY
+Selects a tools folder, configures Defender exclusions, copies archives, and guides extraction.
+#>
 function Invoke-MaliciousToolsSetup {
 
     ################################################################################
@@ -19,6 +26,8 @@ function Invoke-MaliciousToolsSetup {
 
     If (-not $SkipClearHost) { Clear-Host }
     Invoke-Output -Type Header -Message "Prepare folder for Malicious Tools"
+    $Functionality = (Get-Help $CurrentFunction).Functionality
+    Invoke-Output -Type H1 -Message $Functionality
     Invoke-Output -Type H1 -Message "Steps to do:`n"
     Invoke-output -Type Bullet -Message "Define or create a folder to store malicious tools, such as Rubeus, Certify"
     Invoke-output -Type Bullet -Message "Microsoft Defender: Disable real-time monitoring."

@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Displays the account setting shown as the current honeytoken.
+
+.FUNCTIONALITY
+Reads BreakGlassAccount and displays it under the HoneyToken heading, or warns if unset.
+#>
 function Get-Honeytoken {
 
     ################################################################################

@@ -1,4 +1,11 @@
-﻿function Get-FolderPath {
+﻿<#
+.SYNOPSIS
+Opens a folder picker and returns the selected path.
+
+.FUNCTIONALITY
+Returns the chosen folder path, or null if the user cancels the dialog.
+#>
+function Get-FolderPath {
     param(
         [string]$InitialDirectory = '',
         [string]$Description = 'Select Folder'

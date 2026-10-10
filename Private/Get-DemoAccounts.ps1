@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Finds and displays AS2Go demo users in a domain.
+
+.FUNCTIONALITY
+Counts tagged demo accounts and displays a sample with selected account details.
+#>
 function Get-DemoAccounts {
 
     ################################################################################

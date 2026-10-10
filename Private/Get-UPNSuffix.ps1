@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Selects a UPN suffix configured in the Active Directory forest.
+
+.FUNCTIONALITY
+Offers available forest suffixes, saves the selected value, and returns it.
+#>
 function Get-UPNSuffix {
 
     ################################################################################

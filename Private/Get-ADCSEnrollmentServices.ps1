@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Lists Active Directory Certificate Services enrollment services.
+
+.FUNCTIONALITY
+Reports enrollment servers, reachability, and whether certificate templates are assigned.
+#>
 function Get-ADCSEnrollmentServices {
 
     ################################################################################

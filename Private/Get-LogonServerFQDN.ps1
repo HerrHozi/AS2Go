@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Resolves the current logon server to its fully qualified domain name.
+
+.FUNCTIONALITY
+Resolves LOGONSERVER through Active Directory, with DNS lookup as a fallback.
+#>
 function Get-LogonServerFQDN {
 
     ################################################################################

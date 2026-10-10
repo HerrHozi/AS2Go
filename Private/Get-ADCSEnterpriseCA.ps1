@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Inventories Enterprise CAs registered in Active Directory.
+
+.FUNCTIONALITY
+Builds CA certificate relationships and reports server availability and template status.
+#>
 function Get-ADCSEnterpriseCA {
 
     ################################################################################
@@ -26,6 +33,13 @@ function Get-ADCSEnterpriseCA {
         -Server $Server
 
     # Helper: build X509 objects from cACertificate (handles collections)
+    <#
+    .SYNOPSIS
+    Converts CA certificate data from Active Directory into X.509 objects.
+
+    .FUNCTIONALITY
+    Parses each CA certificate byte array and returns valid X.509 certificates.
+    #>
     function Get-CaCertificates {
         param([Microsoft.ActiveDirectory.Management.ADObject]$CaObject)
 

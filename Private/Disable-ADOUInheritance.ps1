@@ -10,6 +10,9 @@
 
         The operation is executed against a specific Domain Controller.
 
+    .FUNCTIONALITY
+    Disables OU ACL inheritance, removes inherited permissions, and returns the resulting ACL state.
+
     .PARAMETER OU
         Distinguished Name (DN) of the Organizational Unit.
 

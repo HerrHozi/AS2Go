@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Displays the configured break-glass account.
+
+.FUNCTIONALITY
+Reads the saved account distinguished name and reports whether one is configured.
+#>
 function Get-BreakGlassAccount {
 
     ################################################################################

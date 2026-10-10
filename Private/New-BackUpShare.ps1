@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Creates the AS2Go sample backup share on a domain controller.
+
+.FUNCTIONALITY
+Creates the remote folder, grants Domain Admins modify access, and creates the SMB share.
+#>
 function New-BackUpShare {
 
     ################################################################################
@@ -13,32 +20,43 @@ function New-BackUpShare {
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host #####################
 
-    Invoke-Command -ComputerName $Server  -ScriptBlock {
+    try {
+        Invoke-Command -ComputerName $Server -ErrorAction Stop -ScriptBlock {
+            
+            $sharePath = "C:\temp\as2go"
+
+            if (-not (Test-Path $sharePath)) {
+                New-Item -Path $sharePath -ItemType Directory -Force | Out-Null
+            }
+
+            # Optional: grant permissions for Domain Admins
+            $acl = Get-Acl $sharePath
+            $permission = "Domain Admins", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow"
+            $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
+            $acl.SetAccessRule($accessRule)
+            Set-Acl $sharePath $acl
+
+            if (-not (Get-SmbShare -Name "AD-Backup" -ErrorAction SilentlyContinue)) {
+                New-SmbShare -Name "AD-Backup" -Path $sharePath `
+                    -ChangeAccess "Domain Admins" `
+                    -Description "Needed for AS2Go"
+            }
+        }
         
-        $sharePath = "C:\temp\as2go"
+        $shares = Get-SmbShare -CimSession $Server -ErrorAction Stop | Where-Object { $_.Special -eq $false }
+        $shares | Select-Object PSComputerName, Name, Path, Description | Out-Host
 
-        if (-not (Test-Path $sharePath)) {
-            New-Item -Path $sharePath -ItemType Directory -Force | Out-Null
-        }
-
-        # Optional: grant permissions for Domain Admins
-        $acl = Get-Acl $sharePath
-        $permission = "Domain Admins", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow"
-        $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
-        $acl.SetAccessRule($accessRule)
-        Set-Acl $sharePath $acl
-
-        if (-not (Get-SmbShare -Name "AD-Backup" -ErrorAction SilentlyContinue)) {
-            New-SmbShare -Name "AD-Backup" -Path $sharePath `
-                -ChangeAccess "Domain Admins" `
-                -Description "Needed for AS2Go"
-        }
+        $4logfile = $shares | Select-Object PSComputerName, Name, Path, Description | Out-String
+        Write-Log -Message "    >> Identified the follwing shares: $4logfile"
     }
-    
-    Get-SmbShare -CimSession $Server | Where-Object { $_.Special -eq $false } | Select-Object PSComputerName, Name, Path, Description | out-host
+    catch {
+        $errMsg = $_.Exception.Message
+        if ($errMsg -match '(?i)access is denied|cannot connect to cim server|connecting to remote server .* failed') {
+            throw "AS2GO_ACCESS_DENIED: Missing permissions for WinRM/CIM or share management on $Server. Use an account with local admin rights on the target DC."
+        }
 
-    $4logfile = Get-SmbShare -CimSession $Server | Where-Object { $_.Special -eq $false } | Select-Object PSComputerName, Name, Path, Description | Out-String
-    Write-Log -Message "    >> Identified the follwing shares: $4logfile"
+        throw
+    }
 
     ######################## main code ############################
     $runtime = Get-RunTime -StartRunTime $StartRunTime

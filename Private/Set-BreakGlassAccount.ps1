@@ -1,19 +1,24 @@
+<#
+.SYNOPSIS
+Selects or keeps the lab's break-glass account.
+
+.DESCRIPTION
+Selects or keeps the lab's break-glass account. 
+This account is excluded from all attack scenarios and is not considered in any attack path or risk evaluation.
+
+.FUNCTIONALITY
+Stores the selected account DN so the account can be excluded from attack scenarios.
+
+.COMPONENT
+Category: Mainfunction
+#>
 function Set-BreakGlassAccount {
 
-    ################################################################################
-    #####                                                                      ##### 
-    #####    Define a Account which will be ignored during the AS2Go           #####                             
-    #####                                                                      #####
-    ################################################################################
+    $Info = Measure-FunctionRuntime -Begin
+    Invoke-Output -Type Header -Message "Define a Break Glass Account"
+    Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
-
-    Invoke-Output -Type Header "Define a Break Glass Account"
-    Invoke-Output -Type H1 -Message "The break-glass account is excluded from all attack scenarios and is not considered in any attack path or risk evaluation."
-
+    #start main code
     $previousDN = Get-ASConfig -Setting "BreakGlassAccount"
 
     If ($previousDN -match 'OU=|CN=|DC=' ) {
@@ -44,9 +49,7 @@ function Set-BreakGlassAccount {
     else {
         Invoke-Output -Type Info -message "Keep previous Break Glass Account!"    
     }   
-
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    #end main code
+    
+    Measure-FunctionRuntime -End -Details $Info 
 }
