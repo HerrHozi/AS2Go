@@ -2,6 +2,13 @@
 .SYNOPSIS
 Tests forest domain controllers and selects a preferred controller per domain.
 
+.DESCRIPTION
+Enumerates forest controllers and tests network and LDAP reachability, then selects and caches
+a preferred controller for each domain.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Checks controller reachability and LDAP availability, then caches the preferred DCs.
 #>

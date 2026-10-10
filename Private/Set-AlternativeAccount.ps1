@@ -1,3 +1,17 @@
+<#
+.SYNOPSIS
+Selects the account to use as the certificate request's Subject Alternative Name.
+
+.DESCRIPTION
+Offers the previous target, another user, or a domain's built-in Administrator as the SAN
+account. Stores the selected distinguished name in AS2Go settings and returns it.
+
+.FUNCTIONALITY
+Selects and stores a target account for the certificate request's Subject Alternative Name.
+
+.COMPONENT
+Category: Main Function
+#>
 function Set-AlternativeAccount {
 
     ################################################################################
@@ -12,8 +26,8 @@ function Set-AlternativeAccount {
     #################### main code | out- host #####################
 
     Invoke-Output -Type Header "Step 2 - Define a Subject Alternative Name (SAN)"
-    Invoke-Output -Type Bullet -Message "The Subject Alternative Name (SAN) defines additional identities that will be included in the issued certificate."
-
+    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+  
     $previousDN = Get-ASConfig -Setting "LastAltUser"
 
     If ($previousDN -match '^CN=' ) {

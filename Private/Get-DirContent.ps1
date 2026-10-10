@@ -21,7 +21,7 @@ function Get-DirContent {
         Try {
             Get-ChildItem -Path $Path -ErrorAction Stop | Out-Host
             $isSuccess = $true
-            Invoke-Output -T Success -M "Accessed path $Path successfully!"
+            Invoke-Output -Type  Success -M "Accessed path $Path successfully!"
         }
         Catch {
             if ($attempt -lt $maxAttempts) {
@@ -29,7 +29,7 @@ function Get-DirContent {
                 Start-Sleep -Seconds 2
             }
             else {
-                Invoke-Output -T Error -M "No access to path $Path!"
+                Invoke-Output -Type  Error -M "No access to path $Path!"
             }
         }
     }

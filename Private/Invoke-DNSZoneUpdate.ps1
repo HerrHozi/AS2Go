@@ -2,6 +2,13 @@
 .SYNOPSIS
 Configures DNS zone transfers for AS2Go training.
 
+.DESCRIPTION
+Reviews primary DNS zones and previews the proposed transfer setting before applying changes.
+It can allow transfers to any server for the lab's MDI detection scenario.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Reviews primary zones, previews changes, and can allow transfers to any server.
 #>
@@ -28,7 +35,7 @@ function Invoke-DNSZoneUpdate {
     Where-Object { $_.ZoneType -eq 'Primary' -and $_.ZoneName -notmatch 'TrustAnchors' }  | 
     Select-Object ZoneType, ZoneName, SecureSecondaries, IsReverseLookupZone | Sort-Object IsReverseLookupZone, ZoneName | Out-Host
     
-    Invoke-Output -T Info -Message "The following zones will be updated to 'TransferAnyServer':"
+    Invoke-Output -Type  Info -Message "The following zones will be updated to 'TransferAnyServer':"
 
     Get-DnsServerZone -ComputerName $script:logonserver |
     Where-Object { $_.ZoneName -match (Get-ADForest).RootDomain } |
@@ -56,7 +63,7 @@ function Invoke-DNSZoneUpdate {
     else {
         Write-log -Message "    Skipped Function ###"
     }
-    Invoke-Output -T Success -Message "Finished updating DNS Zone Settings!"
+    Invoke-Output -Type  Success -Message "Finished updating DNS Zone Settings!"
 
     ######################## main code ############################
     $runtime = Get-RunTime -StartRunTime $StartRunTime

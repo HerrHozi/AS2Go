@@ -2,6 +2,13 @@
 .SYNOPSIS
 Collects domain details and the default password policy.
 
+.DESCRIPTION
+Collects domain identity, password-policy settings, machine-account quota, and enabled-user
+counts for the specified domain.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Returns domain metadata, password settings, machine-account quota, and enabled-user count.
 #>

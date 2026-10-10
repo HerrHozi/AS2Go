@@ -1,6 +1,22 @@
+<#
+.SYNOPSIS
+Runs extended Active Directory reconnaissance tasks.
+
+.DESCRIPTION
+Enumerates privileged group members, attempts a DNS zone transfer, and lists NetBIOS sessions
+on the domain controller. The workflow also triggers honeytoken activity and supports attended
+or unattended execution.
+
+.FUNCTIONALITY
+Enumerates privileged group members, attempts a DNS zone transfer, and lists DC NetBIOS sessions.
+Triggers honeytoken activity as part of extended Active Directory reconnaissance.
+
+.COMPONENT
+Category: Main Function
+#>
 function Start-ReconnaissanceExtended {
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
+
+    $Info = Measure-FunctionRuntime -Begin
     ####
     If (-not $SkipClearHost) { Clear-Host }
     
@@ -14,7 +30,7 @@ function Start-ReconnaissanceExtended {
     }
 
 
-    Invoke-Output -T Header -M "TRY to enumerate 10 members of the '$($Script:GroupDNSA.samaccountname)' group"
+    Invoke-Output -Type  Header -M "TRY to enumerate 10 members of the '$($Script:GroupDNSA.samaccountname)' group"
  
 
     Write-Host      -NoNewline "  Command: "
@@ -27,7 +43,7 @@ function Start-ReconnaissanceExtended {
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -T Header -M "TRY to enumerate 10 members of the '$($Script:GroupEA.samaccountname)' group"
+    Invoke-Output -Type  Header -M "TRY to enumerate 10 members of the '$($Script:GroupEA.samaccountname)' group"
 
     
     Write-Host      -NoNewline "  Command: "
@@ -42,10 +58,9 @@ function Start-ReconnaissanceExtended {
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host "      Open a new window to perform a domain zone transfer               "
-    Write-Host "____________________________________________________________________`n" 
-    write-host ""
+    Invoke-Output -Type  Header -Message "TRY to perform a domain zone transfer"
+    Invoke-Output -Type H1 -Message "This step attempts to perform a domain zone transfer using nslookup.`n"
+
     Write-Host      -NoNewline "  Command: "
     Write-Highlight -Text "nslookup | ", "ls ", "-d ", "$Script:ASFQDN" `
         -Color $fgcC, $fgcC, $fgcS, $fgcV
@@ -62,10 +77,9 @@ function Start-ReconnaissanceExtended {
     Start-Process nslookup
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host "          TRY to list NetBIOS sessions on Domain Controller         "
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host ""
+    Invoke-Output -Type  Header -Message "TRY to list NetBIOS sessions on Domain Controller"
+    Invoke-Output -Type H1 -Message "This step attempts to list NetBIOS sessions on the domain controller using NetSess.exe.`n" 
+
     Write-Host      -NoNewline "  Command: "
     Write-Highlight -Text ".\NetSess.exe ", "$Script:ASDC" `
         -Color $fgcC, $fgcV
@@ -79,5 +93,5 @@ function Start-ReconnaissanceExtended {
     New-HoneytokenActivity
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     ####
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

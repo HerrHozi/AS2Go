@@ -2,6 +2,13 @@
 .SYNOPSIS
 Finds and displays AS2Go tiering organizational units.
 
+.DESCRIPTION
+Finds OUs marked as AS2Go tier assets, reports their count, and displays example paths and
+descriptions.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Counts OUs tagged as AS2Go tier assets and displays example paths and descriptions.
 #>

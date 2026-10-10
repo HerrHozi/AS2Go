@@ -2,6 +2,13 @@
 .SYNOPSIS
 Creates the AS2Go tiered OU and group structure.
 
+.DESCRIPTION
+Builds the tiered organizational units and groups, provisions demo objects, moves privileged
+groups to Tier 0, and applies the lab permissions.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Builds the tiered OU/group layout and demo objects.
 Moves privileged groups to Tier 0 and applies the lab ACLs.
@@ -14,7 +21,13 @@ Function Invoke-NewAS2GoAssets {
     ######                                                                     #####
     ################################################################################
     
-    param([string] $AS2GoOU = "AS2Go", [string] $Scenario = "AS2Go", [string] $UPNSuffix = "@mrhozi.com", [Parameter(Mandatory)][string]$Server)
+    param(
+        [string] $AS2GoOU = "AS2Go", 
+        [string] $Scenario = "AS2Go", 
+        [string] $UPNSuffix = "@mrhozi.com", 
+        [Parameter(Mandatory)]
+        [string]$Server
+    )
 
     $CurrentFunction = Get-FunctionName
     Write-Log -Message "### Start Function $CurrentFunction ###"
@@ -80,7 +93,7 @@ Function Invoke-NewAS2GoAssets {
     ######                                                                     #####
     ################################################################################
     
-    Invoke-Output -T Header -Message "Start creating Tiering OUs & Groups ...."
+    Invoke-Output -Type  Header -Message "Start creating Tiering OUs & Groups ...."
     $Functionality = (Get-Help $CurrentFunction).Functionality
     Invoke-Output -Type H1 -Message $Functionality
 
@@ -111,7 +124,7 @@ Function Invoke-NewAS2GoAssets {
 
     If ($null -ne $check) {
         $Cname = Convert-FromDNToCN -DistinguishedName "$RootOU"
-        Invoke-Output -T Warning -M "OU '$AS2GoOU' alreday exists under $Cname!"
+        Invoke-Output -Type  Warning -M "OU '$AS2GoOU' alreday exists under $Cname!"
         #return 
     } 
     Else {
@@ -127,11 +140,11 @@ Function Invoke-NewAS2GoAssets {
         
 
         $Cname = Convert-FromDNToCN -DistinguishedName "OU=$AS2GoOU,$RootOU"
-        Invoke-Output -T Textmaker -M "Created AS2GO OU:" -Tm $Cname
+        Invoke-Output -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname
     
         New-ADOrganizationalUnit -Name "Demo Accounts" -Path "OU=$AS2GoOU,$RootOU" -Description "AS2Go Demo Accounts" -PostalCode "AS2GoDemoAccounts" -Server $Server
         $Cname = Convert-FromDNToCN -DistinguishedName "OU=Demo Accounts,OU=$AS2GoOU,$RootOU"
-        Invoke-Output -T Textmaker -M "Created AS2GO OU:" -Tm $Cname
+        Invoke-Output -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname
     }
 
     foreach ($Tier in $Tiers) {
@@ -146,16 +159,16 @@ Function Invoke-NewAS2GoAssets {
 
         If ($null -ne $check) {
             $Cname = Convert-FromDNToCN -DistinguishedName "OU=$AS2GoOU,$RootOU"
-            Invoke-Output -T Success -M "OU '$($TieringOUName[$i].Name)' alreday exists under $Cname!"
+            Invoke-Output -Type  Success -M "OU '$($TieringOUName[$i].Name)' alreday exists under $Cname!"
             return 
         } 
 
         New-ADOrganizationalUnit -Name $TieringOUName[$i].Name -Path "OU=$AS2GoOU,$RootOU" -Description $TieringOUName[$i].Description -PostalCode "AS2GOTierung" -Server $Server 
         $ShortDNPAth = "OU=" + $TieringOUName[$i].Name + ",OU=$AS2GoOU,$RootOU"
 
-        Invoke-Output -T Info -M "Creating Tier $Tier Assets ...."
+        Invoke-Output -Type  Info -M "Creating Tier $Tier Assets ...."
 
-        #Invoke-Output -T TextMaker -M "Created Parent OU" -Tm $TieringOUName[$i].Name
+        #Invoke-Output -Type  TextMaker -M "Created Parent OU" -Tm $TieringOUName[$i].Name
 
         Write-Host "   Created Parent OU " -NoNewline; Write-Host $TieringOUName[$i].Name -ForegroundColor Yellow
 
@@ -235,7 +248,7 @@ Function Invoke-NewAS2GoAssets {
     ################################################################################
 
 
-    Invoke-Output -T Header -Message "Move sensitive groups to Tier 0 Level, except the 'Protected Users' Group ...."
+    Invoke-Output -Type  Header -Message "Move sensitive groups to Tier 0 Level, except the 'Protected Users' Group ...."
 
     Get-ADGroup -LDAPFilter "(adminCount=1)" -Properties * -Server $logonServer -SearchBase $ADRoot.defaultNamingContext | Where-Object {
         ($_.SID -like "*-512" -or 
@@ -265,20 +278,20 @@ Function Invoke-NewAS2GoAssets {
     ######                                                                     #####
     ################################################################################
 
-    Invoke-Output -T Header -Message "Adding AS2Go Groups to Local Admins on this machine ...."
+    Invoke-Output -Type  Header -Message "Adding AS2Go Groups to Local Admins on this machine ...."
 
     $DomainNetBIOS = $Domain.NetBIOSName
 
     foreach ($group in @($HDGroup, $VIGroup)) {
         try {
             Add-LocalGroupMember -Group "Administrators" -Member "$DomainNetBIOS\$group" -ErrorAction Stop
-            Invoke-Output -T Success -M "Added '$group' to local Administrators on $env:COMPUTERNAME" -noExtraLines
+            Invoke-Output -Type  Success -M "Added '$group' to local Administrators on $env:COMPUTERNAME" -noExtraLines
         }
         catch [Microsoft.PowerShell.Commands.MemberExistsException] {
-            Invoke-Output -T Warning -M "'$group' is already a member of local Administrators"
+            Invoke-Output -Type  Warning -M "'$group' is already a member of local Administrators"
         }
         catch {
-            Invoke-Output -T Warning -M "Failed to add '$group': $_"
+            Invoke-Output -Type  Warning -M "Failed to add '$group': $_"
         }
     }
 
@@ -303,7 +316,7 @@ Function Invoke-NewAS2GoAssets {
     Disable-ADOUInheritance -TargetDN ("OU=" + $TieringOUName[0].Name + ",OU=$AS2GoOU,$RootOU") -LogonServer $logonServer
     Set-DenyPermission -TargetDN "OU=T0 Groups,OU=$($TieringOUName[0].Name),OU=$AS2GoOU,$RootOU" -Trustee  $AS2GoGroups[2].Name -LogonServer $logonServer
 
-    Invoke-Output -T Success -Message "Finished creating Tiering OUs & Groups!"
+    Invoke-Output -Type  Success -Message "Finished creating Tiering OUs & Groups!"
     ######################## main code ############################
     $runtime = Get-RunTime -StartRunTime $StartRunTime
     Write-Log -Message "    Run Time: $runtime [h] ###"

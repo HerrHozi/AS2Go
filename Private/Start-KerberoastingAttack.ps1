@@ -73,7 +73,7 @@ The next step is to crack the roasted hashes using Hashcat.
     In this example, the password policy is known, so a brute-force or mask attack can be used.
     The Hashcat mode for Kerberos 5 TGS-REP hashes is 13100.
 "@     
-            #Invoke-Output -T Info -M $message
+            #Invoke-Output -Type  Info -M $message
 
             Write-Host "`n"
             write-host "  [i] The next step is to " -NoNewline; write-host "crack " -NoNewline -ForegroundColor $fgcH 

@@ -2,6 +2,13 @@
 .SYNOPSIS
 Displays an overview of domains and domain controllers in the current forest.
 
+.DESCRIPTION
+Collects domain details, domain classifications, controller counts, and preferred controllers,
+then displays a formatted forest overview.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Combines domain details, domain types, controller counts, and preferred DCs in a forest summary.
 #>

@@ -2,6 +2,12 @@
 .SYNOPSIS
 Opens a folder picker and returns the selected path.
 
+.DESCRIPTION
+Opens a folder-selection dialog and returns the chosen path, or null if the user cancels.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Returns the chosen folder path, or null if the user cancels the dialog.
 #>

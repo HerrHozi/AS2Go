@@ -2,6 +2,12 @@
 .SYNOPSIS
 Writes a named setting to the AS2Go JSON configuration.
 
+.DESCRIPTION
+Updates an existing configuration value or adds a new setting, then saves the JSON file.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Updates an existing setting or adds it, then saves the JSON configuration.
 #>

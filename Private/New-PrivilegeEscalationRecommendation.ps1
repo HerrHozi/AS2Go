@@ -1,3 +1,24 @@
+<#
+.SYNOPSIS
+Assesses host and Active Directory conditions relevant to privilege escalation.
+
+.DESCRIPTION
+Collects OS details, cached Kerberos tickets, group membership, admin-share access, and WDigest
+settings, along with SPN and certificate-template findings. Displays these findings and OS
+compatibility for several privilege-escalation techniques.
+
+.PARAMETER computer
+Computer name used to collect the target's operating system details.
+
+.OUTPUTS
+System.String. Returns the constant value "C".
+
+.FUNCTIONALITY
+Displays host compatibility and security conditions relevant to privilege escalation.
+
+.COMPONENT
+Category: Main Function
+#>
 function New-PrivilegeEscalationRecommendation {
 
     ################################################################################
@@ -22,7 +43,9 @@ function New-PrivilegeEscalationRecommendation {
 
 
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -T Header -M "Choose your Type of Privilege Escalation"
+    Invoke-Output -Type  Header -M "Choose your Type of Privilege Escalation"
+    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    write-host ""
 
     Write-Host "     ... please be patient, while checking your environment ... " -ForegroundColor Yellow
 
@@ -111,8 +134,10 @@ function New-PrivilegeEscalationRecommendation {
 
 
     #If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -T Header -M "Choose your Type of Privilege Escalation"
-
+    Invoke-Output -Type  Header -M "Choose your Type of Privilege Escalation"
+    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    write-host ""
+    
     Write-host "     current Victim PC Name & OS:  $overview - " -NoNewline
     Write-host $version -ForegroundColor Yellow
     Write-Host

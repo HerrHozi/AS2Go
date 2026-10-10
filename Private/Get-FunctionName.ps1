@@ -28,7 +28,7 @@ Returns: Get-FunctionName
 Returns the function name from the selected call-stack entry.
 
 .COMPONENT
-Category: subfunction
+Category: Sub Function
 #>
 function Get-FunctionName {
     param(

@@ -2,6 +2,12 @@
 .SYNOPSIS
 Sets the console background and foreground colors.
 
+.DESCRIPTION
+Applies the supplied background and foreground colors to the current PowerShell host console.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Applies the supplied colors to the current PowerShell host console.
 #>

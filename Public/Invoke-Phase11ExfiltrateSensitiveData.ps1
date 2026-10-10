@@ -86,8 +86,8 @@ function Invoke-ASPhase11ExfiltrateSensitiveData {
 
         If (-not $SkipImages) { Show-Phases -Phase "phase_011.html" }
         If (-not $SkipClearHost) { Clear-Host }
-        Invoke-Output -T Header -M "Attack Phase - $($Script:Phase11.toupper())"
-        Invoke-Output -T Bullet "Attempt to exfiltrate sensitive data over an SMB share"
+        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase11.toupper())"
+        Invoke-Output -Type  Bullet "Attempt to exfiltrate sensitive data over an SMB share"
 
         If ($UnAttended) {
             $answer = $Script:Yes

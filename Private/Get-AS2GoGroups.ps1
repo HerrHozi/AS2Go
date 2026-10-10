@@ -2,6 +2,13 @@
 .SYNOPSIS
 Finds and displays AS2Go security groups in a domain.
 
+.DESCRIPTION
+Finds groups marked for AS2Go administrator, helpdesk, or victim roles and displays their
+counts and sample entries.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Counts groups tagged as AS2Go admins, helpdesk, or victims and shows examples.
 #>

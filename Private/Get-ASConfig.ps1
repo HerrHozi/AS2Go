@@ -2,6 +2,12 @@
 .SYNOPSIS
 Reads a named setting from the AS2Go JSON configuration.
 
+.DESCRIPTION
+Loads the AS2Go JSON configuration and returns the value associated with the requested setting.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Loads the configured value from the module's JSON settings file and returns it.
 #>

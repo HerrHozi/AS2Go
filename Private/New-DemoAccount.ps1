@@ -2,6 +2,13 @@
 .SYNOPSIS
 Creates demo Active Directory users from the configured CSV file.
 
+.DESCRIPTION
+Validates the target OU, optionally creates nested OUs, and creates selected users from the CSV
+with the requested scenario details and group memberships.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Checks the OU, optionally builds nested OUs, then creates selected users with scenario data.
 #>

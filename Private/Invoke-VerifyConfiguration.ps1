@@ -2,6 +2,13 @@
 .SYNOPSIS
 Checks the configured AS2Go lab environment.
 
+.DESCRIPTION
+Audits break-glass, tiering, groups, demo users, AD CS, enrollment services, and honeytokens,
+then reports the verification results.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Audits break-glass, tiering, groups, demo users, AD CS, enrollment services, and honeytokens.
 #>

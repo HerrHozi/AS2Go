@@ -2,6 +2,13 @@
 .SYNOPSIS
 Selects or keeps the account used as the MDI honeytoken.
 
+.DESCRIPTION
+Prompts the user to keep the configured honeytoken or select another account, then saves its
+distinguished name in module settings.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Prompts for a honeytoken user, then stores the selected distinguished name.
 #>
@@ -19,7 +26,7 @@ function Set-HoneyToken {
     #################### main code | out- host #####################
 
     Invoke-Output -Type Header "Select a honeytoken account that will be monitored by MDI."
-    Invoke-Output -Type H1 -Message "Microsoft Defender for Identity (MDI) honeytokens are decoy accounts tagged to trigger immediate alerts on any authentication attempt, `nserving as early warning traps for attackers targeting Active Directory credentials."
+    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     $previousDN = Get-ASConfig -Setting "Honeytoken"
 

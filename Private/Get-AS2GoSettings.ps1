@@ -1,3 +1,21 @@
+<#
+.SYNOPSIS
+Verifies and updates global AS2Go settings.
+
+.DESCRIPTION
+Loads and normalizes saved settings, refreshes available domain and host defaults, and syncs
+the values to script variables. In interactive mode, displays the settings and lets the user
+review or edit them; ReadOnly mode returns the settings and configuration without prompting.
+
+.PARAMETER ReadOnly
+Returns the loaded settings and configuration without displaying the interactive review menu.
+
+.FUNCTIONALITY
+Loads, normalizes, and optionally interactively updates global AS2Go settings.
+
+.COMPONENT
+Category: Main Function
+#>
 function Get-AS2GoSettings {
 
     ################################################################################
@@ -17,6 +35,8 @@ function Get-AS2GoSettings {
     #################### main code | out- host #####################
 
     Invoke-Output -Type Header -Message "Verify and Update global AS2Go Settings"
+    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-Host ""
 
     Set-ASConfig -Setting "ticketsDir" -Value $Script:AS2GOTicketsDir
 
@@ -255,7 +275,7 @@ function Get-AS2GoSettings {
 
         $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
 
-       switch ($decision) {
+        switch ($decision) {
             "Yes" { $repeat = $Script:No }
             "Quit" {
                 Write-Log -Message "Skipped AS2Go Settings verification/update!"

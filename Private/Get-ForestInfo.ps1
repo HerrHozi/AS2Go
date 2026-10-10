@@ -81,7 +81,7 @@ function Get-ForestInfo {
         CanonicalName  = Get-CanonicalName -SID ($DNSADMINS.SID) -Domain $($CurrentDomain.DomainFQDN)
     }
 
-    Invoke-Output -T Header -M "Priviledge Groups identified based on RID"
+    Invoke-Output -Type  Header -M "Priviledge Groups identified based on RID"
 
     $allGroups = $Script:GroupDA + $Script:GroupPUG + $Script:GroupEA + $Script:GroupSA + $Script:GroupDNSA
     $allGroups | Select-Object Domain, SamAccountName, SID, CanonicalName | Format-Table | Out-Host
@@ -115,7 +115,7 @@ function Get-DomainDetails {
         }
     }
     catch {
-        Invoke-Output -T Warning -M ("$DomainName | $_")
+        Invoke-Output -Type  Warning -M ("$DomainName | $_")
     }
 
 

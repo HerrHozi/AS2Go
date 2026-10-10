@@ -2,6 +2,13 @@
 .SYNOPSIS
 Creates the AS2Go sample backup share on a domain controller.
 
+.DESCRIPTION
+Creates the remote backup folder, grants Domain Admins modify access, and publishes the folder
+as an SMB share.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Creates the remote folder, grants Domain Admins modify access, and creates the SMB share.
 #>

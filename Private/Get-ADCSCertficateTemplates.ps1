@@ -2,6 +2,13 @@
 .SYNOPSIS
 Finds AS2Go certificate templates by prefix.
 
+.DESCRIPTION
+Queries Active Directory for templates matching the supplied prefix and displays their names
+and metadata.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Queries Active Directory for matching templates and displays their names and metadata.
 #>

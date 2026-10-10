@@ -1,15 +1,20 @@
+<#
+.SYNOPSIS
+Moves artifacts from the exfiltration folder to the cleanup folder.
+
+.DESCRIPTION
+Creates the cleanup folder when needed, then moves matching NTDS and other exfiltration files
+out of the active exfiltration folder to prepare it for another lab run.
+
+.FUNCTIONALITY
+Moves selected exfiltration artifacts to the cleanup folder for a clean lab run.
+
+.COMPONENT
+Category: Sub Function
+#>
 function Clear-ExfiltrationFolder {
 
-    ################################################################################
-    #####                                                                      ##### 
-    ##### Clean-up the Exfiltration Folder to remove any files from previous runs #####                                 
-    #####                                                                      #####
-    ################################################################################
-
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     # clean-up AS2Go Folder
     New-Item -Path $Script:DefautCleanUpFolder -ItemType Directory  -ErrorAction Ignore | Out-Null
@@ -23,8 +28,5 @@ function Clear-ExfiltrationFolder {
     
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info 
 }

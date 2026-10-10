@@ -2,6 +2,13 @@
 .SYNOPSIS
 Returns the preferred domain controller for a domain.
 
+.DESCRIPTION
+Accepts a domain name or distinguished name, resolves its domain, and returns the cached
+preferred domain controller.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Resolves a domain name or distinguished name through the configured controller map.
 #>

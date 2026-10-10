@@ -19,6 +19,8 @@ function Set-AttackScope {
     else {
         do {        
             
+            $title = "Define the attack scope for - $action!"
+            $message = "Target scope:"
             $Options = @(
                 [pscustomobject] @{ Label = "&Forest Level"; Help = "Entire Forest (all domains)."; Value = "Forest" },
                 [pscustomobject] @{ Label = "&Domain Level"; Help = "Select specific domain."; Value = "D" },
@@ -26,8 +28,7 @@ function Set-AttackScope {
                 [pscustomobject] @{ Label = "&OU Level"; Help = "Select specific organization unit."; Value = "OU" },
                 [pscustomobject] @{ Label = "&Skip"; Help = "Skip this attack."; Value = "S" }
             )
-            $title = "Define the attack scope for - $action!"
-            $message = "Target scope:"
+
             $scope = Show-DecisionPrompt -Message $message  -Options $Options -Default 2 -Title $title
 
             If ($scope -eq "OU") {
@@ -70,6 +71,7 @@ function Set-AttackScope {
             }
             else {
                 $DomainSearchBase = "SKIP"
+                return "SKIP"
             }
             
             If ($null -ne $DomainSearchBase) {
