@@ -2,6 +2,13 @@
 .SYNOPSIS
 Adds a deny access rule for a trustee on an organizational unit.
 
+.DESCRIPTION
+Applies an inherited DENY GenericAll access rule to the selected OU for the specified trustee,
+then verifies the resulting permission state.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Applies and verifies an inherited DENY GenericAll ACE on the selected OU.
 #>
@@ -20,10 +27,10 @@ function Set-DenyPermission {
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host #####################
 
-    Invoke-Output -T Header -Message "Set DENY permission for $Trustee"
+    Invoke-Output -Type  Header -Message "Set DENY permission for $Trustee"
 
     $cname = Convert-FromDNToCN -DistinguishedName $TargetDN
-    Invoke-Output -T TextMaker -M "on OU:" -Tm $cname
+    Invoke-Output -Type  TextMaker -M "on OU:" -Tm $cname
 
     # --- Get OU Security Descriptor from correct DC ---
     $OUObject = Get-ADObject `

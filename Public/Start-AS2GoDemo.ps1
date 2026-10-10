@@ -123,7 +123,7 @@ Function Start-AS2GoDemo {
     Clear-ExfiltrationFolder
 
 
-    Invoke-Output -T Header -M "Attack Scenario to GO - along the kill-chain (AS2Go)"
+    Invoke-Output -Type  Header -M "Attack Scenario to GO - along the kill-chain (AS2Go)"
     
     $MoAD = Confirm-PoSHModuleAvailabliy -PSModule "ActiveDirectory"
     $MoGPO = Confirm-PoSHModuleAvailabliy -PSModule "GroupPolicy"
@@ -235,7 +235,7 @@ Function Start-AS2GoDemo {
             Write-Log -Message "Skipped Attack Phase - Brute Force Account"
         }
         else {
-            Invoke-Phase04BruteForceAttack -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+            Invoke-ASPhase04BruteForceAttack -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         }
 
     }
@@ -264,7 +264,7 @@ Function Start-AS2GoDemo {
 
     Update-WindowTitle -NewTitle "Used Accounts"
 
-    Invoke-Output -T Header -M $MyInfo
+    Invoke-Output -Type  Header -M $MyInfo
 
     $Global:ASVictim = $env:UserName
 
@@ -386,7 +386,9 @@ Function Start-AS2GoDemo {
 
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -T Header -M "Attack Phase - COMPROMISED User Account"
+        Invoke-Output -Type  Header -M "Attack Phase - COMPROMISED User Account"
+        $Functionality = "This phase involves handling a compromised user account, determining if it has privileged access, `nand taking appropriate actions based on the account's sensitivity."
+        Invoke-Output -Type H1 -Message $Functionality
 
         If ($UnAttended) {
             $answer = $Script:PrivledgeAccount
@@ -491,16 +493,19 @@ Function Start-AS2GoDemo {
             Write-Host ""
             Pause
             If (-not $SkipClearHost) { Clear-Host }
-            Write-Host "____________________________________________________________________`n" 
-            Write-Host "        Displays a list of currently cached Kerberos tickets        "
-            Write-Host "____________________________________________________________________`n" 
+            invoke-output -type Header -message "Displays a list of currently cached Kerberos tickets"
+
             Write-Host ""             
             Write-Host -NoNewline "  Command: "
             Write-Highlight -Text ('klist') -Color $fgcC
             Write-Host ""           
             If ($UnAttended) { Start-Sleep 1 } else { Pause }
             Write-Host ""
-            klist
+            $tickets = Get-KlistTicket
+            $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+            Invoke-Output -Type Info -Message "Last Ticket"
+            $tickets | Select-object -Last 1 | Format-List
+            
             If ($UnAttended) { Start-Sleep 1 } else { Pause }
             #If (-not $SkipClearHost) { Clear-Host }
         }
@@ -512,7 +517,7 @@ Function Start-AS2GoDemo {
 
         # If ($skipstep) {break}
 
-        #Invoke-Output -T Header -M "??? REPEAT | Attack Phase - COMPROMISED User Account ???"
+        #Invoke-Output -Type  Header -M "??? REPEAT | Attack Phase - COMPROMISED User Account ???"
 
 
         If ($UnAttended) {
@@ -539,7 +544,7 @@ Function Start-AS2GoDemo {
         Write-Log -Message "Skipped Attack Phase - $($Script:Phase06)"
     }
     else {
-        Invoke-Phase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
+        Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
     }
 
     ################################################################################
@@ -556,7 +561,7 @@ Function Start-AS2GoDemo {
         Write-Log -Message "Skipped Attack Phase - $($Script:Phase07)"
     }
     else {
-        Invoke-Phase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
     }
 
 
@@ -571,7 +576,7 @@ Function Start-AS2GoDemo {
         Write-Log -Message "Skipped Attack Phase - $($Script:Phase09)"
     }
     else {
-        Invoke-Phase09ReconnaissancePriviledged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
+        Invoke-ASPhase09ReconnaissancePriviledged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
     }
 
 
@@ -586,8 +591,8 @@ Function Start-AS2GoDemo {
         Write-Log -Message "Skipped Attack Phase - ACCESS SENSITIVE DATA "
     }
     else {
-        Invoke-Phase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
-        Invoke-Phase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
+        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
     }
 
     ################################################################################
@@ -601,7 +606,7 @@ Function Start-AS2GoDemo {
         Write-Log -Message "Skipped Attack Phase - DOMAIN COMPROMISED AND PERSISTENCE"
     }
     else {
-        Invoke-Phase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
     }
     #endregion Attack Phase -  DOMAIN COMPROMISED AND PERSISTENCE
 

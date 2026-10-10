@@ -8,6 +8,9 @@ Creates demo accounts in Active Directory.
 Reads demo account data from the configured CSV file, prompts for the number
 of accounts and target OU, then creates the accounts and updates group membership.
 
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Creates demo accounts in Active Directory based on the specified parameters and CSV file.
 
@@ -136,6 +139,12 @@ Function Invoke-DemoAccounts {
 <#
 .SYNOPSIS
 Prompts for a positive integer within a specified limit.
+
+.DESCRIPTION
+Repeats the prompt until the user enters an integer from 1 through the supplied maximum.
+
+.COMPONENT
+Category: Sub Function
 
 .FUNCTIONALITY
 Validates entered values and returns the first number between one and the supplied maximum.

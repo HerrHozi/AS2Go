@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+Runs the Kerberoasting attack workflow for the current AS2Go stage.
+
+.DESCRIPTION
+Sets the Kerberoasting stage, explains the service-ticket attack, and calls the attack routine.
+In attended mode, prompts the user to repeat the workflow.
+
+.FUNCTIONALITY
+This attack requests Kerberos service tickets for Service Principal Names (SPNs),
+allowing weak service account passwords to potentially be cracked offline
+and the associated credentials to be recovered.
+
+.COMPONENT
+Category: Main Function
+#>
 function Invoke-KerberoastingAttack {
 
     ################################################################################
@@ -18,14 +34,9 @@ function Invoke-KerberoastingAttack {
 
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -T Header -M "Privilege Escalation via Kerberoasting"
+        Invoke-Output -Type  Header -M "Privilege Escalation via Kerberoasting"
+        Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-        $message = @"
-This attack requests Kerberos service tickets for Service Principal Names (SPNs),
-    allowing weak service account passwords to potentially be cracked offline
-    and the associated credentials to be recovered.
-"@
-        Invoke-Output -T Bullet -M $message
         Start-KerberoastingAttack    
 
         #If (-not $SkipClearHost) { Clear-Host }

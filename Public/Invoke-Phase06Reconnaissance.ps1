@@ -89,9 +89,9 @@ function Invoke-ASPhase06Reconnaissance {
         # If ($skipstep) { break }     
         If (-not $SkipClearHost) { Clear-Host }
         
-        Invoke-Output -T Header -M "Attack Phase - $($Script:Phase06.toupper())"
-
-        Write-Host "       try to collect reconnaissance and configuration data         "
+        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase06.toupper())"
+        $Functionality = "This phase involves collecting reconnaissance and configuration data with a non-privileged user."
+        Invoke-Output -Type H1 -Message $Functionality
 
         If ($AS2GoDemo) {
             If ($UnAttended) {
@@ -130,7 +130,7 @@ function Invoke-ASPhase06Reconnaissance {
 
         If (-not $AS2GoDemo) { break }
         #        If (-not $SkipClearHost) { Clear-Host }
-        #        Invoke-Output -T Header -M "??? REPEAT | Attack Phase - $($Script:Phase06)  ???"
+        #        Invoke-Output -Type  Header -M "??? REPEAT | Attack Phase - $($Script:Phase06)  ???"
 
         If ($UnAttended) {
             $repeat = $Script:No

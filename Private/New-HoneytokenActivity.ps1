@@ -21,8 +21,8 @@ function New-HoneytokenActivity {
         Get-ADUser -Filter * -Server $Script:ASDC -Credential $Credential
     }
     Catch {
-        Write-Host "Created Honeytoken activity for $Script:ASHoneyToken | Attempted to login and authenticate" -ForegroundColor $Script:FGCHighLight
-        Write-Log -Message "Created Honeytoken activity for $Script:ASHoneyToken"
+        $cn = Convert-FromDNToCN -DistinguishedName $Script:ASHoneyToken
+        Invoke-output -Type Textmaker -Message "Honeytoken activity: Attempted to login and authenticate" -Tm "$cn"
     }
         
     Write-Log -Message "    >> Used $Script:ASHoneyToken with password $randowmPW"

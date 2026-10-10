@@ -2,6 +2,13 @@
 .SYNOPSIS
 Resolves the current logon server to its fully qualified domain name.
 
+.DESCRIPTION
+Resolves LOGONSERVER through Active Directory and falls back to DNS when the directory lookup
+does not return a result.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Resolves LOGONSERVER through Active Directory, with DNS lookup as a fallback.
 #>

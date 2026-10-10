@@ -43,7 +43,7 @@ Logs the elapsed runtime for the function captured by the Begin call.
 Logs function start and end information and measures elapsed runtime.
 
 .COMPONENT
-Category: SubFunction
+Category: Sub Function
 
 #>
 function Measure-FunctionRuntime {

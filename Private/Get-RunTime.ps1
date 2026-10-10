@@ -2,6 +2,12 @@
 .SYNOPSIS
 Calculates elapsed time from a supplied start time.
 
+.DESCRIPTION
+Parses the supplied start timestamp and returns the elapsed time span through the current time.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Returns the elapsed time span between the start time and the current time.
 #>

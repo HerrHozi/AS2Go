@@ -14,7 +14,7 @@ function Get-FileVersion {
         #       Write-Host "WARNING: Cannot find file - $fullname!" -ForegroundColor $Script:FGCWarning
         #       Write-Log -Message "WARNING: Cannot find file - $fullname!" -level WARN
 
-        Invoke-Output -T Warning -M "Cannot find file - $fullname!"
+        Invoke-Output -Type  Warning -M "Cannot find file - $fullname!"
 
         If ($fullname.ToUpper() -eq $Script:ConfigFile.ToUpper()) {
             Write-Host "`n`nProbably you started the PoSH Script $scriptName `nfrom the wrong directory $Script:ConfigFile!" -ForegroundColor $Script:FGCError

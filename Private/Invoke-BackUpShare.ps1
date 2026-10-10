@@ -2,6 +2,13 @@
 .SYNOPSIS
 Creates a domain controller share with sample AD backup files.
 
+.DESCRIPTION
+Guides the user through selecting a preferred domain controller and creating the AD backup
+share, then copies sample files and saves the share path in module settings.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Selects the preferred DC and creates an AD-Backup share.
 Copies and lists sample backup files, then saves the share path in module settings.

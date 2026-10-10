@@ -2,6 +2,13 @@
 .SYNOPSIS
 Lists Active Directory Certificate Services enrollment services.
 
+.DESCRIPTION
+Queries enrollment service objects and reports server reachability and assigned certificate
+templates.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Reports enrollment servers, reachability, and whether certificate templates are assigned.
 #>

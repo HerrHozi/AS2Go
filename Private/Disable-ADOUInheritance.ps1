@@ -10,6 +10,9 @@
 
         The operation is executed against a specific Domain Controller.
 
+    .COMPONENT
+    Category: Main Function
+
     .FUNCTIONALITY
     Disables OU ACL inheritance, removes inherited permissions, and returns the resulting ACL state.
 
@@ -49,11 +52,11 @@ function Disable-ADOUInheritance {
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host #####################
 
-    Invoke-Output -T Header -M "Disable AD OU Inheritance"
+    Invoke-Output -Type  Header -M "Disable AD OU Inheritance"
 
     $cname = Convert-FromDNToCN -DistinguishedName $TargetDN
 
-    Invoke-output -T TextMaker -M "Disabling inheritance on OU:" -Tm $cname
+    Invoke-Output -Type  TextMaker -M "Disabling inheritance on OU:" -Tm $cname
 
     Write-Verbose "Target OU DN : $TargetDN"
     Write-Verbose "Target DC    : $LogonServer"

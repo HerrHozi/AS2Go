@@ -2,6 +2,12 @@
 .SYNOPSIS
 Converts a distinguished name to canonical Active Directory path format.
 
+.DESCRIPTION
+Decodes escaped distinguished-name components and returns the corresponding canonical AD path.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Decodes escaped DN components and returns the corresponding canonical path.
 #>

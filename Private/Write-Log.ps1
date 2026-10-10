@@ -2,6 +2,12 @@
 .SYNOPSIS
 Writes a timestamped message to the AS2Go log.
 
+.DESCRIPTION
+Writes a timestamped message with the requested severity when module logging is enabled.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Writes the selected severity and message when module logging is enabled.
 #>

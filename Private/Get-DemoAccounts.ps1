@@ -2,6 +2,13 @@
 .SYNOPSIS
 Finds and displays AS2Go demo users in a domain.
 
+.DESCRIPTION
+Finds accounts marked as AS2Go demo users, reports their count, and displays selected account
+details as examples.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Counts tagged demo accounts and displays a sample with selected account details.
 #>

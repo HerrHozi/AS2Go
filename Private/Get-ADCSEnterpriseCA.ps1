@@ -2,6 +2,13 @@
 .SYNOPSIS
 Inventories Enterprise CAs registered in Active Directory.
 
+.DESCRIPTION
+Reads enterprise CA objects and correlates their certificates, server availability, and
+published certificate templates.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Builds CA certificate relationships and reports server availability and template status.
 #>

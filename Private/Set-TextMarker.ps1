@@ -2,6 +2,13 @@
 .SYNOPSIS
 Formats a table and highlights rows matching a selected value.
 
+.DESCRIPTION
+Aligns the supplied table data and colors rows whose selected column matches the requested
+value.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Builds aligned columns and colors rows that match the requested column value.
 #>

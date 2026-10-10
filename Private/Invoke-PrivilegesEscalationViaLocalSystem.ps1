@@ -1,3 +1,20 @@
+<#
+.SYNOPSIS
+Presents PsExec command options for privilege escalation in the AS2Go lab.
+
+.DESCRIPTION
+Displays PsExec command choices for Local System, Help Desk, or Domain Admin execution on the
+victim machine. The user can select a command to run or skip the workflow, then choose whether
+to repeat the selection.
+
+.FUNCTIONALITY
+This attack abuses the fact that the Local System account has extensive privileges on the Active Directory. 
+By using PsExec, an attacker can execute a command prompt with Local System privileges, 
+which can be used to further escalate privileges or perform malicious activities on the environment.
+
+.COMPONENT
+Category: Main Function
+#>
 function Invoke-PrivilegesEscalationViaLocalSystem {
 
     ################################################################################
@@ -21,14 +38,8 @@ function Invoke-PrivilegesEscalationViaLocalSystem {
         If (-not $SkipClearHost) { Clear-Host }
 
         Invoke-Output -Type Header -Message "Select your preferred PSExec Command"
+        Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-        $message = @"
-This attack abuses the fact that the Local System account has extensive privileges on the Active Directory. 
-    By using PsExec, an attacker can execute a command prompt with Local System privileges, 
-    which can be used to further escalate privileges or perform malicious activities on the environment.
-"@
-
-        Invoke-Output -Type Bullet -Message $message
 
         Write-Host "`nEnter " -NoNewline 
         Write-Host "H " -NoNewline -ForegroundColor Yellow

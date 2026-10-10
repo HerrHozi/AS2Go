@@ -272,18 +272,18 @@ function Initialize-AS2GoLabConfiguration {
 
     try {
         Import-Module $Global:PathADCSGoat -NoClobber -ErrorAction Stop
-        Invoke-Output -T Bullet -M "Imported PowerShell module: " -TM "ADCSGoat"
+        Invoke-Output -Type  Bullet -M "Imported PowerShell module: " -TM "ADCSGoat"
     } 
     catch {
-        Invoke-Output -T Error -M "Unable to import PowerShell module $Global:PathADCSGoat"
+        Invoke-Output -Type  Error -M "Unable to import PowerShell module $Global:PathADCSGoat"
     }
 
     try {
         Import-Module $Global:PathPSCertutil -NoClobber -ErrorAction Stop
-        Invoke-Output -T Bullet -M "Imported PowerShell module: " -TM "PSCertutil"
+        Invoke-Output -Type  Bullet -M "Imported PowerShell module: " -TM "PSCertutil"
     } 
     catch {
-        Invoke-Output -T Error -M "Unable to import PowerShell module $Global:PathPSCertutil"
+        Invoke-Output -Type  Error -M "Unable to import PowerShell module $Global:PathPSCertutil"
     }
 
     if ($MoAD -eq "failed" -or $MoDNS -eq "failed") {
@@ -397,7 +397,7 @@ function Initialize-AS2GoLabConfiguration {
     Write-Log -Message "    Run Time: $runtime [h] ###"
     Write-Log -Message "### End Function $CurrentFunction ###"
 
-    Invoke-Output -T Header -M "Any feedback is welcome - zimmermann.holger@live.de!"
+    Invoke-Output -Type  Header -M "Any feedback is welcome - zimmermann.holger@live.de!"
 
     Write-Log -Message "  >> Force garbage collection"
     [GC]::Collect()

@@ -91,13 +91,13 @@ function Invoke-ASPhase07PrivilegeEscalation {
     If (-not $SkipImages) { Show-Phases -Phase "phase_007.html" }
     If (-not $SkipClearHost) { Clear-Host }
     
-    Invoke-Output -T Header -M "Attack Phase - $($Script:Phase07.toupper())"
-    Invoke-Output -T Bullet "Reuse captured NTLM hashes to authenticate via Pass-the-Hash"
-    Invoke-Output -T Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
-    Invoke-Output -T Bullet "Roast Kerberos service tickets to recover weak (service) account passwords"
-    Invoke-Output -T Bullet "Abuse an ESC1-vulnerable certificate template to impersonate privileged users"
-    Invoke-Output -T Bullet "Gain remote code execution as Local System using PsExec"
-    Invoke-Output -T Bullet "Extract credentials from process memory"
+    Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
+    Invoke-Output -Type  Bullet "Reuse captured NTLM hashes to authenticate via Pass-the-Hash"
+    Invoke-Output -Type  Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
+    Invoke-Output -Type  Bullet "Roast Kerberos service tickets to recover weak (service) account passwords"
+    Invoke-Output -Type  Bullet "Abuse an ESC1-vulnerable certificate template to impersonate privileged users"
+    Invoke-Output -Type  Bullet "Gain remote code execution as Local System using PsExec"
+    Invoke-Output -Type  Bullet "Extract credentials from process memory"
 
 
     Do {

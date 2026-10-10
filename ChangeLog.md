@@ -2,9 +2,14 @@
 
 ```Text
 Author:          Holger Zimmermann | <zimmermann.holger@live.de>
-Current Version: 2026.10.9.607
-Last Update:     2026-10-09
+Current Version: 2026.10.10.987
+Last Update:     2026-10-10
 ```
+
+- Version 2026.10.10.987
+  - Added Function Get-KListTickets
+  - Updated Help and added block `.COMPONENT` `.FUNCTIONALITY`
+  - Added Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
 - Version 2026.10.9.607
   - Added Function Measure-FunctionRuntime & Set-BreakGlassAccount (for testing)
@@ -119,10 +124,10 @@ Last Update:     2026-10-09
   - Added Functions Get-UPNSuffix & Set-UPNSuffix
 
 - Version 2026.2.24.685
-  - Updated Functions Invoke-Phase12DomainCompromisePersistence
+  - Updated Functions Invoke-ASPhase12DomainCompromisePersistence
 
 - Version 2026.2.24.534
-  - Updated Functions Invoke-Phase10AccessSensitiveData & Invoke-Phase11ExfiltrateSensitiveData
+  - Updated Functions Invoke-ASPhase10AccessSensitiveData & Invoke-ASPhase11ExfiltrateSensitiveData
 
 - Version 2026.2.23.1100
   - Updated Function Get-AS2GoSettings
@@ -216,7 +221,7 @@ Last Update:     2026-10-09
   - Added Function Write-ASMessage
 
 - Version 2025.10.21.653
-  - Added Function Invoke-Phase12DomainCompromisePersistence
+  - Added Function Invoke-ASPhase12DomainCompromisePersistence
 
 - Version 2025.10.17.1010
   - Updated Functions Start-ReconnaissanceExtended & Start-Reconnaissance
@@ -228,7 +233,7 @@ Last Update:     2026-10-09
   - Updated Function New-PasswordSprayAttack & Start-PasswordSprayAttack
 
 - Version 2025.10.1.801
-  - Updated Posh Module for function Invoke-Phase09ReconnaissancePriviledged
+  - Updated Posh Module for function Invoke-ASPhase09ReconnaissancePriviledged
   - Added Function Get-DomainType
 
 - Version 2025.9.30.1279
@@ -242,13 +247,13 @@ Last Update:     2026-10-09
   - Updated PoSH Module for functions New-PrivilegeEscalationRecommendation & Start-KerberoastingAttack
 
 - Version 2025.9.29.645
-  - Updated PoSH Module for step Invoke-Phase07PrivilegeEscalation
+  - Updated PoSH Module for step Invoke-ASPhase07PrivilegeEscalation
 
 - Version 2025.3.12.567
-  - Updated PoSH Module for step Invoke-Phase06Reconnaissance
+  - Updated PoSH Module for step Invoke-ASPhase06Reconnaissance
 
 - Version 2025.3.10.567
-  - Updated PoSH Module for step Invoke-Phase04BruteForceAttack
+  - Updated PoSH Module for step Invoke-ASPhase04BruteForceAttack
 
 - Version 2025.3.8.567
 - converted from PoSH Script to PoSH Module

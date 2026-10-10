@@ -2,6 +2,12 @@
 .SYNOPSIS
 Classifies the domains in an Active Directory forest.
 
+.DESCRIPTION
+Labels each forest domain as the root domain, a child domain, or the root of a separate tree.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Labels each domain as a forest root, child domain, or separate tree root.
 #>
@@ -26,7 +32,7 @@ function Get-DomainType {
 
     # Ensure AD module
     if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
-        Invoke-Output -T Error -M "The 'ActiveDirectory' PowerShell module is not installed."
+        Invoke-Output -Type  Error -M "The 'ActiveDirectory' PowerShell module is not installed."
         return
     }
 

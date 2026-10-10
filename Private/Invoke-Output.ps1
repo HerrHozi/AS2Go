@@ -2,6 +2,13 @@
 .SYNOPSIS
 Displays consistently formatted AS2Go console output.
 
+.DESCRIPTION
+Formats typed messages with the module's console conventions and forwards applicable output
+to the logging helper.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Renders typed console messages and forwards them to logging.
 #>

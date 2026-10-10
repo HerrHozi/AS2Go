@@ -2,6 +2,13 @@
 .SYNOPSIS
 Counts domain controllers in each forest domain.
 
+.DESCRIPTION
+Counts read-write and read-only domain controllers for every forest domain and stores the
+totals for later configuration steps.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Stores the read-write and read-only controller totals for every domain.
 #>

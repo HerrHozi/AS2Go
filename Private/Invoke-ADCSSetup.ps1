@@ -1,5 +1,6 @@
 <#
 .COMPONENT
+Category: Main Function
 
 .SYNOPSIS
 Configures Active Directory Certificate Services for the AS2Go training lab.

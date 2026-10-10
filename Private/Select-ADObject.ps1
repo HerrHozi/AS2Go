@@ -9,6 +9,9 @@
         tree view of the forest structure with custom icons for different object types. It supports browsing 
         across multiple domains and optionally highlights Tier 0 (high-security) objects.
 
+    .COMPONENT
+    Category: Sub Function
+
     .FUNCTIONALITY
     Browses forest objects in a GUI, supports OU creation, and highlights selected Tier 0 entries.
 

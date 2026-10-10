@@ -12,7 +12,7 @@ function Get-VulnerableCertificateTemplate {
     
     $CAtemplate = Get-ASConfig -Setting "BadCA"
 
-    Invoke-Output -T CodeSnippet -M "A simple LDAP query is sufficient:"
+    Invoke-Output -Type  CodeSnippet -M "A simple LDAP query is sufficient:"
     #$code = "`$SearchFilter =  (&(objectClass=pKICertificateTemplate)(cn=`$PublishedTemplate)(msPKI-Certificate-Name-Flag=1)(msPKI-Certificate-Application-Policy=1.3.6.1.5.5.7.3.2))"
     # Write-HighlightedCode  -code $code
 

@@ -87,8 +87,8 @@ function Invoke-ASPhase09ReconnaissancePriviledged {
         # If ($skipstep) { break }     
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -T Header -M "Attack Phase - $($Script:Phase09)"
-        Invoke-Output -T Bullet -M "Use the newly gained privileges to collect reconnaissance and configuration data from the current logon server."
+        Invoke-Output -Type  Header -Message "Attack Phase - $($Script:Phase09)"
+        Invoke-Output -Type  H1 -Message "Use the newly gained privileges to collect reconnaissance `nand configuration data from the current logon server."
  
 
         If ($UnAttended) {
@@ -104,7 +104,9 @@ function Invoke-ASPhase09ReconnaissancePriviledged {
             If (-not $SkipClearHost) { Clear-Host }
 
             Invoke-output -Type Header -Message "Show Services and Processes on Logon Server"
-            
+            $Functionality = "Displays services and processes from the current logon server for reconnaissance. `n"
+            Invoke-Output -Type H1 -Message $Functionality
+
             $server = $env:LOGONSERVER.replace("\", "")
 
             Write-Host      -NoNewline "  Commands: "

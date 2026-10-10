@@ -244,9 +244,12 @@ function Invoke-PassTheTicketAttack {
     write-host ""
     Set-ASConfig -Setting "LastStage" -Value $Script:PtT
     Set-NewColorSchema -NewStage $Script:PtT
-
+   $tickets = Get-KlistTicket
+    $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+    Invoke-Output -Type Info -Message "Last Ticket"
+    $tickets | Select-object -Last 1 | Format-List
     
-    klist
+
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
     Write-Host "____________________________________________________________________`n" 

@@ -89,10 +89,10 @@ function Invoke-ASPhase10AccessSensitiveData {
         If (-not $SkipImages) { Show-Phases -Phase "phase_010.html" }
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -T Header -M "Attack Phase - $($Script:Phase10.toupper())"
-        Invoke-Output -T Bullet "Enumerate available network shares on a domain controller"
-        Invoke-Output -T Bullet "Enumerate the content of exposed backup shares"
-        Invoke-Output -T Bullet "Attempt to open a command console on a privileged admin workstation (PAW)"
+        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase10.toupper())"
+        Invoke-Output -Type  Bullet "Enumerate available network shares on a domain controller"
+        Invoke-Output -Type  Bullet "Enumerate the content of exposed backup shares"
+        Invoke-Output -Type  Bullet "Attempt to open a command console on a privileged admin workstation (PAW)"
 
         If ($UnAttended) {
             $answer = $Script:Yes

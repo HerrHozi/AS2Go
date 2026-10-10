@@ -2,6 +2,13 @@
 .SYNOPSIS
 Prepares a folder for AS2Go training tools.
 
+.DESCRIPTION
+Prompts for a destination, configures Defender exclusions, copies protected tool archives, and
+displays guidance for extracting the training tools.
+
+.COMPONENT
+Category: Main Function
+
 .FUNCTIONALITY
 Selects a tools folder, configures Defender exclusions, copies archives, and guides extraction.
 #>

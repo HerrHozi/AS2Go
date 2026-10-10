@@ -43,7 +43,7 @@ function New-PasswordSprayAttack {
     #################### main code | out- host #####################
     
     if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
-        Invoke-Output -T Error -M "The 'ActiveDirectory' PowerShell module is not installed."
+        Invoke-Output -Type  Error -M "The 'ActiveDirectory' PowerShell module is not installed."
         return
     }
 

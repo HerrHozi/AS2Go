@@ -1,31 +1,32 @@
-function ConvertFrom-KlistDate {
-    param([string]$Value)
 
-    $Value = $Value.Trim()
 
-    # "(local)" entfernen
-    $Value = $Value -replace '\s*\(local\)\s*$', ''
+<#
+.SYNOPSIS
+Parses klist ticket output into structured ticket objects.
 
-    $parsed = [datetime]::MinValue
+.DESCRIPTION
+Parses output from klist tickets, or lines supplied through KlistOutput, into ticket objects.
+Extracts client and server identities, encryption and cache flags, and ticket timestamps.
+Attempts to parse ticket dates using the current, invariant, and en-US cultures.
 
-    foreach ($culture in @(
-            [System.Globalization.CultureInfo]::CurrentCulture,
-            [System.Globalization.CultureInfo]::InvariantCulture,
-            [System.Globalization.CultureInfo]::GetCultureInfo('en-US')
-        )) {
-        if ([datetime]::TryParse(
-                $Value,
-                $culture,
-                [System.Globalization.DateTimeStyles]::AllowWhiteSpaces,
-                [ref]$parsed
-            )) {
-            return $parsed
-        }
-    }
+.PARAMETER KlistOutput
+Optional lines from klist tickets. Defaults to invoking klist tickets.
 
-    return $Value
-}
+.OUTPUTS
+System.Management.Automation.PSCustomObject. Parsed Kerberos ticket metadata.
 
+.EXAMPLE
+Get-KlistTicket
+
+.EXAMPLE
+Get-KlistTicket -KlistOutput $output
+
+.FUNCTIONALITY
+Parses klist ticket output into structured Kerberos ticket objects.
+
+.COMPONENT
+Category: Sub Function
+#>
 function Get-KlistTicket {
     [CmdletBinding()]
     param(
@@ -121,8 +122,34 @@ function Get-KlistTicket {
     $tickets
 }
 
-#$tickets = Get-KlistTicket
-#$tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+function ConvertFrom-KlistDate {
+    param([string]$Value)
+
+    $Value = $Value.Trim()
+
+    # "(local)" entfernen
+    $Value = $Value -replace '\s*\(local\)\s*$', ''
+
+    $parsed = [datetime]::MinValue
+
+    foreach ($culture in @(
+            [System.Globalization.CultureInfo]::CurrentCulture,
+            [System.Globalization.CultureInfo]::InvariantCulture,
+            [System.Globalization.CultureInfo]::GetCultureInfo('en-US')
+        )) {
+        if ([datetime]::TryParse(
+                $Value,
+                $culture,
+                [System.Globalization.DateTimeStyles]::AllowWhiteSpaces,
+                [ref]$parsed
+            )) {
+            return $parsed
+        }
+    }
+
+    return $Value
+}
+
 
 #$tickets |
 #Where-Object { $_.Server -match 'krbtgt' } |

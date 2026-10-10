@@ -32,7 +32,11 @@
     - Optional Rubeus integration for Kerberos-based attacks
 
 .LINK
-    Invoke-Phase04BruteForceAttack
+    Invoke-ASPhase04BruteForceAttack
+
+.FUNCTIONALITY
+    Executes a password spray attack against Active Directory users, 
+    attempting to authenticate multiple accounts with one or more passwords within the specified scope.
 
 #>
 
@@ -80,8 +84,9 @@ function Invoke-ASPhase04BruteForceAttack {
         # If ($skipstep) { break }            
         
         If (-not $SkipClearHost) { Clear-Host }
-        Invoke-Output -T Header -M "Attack Phase - $($Script:Phase04.toupper())"
-        Invoke-output -T Bullet -M "Perform a password spraying attack (a form of brute-force) to validate detection and response."
+        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase04.toupper())"
+        Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+
                 
         If ($AS2GoDemo) {
             if ($UnAttended -eq $true) {

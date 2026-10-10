@@ -2,6 +2,13 @@
 .SYNOPSIS
 Displays the account setting shown as the current honeytoken.
 
+.DESCRIPTION
+Reads the BreakGlassAccount setting and displays it beneath the HoneyToken heading, or warns
+when the setting is empty.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Reads BreakGlassAccount and displays it under the HoneyToken heading, or warns if unset.
 #>

@@ -2,6 +2,13 @@
 .SYNOPSIS
 Displays the configured break-glass account.
 
+.DESCRIPTION
+Reads the saved account distinguished name and displays the resolved account or an unset-state
+message.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Reads the saved account distinguished name and reports whether one is configured.
 #>

@@ -2,6 +2,13 @@
 .SYNOPSIS
 Installs missing AD CS services on the selected domain controller.
 
+.DESCRIPTION
+Checks the selected domain controller for CA and Web Enrollment roles, installs missing services,
+and reports the resulting service status.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Checks CA and Web Enrollment status, installs missing roles, then reports their service state.
 #>

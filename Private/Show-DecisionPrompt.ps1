@@ -2,6 +2,13 @@
 .SYNOPSIS
 Displays a menu prompt and returns the selected option.
 
+.DESCRIPTION
+Builds a console menu from the supplied options, collects the user's selection, and returns
+the corresponding option value.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Builds console choices from the supplied options and returns the selected value.
 #>

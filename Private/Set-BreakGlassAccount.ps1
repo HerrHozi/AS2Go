@@ -10,7 +10,7 @@ This account is excluded from all attack scenarios and is not considered in any 
 Stores the selected account DN so the account can be excluded from attack scenarios.
 
 .COMPONENT
-Category: Mainfunction
+Category: Main Function
 #>
 function Set-BreakGlassAccount {
 

