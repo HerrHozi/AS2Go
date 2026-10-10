@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Writes a timestamped message to the AS2Go log.
+
+.FUNCTIONALITY
+Writes the selected severity and message when module logging is enabled.
+#>
 Function Write-Log {
 
     ################################################################################

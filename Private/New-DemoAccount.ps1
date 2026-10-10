@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Creates demo Active Directory users from the configured CSV file.
+
+.FUNCTIONALITY
+Checks the OU, optionally builds nested OUs, then creates selected users with scenario data.
+#>
 function New-DemoAccount {
 
     param(

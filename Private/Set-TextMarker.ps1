@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Formats a table and highlights rows matching a selected value.
+
+.FUNCTIONALITY
+Builds aligned columns and colors rows that match the requested column value.
+#>
 function Set-TextMarker {
 
     ################################################################################

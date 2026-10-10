@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Counts domain controllers in each forest domain.
+
+.FUNCTIONALITY
+Stores the read-write and read-only controller totals for every domain.
+#>
 function Get-NumberofDCs {
 
     ################################################################################

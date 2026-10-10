@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Sets the console background and foreground colors.
+
+.FUNCTIONALITY
+Applies the supplied colors to the current PowerShell host console.
+#>
 Function Set-NewBackgroundColor {
 
     ################################################################################

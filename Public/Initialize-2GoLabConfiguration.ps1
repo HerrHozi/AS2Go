@@ -17,6 +17,10 @@ function Initialize-AS2GoLabConfiguration {
     Additionally, a file share is created on the Domain Controller to simulate a 
     backup repository containing fake backup files for assessment and testing scenarios.
 
+    .FUNCTIONALITY
+    Checks prerequisites and forest; configures tiered AD assets, demo accounts, and break-glass.
+    Sets up DNS/MDI, AD CS, and a backup share; guides tool setup and verifies the lab.
+
     .PARAMETER AS2GoOU
     Specifies the name of the Active Directory Organizational Unit (OU) to be created or used for AS2Go 
     resources. Default value is "AS2Go".
@@ -201,17 +205,31 @@ function Initialize-AS2GoLabConfiguration {
     $title = "Confirm the requirements" 
     $Message = "Proceed with the initial AS2Go environment configuration?"
  
-    $Options = @(
-        [pscustomobject] @{ Label = "&Yes, all requirements are fulfilled"; Help = "Yes."; Value = $Script:Yes },
-        [pscustomobject] @{ Label = "&Continue, but NOT all requirements are fulfilled (not recommended)"; Help = "e.g. Setup the ADCS could fail"; Value = $Script:Yes },
-        [pscustomobject] @{ Label = "&Quit"; Help = "Quit & return"; Value = $Script:No }
-    )
+    if ((Get-ASConfig -Setting "SkipRequirementsConfirmation") -ne "True") {
 
-    $answer = Show-DecisionPrompt -Title $title -Message $message -default 2 -Options $Options
+        Invoke-Output -Type H1 -Message "`n[!] When Microsoft Defender for Endpoint (MDE) & Identity (MDI) is in your AD environment present please consider the following requirements:`n"
+        Invoke-output -Type Bullet -Message "MDI - Disable Microsoft XDR or set excclusion."
+        Invoke-output -Type Bullet -Message "MDE - Disable Real-time protection."
+        Invoke-output -Type Bullet -Message "MDE - Disable Cloud-Delivered protection."
 
-    if ($answer -eq $Script:No) {
-        Write-Log -Message "User chose to quit the initial configuration. Exiting..."
-        return
+
+
+        $Options = @(
+            [pscustomobject] @{ Label = "&Yes"; Help = "all requirements are fulfilled"; Value = $Script:Yes },
+            [pscustomobject] @{ Label = "&Continue, but NOT all requirements are fulfilled"; Help = "Not recommended, e.g. Setup the ADCS could fail"; Value = $Script:Yes },
+            [pscustomobject] @{ Label = "&Don't show this again"; Help = "Continue and skip this confirmation next time."; Value = "Dont" },
+            [pscustomobject] @{ Label = "&Quit"; Help = "Quit & return"; Value = $Script:No }
+        )
+
+        $answer = Show-DecisionPrompt -Title $title -Message $message -default 1 -Options $Options
+
+        if ($answer -eq "Dont") {
+            Set-ASConfig -Setting "SkipRequirementsConfirmation" -Value "True"
+        }
+        elseif ($answer -eq $Script:No) {
+            Write-Log -Message "User chose to quit the initial configuration. Exiting..."
+            return
+        }
     }
 
     If ((Get-CimInstance Win32_ComputerSystem).PartOfDomain) {
@@ -238,10 +256,16 @@ function Initialize-AS2GoLabConfiguration {
     Invoke-output -Type Bullet -Message "Current Logon Server: " -TM $Script:LogonServer
     Invoke-output -Type Bullet -Message "Current User:         " -TM $currentuser
 
-
     $server = $Script:BestDCs[$FQDN]
     write-Log -Message "    >> Attempting to retrieve group membership for user '$samaccountname' from server '$server' for verification..."
-    Get-ADPrincipalGroupMembership -Identity $samaccountname -Server $server | Select-Object @{N = 'MemberOf'; E = { $_.samaccountname } } | Out-Host
+    $membership = @(Get-ADPrincipalGroupMembership -Identity $samaccountname -Server $server) 
+    $membership | Select-Object @{N = 'MemberOf'; E = { $_.samaccountname } }, @{N = 'SID'; E = { $_.sid } }  | Out-Host
+
+    $test = $membership | where-object { $_.SID -like "*-512" -or $_.SID -like "*-519" }
+    if ($test.Count -eq 0) {
+        Invoke-Output -type Warning -Message "To run this configuration, ensure the user is a member of the Enterprise Admins group or the Domain Admins group."
+        return
+    }
 
     $MoAD = Confirm-PoSHModuleAvailabliy -PSModule "ActiveDirectory"
     $MoDNS = Confirm-PoSHModuleAvailabliy -PSModule "DnsServer"
@@ -262,7 +286,6 @@ function Initialize-AS2GoLabConfiguration {
         Invoke-Output -T Error -M "Unable to import PowerShell module $Global:PathPSCertutil"
     }
 
-
     if ($MoAD -eq "failed" -or $MoDNS -eq "failed") {
         [bool]$PreCheckFailed = $true
     }
@@ -277,7 +300,6 @@ function Initialize-AS2GoLabConfiguration {
             }
         }
     }
-
 
     $title = "AS2Go - Environment Configuration"
     $message = "Follow the listed order for optimal execution."

@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Installs the AD CS Web Enrollment role on a remote server.
+
+.FUNCTIONALITY
+Adds the Web Enrollment feature and configures the AD CS enrollment website.
+#>
 function Install-ADCSEnrollmentServices {
 
     ################################################################################

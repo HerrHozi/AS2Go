@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Selects the UPN suffix for new demo accounts.
+
+.FUNCTIONALITY
+Keeps the saved suffix or prompts for a new one and returns the selected value.
+#>
 function Set-UPNSuffix {
 
     ################################################################################

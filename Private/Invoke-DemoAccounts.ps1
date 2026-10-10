@@ -1,5 +1,31 @@
 
 
+<#
+.SYNOPSIS
+Creates demo accounts in Active Directory.
+
+.DESCRIPTION
+Reads demo account data from the configured CSV file, prompts for the number
+of accounts and target OU, then creates the accounts and updates group membership.
+
+.FUNCTIONALITY
+Creates demo accounts in Active Directory based on the specified parameters and CSV file.
+
+.PARAMETER AS2GoOU
+Name of the parent AS2Go organizational unit for the default target OU.
+
+.PARAMETER Scenario
+Scenario value assigned to the new demo accounts.
+
+.PARAMETER UPNSuffix
+UPN suffix used for the new accounts.
+
+.PARAMETER Server
+Required server name. AD operations currently use the configured logon server.
+
+.EXAMPLE
+Invoke-DemoAccounts -Server "DC01.example.com"
+#>
 Function Invoke-DemoAccounts {
 
    ################################################################################
@@ -20,8 +46,13 @@ Function Invoke-DemoAccounts {
    Write-Log -Message "### Start Function $CurrentFunction ###"
    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
    #################### main code | out- host #####################
+   
    If (-not $SkipClearHost) { Clear-Host }
-   Invoke-Output -Type Header -Message "Add AS2GO Demo Accounts to the Lab"
+   Invoke-Output -Type Header -Message "Add AS2Go Demo Accounts to the Lab"
+
+   $Functionality = (Get-Help $CurrentFunction).Functionality
+   Invoke-Output -Type H1 -Message $Functionality
+
 
    [int]$recommendAmount = Get-ASConfig -Setting "LastNumofDemoUsers"
    $FileWithDemoUsers = Join-Path -Path $Script:ASSetup -ChildPath "AS2GO-DemoUsers.csv"
@@ -74,9 +105,17 @@ Function Invoke-DemoAccounts {
    $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
 
    If ($answer -eq "O") {
-      $OrganizationalUnit = Select-ADObject -Title "Select Target OU - Domain switching is NOT supported (YET)!" -LocalDomainOnly
-      $cname = Convert-FromDNToCN -DistinguishedName $OrganizationalUnit
-      Invoke-Output -Type TextMaker -Message "Changed target OU to:" -TM $cname
+      $OrganizationalUnit = Select-ADObject -Title "Select Target OU - Domain switching is NOT supported (YET)!" -LocalDomainOnly -AddOU
+      if ($OrganizationalUnit -eq $null) {
+         Invoke-Output -Type Warning -Message "No organizational unit was selected. Using the default OU."
+         $OrganizationalUnit = "OU=Demo Accounts,OU=$AS2GoOU,$((Get-ADDomain).DistinguishedName)"
+         $cname = Convert-FromDNToCN -DistinguishedName $OrganizationalUnit
+      }
+      else {
+         $cname = Convert-FromDNToCN -DistinguishedName $OrganizationalUnit
+         Invoke-Output -Type TextMaker -Message "Changed target OU to:" -TM $cname
+      }
+
    }
 
    Set-ASConfig -Setting "MySearchBase" -Value $OrganizationalUnit
@@ -94,6 +133,13 @@ Function Invoke-DemoAccounts {
 }
 
 
+<#
+.SYNOPSIS
+Prompts for a positive integer within a specified limit.
+
+.FUNCTIONALITY
+Validates entered values and returns the first number between one and the supplied maximum.
+#>
 function Read-Value {
    param (
       [int]$Prompt

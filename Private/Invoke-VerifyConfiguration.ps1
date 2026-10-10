@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Checks the configured AS2Go lab environment.
+
+.FUNCTIONALITY
+Audits break-glass, tiering, groups, demo users, AD CS, enrollment services, and honeytokens.
+#>
 function Invoke-VerifyConfiguration {
 
     ################################################################################
@@ -15,6 +22,8 @@ function Invoke-VerifyConfiguration {
     If (-not $SkipClearHost) { Clear-Host }
     
     Invoke-Output -Type Header -Message "Check if all AS2GO Active Directory requirements are met."
+    $Functionality = (Get-Help $CurrentFunction).Functionality
+    Invoke-Output -Type H1 -Message $Functionality
 
     Get-BreakGlassAccount
 

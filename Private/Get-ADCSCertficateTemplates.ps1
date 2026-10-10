@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Finds AS2Go certificate templates by prefix.
+
+.FUNCTIONALITY
+Queries Active Directory for matching templates and displays their names and metadata.
+#>
 function Get-ADCSCertifcateTemplates {
 
     ################################################################################

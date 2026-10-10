@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Tests forest domain controllers and selects a preferred controller per domain.
+
+.FUNCTIONALITY
+Checks controller reachability and LDAP availability, then caches the preferred DCs.
+#>
 function Set-BestDomainController {
 
     ################################################################################

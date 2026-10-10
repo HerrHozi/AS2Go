@@ -1,13 +1,17 @@
-﻿# Change Log
+# Change Log
 
 ```Text
 Author:          Holger Zimmermann | <zimmermann.holger@live.de>
-Current Version: 2026.10.7.871
-Last Update:     2026-10-07
+Current Version: 2026.10.9.607
+Last Update:     2026-10-09
 ```
 
+- Version 2026.10.9.607
+  - Added Function Measure-FunctionRuntime & Set-BreakGlassAccount (for testing)
+
 - Version 2026.10.7.871
-  - TBD
+  - Updated Function Invoke-PassTheTicketAttack
+  - Added Function Get-KirbiTicketInfo, Get-KirbiUniqueAccounts, Get-KirbiUniqueInfo
 
 - Version 2026.8.10.1104
   - Updated Function Invoke-ADCSSetup | added option for new prefix

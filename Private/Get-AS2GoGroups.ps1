@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Finds and displays AS2Go security groups in a domain.
+
+.FUNCTIONALITY
+Counts groups tagged as AS2Go admins, helpdesk, or victims and shows examples.
+#>
 function Get-AS2GoGroups {
 
     ################################################################################

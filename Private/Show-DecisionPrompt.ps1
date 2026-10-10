@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Displays a menu prompt and returns the selected option.
+
+.FUNCTIONALITY
+Builds console choices from the supplied options and returns the selected value.
+#>
 function Show-DecisionPrompt {
     
     ################################################################################

@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Prompts for a text answer with a default value.
+
+.FUNCTIONALITY
+Returns the entered answer in uppercase, using the default when input is blank.
+#>
 Function Get-Answer {
 
     ################################################################################

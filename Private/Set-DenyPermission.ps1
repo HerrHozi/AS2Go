@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Adds a deny access rule for a trustee on an organizational unit.
+
+.FUNCTIONALITY
+Applies and verifies an inherited DENY GenericAll ACE on the selected OU.
+#>
 function Set-DenyPermission {
 
     ################################################################################

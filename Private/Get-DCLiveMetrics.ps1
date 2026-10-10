@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Measures CPU load and LDAP response time on a domain controller.
+
+.FUNCTIONALITY
+Uses remote counters and RootDSE access, then returns CPU and LDAP metrics.
+#>
 function Get-DCLiveMetrics {
     param([string]$Server)
 

@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Configures Active Directory settings for Microsoft Defender for Identity detections.
+
+.FUNCTIONALITY
+Offers DNS zone-transfer and honeytoken setup to enable Microsoft Defender for Identity detections.
+#>
 function Invoke-MDITriggers {
 
     ################################################################################
@@ -8,6 +15,8 @@ function Invoke-MDITriggers {
 
 
     Invoke-Output -Type Header "Configure settings to enable MDI specific detections"
+    $Functionality = (Get-Help 'Invoke-MDITriggers').Functionality
+    Invoke-Output -Type H1 -Message $Functionality
     
     $title = "MDI Triggers"
     $message = "Follow listed order for optimal execution."

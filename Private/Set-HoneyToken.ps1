@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Selects or keeps the account used as the MDI honeytoken.
+
+.FUNCTIONALITY
+Prompts for a honeytoken user, then stores the selected distinguished name.
+#>
 function Set-HoneyToken {
 
     ################################################################################

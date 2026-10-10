@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Installs missing AD CS services on the selected domain controller.
+
+.FUNCTIONALITY
+Checks CA and Web Enrollment status, installs missing roles, then reports their service state.
+#>
 function Add-ADCSForAS2Go {
 
     ################################################################################

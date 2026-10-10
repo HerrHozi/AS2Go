@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Adds randomly selected demo users to Account Operators.
+
+.FUNCTIONALITY
+Selects random users, enables them, resets lab passwords, and adds them to Account Operators.
+#>
 function Add-RandomUsersToAccountOperators {
 
     ################################################################################

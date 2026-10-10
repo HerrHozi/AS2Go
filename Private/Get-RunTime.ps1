@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Calculates elapsed time from a supplied start time.
+
+.FUNCTIONALITY
+Returns the elapsed time span between the start time and the current time.
+#>
 function Get-RunTime {
 
     ################################################################################

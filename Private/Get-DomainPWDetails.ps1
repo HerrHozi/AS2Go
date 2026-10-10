@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Collects domain details and the default password policy.
+
+.FUNCTIONALITY
+Returns domain metadata, password settings, machine-account quota, and enabled-user count.
+#>
 function Get-DomainPWDetails {
 
     Param([string]$DomainName)
@@ -10,6 +17,7 @@ function Get-DomainPWDetails {
 
     try {
         $DomainInfo = Get-ADDomain -Server $DomainName
+        $DomainObject = Get-ADObject -Identity $DomainInfo.DistinguishedName -Properties 'ms-DS-MachineAccountQuota' -Server $DomainName
         $PWPOlicy = Get-ADDefaultDomainPasswordPolicy -Server $DomainName
 
         [PSCustomObject]@{
@@ -20,6 +28,7 @@ function Get-DomainPWDetails {
             NetBIOSName                 = $DomainInfo.NetBIOSName
             DomainSID                   = $DomainInfo.DomainSID.Value
             DomainMode                  = $DomainInfo.DomainMode
+            MachineAccountQuota         = $DomainObject.'ms-DS-MachineAccountQuota'
             IsRootDomain                = ($DomainInfo.DNSRoot -eq $Forest.RootDomain)
             IsCurrentDomain             = If ($DomainInfo.DNSRoot -eq $CurrentDomain) { "Yes" } else { "" }
             PdcRoleOwner                = $DomainInfo.PDCEmulator

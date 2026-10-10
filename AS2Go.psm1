@@ -58,6 +58,7 @@ $Script:AS2GOTempDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Temp"
 $Script:AS2GOConfigDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Config"
 $Script:DefautCleanUpFolder = Join-Path -Path $script:AS2GoPublicDir -ChildPath "CleanUp"
 $Script:DefautExfiltrationFolder = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Exfiltration"
+$Script:AS2GOTicketsDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Tickets"
 
 $Script:ASModuleLog = Join-Path -Path $Script:AS2GoLogDir -ChildPath "AS2Go.log"
 $Script:ConfigFile = Join-Path -Path $Script:AS2GOConfigDir -ChildPath "AS2Go.json"
@@ -419,6 +420,7 @@ Invoke-AS2GoDirectory -Directory $Script:AS2GoConfigDir
 Invoke-AS2GoDirectory -Directory (Join-Path -Path $script:AS2GoPublicDir -ChildPath "MaliciousTools")
 Invoke-AS2GoDirectory -Directory $Script:DefautCleanUpFolder
 Invoke-AS2GoDirectory -Directory $Script:DefautExfiltrationFolder
+Invoke-AS2GoDirectory -Directory $Script:AS2GOTicketsDir
 
 If (-not (Test-Path -Path $Script:ConfigFile)) {
     copy-item "$ASModulePath\AS2GO.json" -Destination $Script:ConfigFile
@@ -470,3 +472,6 @@ Write-HighlightedCode  -code "                   ASP12 -EnableLogging -SkipImage
 
 Write-host "`n"
 $host.ui.RawUI.WindowTitle = "$ASModuleName - $($ASModuleManifest.Version)"
+
+
+

@@ -1,3 +1,23 @@
+<#
+.COMPONENT
+
+.SYNOPSIS
+Configures Active Directory Certificate Services for the AS2Go training lab.
+
+.DESCRIPTION
+Installs AD CS and publishes AS2Go certificate templates for hands-on security training.
+
+.FUNCTIONALITY
+Selects a domain controller and inventories CAs, Enrollment Services, and template status. 
+Installs missing AD CS services or creates and publishes vulnerable ESC templates and CA settings. 
+
+.PARAMETER CTPreFix
+Prefix used to identify the AS2Go certificate templates.
+
+.EXAMPLE
+Invoke-ADCSSetup -CTPreFix "AS2Go"
+Configures AD CS using the AS2Go certificate-template prefix.
+#>
 function Invoke-ADCSSetup {
 
     ################################################################################
@@ -15,6 +35,12 @@ function Invoke-ADCSSetup {
     
     If (-not $SkipClearHost) { Clear-Host }
     Invoke-Output -Type Header -Message "Setup Active Directory Certificate Services (ADCS) for AS2Go"
+    
+    
+    $Functionality = (Get-Help $CurrentFunction).Functionality
+    Invoke-Output -Type H1 -Message ($Functionality + "`n")
+    
+    
     $bestDC = Get-BestDomainController -Domain (Get-ADForest).RootDomain
     Get-ADCSEnterpriseCA -Server $bestDC
     Get-ADCSEnrollmentServices -Server $bestDC

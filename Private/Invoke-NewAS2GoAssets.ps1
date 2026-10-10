@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+Creates the AS2Go tiered OU and group structure.
+
+.FUNCTIONALITY
+Builds the tiered OU/group layout and demo objects.
+Moves privileged groups to Tier 0 and applies the lab ACLs.
+#>
 Function Invoke-NewAS2GoAssets {
     
     ################################################################################
@@ -73,6 +81,8 @@ Function Invoke-NewAS2GoAssets {
     ################################################################################
     
     Invoke-Output -T Header -Message "Start creating Tiering OUs & Groups ...."
+    $Functionality = (Get-Help $CurrentFunction).Functionality
+    Invoke-Output -Type H1 -Message $Functionality
 
     $cname = Convert-FromDNToCN -DistinguishedName "$RootOU"
         

@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Classifies the domains in an Active Directory forest.
+
+.FUNCTIONALITY
+Labels each domain as a forest root, child domain, or separate tree root.
+#>
 function Get-DomainType {
 
     ################################################################################

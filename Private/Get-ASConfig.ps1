@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+Reads a named setting from the AS2Go JSON configuration.
+
+.FUNCTIONALITY
+Loads the configured value from the module's JSON settings file and returns it.
+#>
 Function Get-ASConfig {
 
     ################################################################################
