@@ -28,10 +28,10 @@ function Test-PoSHModuleAvailability {
     try {
         if (-not (Get-Module -ListAvailable -Name $PSModule -SkipEditionCheck)) {
             if ($PSModule -eq 'GroupPolicy') {
-                Invoke-Output -Type Warning -M "The '$PSModule' PowerShell module is not installed."
+                Write-AS2GoOutput -Type Warning -M "The '$PSModule' PowerShell module is not installed."
             }
             else {
-                Invoke-Output -Type Error -M "The '$PSModule' PowerShell module is not installed."
+                Write-AS2GoOutput -Type Error -M "The '$PSModule' PowerShell module is not installed."
             }
 
             return $false
@@ -39,12 +39,12 @@ function Test-PoSHModuleAvailability {
 
         Import-Module -Name $PSModule -SkipEditionCheck -ErrorAction Stop
 
-        Invoke-Output -Type Bullet -M 'Imported PowerShell module: ' -TM $PSModule
+        Write-AS2GoOutput -Type Bullet -M 'Imported PowerShell module: ' -TM $PSModule
 
         $result = $true
     }
     catch {
-        Invoke-Output -Type Error -M "Failed to import the '$PSModule' PowerShell module." -TM $_.Exception.Message
+        Write-AS2GoOutput -Type Error -M "Failed to import the '$PSModule' PowerShell module." -TM $_.Exception.Message
         $result = $false
     }
     finally {

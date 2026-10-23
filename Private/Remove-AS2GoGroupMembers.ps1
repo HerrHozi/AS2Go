@@ -1,4 +1,4 @@
-function Start-GroupManipulation {
+function Remove-AS2GoGroupMembers {
 
     ################################################################################
     #####                                                                      ##### 
@@ -17,10 +17,7 @@ function Start-GroupManipulation {
         [string] $BackDoorAccount
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     try {
 
@@ -29,7 +26,7 @@ function Start-GroupManipulation {
             $Server = $grp.domain
             $group = Get-ADGroup -Identity $grp.SID -Server $Server -ErrorAction Stop
 
-            Invoke-Output -Type Info -Message "Processing Group: $($grp.CanonicalName)"
+            Write-AS2GoOutput -Type Info -Message "Processing Group: $($grp.CanonicalName)"
             $members = Get-ADGroupMember -Identity $group -Recursive:$false -Server $Server
 
             foreach ($member in $members) {
@@ -38,29 +35,26 @@ function Start-GroupManipulation {
 
                 if ($memberSID -ne $BreakGlassAccount -and $memberSID -ne $BackDoorAccount) {
                     try {
-                        Invoke-Output -Type Bullet -Message "Removing " -TM "$($member.SamAccountName) [$memberSID]"
+                        Write-AS2GoOutput -Type Bullet -Message "Removing " -TM "$($member.SamAccountName) [$memberSID]"
                         Remove-ADGroupMember -Identity $group `
                             -Members $member `
                             -Confirm:$false  `
                             -Server $Server -ErrorAction Stop
                     }
                     catch {
-                        Invoke-Output -Type Error -Message $_
+                        Write-AS2GoOutput -Type Error -Message $_
                     }
                 }
                 else {
-                    Invoke-Output -Type H1 -Message "  + Keeping  $($member.SamAccountName) [$memberSID]"
+                    Write-AS2GoOutput -Type H1 -Message "  + Keeping  $($member.SamAccountName) [$memberSID]"
                 }
             }
         }
-        Invoke-Output -Type Success -Message  "Group Manipulation Completed."
+        Write-AS2GoOutput -Type Success -Message  "Group Manipulation Completed."
     }
     catch {
-        Invoke-Output -Type Error -Message $_
+        Write-AS2GoOutput -Type Error -Message $_
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

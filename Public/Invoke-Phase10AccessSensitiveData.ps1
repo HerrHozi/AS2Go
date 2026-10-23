@@ -69,10 +69,7 @@ function Invoke-ASPhase10AccessSensitiveData {
         [switch]$SkipSensitiveDataAccess
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ($SkipSensitiveDataAccess) {
         Write-Log -Message "Skipped Attack Phase - $($Script:Phase10.toupper())"
@@ -89,10 +86,10 @@ function Invoke-ASPhase10AccessSensitiveData {
         Show-CurrentPhase -Phase "phase_10.html"
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase10.toupper())"
-        Invoke-Output -Type  Bullet "Enumerate available network shares on a domain controller"
-        Invoke-Output -Type  Bullet "Enumerate the content of exposed backup shares"
-        Invoke-Output -Type  Bullet "Attempt to open a command console on a privileged admin workstation (PAW)"
+        Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase10.toupper())"
+        Write-AS2GoOutput -Type  Bullet "Enumerate available network shares on a domain controller"
+        Write-AS2GoOutput -Type  Bullet "Enumerate the content of exposed backup shares"
+        Write-AS2GoOutput -Type  Bullet "Attempt to open a command console on a privileged admin workstation (PAW)"
 
         If ($UnAttended) {
             $answer = $Script:Yes
@@ -102,12 +99,9 @@ function Invoke-ASPhase10AccessSensitiveData {
         }
 
         If ($answer -eq $Script:Yes) {
-            Start-Phase10DataAccess
+            Invoke-Phase10DataAccess
         }
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

@@ -1,3 +1,34 @@
+<#
+.SYNOPSIS
+Removes direct members from privileged groups in a selected AD scope.
+
+.DESCRIPTION
+Prompts for a target scope and reads the configured privileged group RIDs to identify matching groups.
+Resolves the configured break-glass and last backdoor account SIDs and displays the affected groups.
+After confirmation, invokes Remove-AS2GoGroupMembers to remove direct memberships except those protected SIDs.
+If configured accounts are absent, the implementation retains its fallback SID values; it does not create accounts.
+
+.EXAMPLE
+Invoke-GroupManipulation
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires initialized AS2Go settings and permission to change the selected group memberships.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Selects an AD scope and finds privileged groups using the configured group RIDs.
+After confirmation, removes direct members while retaining the protected break-glass and backdoor account SIDs.
+#>
 function Invoke-GroupManipulation {
 
     ################################################################################
@@ -6,10 +37,7 @@ function Invoke-GroupManipulation {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $BGA = "S-1-5-21-18515944-1610616278-1029250612-500"
     $BDA = "S-1-5-21-18515944-1610616278-1029250612-500"
@@ -74,7 +102,7 @@ function Invoke-GroupManipulation {
         }
     }
 
-    Invoke-Output -Type Header -Message "Identified privileged groups"
+    Write-AS2GoOutput -Type Header -Message "Identified privileged groups"
    
     If ($groups) {
 
@@ -83,24 +111,21 @@ function Invoke-GroupManipulation {
     }
     else {
         $cname = Convert-FromDNtoCN -DistinguishedName $TargetDN
-        Invoke-Output -Type Warning -Message "No previledge groups identified under $cname"
+        Write-AS2GoOutput -Type Warning -Message "No previledge groups identified under $cname"
         return
     }
        
-    Invoke-Output -Type Info -Message "The specified Break Glass Account and Back Door Account will be ignored"
-    Invoke-Output -Type Bullet -Message "Backdoor Account:   " -TM $BDAccount.cn
-    Invoke-Output -Type Bullet -Message "Break Glass Account:" -TM $BGAccount.cn
+    Write-AS2GoOutput -Type Info -Message "The specified Break Glass Account and Back Door Account will be ignored"
+    Write-AS2GoOutput -Type Bullet -Message "Backdoor Account:   " -TM $BDAccount.cn
+    Write-AS2GoOutput -Type Bullet -Message "Break Glass Account:" -TM $BGAccount.cn
     
     $title = "The identified privileged groups will now be purged. `nAll existing memberships will be permanently removed within the selected scope." 
     $Message = "Proceed with execution?"
  
     $answer = Show-DecisionPrompt -Title $title -Message $message
     If ($answer -eq $Script:Yes) {
-        Start-GroupManipulation -Server $Script:ASDC -Groups $groups -BreakGlassAccount $BGA -BackDoorAccount $BDA
+        Remove-AS2GoGroupMembers -Server $Script:ASDC -Groups $groups -BreakGlassAccount $BGA -BackDoorAccount $BDA
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

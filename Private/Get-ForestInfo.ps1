@@ -7,10 +7,7 @@ function Get-ForestInfo {
     ################################################################################
 
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
 
     $Script:GroupEA = @()
@@ -81,17 +78,14 @@ function Get-ForestInfo {
         CanonicalName  = Get-CanonicalName -SID ($DNSADMINS.SID) -Domain $($CurrentDomain.DomainFQDN)
     }
 
-    Invoke-Output -Type  Header -M "Priviledge Groups identified based on RID"
+    Write-AS2GoOutput -Type  Header -M "Priviledge Groups identified based on RID"
 
     $allGroups = $Script:GroupDA + $Script:GroupPUG + $Script:GroupEA + $Script:GroupSA + $Script:GroupDNSA
     $allGroups | Select-Object Domain, SamAccountName, SID, CanonicalName | Format-Table | Out-Host
 
     $4logfile = $allGroups | Select-Object Domain, SamAccountName, SID, CanonicalName | Format-Table | Out-String
     Write-Log -Message $4logfile
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
 }
 
@@ -115,7 +109,7 @@ function Get-DomainDetails {
         }
     }
     catch {
-        Invoke-Output -Type  Warning -M ("$DomainName | $_")
+        Write-AS2GoOutput -Type  Warning -M ("$DomainName | $_")
     }
 
 

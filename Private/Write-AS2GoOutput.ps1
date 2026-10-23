@@ -12,7 +12,7 @@ Category: Sub Function
 .FUNCTIONALITY
 Renders typed console messages and forwards them to logging.
 #>
-function Invoke-Output {
+function Write-AS2GoOutput {
 
     ################################################################################
     #####                                                                      ##### 

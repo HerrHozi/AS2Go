@@ -12,7 +12,7 @@ Category: Main Function
 .FUNCTIONALITY
 Combines domain details, domain types, controller counts, and preferred DCs in a forest summary.
 #>
-function Invoke-ForestOverview {
+function Show-ForestOverview {
 
     ################################################################################
     #####                                                                      ##### 
@@ -22,10 +22,8 @@ function Invoke-ForestOverview {
 
     Param([string] $param1, [string] $param2)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
+    $CurrentFunction = $Info.FunctionName
     
     $Script:DoaminTypes = Get-DomainType
     $Script:DCsPerDomain = Get-NumberofDCs
@@ -36,9 +34,9 @@ function Invoke-ForestOverview {
         Get-DomainPWDetails -DomainName $_
     }
 
-    invoke-output -Type Header -Message "Identified the following domains"
+    Write-AS2GoOutput -Type Header -Message "Identified the following domains"
     $Functionality = (Get-Help $CurrentFunction).Functionality
-    Invoke-Output -Type H1 -Message $Functionality
+    Write-AS2GoOutput -Type H1 -Message $Functionality
 
     $overview = $AllDomainsDetails |
     Select-Object `
@@ -57,11 +55,8 @@ function Invoke-ForestOverview {
 
 
     if ($null -ne $script:ErrorForestInfo ) {
-        Invoke-output -Type Error -Message $script:ErrorForestInfo
+        Write-AS2GoOutput -Type Error -Message $script:ErrorForestInfo
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

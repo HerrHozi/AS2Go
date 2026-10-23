@@ -6,17 +6,17 @@ Selects or keeps the lab's break-glass account.
 Selects or keeps the lab's break-glass account. This account is excluded from all 
 attack scenarios and is not considered in any attack path or risk evaluation.                       
 
-.FUNCTIONALITY
-Stores the selected account DN so the account can be excluded from attack scenarios.
-
 .COMPONENT
 Category: Main Function
+
+.FUNCTIONALITY
+Selects or retains the configured break-glass account for exclusion from attack scenarios.
 #>
 function New-FunctionTemplate {
 
     $Info = Measure-FunctionRuntime -Begin
-    Invoke-Output -Type Header -Message "Define a Break Glass Account"
-    Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Header -Message "Define a Break Glass Account"
+    Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
     #start main code
     $previousDN = Get-ASConfig -Setting "BreakGlassAccount"
@@ -25,7 +25,7 @@ function New-FunctionTemplate {
         $previousCN = Convert-FromDNToCN -DistinguishedName $previousDN
         $HelpP = "Use the scope from previous selection/attack."
         $message = "Use current account ($previousCN) or select new:"
-        Invoke-Output -Type TextMaker -Message "Current Break Glass Account:" -Tm $previousCN
+        Write-AS2GoOutput -Type TextMaker -Message "Current Break Glass Account:" -Tm $previousCN
     }
     else {
         $message = "Select new Break Glass Account:"
@@ -44,10 +44,10 @@ function New-FunctionTemplate {
         $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0
         Set-ASConfig -Setting "BreakGlassAccount" -Value $result
         $result = Convert-FromDNToCN -DistinguishedName $result
-        Invoke-Output -Type TextMaker -Message "New Break Glass Account:" -Tm $result
+        Write-AS2GoOutput -Type TextMaker -Message "New Break Glass Account:" -Tm $result
     }
     else {
-        Invoke-Output -Type Info -message "Keep previous Break Glass Account!"    
+        Write-AS2GoOutput -Type Info -message "Keep previous Break Glass Account!"    
     }   
     #end main code
     

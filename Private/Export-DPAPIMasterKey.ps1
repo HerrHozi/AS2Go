@@ -1,4 +1,4 @@
-function Start-ExportDPAPIMasterKey {
+function Export-DPAPIMasterKey {
 
     ################################################################################
     #####                                                                      ##### 
@@ -6,10 +6,7 @@ function Start-ExportDPAPIMasterKey {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     New-Item $Script:DefautExfiltrationFolder -ItemType directory -ErrorAction Ignore
     
@@ -20,12 +17,9 @@ function Start-ExportDPAPIMasterKey {
     
     get-item "$Script:DefautExfiltrationFolder\ntds_*" | Sort-Object LastWriteTime -Descending | out-host
     
-    Invoke-output -type Success -Message "DPAPI Master Key Exported to $Script:DefautExfiltrationFolder from DC '$server'."
+    Write-AS2GoOutput -type Success -Message "DPAPI Master Key Exported to $Script:DefautExfiltrationFolder from DC '$server'."
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

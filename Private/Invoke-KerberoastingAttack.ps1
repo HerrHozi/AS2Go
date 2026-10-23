@@ -1,18 +1,33 @@
 <#
 .SYNOPSIS
-Runs the Kerberoasting attack workflow for the current AS2Go stage.
+Runs the AS2Go Kerberoasting stage and optional repeat workflow.
 
 .DESCRIPTION
-Sets the Kerberoasting stage, explains the service-ticket attack, and calls the attack routine.
-In attended mode, prompts the user to repeat the workflow.
+Updates the window title and saved lab stage, then invokes the Kerberoasting routine.
+The routine selects a domain and requests service tickets for accounts matching admincount=1 using Rubeus.
+Exports hashes to the configured exfiltration directory and offers to view them.
+Attended execution offers to repeat the stage; unattended execution exits the stage after one pass.
 
-.FUNCTIONALITY
-This attack requests Kerberos service tickets for Service Principal Names (SPNs),
-allowing weak service account passwords to potentially be cracked offline
-and the associated credentials to be recovered.
+.EXAMPLE
+Invoke-KerberoastingAttack
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Uses the same Rubeus, domain-context, and initialized module settings as Invoke-Kerberoasting.
 
 .COMPONENT
 Category: Main Function
+
+.FUNCTIONALITY
+Runs the Kerberoasting stage, requesting service tickets for accounts matching adminCount=1 in a selected domain.
+Exports hashes for offline analysis and offers to repeat the stage in attended mode.
 #>
 function Invoke-KerberoastingAttack {
 
@@ -22,10 +37,7 @@ function Invoke-KerberoastingAttack {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     Update-WindowTitle -NewTitle $Script:Phase27
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase27
@@ -34,10 +46,10 @@ function Invoke-KerberoastingAttack {
 
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -Type  Header -M "Privilege Escalation via Kerberoasting"
-        Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+        Write-AS2GoOutput -Type  Header -M "Privilege Escalation via Kerberoasting"
+        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-        Start-KerberoastingAttack    
+        Invoke-Kerberoasting    
 
         #If (-not $SkipClearHost) { Clear-Host }
 
@@ -53,10 +65,7 @@ function Invoke-KerberoastingAttack {
     } Until ($repeat -eq $Script:No)
 
     Write-Log -Message "    >> using $CAtemplate"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     #
 }

@@ -32,18 +32,15 @@
     - Optional Rubeus integration for Kerberos-based attacks
 
 .LINK
-    Start-PasswordSprayAttack
+    Invoke-PasswordSprayAttack
 
 #>
 function New-PasswordSprayAttack {
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
     
     if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
-        Invoke-Output -Type  Error -M "The 'ActiveDirectory' PowerShell module is not installed."
+        Write-AS2GoOutput -Type  Error -M "The 'ActiveDirectory' PowerShell module is not installed."
         return
     }
 
@@ -136,7 +133,7 @@ function New-PasswordSprayAttack {
             do {
                 $PasswordToTest = Read-Host "`n  Enter new password"
                 if ([string]::IsNullOrWhiteSpace($PasswordToTest)) {
-                    Invoke-Output -Type Warning -Message "Please enter at least $MaxPwLenght character!"
+                    Write-AS2GoOutput -Type Warning -Message "Please enter at least $MaxPwLenght character!"
                 }
             }
             while ([string]::IsNullOrWhiteSpace($PasswordToTest) -or $PasswordToTest.Length -lt [int]$MaxPwLenght)
@@ -180,7 +177,7 @@ function New-PasswordSprayAttack {
         $IncludeSamAccountNameAsPassword = $false
     }
     else {
-        Invoke-Output -Type Success -Message "Password Spray cancelled by user."
+        Write-AS2GoOutput -Type Success -Message "Password Spray cancelled by user."
         return
     }
    
@@ -190,7 +187,7 @@ function New-PasswordSprayAttack {
         foreach ($domain in $domains) {
             $DomainSearchBase = (Get-ADDomain -Server $domain).DistinguishedName
             $runtime = Measure-Command {
-                Start-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $domain -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword
+                Invoke-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $domain -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword
             }
             Write-log -Message "Finished in $($runtime.TotalSeconds) seconds."
         }
@@ -198,15 +195,12 @@ function New-PasswordSprayAttack {
     else {
         $server = Get-BestDomainController -domain $DomainSearchBase
         $runtime = Measure-Command {
-            Start-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $server -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword 
+            Invoke-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $server -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword 
         }
         Write-log -Message "Finished in $($runtime.TotalSeconds) seconds."
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }
 
 

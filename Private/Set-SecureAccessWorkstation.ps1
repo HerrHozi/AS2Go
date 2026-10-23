@@ -15,15 +15,15 @@ Category: Main Function
 function Set-SecureAccessWorkstation {
 
     $Info = Measure-FunctionRuntime -Begin
-    Invoke-Output -Type Header -Message "Define a Secure Access Workstation"
-    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Header -Message "Define a Secure Access Workstation"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     $previousSAW = Get-ASConfig -Setting "mySAW"
 
     if (-not [string]::IsNullOrWhiteSpace([string]$previousSAW)) {
         $message = "Use the current Secure Access Workstation ($previousSAW) or select a new one:"
         $helpPrevious = "Keep the workstation from the previous configuration."
-        Invoke-Output -Type TextMaker -Message "Current Secure Access Workstation:" -Tm $previousSAW
+        Write-AS2GoOutput -Type TextMaker -Message "Current Secure Access Workstation:" -Tm $previousSAW
         $options = @(
             [pscustomobject]@{ Label = "&Previous Secure Access Workstation"; Help = $helpPrevious; Value = "Previous" },
             [pscustomobject]@{ Label = "Select &new Secure Access Workstation"; Help = "Choose a computer to use as the Secure Access Workstation."; Value = "New" },
@@ -60,39 +60,39 @@ function Set-SecureAccessWorkstation {
 
                 Set-ASConfig -Setting "mySAW" -Value $computerName
                 $sawComputerName = $computerName
-                Invoke-Output -Type TextMaker -Message "New Secure Access Workstation:" -Tm $computerName
+                Write-AS2GoOutput -Type TextMaker -Message "New Secure Access Workstation:" -Tm $computerName
             }
             catch {
-                Invoke-Output -Type Warning -Message "Could not set the Secure Access Workstation: $_"
+                Write-AS2GoOutput -Type Warning -Message "Could not set the Secure Access Workstation: $_"
             }
         }
     }
     elseif ($Decision -eq "Type") {
-        $computerName = Invoke-Output -Type Input -Message "Enter the host name of the Secure Access Workstation"
+        $computerName = Write-AS2GoOutput -Type Input -Message "Enter the host name of the Secure Access Workstation"
 
         if ([string]::IsNullOrWhiteSpace([string]$computerName)) {
-            Invoke-Output -Type Warning -Message "No host name entered. The Secure Access Workstation configuration was not changed."
+            Write-AS2GoOutput -Type Warning -Message "No host name entered. The Secure Access Workstation configuration was not changed."
         }
         else {
             $computerName = $computerName.Trim()
             Set-ASConfig -Setting "mySAW" -Value $computerName
             $sawComputerName = $computerName
-            Invoke-Output -Type TextMaker -Message "New Secure Access Workstation:" -Tm $computerName
+            Write-AS2GoOutput -Type TextMaker -Message "New Secure Access Workstation:" -Tm $computerName
         }
     }
     else {
         $sawComputerName = $previousSAW
-        Invoke-Output -Type Info -Message "Keep previous Secure Access Workstation!"
+        Write-AS2GoOutput -Type Info -Message "Keep previous Secure Access Workstation!"
     }
 
     if (-not [string]::IsNullOrWhiteSpace([string]$sawComputerName)) {
         $winRMReachable = Test-NetConnection -ComputerName $sawComputerName -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 
         if ($winRMReachable) {
-            Invoke-Output -Type Success -Message "WinRM is reachable on $sawComputerName (TCP 5985)."
+            Write-AS2GoOutput -Type Success -Message "WinRM is reachable on $sawComputerName (TCP 5985)."
         }
         else {
-            Invoke-Output -Type Warning -Message "WinRM is not reachable on $sawComputerName (TCP 5985)."
+            Write-AS2GoOutput -Type Warning -Message "WinRM is not reachable on $sawComputerName (TCP 5985)."
         }
     }
 

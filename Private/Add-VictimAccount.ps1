@@ -32,7 +32,7 @@ function Add-VictimAccount {
     $Info = Measure-FunctionRuntime -Begin
 
     try {
-        $ou = Invoke-ADOUPathCheck -DistinguishedName $TargetOU -Server $Server
+        $ou = Initialize-ADOUPath -DistinguishedName $TargetOU -Server $Server
         $UPNSuffix = if ([string]::IsNullOrWhiteSpace($UPNSuffix)) {
             Set-UPNSuffix
         }
@@ -110,10 +110,10 @@ function Add-VictimAccount {
                 -ErrorAction Stop
         }
         else {
-            Invoke-Output -Type Warning -Message "Group 'SG-AS2Go-Victims' does not exist. Victim user '$samAccountName' was created without this membership."
+            Write-AS2GoOutput -Type Warning -Message "Group 'SG-AS2Go-Victims' does not exist. Victim user '$samAccountName' was created without this membership."
         }
 
-        Invoke-Output -Type Success -Message "Created victim user '$samAccountName'."
+        Write-AS2GoOutput -Type Success -Message "Created victim user '$samAccountName'."
     }
     finally {
         if ($Info) {

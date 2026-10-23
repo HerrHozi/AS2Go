@@ -1,9 +1,6 @@
 function New-UserManipulation {
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
     
     $Forest = Get-ADForest
     $Script:DoaminTypes = Get-DomainType
@@ -89,7 +86,7 @@ function New-UserManipulation {
                 do {
                     $NewRandomPW = Read-Host "`n  Enter new password"
                     if ([string]::IsNullOrWhiteSpace($NewRandomPW)) {
-                        Invoke-Output -Type Warning -Message "Please enter at least one character!"
+                        Write-AS2GoOutput -Type Warning -Message "Please enter at least one character!"
                     }
                 }
                 while ([string]::IsNullOrWhiteSpace($NewRandomPW))
@@ -111,7 +108,7 @@ function New-UserManipulation {
         foreach ($domain in $domains) {
             $DomainSearchBase = (Get-ADDomain -Server $domain).DistinguishedName
             $runtime = Measure-Command {
-                Start-UserManipulation -SearchBase $DomainSearchBase -NewPassword $NewRandomPW -Server $domain -Action $action
+                Invoke-UserManipulation -SearchBase $DomainSearchBase -NewPassword $NewRandomPW -Server $domain -Action $action
             }
             Write-log -Message "Finished in $($runtime.TotalSeconds) seconds."
         }
@@ -119,15 +116,12 @@ function New-UserManipulation {
     else {
         $server = Get-BestDomainController -domain $DomainSearchBase
         $runtime = Measure-Command {
-            Start-UserManipulation -SearchBase $DomainSearchBase -NewPassword $NewRandomPW -Server $server -Action $action
+            Invoke-UserManipulation -SearchBase $DomainSearchBase -NewPassword $NewRandomPW -Server $server -Action $action
         }
         Write-log -Message "Finished in $($runtime.TotalSeconds) seconds."
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }
 
 

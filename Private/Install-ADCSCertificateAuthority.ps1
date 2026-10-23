@@ -15,12 +15,9 @@ function Install-ADCSCertificateAuthority {
 
     Param([string] $Server)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type TextMaker -Message "Installing Windows Feature" -TM "ADCS-Cert-Authority (IncludeManagementTools)"
+    Write-AS2GoOutput -Type TextMaker -Message "Installing Windows Feature" -TM "ADCS-Cert-Authority (IncludeManagementTools)"
     
     Invoke-Command -ComputerName $Server -ScriptBlock {
         try {
@@ -31,7 +28,7 @@ function Install-ADCSCertificateAuthority {
         }
     }
     
-    Invoke-Output -Type TextMaker -Message "Installing Windows Role   " -TM "Certification Authority"
+    Write-AS2GoOutput -Type TextMaker -Message "Installing Windows Role   " -TM "Certification Authority"
     
     Invoke-Command -ComputerName $Server -ScriptBlock {
         Install-AdcsCertificationAuthority `
@@ -48,8 +45,5 @@ function Install-ADCSCertificateAuthority {
 
     $Script:ADCSEnterpriseCAMissing = $false
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

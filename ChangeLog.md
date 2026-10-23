@@ -2,12 +2,21 @@
 
 ```Text
 Author:          Holger Zimmermann | <zimmermann.holger@live.de>
-Current Version: 2026.10.23.572
+Current Version: 2026.10.23.732
 Last Update:     2026-10-23
 ```
 
+- Version 2026.10.23.732
+  - new help and function names
+
+- Version 2026.10.23.639
+  - Checkpoint
+
+- Version 2026.10.23.617
+  - Rename Main Function to Invoke-xxxx
+
 - Version 2026.10.23.572
-  - Add Ptt
+  - replaced code block get-function etc. by Measure-FunctionRuntime
 
 - Version 2026.10.22.922
   - Added Function Invoke-ASPhase05InitialAccess, Test-LocalAdministrator & Get-CurrentADuser
@@ -36,7 +45,7 @@ Last Update:     2026-10-23
 - Version 2026.10.10.987
   - Added Function Get-KListTickets
   - Updated Help and added block `.COMPONENT` `.FUNCTIONALITY`
-  - Added Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+  - Added Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
 - Version 2026.10.9.607
   - Added Function Measure-FunctionRuntime & Set-BreakGlassAccount (for testing)
@@ -55,7 +64,7 @@ Last Update:     2026-10-23
   - Minor Bug fixes
 
 - Version 2026.5.22.663
-  - Updated Functions New-BackDoorUser & Invoke-NewAS2GoAssets | add error handling for insufficient privileges
+  - Updated Functions New-BackDoorUser & Initialize-AS2GoAssets | add error handling for insufficient privileges
   - added IntelliSense for private AS2Go Functions
 
 - Version 2026.5.21.1342
@@ -65,7 +74,7 @@ Last Update:     2026-10-23
   - Started Updating Function Invoke-PassTheTicketAttack 
 
 - Version 2026.5.20.583
-  - Added Function Start-ExportDPAPIMasterKey
+  - Added Function Export-DPAPIMasterKey
   - Added Function Invoke-GoldenTicket
   - Added Function Clear-ExfiltrationFolder
 
@@ -73,7 +82,7 @@ Last Update:     2026-10-23
   - replace variables by $script:xxxx
 
 - Version 2026.5.18.1200
-  - Added Function Invoke-MaliciousToolsSetup
+  - Added Function Initialize-AS2GoTools
 
 - Version 2026.5.18.1133
   - Added / Updated Functions regarding GPT Manipulation - Add Scheduled Tasks & User Right Assignment
@@ -85,14 +94,14 @@ Last Update:     2026-10-23
 
 - Version 2026.5.13.567
   - Renamed Functions -KeyValue to -ASConfig
-  - Added Function Invoke-PrivilegesEscalationViaLocalSystem
+  - Added Function Invoke-PrivilegeEscalationViaLocalSystem
   - Updated Function Show-DecisionPrompt | Updated for REPEAT
 
 - Version 2026.5.12.1072
   - Updated Function 
 
 - Version 2026.5.11.755
-  - Updated Functions Invoke-KerberoastingAttack & Start-KerberoastingAttack
+  - Updated Functions Invoke-KerberoastingAttack & Invoke-Kerberoasting
 
 - Version 2026.5.8.619
   - Updated Functions regarding ESC1, add selection for Built-in Account
@@ -118,30 +127,30 @@ Last Update:     2026-10-23
   - Updated Function Restart-VictimMachines
 
 - Version 2026.5.5.532
-  - Updated Functions New-UserManipulation & Start-UserManipulation
+  - Updated Functions New-UserManipulation & Invoke-UserManipulation
 
 - Version 2026.5.4.1360
-  - Updated Functions for Ransomware Attack | Start-Phase12DomainCompromise, Invoke-FileEncryption, Invoke-FakeRansomwarePopUp, New-RansomwareAttack
+  - Updated Functions for Ransomware Attack | Invoke-Phase12DomainCompromise, Invoke-FileEncryption, Start-AS2GoDemoPopup, New-RansomwareAttack
 
 - Version 2026.4.30.1114
   - Moved Log File to $env:LOCALAPPDATA\AS2Go\Logs
 
 - Version 2026.3.17.1034
-  - Update Function Start-PasswordSprayAttack
+  - Update Function Invoke-PasswordSprayAttack
 
 - Version 2026.3.17.575
   - Added Function Set-AttackScope
-  - Updated Function Start-PasswordSprayAttack, includes samaccountname as password
+  - Updated Function Invoke-PasswordSprayAttack, includes samaccountname as password
   - replaced Write-BlockFont with own logo
 
 - Version 2026.3.16.772
-  - Updated Function Start-PasswordSprayAttack (paralell processing) & New-PasswordSprayAttack
+  - Updated Function Invoke-PasswordSprayAttack (paralell processing) & New-PasswordSprayAttack
 
 - Version 2026.2.26.773
   - Updated Function New-BackDoorUser | added to all Builtin Admins Groups
 
 - Version 2026.2.25.1057
-  - Added Functions Invoke-GroupManipulation & Start-GroupManipulation
+  - Added Functions Invoke-GroupManipulation & Remove-AS2GoGroupMembers
 
 - Version 2026.2.25.741
   - Replace ADCSGoat (0.0.4) & PSCertUtil (0.0.3) with newer versions
@@ -173,12 +182,12 @@ Last Update:     2026-10-23
   - Added Function Get-BestDomainController
 
 - Version 2026.2.19.1054
-  - Updated Function Invoke-NewAS2GoAssets & Invoke-VerifyConfiguration
+  - Updated Function Initialize-AS2GoAssets & Invoke-VerifyConfiguration
   - Added Functions Get-TieringAssets & Get-DemoAccounts 
 
 - Version 2026.2.19.864
   - Added Function Invoke-BackUpShare & New-BackUpShare
-  - Updated Function Start-PasswordSprayAttack
+  - Updated Function Invoke-PasswordSprayAttack
 
 - Version 2026.2.19.670
   - Updated Function New-DemoAccount | Added Option for sub OUs Location, Department or both.
@@ -194,13 +203,13 @@ Last Update:     2026-10-23
   - Updated Function Add-ADCSForAS2Go, Get-ADCSCertifcateTemplates, Invoke-ADCSSetup
 
 - Version 2026.2.17.1324
-  - Updated Functions Invoke-ForestOverview, Get-NumberOfDCs, Set-BestDomainController, Get-DomainPWDetails | error Handling if no DC is available
+  - Updated Functions Show-ForestOverview, Get-NumberOfDCs, Set-BestDomainController, Get-DomainPWDetails | error Handling if no DC is available
 
 - Version 2026.2.16.1115
   - Added Functions Get-ADCSEnterpriseCA & Get-ADCSEnrollmentServices
 
 - Version 2026.2.14.802
-  - Added Function Invoke-ForestOverview, Get-NumberofDCs & Set-BestDomainController
+  - Added Function Show-ForestOverview, Get-NumberofDCs & Set-BestDomainController
 
 - Version 2026.2.13.582
   - Code Clean Up & first preview
@@ -228,21 +237,21 @@ Last Update:     2026-10-23
   - Replace $MyFunction by $CurrentFunction
 
 - Version 2026.2.6.853
-  - Updated Function Invoke-DNSZoneUpdate
+  - Updated Function Set-AS2GoDnsZoneConfiguration
 
 - Version 2026.2.6.559
   - Updated Function Set-DenyPermission
 
 - Version 2026.2.3.769
   - Added Public Function Initialize-ActiveDirectoryConfig
-  - Added Functions Invoke-NewAS2GoAssets, Disable-ADOUInheritance & Set-DenyPermissions
+  - Added Functions Initialize-AS2GoAssets, Disable-ADOUInheritance & Set-DenyPermissions
 
 - Version 2026.2.2.1086
   - Added Function Select-OU
   - Added Function Show-DecisionPrompt
 
 - Version 2025.10.26.710
-  - Updated and Renamed Function Write-ASMessage to Invoke-Output
+  - Updated and Renamed Function Write-ASMessage to Write-AS2GoOutput
 
 - Version 2025.10.21.1103
   - Added Function Write-ASMessage
@@ -251,27 +260,27 @@ Last Update:     2026-10-23
   - Added Function Invoke-ASPhase12DomainCompromisePersistence
 
 - Version 2025.10.17.1010
-  - Updated Functions Start-ReconnaissanceExtended & Start-Reconnaissance
+  - Updated Functions Invoke-ReconnaissanceExtended & Invoke-Reconnaissance
 
 - Version 2025.10.3.1107
   - Added Function Write-ASWarning, Write-ASError & Write-ASHeader
 
 - Version 2025.10.2.710
-  - Updated Function New-PasswordSprayAttack & Start-PasswordSprayAttack
+  - Updated Function New-PasswordSprayAttack & Invoke-PasswordSprayAttack
 
 - Version 2025.10.1.801
   - Updated Posh Module for function Invoke-ASPhase09ReconnaissancePriviledged
   - Added Function Get-DomainType
 
 - Version 2025.9.30.1279
-  - Updated Functions Start-Reconnaissance, Get-ForestInfo & Get-PriviledgeGroupMembers
+  - Updated Functions Invoke-Reconnaissance, Get-ForestInfo & Get-PriviledgeGroupMembers
 
 - Version 2025.9.30.762
   - Updated $Script Variable
   - Add input parameter Tools
 
 - Version 2025.9.30.567
-  - Updated PoSH Module for functions New-PrivilegeEscalationRecommendation & Start-KerberoastingAttack
+  - Updated PoSH Module for functions New-PrivilegeEscalationRecommendation & Invoke-Kerberoasting
 
 - Version 2025.9.29.645
   - Updated PoSH Module for step Invoke-ASPhase07PrivilegeEscalation

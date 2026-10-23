@@ -11,10 +11,7 @@ function Request-PfxWithCertify {
         [PSCustomObject]$AlternativeAccount
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     [string] $CertificationAuthority = $Certificate.EnrollmentCA
     [string] $CertificateName = $Certificate.Name
@@ -30,7 +27,7 @@ function Request-PfxWithCertify {
     $sid = $AlternativeAccount.SID
     
     #".\Certify.exe request --ca ROOT-DC19-01.WS19-ROOT.CORP\WS19-ROOT --template CH01-BadCert --upn Administrator --sid S-1-5-21-3434748730-880471986-746661712-500"
-    Invoke-Output -Type CodeSnippet -Message "Command:"
+    Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
 
     Write-Highlight -Text "     .\certify.exe ", "request ", "--ca ", $CertificationAuthority, " --template ", $CertificateName, " --upn ", $altname1, " --sid ", $sid   `
         -Color $fgcC, $fgcF, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV
@@ -47,7 +44,7 @@ function Request-PfxWithCertify {
         Write-Host "? Do you want to add the parameter - " -NoNewline
         Write-host "/machine`n" -ForegroundColor Yellow
 
-        Invoke-Output -Type CodeSnippet -Message "Command:"
+        Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
         Write-Highlight -Text "     .\certify.exe ", "request ", "/ca:", $CertificationAuthority, " /template:", $CertificateName, " /altname:", $altname, " /machine:", $hostname    `
             -Color $fgcS, $fgcS, $fgcS, $fgcS, $fgcS, $fgcS, $fgcS, $fgcS, $fgcF, $fgcV
         
@@ -61,7 +58,7 @@ function Request-PfxWithCertify {
     $answer = Get-Answer -question $question -defaultValue $Script:Yes
 
     If ($answer -eq $Script:Yes) {
-        Invoke-Output -Type Codesnippet -Message "Requesting Certificate with Certify ..."
+        Write-AS2GoOutput -Type Codesnippet -Message "Requesting Certificate with Certify ..."
 
         #Check connection to Enterprise CA
         $result = certutil -config $CertificationAuthority -ping
@@ -96,17 +93,14 @@ function Request-PfxWithCertify {
     }
  
 
-    Invoke-output -Type Success -Message "Certificate Requesting with Certify was successful! The certificate is stored in variable `$PfxBase64."
+    Write-AS2GoOutput -Type Success -Message "Certificate Requesting with Certify was successful! The certificate is stored in variable `$PfxBase64."
 
     If (-not $unAttended) {
         pause
     }
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $PfxBase64
 }

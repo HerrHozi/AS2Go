@@ -26,10 +26,7 @@ function Set-BestDomainController {
         [int]$TimeoutMs = 1500
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $forest = Get-ADForest
     $rootDomain = $forest.RootDomain
@@ -155,9 +152,6 @@ function Set-BestDomainController {
         $Script:BestDCs[$_.Domain] = $_.FQDN
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
     return $Script:BestDCs
 }

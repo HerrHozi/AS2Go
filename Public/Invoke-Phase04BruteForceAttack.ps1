@@ -61,10 +61,7 @@ function Invoke-ASPhase04BruteForceAttack {
         [switch]$DeveloperMode
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ($DeveloperMode) {
         $SkipImages = $true
@@ -84,8 +81,8 @@ function Invoke-ASPhase04BruteForceAttack {
             # If ($skipstep) { break }            
         
             If (-not $SkipClearHost) { Clear-Host }
-            Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase04.toupper())"
-            Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+            Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase04.toupper())"
+            Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
                 
             If ($AS2GoDemo) {
@@ -128,8 +125,5 @@ function Invoke-ASPhase04BruteForceAttack {
         } Until ($repeat -eq $Script:No)
 
 
-        ######################## main code ############################
-        $runtime = Get-RunTime -StartRunTime $StartRunTime
-        Write-Log -Message "    Run Time: $runtime [h] ###"
-        Write-Log -Message "### End Function $CurrentFunction ###"
+        Measure-FunctionRuntime -End -Details $Info
     }

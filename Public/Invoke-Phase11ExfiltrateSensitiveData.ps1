@@ -67,10 +67,7 @@ function Invoke-ASPhase11ExfiltrateSensitiveData {
         [switch]$SkipSensitiveDataAccess
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ($SkipSensitiveDataAccess) {
         Write-Log -Message "Skipped Attack Phase - $($Script:Phase11.toupper())"
@@ -86,8 +83,8 @@ function Invoke-ASPhase11ExfiltrateSensitiveData {
 
         Show-CurrentPhase -Phase "phase_11.html"
         If (-not $SkipClearHost) { Clear-Host }
-        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase11.toupper())"
-        Invoke-Output -Type  Bullet "Attempt to exfiltrate sensitive data over an SMB share"
+        Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase11.toupper())"
+        Write-AS2GoOutput -Type  Bullet "Attempt to exfiltrate sensitive data over an SMB share"
 
         If ($UnAttended) {
             $answer = $Script:Yes
@@ -97,12 +94,9 @@ function Invoke-ASPhase11ExfiltrateSensitiveData {
         }
 
         If ($answer -eq $Script:Yes) {
-            Start-Phase11DataExfiltration
+            Invoke-Phase11DataExfiltration
         }
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

@@ -68,10 +68,7 @@ function Invoke-ASPhase06Reconnaissance {
         [switch]$AS2GoDemo
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
     
     If (-not $AS2GoDemo) { 
         Set-NewColorSchema -NewStage $Script:InitialStart
@@ -89,9 +86,9 @@ function Invoke-ASPhase06Reconnaissance {
         # If ($skipstep) { break }     
         If (-not $SkipClearHost) { Clear-Host }
         
-        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase06.toupper())"
+        Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase06.toupper())"
         $Functionality = "This phase involves collecting reconnaissance and configuration data with a non-privileged user."
-        Invoke-Output -Type H1 -Message $Functionality
+        Write-AS2GoOutput -Type H1 -Message $Functionality
 
         If ($AS2GoDemo) {
             If ($UnAttended) {
@@ -107,7 +104,7 @@ function Invoke-ASPhase06Reconnaissance {
         }
 
         If ($answer -eq $Script:Yes) {
-            Start-Reconnaissance
+            Invoke-Reconnaissance
             $reconnaissance = $Script:No
 
             If ($UnAttended) {
@@ -119,7 +116,7 @@ function Invoke-ASPhase06Reconnaissance {
             }
 
             If ($answer -eq $Script:Yes) {
-                Start-ReconnaissanceExtended
+                Invoke-ReconnaissanceExtended
             }
         }
         elseIf ($answer -eq $Script:Exit) {
@@ -130,7 +127,7 @@ function Invoke-ASPhase06Reconnaissance {
 
         If (-not $AS2GoDemo) { break }
         #        If (-not $SkipClearHost) { Clear-Host }
-        #        Invoke-Output -Type  Header -M "??? REPEAT | Attack Phase - $($Script:Phase06)  ???"
+        #        Write-AS2GoOutput -Type  Header -M "??? REPEAT | Attack Phase - $($Script:Phase06)  ???"
 
         If ($UnAttended) {
             $repeat = $Script:No
@@ -142,8 +139,5 @@ function Invoke-ASPhase06Reconnaissance {
 
     } Until ($repeat -eq $Script:No)  
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

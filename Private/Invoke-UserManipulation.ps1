@@ -1,4 +1,54 @@
-function Start-UserManipulation {
+<#
+.SYNOPSIS
+Disables AD users, resets their passwords, or performs both operations.
+
+.DESCRIPTION
+Selects enabled users for Disable and all users in the search base for other actions.
+Runs LDAP DirectoryEntry operations in parallel to disable accounts, reset passwords, or perform both.
+Each successful change writes TickValue to adminDescription. A missing NewPassword is replaced with a random password.
+Displays progress, DC CPU and LDAP timing when available, and per-user success or error messages.
+Q can stop processing. This low-level function does not exclude backdoor or break-glass accounts.
+
+.PARAMETER SearchBase
+Distinguished name of the OU or domain subtree containing the target users.
+
+.PARAMETER Server
+AD server used for user enumeration and LDAP changes; also queried for progress metrics.
+
+.PARAMETER NewPassword
+Plain-text replacement password for PwReset or Both. A random password is generated when omitted or blank.
+
+.PARAMETER Action
+Operation to perform: Disable, PwReset, or Both, matched without case sensitivity. Other values do not change accounts.
+
+.PARAMETER TickValue
+Value written to adminDescription after a successful change. Defaults to the current time as yyyy-MM-dd HH:mm:ss.
+
+.PARAMETER ThrottleLimit
+Maximum concurrent account-processing operations, from 1 through 100. Defaults to 5.
+
+.EXAMPLE
+Invoke-UserManipulation -SearchBase "OU=Demo Accounts,OU=AS2Go,DC=example,DC=com" -Server "DC01.example.com" -Action Disable
+Disables enabled users in the selected demo-account OU and marks successful changes.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires permission to change the target users. No protected-account exclusions are applied in this function.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Disables users, resets passwords, or performs both operations within the specified AD search base.
+Marks changed accounts in adminDescription and reports results, progress, and available DC metrics.
+#>
+function Invoke-UserManipulation {
 
     ################################################################################
     ######                                                                     #####
@@ -21,10 +71,7 @@ function Start-UserManipulation {
         [int]$ThrottleLimit = 5
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     # Auto-generate password if none given
     if ([string]::IsNullOrWhiteSpace($NewPassword)) {
@@ -41,7 +88,7 @@ function Start-UserManipulation {
         $total = $users.Count
 
         if ($total -eq 0) {
-            Invoke-Output -Type Warning -Message "No enabled users found under $SearchBase"
+            Write-AS2GoOutput -Type Warning -Message "No enabled users found under $SearchBase"
             return
         }
     }
@@ -56,7 +103,7 @@ function Start-UserManipulation {
     }
 
     $cname = Convert-FromDNToCN -DistinguishedName $SearchBase
-    Invoke-Output -Type Quit -Message "Press 'Q' at any time to abort User Manipulation`n      for '$total' users under '$cname'!`n      Password: '$NewPassword' | Tick: '$TickValue'"
+    Write-AS2GoOutput -Type Quit -Message "Press 'Q' at any time to abort User Manipulation`n      for '$total' users under '$cname'!`n      Password: '$NewPassword' | Tick: '$TickValue'"
 
     $startTime = Get-Date
 
@@ -243,23 +290,20 @@ function Start-UserManipulation {
     $failed = $allResults | Where-Object { $_.Success -eq $false }
 
     if ($succeeded) {
-        Invoke-Output -Type TextMaker -Message "Successfully manipulated user accounts in the selected scope: $cname | " -TM "Total: $($succeeded.Count)"
+        Write-AS2GoOutput -Type TextMaker -Message "Successfully manipulated user accounts in the selected scope: $cname | " -TM "Total: $($succeeded.Count)"
     }
 
     #Undo-UserManipulation -TickValue $TickValue -Server $server -SearchBase $SearchBase
 
     if ($failed) {
-        Invoke-Output -Type Warning -Message "$($failed.Count) user(s) had errors:"
+        Write-AS2GoOutput -Type Warning -Message "$($failed.Count) user(s) had errors:"
         $failed | ForEach-Object {
-            Invoke-Output -Type Bullet -Message "$($_.User): $($_.Errors)"
+            Write-AS2GoOutput -Type Bullet -Message "$($_.User): $($_.Errors)"
         }
     }
 
-    Invoke-Output -Type Success -Message "Completed user account manipulation for the current scope (see examples above)."
+    Write-AS2GoOutput -Type Success -Message "Completed user account manipulation for the current scope (see examples above)."
     Write-Log -Message "    >> Password used: $NewPassword"
     Write-Log -Message "    >> TickValue: $TickValue"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

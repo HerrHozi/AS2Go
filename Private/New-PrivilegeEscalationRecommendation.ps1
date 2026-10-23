@@ -30,10 +30,7 @@ function New-PrivilegeEscalationRecommendation {
 
     Param([string] $computer)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     #https://www.stigviewer.com/stig/windows_10/2017-02-21/
 
@@ -47,8 +44,8 @@ function New-PrivilegeEscalationRecommendation {
 
 
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -Type  Header -M "Choose your Type of Privilege Escalation"
-    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type  Header -M "Choose your Type of Privilege Escalation"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     write-host ""
 
     Write-Host "     ... please be patient, while checking your environment ... " -ForegroundColor Yellow
@@ -138,8 +135,8 @@ function New-PrivilegeEscalationRecommendation {
 
 
     #If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -Type  Header -M "Choose your Type of Privilege Escalation"
-    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type  Header -M "Choose your Type of Privilege Escalation"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     write-host ""
     
     Write-host "     current Victim PC Name & OS:  $overview - " -NoNewline
@@ -400,10 +397,7 @@ $Global:ASVictim = whoami
 
     
     Write-Log -Message "    >> Your Victim PC settings -  $overview - $version"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return "C"
 

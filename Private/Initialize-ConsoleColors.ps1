@@ -13,7 +13,7 @@ function Initialize-ConsoleColors {
 
     $info = Measure-FunctionRuntime -Begin
     if (-not (Test-Path -Path $JsonPath)) {
-        Invoke-Output -Type Warning -Message "Console color config not found: $JsonPath"
+        Write-AS2GoOutput -Type Warning -Message "Console color config not found: $JsonPath"
         return
     }
 
@@ -43,7 +43,7 @@ function Initialize-ConsoleColors {
         }
     }
     catch {
-        Invoke-Output -Type Warning -Message "Failed to load console colors from JSON: $JsonPath"
+        Write-AS2GoOutput -Type Warning -Message "Failed to load console colors from JSON: $JsonPath"
     }
 
     Measure-FunctionRuntime -End -Details $info

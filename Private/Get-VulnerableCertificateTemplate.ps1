@@ -6,13 +6,11 @@ function Get-VulnerableCertificateTemplate {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    #region ####################### main code #########################
+    $Info = Measure-FunctionRuntime -Begin
     
     $CAtemplate = Get-ASConfig -Setting "BadCA"
 
-    Invoke-Output -Type  CodeSnippet -M "A simple LDAP query is sufficient:"
+    Write-AS2GoOutput -Type  CodeSnippet -M "A simple LDAP query is sufficient:"
     #$code = "`$SearchFilter =  (&(objectClass=pKICertificateTemplate)(cn=`$PublishedTemplate)(msPKI-Certificate-Name-Flag=1)(msPKI-Certificate-Application-Policy=1.3.6.1.5.5.7.3.2))"
     # Write-HighlightedCode  -code $code
 
@@ -131,10 +129,7 @@ function Get-VulnerableCertificateTemplate {
 
 
     Write-Log -Message "    >> using $CAtemplate, can be enrolled by Domain Computer - $UseDomainComputers"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $CA 
 }

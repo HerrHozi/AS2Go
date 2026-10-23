@@ -8,10 +8,7 @@ function Add-TaskElementToFileScheduleTaskXml {
 
     Param([string] $xmlFilePath)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     [datetime]$tomorrow = (Get-Date).AddDays(1)
     [xml]$xml = Get-Content $xmlFilePath
@@ -73,11 +70,8 @@ function Add-TaskElementToFileScheduleTaskXml {
 
     $xml.Save($xmlFilePath)
 
-    Invoke-output -Type Success -Message "Task $sNewName added to file $xmlFilePath" -noextralines  
+    Write-AS2GoOutput -Type Success -Message "Task $sNewName added to file $xmlFilePath" -noextralines  
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
 }

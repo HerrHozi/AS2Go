@@ -13,17 +13,14 @@ function Set-UPNSuffix {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $previousUPN = Get-ASConfig -Setting "LastUPNSuffix"
 
     If ($previousUPN.contains("@") ) {
         $HelpP = "Use the previous selection."
         $message = "Use current UPN suffix ($previousUPN) or select new:"
-        #       Invoke-Output -Type TextMaker -Message "Current UPN suffix:" -Tm $previousUPN
+        #       Write-AS2GoOutput -Type TextMaker -Message "Current UPN suffix:" -Tm $previousUPN
     }
     else {
         $message = "Select new UPN suffix:"
@@ -40,18 +37,15 @@ function Set-UPNSuffix {
 
     If ($Decision -eq "New") {
         $result = Get-UPNSuffix
-        Invoke-Output -Type TextMaker -Message "New UPN suffix:" -Tm $result
+        Write-AS2GoOutput -Type TextMaker -Message "New UPN suffix:" -Tm $result
     }
     else {
 
         $result = $previousUPN
-        Invoke-Output -Type Info -message "Keep previous UPN suffix!"    
+        Write-AS2GoOutput -Type Info -message "Keep previous UPN suffix!"    
     }   
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $result
     

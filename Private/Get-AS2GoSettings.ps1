@@ -32,8 +32,8 @@ function Get-AS2GoSettings {
     $Info = Measure-FunctionRuntime -Begin
 
 
-    Invoke-Output -Type Header -Message "Verify and Update global AS2Go Settings"
-    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Header -Message "Verify and Update global AS2Go Settings"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     Write-Host ""
 
     Set-ASConfig -Setting "ticketsDir" -Value $Script:AS2GOTicketsDir
@@ -130,7 +130,7 @@ function Get-AS2GoSettings {
                 $newValue = Get-FolderPath -InitialDirectory 'C:\' -Description 'Please select the tools folder (with mimikatz.exe)'
             }
             default {
-                $newValue = Invoke-Output -Type Input -Message "Please enter the new value"
+                $newValue = Write-AS2GoOutput -Type Input -Message "Please enter the new value"
             }
         }
 
@@ -190,7 +190,7 @@ function Get-AS2GoSettings {
     do {
         if (-not $firstRun) {
             Clear-Host
-            Invoke-Output -Type Info -message "Updated Values"
+            Write-AS2GoOutput -Type Info -message "Updated Values"
         }
         $firstRun = $false
 

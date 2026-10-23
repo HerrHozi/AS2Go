@@ -1,17 +1,33 @@
 <#
 .SYNOPSIS
-Creates a domain controller share with sample AD backup files.
+Prepares a domain controller share containing simulated AD backup data.
 
 .DESCRIPTION
-Guides the user through selecting a preferred domain controller and creating the AD backup
-share, then copies sample files and saves the share path in module settings.
+Uses the configured preferred controller for the current domain and creates the remote AD-Backup SMB share.
+The helper creates C:\temp\as2go when needed and grants Domain Admins modify/change access.
+Copies the lab ShareContent files into the share, displays its contents, and stores its UNC path as OfflineDITFile.
+Reports access-denied and other failures rather than proceeding as though share creation succeeded.
+
+.EXAMPLE
+Invoke-BackUpShare
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires PowerShell remoting, SMB access, initialized controller mappings, and the lab ShareContent directory.
 
 .COMPONENT
 Category: Main Function
 
 .FUNCTIONALITY
-Selects the preferred DC and creates an AD-Backup share.
-Copies and lists sample backup files, then saves the share path in module settings.
+Prepares the AD-Backup share on the configured DC and grants Domain Admins access.
+Copies and lists sample backup files, then saves the share path for later data-access and exfiltration stages.
 #>
 function Invoke-BackUpShare {
 
@@ -21,28 +37,26 @@ function Invoke-BackUpShare {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
+    $CurrentFunction = $Info.FunctionName
 
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -Type Header -Message "Create a Share for 'fake' AD Backups on Domain Controller"
+    Write-AS2GoOutput -Type Header -Message "Create a Share for 'fake' AD Backups on Domain Controller"
     $Functionality = (Get-Help $CurrentFunction).Functionality
-    Invoke-Output -Type H1 -Message $Functionality
+    Write-AS2GoOutput -Type H1 -Message $Functionality
 
     $TargetServer = $Script:BestDCs[(Get-ADDomain).DNSRoot]
 
-    Invoke-output -Type Bullet -Message "Target Domain Controller:" -TM $TargetServer
+    Write-AS2GoOutput -Type Bullet -Message "Target Domain Controller:" -TM $TargetServer
     try {
         New-BackUpShare -Server $TargetServer -ErrorAction Stop
         Copy-Item "$Script:ASSetup\ShareContent\*.*" -Destination "\\$TargetServer\AD-Backup" -Force -ErrorAction Stop
         Get-ChildItem -Path      "\\$TargetServer\AD-Backup" -ErrorAction Stop | Out-Host
-        Invoke-Output -Type TextMaker -Message "Done - New Share is available" -TM  "\\$TargetServer\AD-Backup"
+        Write-AS2GoOutput -Type TextMaker -Message "Done - New Share is available" -TM  "\\$TargetServer\AD-Backup"
         Set-ASConfig -Setting "OfflineDITFile" -Value "\\$TargetServer\AD-Backup" -ErrorAction Stop
     }
     catch [System.UnauthorizedAccessException] {
-        Invoke-Output -Type Error -Message "No permission to create or write backup share on $TargetServer. Use an account with local admin/share permissions."
+        Write-AS2GoOutput -Type Error -Message "No permission to create or write backup share on $TargetServer. Use an account with local admin/share permissions."
     }
     catch {
         $errMsg = $_.Exception.Message
@@ -50,7 +64,7 @@ function Invoke-BackUpShare {
             $_.CategoryInfo.Category -eq [System.Management.Automation.ErrorCategory]::PermissionDenied -or
             $errMsg -match '(?i)AS2GO_ACCESS_DENIED|access is denied|cannot connect to cim server|connecting to remote server .* failed'
         ) {
-            Invoke-Output -Type Error -Message "No permission to create or write backup share on $TargetServer. Use an account with local admin/share permissions."
+            Write-AS2GoOutput -Type Error -Message "No permission to create or write backup share on $TargetServer. Use an account with local admin/share permissions."
         }
         else {
             Write-Error "Failed to create and fill the backup share on $TargetServer`: $($_.Exception.Message)"
@@ -58,8 +72,5 @@ function Invoke-BackUpShare {
     }    
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

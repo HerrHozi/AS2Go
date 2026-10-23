@@ -8,10 +8,7 @@ function Get-ADCSComponents {
 
     Param([string] $param1, [string] $param2)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $script:EnrollmentServices = @()
     $script:RootCA = @()
@@ -65,8 +62,5 @@ function Get-ADCSComponents {
     $Script:ADCS["EnrollmentService"] = $ADCS | Where-Object { $_.ObjectClass -eq 'pKIEnrollmentService' } | select-object -ExpandProperty 'CanonicalName'
     $Script:ADCS["certificationAuthority"] = $ADCS | Where-Object { $_.ObjectClass -eq 'certificationAuthority' -and $_.CanonicalName -notmatch '/AIA|/NTAuthCertificates' } | select-object -ExpandProperty 'CanonicalName'
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

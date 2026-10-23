@@ -1,4 +1,35 @@
-function Start-Phase10DataAccess {
+<#
+.SYNOPSIS
+Demonstrates discovery and access to simulated sensitive data.
+
+.DESCRIPTION
+Writes a recursive listing of the AS2Go module into an ntds.dit placeholder on the configured AD backup share.
+Runs net view for share discovery and lists the backup-share contents.
+Copies a sample password-file viewing command to the clipboard and launches PsExec against the application server.
+The user can explore the remote command prompt; the sample password file is not read automatically.
+
+.EXAMPLE
+Invoke-Phase10DataAccess
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Uses configured backup-share, application-server, and tool paths. The .dit file is a directory listing, not a live AD database.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Writes a simulated ntds.dit file and enumerates the configured server shares and backup contents.
+Opens a PsExec command prompt on the application server and prepares a sample sensitive-file command.
+#>
+function Invoke-Phase10DataAccess {
 
     ################################################################################
     #####                                                                      ##### 
@@ -6,16 +37,13 @@ function Start-Phase10DataAccess {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $server = $($Script:ASOfflineDITFile).Split(".")[0]
     $fakeditfile = Join-Path -Path $Script:ASOfflineDITFile -ChildPath "ntds.dit"
 
 
-    Invoke-Output -Type Header -Message "Starting with Share Enumeration"
+    Write-AS2GoOutput -Type Header -Message "Starting with Share Enumeration"
 
     Write-Host ""
     Write-Host      -NoNewline "  Command: "
@@ -34,13 +62,13 @@ function Start-Phase10DataAccess {
     Invoke-Command -ScriptBlock { net view $server } | Out-Host
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
-    Invoke-Output -Type Header -Message "Starting Enumeration of Share Content"
+    Write-AS2GoOutput -Type Header -Message "Starting Enumeration of Share Content"
     Get-DirContent -Path $Script:ASOfflineDITFile
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-Output -Type Header -Message  "Try to open cmd console on $Script:ASAppServer"
+    Write-AS2GoOutput -Type Header -Message  "Try to open cmd console on $Script:ASAppServer"
 
     Write-Host ""
     Write-Host      -NoNewline "  Command: "
@@ -60,7 +88,7 @@ function Start-Phase10DataAccess {
     $tool = Join-Path -Path $Script:ASTools -ChildPath "PsExec.exe"
     Start-Process $tool -ArgumentList "\\$Script:ASAppServer -accepteula cmd.exe"
 
-    Invoke-Output -Type Bullet -Message "Try to find some sensitive data, e.g. files with passwords" 
+    Write-AS2GoOutput -Type Bullet -Message "Try to find some sensitive data, e.g. files with passwords" 
     
     Write-Host""
     Write-Host      -NoNewline "  Command: "
@@ -71,8 +99,5 @@ function Start-Phase10DataAccess {
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

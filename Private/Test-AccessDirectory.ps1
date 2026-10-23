@@ -6,16 +6,13 @@ function Test-AccessDirectory {
         [string]$directory
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     [bool]$passed = $false
 
     
 
-    Invoke-output -Type Codesnippet -Message "Command to access directory '$directory':"
+    Write-AS2GoOutput -Type Codesnippet -Message "Command to access directory '$directory':"
 
     Write-Highlight -Text "Get-ChildItem ", "$directory ", "-filter ", "*.*" `
         -Color $fgcC, $fgcF, $fgcS, $fgcF
@@ -26,13 +23,10 @@ function Test-AccessDirectory {
         $passed = $true
     }
     catch {
-        Invoke-Output -Type Error -Message "Failed to access directory '$directory'."
+        Write-AS2GoOutput -Type Error -Message "Failed to access directory '$directory'."
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $passed
 }

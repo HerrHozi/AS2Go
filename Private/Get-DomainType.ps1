@@ -25,14 +25,11 @@ function Get-DomainType {
         [string] $ForestDnsName
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     # Ensure AD module
     if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
-        Invoke-Output -Type  Error -M "The 'ActiveDirectory' PowerShell module is not installed."
+        Write-AS2GoOutput -Type  Error -M "The 'ActiveDirectory' PowerShell module is not installed."
         return
     }
 
@@ -83,10 +80,7 @@ function Get-DomainType {
     $4logfile = $result.GetEnumerator() | Format-Table -AutoSize | Out-String
     Write-Log -Message "    >> Filled hashtable with Domain Types: $4logfile"
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $result
 }

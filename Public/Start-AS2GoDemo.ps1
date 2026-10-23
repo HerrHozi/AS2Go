@@ -101,7 +101,11 @@ Function Start-AS2GoDemo {
         [switch]$SkipForgeAuthCertificates, 
         [switch]$SkipKerberoastingAttack,
         [switch]$DeveloperMode,
-        [switch]$Simulation
+        [switch]$Simulation,
+        [validateSet("PtH", "PtT", "Kerberoasting", "ESC1", "WDigest", "PsExec")]
+        [String]$PrivilegeEscalation,
+        [validateSet("Encrypt", "Reboot", "BackdoorUser", "GPT", "UserManipulation", "GroupManipulation")]
+        [String]$DomainPersistence
     )
 
 
@@ -133,7 +137,7 @@ Function Start-AS2GoDemo {
     
     Clear-ExfiltrationFolder
 
-    Invoke-Output -Type  Header -M "Attack Scenario to Go - along the kill-chain (AS2Go)"
+    Write-AS2GoOutput -Type  Header -M "Attack Scenario to Go - along the kill-chain (AS2Go)"
     
     $Script:MoAD = Test-PoSHModuleAvailability -PSModule "ActiveDirectory"
     $Script:MoGPO = Test-PoSHModuleAvailability -PSModule "GroupPolicy"
@@ -276,7 +280,7 @@ Function Start-AS2GoDemo {
 
     Update-WindowTitle -NewTitle "Used Accounts"
 
-    Invoke-Output -Type  Header -M $MyInfo
+    Write-AS2GoOutput -Type  Header -M $MyInfo
 
     $Global:ASVictim = $env:UserName
 
@@ -368,18 +372,18 @@ Function Start-AS2GoDemo {
 
 
 
-    Invoke-Output -Type HEADER -Message "ATTACK NAVIGATION"
-    Invoke-Output -Type H1 -Message "Choose your starting point in the attack chain.`n"
+    Write-AS2GoOutput -Type HEADER -Message "ATTACK NAVIGATION"
+    Write-AS2GoOutput -Type H1 -Message "Choose your starting point in the attack chain.`n"
 
-    Invoke-output -Type Bullet -Message "[4] $Script:Phase04" 
-    Invoke-output -Type Bullet -Message "[5] $Script:Phase05"
-    Invoke-output -Type Bullet -Message "[6] $Script:Phase06"
-    Invoke-output -Type Bullet -Message "[7] $Script:Phase07"
-    #Invoke-output -Type Bullet -Message "[8] $Script:Phase08"
-    Invoke-output -Type Bullet -Message "[9] $Script:Phase09"   
-    Invoke-output -Type Bullet -Message "[1] $Script:Phase10"
-    Invoke-output -Type Bullet -Message "[E] $Script:Phase11"
-    Invoke-output -Type Bullet -Message "[T] $Script:Phase12"
+    Write-AS2GoOutput -Type Bullet -Message "[4] $Script:Phase04" 
+    Write-AS2GoOutput -Type Bullet -Message "[5] $Script:Phase05"
+    Write-AS2GoOutput -Type Bullet -Message "[6] $Script:Phase06"
+    Write-AS2GoOutput -Type Bullet -Message "[7] $Script:Phase07"
+    #Write-AS2GoOutput -Type Bullet -Message "[8] $Script:Phase08"
+    Write-AS2GoOutput -Type Bullet -Message "[9] $Script:Phase09"   
+    Write-AS2GoOutput -Type Bullet -Message "[1] $Script:Phase10"
+    Write-AS2GoOutput -Type Bullet -Message "[E] $Script:Phase11"
+    Write-AS2GoOutput -Type Bullet -Message "[T] $Script:Phase12"
 
     Show-CurrentPhase -Phase "phase_00.html"
 

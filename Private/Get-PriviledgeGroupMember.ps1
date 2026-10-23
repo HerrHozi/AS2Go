@@ -2,10 +2,7 @@ function Get-PriviledgeGroupMember {
 
     Param([PSCustomObject[]] $Group)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     Try {
         $members = Get-ADGroupMember -Server $Group.FQDN -Identity $Group.SID -Recursive | Select-Object objectClass, SamAccountName, @{N = "CanonicalName"; E = { Convert-FromDNToCN -DistinguishedName $_.distinguishedName } } 
@@ -19,8 +16,5 @@ function Get-PriviledgeGroupMember {
     }
 
     Write-Log -Message "    >> using $($Group.SID) from domain $($Group.FQDN)"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

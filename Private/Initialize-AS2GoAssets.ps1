@@ -13,7 +13,7 @@ Category: Main Function
 Builds the tiered OU/group layout and demo objects.
 Moves privileged groups to Tier 0 and applies the lab ACLs.
 #>
-Function Invoke-NewAS2GoAssets {
+Function Initialize-AS2GoAssets {
     
     ################################################################################
     ######                                                                     #####
@@ -29,10 +29,8 @@ Function Invoke-NewAS2GoAssets {
         [string]$Server
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
+    $CurrentFunction = $Info.FunctionName
     If (-not $SkipClearHost) { Clear-Host }
     #get the Domain Root OU
     $ADRoot = Get-ADRootDSE
@@ -93,9 +91,9 @@ Function Invoke-NewAS2GoAssets {
     ######                                                                     #####
     ################################################################################
     
-    Invoke-Output -Type  Header -Message "Start creating Tiering OUs & Groups ...."
+    Write-AS2GoOutput -Type  Header -Message "Start creating Tiering OUs & Groups ...."
     $Functionality = (Get-Help $CurrentFunction).Functionality
-    Invoke-Output -Type H1 -Message $Functionality
+    Write-AS2GoOutput -Type H1 -Message $Functionality
 
     $cname = Convert-FromDNToCN -DistinguishedName "$RootOU"
         
@@ -124,7 +122,7 @@ Function Invoke-NewAS2GoAssets {
 
     If ($null -ne $check) {
         $Cname = Convert-FromDNToCN -DistinguishedName "$RootOU"
-        Invoke-Output -Type  Warning -M "OU '$AS2GoOU' alreday exists under $Cname!"
+        Write-AS2GoOutput -Type  Warning -M "OU '$AS2GoOU' alreday exists under $Cname!"
         #return 
     } 
     Else {
@@ -134,17 +132,17 @@ Function Invoke-NewAS2GoAssets {
         }
         catch {
             $principal = "$env:USERDOMAIN\$env:USERNAME"
-            Invoke-Output -type Error -Message "$_ | Affecting '$principal' on '$RootOU'"
+            Write-AS2GoOutput -type Error -Message "$_ | Affecting '$principal' on '$RootOU'"
             return
         }
         
 
         $Cname = Convert-FromDNToCN -DistinguishedName "OU=$AS2GoOU,$RootOU"
-        Invoke-Output -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname
+        Write-AS2GoOutput -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname
     
         New-ADOrganizationalUnit -Name "Demo Accounts" -Path "OU=$AS2GoOU,$RootOU" -Description "AS2Go Demo Accounts" -PostalCode "AS2GoDemoAccounts" -Server $Server
         $Cname = Convert-FromDNToCN -DistinguishedName "OU=Demo Accounts,OU=$AS2GoOU,$RootOU"
-        Invoke-Output -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname
+        Write-AS2GoOutput -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname
     }
 
     foreach ($Tier in $Tiers) {
@@ -159,16 +157,16 @@ Function Invoke-NewAS2GoAssets {
 
         If ($null -ne $check) {
             $Cname = Convert-FromDNToCN -DistinguishedName "OU=$AS2GoOU,$RootOU"
-            Invoke-Output -Type  Success -M "OU '$($TieringOUName[$i].Name)' alreday exists under $Cname!"
+            Write-AS2GoOutput -Type  Success -M "OU '$($TieringOUName[$i].Name)' alreday exists under $Cname!"
             return 
         } 
 
         New-ADOrganizationalUnit -Name $TieringOUName[$i].Name -Path "OU=$AS2GoOU,$RootOU" -Description $TieringOUName[$i].Description -PostalCode "AS2GOTierung" -Server $Server 
         $ShortDNPAth = "OU=" + $TieringOUName[$i].Name + ",OU=$AS2GoOU,$RootOU"
 
-        Invoke-Output -Type  Info -M "Creating Tier $Tier Assets ...."
+        Write-AS2GoOutput -Type  Info -M "Creating Tier $Tier Assets ...."
 
-        #Invoke-Output -Type  TextMaker -M "Created Parent OU" -Tm $TieringOUName[$i].Name
+        #Write-AS2GoOutput -Type  TextMaker -M "Created Parent OU" -Tm $TieringOUName[$i].Name
 
         Write-Host "   Created Parent OU " -NoNewline; Write-Host $TieringOUName[$i].Name -ForegroundColor Yellow
 
@@ -234,7 +232,7 @@ Function Invoke-NewAS2GoAssets {
                     Write-Host ([string]" - including computer object:").PadRight($space, ' ') -NoNewline; Write-Host $NewComputer -ForegroundColor Yellow 
                 }
                 Default {
-                    Invoke-Output -type Warning -Message "Unable to determine value of $ou" 
+                    Write-AS2GoOutput -type Warning -Message "Unable to determine value of $ou" 
 
                 }
             } # end Switch
@@ -248,7 +246,7 @@ Function Invoke-NewAS2GoAssets {
     ################################################################################
 
 
-    Invoke-Output -Type  Header -Message "Move sensitive groups to Tier 0 Level, except the 'Protected Users' Group ...."
+    Write-AS2GoOutput -Type  Header -Message "Move sensitive groups to Tier 0 Level, except the 'Protected Users' Group ...."
 
     Get-ADGroup -LDAPFilter "(adminCount=1)" -Properties * -Server $logonServer -SearchBase $ADRoot.defaultNamingContext | Where-Object {
         ($_.SID -like "*-512" -or 
@@ -278,20 +276,20 @@ Function Invoke-NewAS2GoAssets {
     ######                                                                     #####
     ################################################################################
 
-    Invoke-Output -Type  Header -Message "Adding AS2Go Groups to Local Admins on this machine ...."
+    Write-AS2GoOutput -Type  Header -Message "Adding AS2Go Groups to Local Admins on this machine ...."
 
     $DomainNetBIOS = $Domain.NetBIOSName
 
     foreach ($group in @($HDGroup, $VIGroup)) {
         try {
             Add-LocalGroupMember -Group "Administrators" -Member "$DomainNetBIOS\$group" -ErrorAction Stop
-            Invoke-Output -Type  Success -M "Added '$group' to local Administrators on $env:COMPUTERNAME" -noExtraLines
+            Write-AS2GoOutput -Type  Success -M "Added '$group' to local Administrators on $env:COMPUTERNAME" -noExtraLines
         }
         catch [Microsoft.PowerShell.Commands.MemberExistsException] {
-            Invoke-Output -Type  Warning -M "'$group' is already a member of local Administrators"
+            Write-AS2GoOutput -Type  Warning -M "'$group' is already a member of local Administrators"
         }
         catch {
-            Invoke-Output -Type  Warning -M "Failed to add '$group': $_"
+            Write-AS2GoOutput -Type  Warning -M "Failed to add '$group': $_"
         }
     }
 
@@ -316,9 +314,6 @@ Function Invoke-NewAS2GoAssets {
     Disable-ADOUInheritance -TargetDN ("OU=" + $TieringOUName[0].Name + ",OU=$AS2GoOU,$RootOU") -LogonServer $logonServer
     Set-DenyPermission -TargetDN "OU=T0 Groups,OU=$($TieringOUName[0].Name),OU=$AS2GoOU,$RootOU" -Trustee  $AS2GoGroups[2].Name -LogonServer $logonServer
 
-    Invoke-Output -Type  Success -Message "Finished creating Tiering OUs & Groups!"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Write-AS2GoOutput -Type  Success -Message "Finished creating Tiering OUs & Groups!"
+    Measure-FunctionRuntime -End -Details $Info
 }

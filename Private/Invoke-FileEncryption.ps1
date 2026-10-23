@@ -1,79 +1,50 @@
 <#
-.Synopsis
-    AS2Go – File Encryption Simulation (Security Awareness Demo)
+.SYNOPSIS
+Demonstrates certificate-based file encryption in a specified directory or share.
 
-.Description
-    This script is part of the AS2Go (Attack Simulation 2 Go) framework and is
-    intended exclusively for authorized security-awareness training and red-team
-    demonstrations in isolated lab environments.
+.DESCRIPTION
+Checks that the supplied path exists and selects the first certificate under Cert:\LocalMachine with a
+private key and a subject matching CN=<computer name>. followed by further subject-name text.
+Enumerates all files recursively, including hidden files, and calls Start-FileEncryption for each file.
+The helper reads the file into memory, saves a plain-text copy in Script:AS2GOTempDir, and overwrites the original
+using AES-256-CBC with an RSA-protected session key. Missing paths or certificates stop the workflow.
 
-    It simulates a ransomware-style file-encryption scenario by encrypting files
-    on a designated network share using an X.509 RSA public-key certificate and
-    AES-256-CBC symmetric encryption.  The purpose is to demonstrate the impact
-    of ransomware attacks so that defenders can observe, detect, and respond to
-    the behaviour in a controlled, reversible manner.
+.PARAMETER share
+Directory or UNC share whose files are processed recursively. Supply an existing path accessible to the current user.
 
-    All encrypted files are first copied to $env:TEMP as a built-in safety net.
-    The companion decryption script can restore all files using the private key
-    of the same certificate.
+.EXAMPLE
+Invoke-FileEncryption -share "\\DC01.example.com\AS2Go-EncryptionDemo"
+Processes all files below the specified lab share using the matching machine certificate.
 
-.Requirements
-    A valid certificate must exist (or will be created automatically) in
-    Cert:\LocalMachine\My with Subject "CN={AS2Go}".
-    Run the following to inspect available certificates:
-        Get-ChildItem Cert:\LocalMachine\My | Format-Table Thumbprint, Subject
+.INPUTS
+None. This function does not declare pipeline input.
 
-    To create a suitable self-signed certificate manually:
-        New-SelfSignedCertificate -Subject "CN={AS2Go}" `
-            -CertStoreLocation "Cert:\LocalMachine\My" `
-            -KeyExportPolicy Exportable -KeySpec Signature `
-            -KeyLength 2048 -KeyAlgorithm RSA -HashAlgorithm SHA256
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
 
-    On Windows Server 2012 – import an exported PFX instead:
-        $SecurePass = ConvertTo-SecureString -String '1q' -AsPlainText -Force
-        Import-PfxCertificate -FilePath C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.04.30.1114\LabSetup\Encryption `
-            -CertStoreLocation Cert:\LocalMachine\My -Password $SecurePass
-        Get-ChildItem Cert:\LocalMachine\My | Format-Table Thumbprint, Subject
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires an existing suitable RSA certificate; this function does not create or import one.
+Temporary copies use only the source filename, so matching names in different directories can overwrite each other.
+Author: AS2Go / me@mrhozi.com. License: MIT.
+Credit: Encryption/FileStream pattern based on work by Ryan Ries.
 
+.COMPONENT
+Category: Main Function
 
-        $PfxPath    = 'C:\Users\adsa\OneDrive - mrhozi\PowerShell Module\AS2Go\2026.04.30.1114\LabSetup\Encryption\as2go.pfx'
-$SecurePass = ConvertTo-SecureString -String '1q' -AsPlainText -Force
-
-Import-PfxCertificate -FilePath $PfxPath `
-    -CertStoreLocation 'Cert:\LocalMachine\My' `
-    -Password $SecurePass `
-    -Exportable
-
-Get-ChildItem 'Cert:\LocalMachine\My' |
-    Format-Table Thumbprint, Subject, HasPrivateKey
-
-.Notes
-    Author  : AS2Go / me@mrhozi.com
-    License : MIT
-    Credit  : Encryption/FileStream pattern based on work by Ryan Ries.
-              https://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx
-
-    WARNING : Use only in authorized lab environments. Unauthorized use is
-              illegal and unethical.
-
-
+.FUNCTIONALITY
+Recursively encrypts files in the selected path using AES and an existing machine certificate.
+Saves plain-text copies in the AS2Go temporary folder before overwriting the original files.
 #>
-
-# Part of the AS2Go Security Awareness Demo Framework
-# Simulates certificate-based file encryption on a designated lab share.
-
 Function Invoke-FileEncryption {
     param(
         [string] $share
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ((Test-Path -Path $share -PathType Any) -eq $false) {
-        Invoke-OutPut -Type Warning -Message "Target path not found - aborting simulation: '$share'"
+        Write-AS2GoOutput -Type Warning -Message "Target path not found - aborting simulation: '$share'"
         return
     }
 
@@ -92,7 +63,7 @@ Function Invoke-FileEncryption {
     Select-Object -First 1
 
     if ($null -eq $cert) {
-        Invoke-Output -Type Warning -Message "No matching computer certificate with a private key found - aborting file encryption."
+        Write-AS2GoOutput -Type Warning -Message "No matching computer certificate with a private key found - aborting file encryption."
         Write-Log -Message "File encryption aborted: No matching computer certificate with a private key found."
         return
     }
@@ -109,10 +80,7 @@ Function Invoke-FileEncryption {
         Start-FileEncryption -FileToEncrypt $file -Cert $Cert -ErrorAction SilentlyContinue
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }
 
 Function Start-FileEncryption {
@@ -163,7 +131,7 @@ Function Start-FileEncryption {
         $cryptoStream.FlushFinalBlock()
     }
     catch {
-        Invoke-OutPut -Type Error "Encryption failed for '$($FileToEncrypt.FullName)': $_"
+        Write-AS2GoOutput -Type Error "Encryption failed for '$($FileToEncrypt.FullName)': $_"
         return
     }
     finally {
@@ -171,7 +139,7 @@ Function Start-FileEncryption {
         $writer?.Close()
         $aes.Dispose()
     }
-    Invoke-Output -Type Bullet -Message "Encoded file" -TM $FileToEncrypt.FullName
+    Write-AS2GoOutput -Type Bullet -Message "Encoded file" -TM $FileToEncrypt.FullName
 }
 
 Function Start-FileEncryption_Old {

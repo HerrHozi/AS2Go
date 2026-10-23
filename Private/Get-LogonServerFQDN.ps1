@@ -20,10 +20,7 @@ function Get-LogonServerFQDN {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $logonServer = $env:LOGONSERVER -replace '^\\\\',''
 
@@ -46,10 +43,7 @@ function Get-LogonServerFQDN {
     }
 
     Write-Log -Message "    >> found logon server FQDN: $logonServer"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $logonServer
 }

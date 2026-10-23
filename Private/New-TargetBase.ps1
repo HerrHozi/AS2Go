@@ -11,10 +11,7 @@ function New-TargetBase {
         [switch] $ExcludeForestLevel
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $previousDN = Get-KeyValue "PreviousBase"
 
@@ -58,10 +55,7 @@ function New-TargetBase {
     Set-ASConfig -Setting "PreviousBase" -Value  $result
     
     Write-Log -Message "    >> Selected base '$Decision' returns $result"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $result
 }

@@ -4,17 +4,14 @@ function Get-FileVersion {
         [Parameter(Mandatory = $True)][string]$fullname
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ((Test-Path -Path $fullname -PathType Leaf) -eq $false) {
         $release = "failed"
         #       Write-Host "WARNING: Cannot find file - $fullname!" -ForegroundColor $Script:FGCWarning
         #       Write-Log -Message "WARNING: Cannot find file - $fullname!" -level WARN
 
-        Invoke-Output -Type  Warning -M "Cannot find file - $fullname!"
+        Write-AS2GoOutput -Type  Warning -M "Cannot find file - $fullname!"
 
         If ($fullname.ToUpper() -eq $Script:ConfigFile.ToUpper()) {
             Write-Host "`n`nProbably you started the PoSH Script $scriptName `nfrom the wrong directory $Script:ConfigFile!" -ForegroundColor $Script:FGCError
@@ -30,9 +27,6 @@ function Get-FileVersion {
     }
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
     return $release 
 }

@@ -25,10 +25,7 @@ function Get-ADCSEnrollmentServices {
         [string]$Server    
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $ConfigNC = (Get-ADRootDSE).ConfigurationNamingContext
     $caenrolls = Get-ADObject -LDAPFilter "(objectClass=pKIEnrollmentService)" `
@@ -36,7 +33,7 @@ function Get-ADCSEnrollmentServices {
         -Properties Name, dNSHostName, certificateTemplates, flags   `
         -Server $Server
 
-    Invoke-Output -Type H1 -Message "Identitfied Web Enrollment Services CAs"
+    Write-AS2GoOutput -Type H1 -Message "Identitfied Web Enrollment Services CAs"
 
 
     If ($null -ne $caenrolls) {
@@ -48,7 +45,7 @@ function Get-ADCSEnrollmentServices {
         $Script:ADCSEnrollmentServiceMissing = $false
     }
     else {
-        Invoke-Output -Type Info -Message "No pKIEnrollmentService found."
+        Write-AS2GoOutput -Type Info -Message "No pKIEnrollmentService found."
     }
 
     
@@ -59,8 +56,5 @@ function Get-ADCSEnrollmentServices {
     @{N = 'Templates'; E = { $_.certificateTemplates.Count } } | Format-Table | out-string 
     Write-Log -Message "    >> Identified the following Web Enrollment Services in Forest '$ConfigNC': $4logfile"
   
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

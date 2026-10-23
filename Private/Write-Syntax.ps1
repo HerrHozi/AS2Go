@@ -3,10 +3,7 @@ function Write-Syntax {
         [string]$Code
     )
     try {
-        $CurrentFunction = Get-FunctionName
-        Write-Log -Message "### Start Function $CurrentFunction ###"
-        $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-        #################### main code | out- host #####################
+        $Info = Measure-FunctionRuntime -Begin
     }
     catch {
         <#Do this if a terminating exception happens#>
@@ -68,10 +65,7 @@ function Write-Syntax {
     Write-Host ""
     try {
         Write-Log -Message "    >> Write Syntax for Highlighting for '$Code'."
-        ######################## main code ############################
-        $runtime = Get-RunTime -StartRunTime $StartRunTime
-        Write-Log -Message "    Run Time: $runtime [h] ###"
-        Write-Log -Message "### End Function $CurrentFunction ###"
+        Measure-FunctionRuntime -End -Details $Info
     }
     catch {
         <#Do this if a terminating exception happens#>

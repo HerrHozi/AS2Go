@@ -13,7 +13,7 @@ function Stop-AS2GoDemo {
 
     $closing = "DONE!"
 
-    Invoke-Output -Type Success -Message $closing
+    Write-AS2GoOutput -Type Success -Message $closing
 
     Update-WindowTitle -NewTitle $closing
 
@@ -21,7 +21,7 @@ function Stop-AS2GoDemo {
     $EndDate = (Get-Date).toString("yyyy-MM-dd HH:mm:ss")
     $duration = NEW-TIMESPAN -Start $StartDate -End $EndDate
 
-    Invoke-Output -Type Info -Message "finished after $duration [h]"
+    Write-AS2GoOutput -Type Info -Message "finished after $duration [h]"
 
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase50
     Set-ASConfig -Setting "LastFinished" -Value  $enddate

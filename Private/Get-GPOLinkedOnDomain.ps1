@@ -58,11 +58,11 @@ function Get-GPOLinkedOnDomain {
     $i = $LinkedGPOs.Count
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-Output -Type Header -Message "GPT Manipulation on Domain $domain"
+    Write-AS2GoOutput -Type Header -Message "GPT Manipulation on Domain $domain"
 
     $LinkedGPOs | Sort-Object Number | Select-Object Number, Displayname, ID, GPOStatus, Description, Owner, ModificationTime | Format-Table | Out-Host
 
-    Invoke-Output -Type Success -Message "Identified $i Group Policy Objects directly linked at the domain level."
+    Write-AS2GoOutput -Type Success -Message "Identified $i Group Policy Objects directly linked at the domain level."
 
     $i -= 1
 

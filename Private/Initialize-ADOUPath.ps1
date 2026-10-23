@@ -5,7 +5,7 @@ Ensures every OU in a distinguished-name path exists.
 .FUNCTIONALITY
 Creates missing parent and child OUs, then returns the requested Active Directory OU.
 #>
-function Invoke-ADOUPathCheck {
+function Initialize-ADOUPath {
 
     ################################################################################
     ######                                                                     #####
@@ -22,10 +22,7 @@ function Invoke-ADOUPathCheck {
         [bool]$ProtectedFromAccidentalDeletion = $false
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $parts = $DistinguishedName -split '(?<!\\),'
     $ouParts = @($parts | Where-Object { $_ -like 'OU=*' })
@@ -76,10 +73,7 @@ function Invoke-ADOUPathCheck {
         $Script:ExistingOUs[$currentDN] = $true
         $pathDN = $currentDN
     }
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return Get-ADOrganizationalUnit -Identity $DistinguishedName -Server $Script:LogonServer -ErrorAction Stop
 }

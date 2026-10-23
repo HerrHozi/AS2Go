@@ -38,7 +38,7 @@ function New-DemoAccount {
         return
     }
 
-    $ou = Invoke-ADOUPathCheck -DistinguishedName $TargetOU -Server $Server
+    $ou = Initialize-ADOUPath -DistinguishedName $TargetOU -Server $Server
     $cname = Convert-FromDNToCN -DistinguishedName $ou.DistinguishedName
 
 
@@ -59,21 +59,21 @@ function New-DemoAccount {
 
     If ($OUStructure -ne "Default") {
 
-        Invoke-Output -Type CodeSnippet -Message "Start creating sub '$OUStructure' OUs ..."
+        Write-AS2GoOutput -Type CodeSnippet -Message "Start creating sub '$OUStructure' OUs ..."
 
         $i = 0
 
         If ($OUStructure -eq "Country") {
             $UniqueCountryCodes | ForEach-Object {
                 $newOU = "OU=$_,$TargetOU"
-                $ou = Invoke-ADOUPathCheck -DistinguishedName $newOU -Server $Server
+                $ou = Initialize-ADOUPath -DistinguishedName $newOU -Server $Server
                 $i++
             }
         }
         elseIf ($OUStructure -eq "Department") {
             $Script:Departments.Name | ForEach-Object {
                 $newOU = "OU=$_,$TargetOU"
-                $ou = Invoke-ADOUPathCheck -DistinguishedName $newOU -Server $Server
+                $ou = Initialize-ADOUPath -DistinguishedName $newOU -Server $Server
                 $i++
             }
         }
@@ -82,7 +82,7 @@ function New-DemoAccount {
                 $newOU = "OU=$_,$TargetOU"
                 $Script:Departments.Name | ForEach-Object {
                     $newOUL2 = "OU=$_,$newOU"
-                    $ou = Invoke-ADOUPathCheck -DistinguishedName $newOUL2 -Server $Server
+                    $ou = Initialize-ADOUPath -DistinguishedName $newOUL2 -Server $Server
                     $i++
                 }
             }
@@ -90,13 +90,13 @@ function New-DemoAccount {
         else {
 
         }
-        Invoke-Output -Type Success -Message "Finished creating of '$i' sub level OUs."
+        Write-AS2GoOutput -Type Success -Message "Finished creating of '$i' sub level OUs."
     }
 
     $UPNSuffix = Set-UPNSuffix
 
 
-    Invoke-Output -Type Quit -Message "Press 'Q' at any time to abort creating '$total' Demo Users!"
+    Write-AS2GoOutput -Type Quit -Message "Press 'Q' at any time to abort creating '$total' Demo Users!"
 
     $startTime = Get-Date
     
@@ -209,7 +209,7 @@ function New-DemoAccount {
     Write-Progress -Activity "Creating Demo Accounts" -Completed
 
     $successCount = ($finalResults | Where-Object { $_.Success }).Count
-    Invoke-Output -Type Success -Message "Finished creating demo users. Success: $successCount of $total."
+    Write-AS2GoOutput -Type Success -Message "Finished creating demo users. Success: $successCount of $total."
 
 
     Measure-FunctionRuntime -End -Details $Info

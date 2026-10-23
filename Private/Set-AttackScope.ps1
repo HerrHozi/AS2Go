@@ -11,6 +11,8 @@ function Set-AttackScope {
         [string] $Action
     )
 
+    $Info = Measure-FunctionRuntime -Begin
+
     $lastSelection = Get-ASConfig -Setting "MySearchBase"
    
     If ($UnAttended) {
@@ -59,7 +61,7 @@ function Set-AttackScope {
                     $DomainSearchBase = $result
                     $cname = Convert-FromDNToCN -DistinguishedName $DomainSearchBase
                     Write-host
-                    Invoke-Output -Type Bullet -Message "Scope updated to:" -TM $cname
+                    Write-AS2GoOutput -Type Bullet -Message "Scope updated to:" -TM $cname
                     $prompt = $Script:Yes
                 }
             }
@@ -77,7 +79,7 @@ function Set-AttackScope {
             If ($null -ne $DomainSearchBase) {
                 $cname = Convert-FromDNToCN -DistinguishedName $DomainSearchBase
                 Write-host
-                Invoke-Output -Type Bullet -Message "Scope updated to:" -TM $cname
+                Write-AS2GoOutput -Type Bullet -Message "Scope updated to:" -TM $cname
 
                 $Options = @(
                     [pscustomobject] @{ Label = "&Proceed"; Help = "Yes."; Value = $Script:Yes },
@@ -91,10 +93,7 @@ function Set-AttackScope {
     }
     Set-ASConfig -Setting "MySearchBase" -Value $DomainSearchBase
     
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $DomainSearchBase
 }
