@@ -1,7 +1,7 @@
 ﻿<#
 .SYNOPSIS
 
-Attack scenario to GO - along the kill-chain (AS2Go)
+Attack Scenario to Go - along the kill-chain (AS2Go)
 
 Requirements:
 
@@ -10,7 +10,7 @@ Requirements:
 .DESCRIPTION
 
 
-AS2Go is an acronym for Attack Scenario To Go. 
+AS2Go is an acronym for Attack Scenario to Go. 
 This PoSH script creates the OU structure, the 3 mandotory group,
 moves the groups into the corresponding OUs and set the DENY permissions on the TIER 0 assets
 

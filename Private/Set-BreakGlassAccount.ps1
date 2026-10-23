@@ -36,7 +36,7 @@ function Set-BreakGlassAccount {
 
     $Options = @(
         [pscustomobject] @{ Label = "&Previous Break Glass Account"; Help = $HelpP ; Value = "Previous" },
-        [pscustomobject] @{ Label = "&New Break Glass Account"; Help = "Choose a dedicated Break Glass Account."; Value = "New" }
+        [pscustomobject] @{ Label = "Select &new Break Glass Account"; Help = "Choose a dedicated Break Glass Account."; Value = "New" }
     )
     $Decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $Title
 

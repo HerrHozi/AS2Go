@@ -6,25 +6,33 @@ function Start-Phase12DomainCompromise {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
-  
+    $info = Measure-FunctionRuntime -Begin
+ 
     $nextAnswer = "B"
 
-    Do {
-        Invoke-Output -Type Header -Message "Domain Dominance & Persistence - Select a Final Action:"
+    $topicBackdoor = "Establish persistent domain access through a covert backdoor account"
+    $topicGPT = "Weaponize Group Policy Template (GPT) files for domain-wide compromise"
+    $topicPurge = "Purge all privileged group memberships to grant exclusive control to the backdoor account"
+    $topicUserAccount = "Disable user accounts or enforce password resets (retain backdoor control)"
+    $topicEncrypt = "Encrypt critical Domain Controller assets for strategic leverage"
+    $topicMasterKey = "Extract the DPAPI master key for credential and secret recovery"
+    $topicGoldenTicket = "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
+    $topicReboot = "Trigger coordinated reboot across accessible Domain Controllers"
+    $topicExit = "Exit AS2Go."
 
-        Write-Host "   B " -ForegroundColor Yellow -NoNewline; Write-Host "- Establish persistent domain access through a covert backdoor account"
-        Write-Host "   T " -ForegroundColor Yellow -NoNewline; Write-Host "- Weaponize Group Policy Template (GPT) files for domain-wide compromise"
-        Write-Host "   P " -ForegroundColor Yellow -NoNewline; Write-Host "- Purge all privileged group memberships to grant exclusive control to the backdoor account"
-        Write-Host "   U " -ForegroundColor Yellow -NoNewline; Write-Host "- Disable user accounts or enforce password resets (retain backdoor control)"
-        Write-Host "   E " -ForegroundColor Yellow -NoNewline; Write-Host "- Encrypt critical Domain Controller assets for strategic leverage"
-        Write-Host "   K " -ForegroundColor Yellow -NoNewline; Write-Host "- Extract the DPAPI master key for credential and secret recovery"
-        Write-Host "   G " -ForegroundColor Yellow -NoNewline; Write-Host "- Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
-        Write-Host "   R " -ForegroundColor Yellow -NoNewline; Write-Host "- Trigger coordinated reboot across accessible Domain Controllers"
-        Write-Host "`n   X " -ForegroundColor Yellow -NoNewline; Write-Host "- Exit AS2Go"
+    Do {
+
+        Invoke-Output -Type Header -Message "Select a Final Action"
+
+        Write-Host "   B " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicBackdoor"
+        Write-Host "   T " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicGPT"
+        Write-Host "   P " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicPurge"
+        Write-Host "   U " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicUserAccount"
+        Write-Host "   E " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicEncrypt"
+        Write-Host "   K " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicMasterKey"
+        Write-Host "   G " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicGoldenTicket"
+        Write-Host "   R " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicReboot"
+        Write-Host "`n   X " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicExit"
 
 
 
@@ -33,52 +41,56 @@ function Start-Phase12DomainCompromise {
         }
         else {
 
+            If(-not $Script:MoGPO){
+                $topicGPT = $null
+            }
+
             $title = "Domain Dominance & Persistence"
-            $message = "Select the action to execute."
+            $message = "Select the action to execute. Options with unmet requirements are hidden."
             $Options = @(
                 [pscustomobject] @{
                     Label = "&Backdoor"
-                    Help  = "Establish persistent domain access through a covert backdoor account"
+                    Help  = $topicBackdoor
                     Value = "B"
                 },
                 [pscustomobject] @{
                     Label = "GP&T"
-                    Help  = "Weaponize Group Policy Template (GPT) files for domain-wide compromise"
+                    Help  = $topicGPT
                     Value = "T"
                 },
                 [pscustomobject] @{
                     Label = "&Purge"
-                    Help  = "Purge all privileged group memberships to grant exclusive control to the backdoor account"
+                    Help  = $topicPurge
                     Value = "P"
                 },
                 [pscustomobject] @{
                     Label = "&User Account"
-                    Help  = "Disable user accounts or enforce password resets (retain backdoor control)"
+                    Help  = $topicUserAccount
                     Value = "U"
                 },
                 [pscustomobject] @{
                     Label = "Master &Key"
-                    Help  = "Extract the DPAPI master key for credential and secret recovery"
+                    Help  = $topicMasterKey
                     Value = "K"
                 },
                 [pscustomobject] @{
                     Label = "&Golden Ticket"
-                    Help  = "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
+                    Help  = $topicGoldenTicket
                     Value = "G"
                 },
                 [pscustomobject] @{
                     Label = "&Encrypt"
-                    Help  = "Encrypt critical Domain Controller assets for strategic leverage"
+                    Help  = $topicEncrypt
                     Value = "E"
                 },
                 [pscustomobject] @{
                     Label = "&Reboot"
-                    Help  = "Trigger coordinated reboot across accessible Domain Controllers"
+                    Help  = $topicReboot
                     Value = "R"
                 },
                 [pscustomobject] @{
                     Label = "E&xit"
-                    Help  = "Exit AS2Go."
+                    Help  = $topicExit
                     Value = "X"
                 }
             )
@@ -102,7 +114,7 @@ function Start-Phase12DomainCompromise {
                     New-BackDoorUser
                     #If ($UnAttended) { Start-Sleep 2 } else { Pause }
                 }
-                $nextAnswer = "T"
+                $nextAnswer = "R"
                 $repeat = $Script:Yes 
             }
             "P" {
@@ -135,6 +147,12 @@ function Start-Phase12DomainCompromise {
                 If ($answer -eq $Script:Yes) {
 
                     $TargetGPO = Get-GPOLinkedOnDomain
+
+
+                    $TargetGPO = Get-TargetGPO
+
+
+                    
                     if ([string]::IsNullOrEmpty($TargetGPO)) {
                         Invoke-Output -Type CodeSnippet -Message "Domain Selection cancled by user"
                     }
@@ -246,10 +264,12 @@ function Start-Phase12DomainCompromise {
                 If (-not $SkipClearHost) { Clear-Host }
                 Invoke-Output -Type  Header -M "Trigger coordinated reboot across accessible Domain Controllers"
                 Restart-VictimMachines
+                $repeat = $Script:Yes
             }
             "X" {
                 Stop-AS2GoDemo -NextStepReboot $Script:No
                 $repeat = $Script:No
+                pause
             }
 
             default {
@@ -257,18 +277,11 @@ function Start-Phase12DomainCompromise {
                 $repeat = $Script:Yes  
             }
         }
-            
-
-
-
-
 
         If (-not $SkipClearHost) { Clear-Host }
   
     } Until ($repeat -eq $Script:No)
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $info
+
 }

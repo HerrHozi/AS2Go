@@ -21,6 +21,9 @@ Get-KlistTicket
 .EXAMPLE
 Get-KlistTicket -KlistOutput $output
 
+.LINK
+https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/klist
+
 .FUNCTIONALITY
 Parses klist ticket output into structured Kerberos ticket objects.
 
@@ -30,8 +33,10 @@ Category: Sub Function
 function Get-KlistTicket {
     [CmdletBinding()]
     param(
-        [string[]]$KlistOutput = (klist tickets)
+        [string[]]$KlistOutput = (klist tickets),
+        [string]$Client = $null
     )
+    $Info = Measure-FunctionRuntime -Begin
 
     $tickets = [System.Collections.Generic.List[object]]::new()
     $current = $null
@@ -119,7 +124,18 @@ function Get-KlistTicket {
         $tickets.Add($current)
     }
 
-    $tickets
+    If ($Client) {
+        $result = @($tickets | Where-Object { $_.Client -eq $Client })
+        Write-Log -Message "    >> Filtered tickets for client '$Client': $($result.Count)"
+    }
+    else {
+        $result = $tickets
+        Write-Log -Message "    >> Total tickets: $($result.Count)"
+    }
+    
+    Measure-FunctionRuntime -End -Details $Info
+
+    return $result
 }
 
 function ConvertFrom-KlistDate {

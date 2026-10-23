@@ -1,0 +1,163 @@
+{
+    "Settings": {
+        "DateAndTimeFormat": {
+            "description": "Format for date and time in logs",
+            "LogFile": "yyyy-MM-dd HH:mm:ss.fff"
+        },
+        "ConsoleColors": {
+            "BeforeEscalation": {
+                "FGCIInfo": {
+                    "value": "Magenta",
+                    "description": "Additional info / side details"
+                },
+                "FGCMInfo": {
+                    "value": "Yellow",
+                    "description": "Main info (instead of Yellow → modern, easy to read)"
+                },
+                "FGCBullet": {
+                    "value": "DarkGray",
+                    "description": "Bullet text (uses the secondary information color)"
+                },
+                "FGCTextMaker": {
+                    "value": "Yellow",
+                    "description": "TextMaker output"
+                },
+                "FGCSInfo": {
+                    "value": "DarkGray",
+                    "description": "Secondary info / less important"
+                },
+                "FGCCommand": {
+                    "value": "White",
+                    "description": "Commands / executions"
+                },
+                "FGCQuestion": {
+                    "value": "Cyan",
+                    "description": "Questions / user input"
+                },
+                "FGCQuestion2": {
+                    "value": "Cyan",
+                    "description": "Questions / user input"
+                },
+                "FGCDecisionPrompt": {
+                    "value": "Cyan",
+                    "description": "Decision prompts"
+                },
+                "FGCHighLight": {
+                    "value": "Magenta",
+                    "description": "Clear highlight text"
+                },
+                "FGCWarning": {
+                    "value": "Cyan",
+                    "description": "Warnings (classic Yellow)"
+                },
+                "FGCH1": {
+                    "value": "Cyan",
+                    "description": "H1 headings (uses the warning color)"
+                },
+                "FGCError": {
+                    "value": "Red",
+                    "description": "Errors (bright red tone, more visible)"
+                },
+                "FGCSuccess": {
+                    "value": "Default",
+                    "description": "Success messages"
+                },
+                "FGCInput": {
+                    "value": "Cyan",
+                    "description": "Commands / executions"
+                },
+                "ConsoleBGColor": {
+                    "value": "Black",
+                    "description": "Background remains black"
+                },
+                "ConsoleFGColor": {
+                    "value": "Gray",
+                    "description": "Default text gray"
+                }
+            },
+            "AfterEscalation": {
+                "FGCIInfo": {
+                    "value": "Green",
+                    "description": "Additional info / side details"
+                },
+                "FGCMInfo": {
+                    "value": "Yellow",
+                    "description": "Main info (instead of Yellow → modern, easy to read)"
+                },
+                "FGCBullet": {
+                    "value": "DarkGray",
+                    "description": "Bullet text (uses the secondary information color)"
+                },
+                "FGCTextMaker": {
+                    "value": "Yellow",
+                    "description": "TextMaker output"
+                },
+                "FGCSInfo": {
+                    "value": "DarkGray",
+                    "description": "Secondary info / less important"
+                },
+                "FGCCommand": {
+                    "value": "White",
+                    "description": "Commands / executions"
+                },
+                "FGCQuestion": {
+                    "value": "Cyan",
+                    "description": "Questions / user input"
+                },
+                "FGCQuestion2": {
+                    "value": "Cyan",
+                    "description": "Questions / user input"
+                },
+                "FGCDecisionPrompt": {
+                    "value": "Cyan",
+                    "description": "Decision prompts"
+                },
+                "FGCHighLight": {
+                    "value": "Magenta",
+                    "description": "Clear highlight text"
+                },
+                "FGCWarning": {
+                    "value": "Cyan",
+                    "description": "Warnings (classic Yellow)"
+                },
+                "FGCH1": {
+                    "value": "Cyan",
+                    "description": "H1 headings (uses the warning color)"
+                },
+                "FGCError": {
+                    "value": "Black",
+                    "description": "Errors (bright red tone, more visible)"
+                },
+                "FGCSuccess": {
+                    "value": "Green",
+                    "description": "Success messages"
+                },
+                "FGCInput": {
+                    "value": "Cyan",
+                    "description": "Commands / executions"
+                },
+                "ConsoleBGColor": {
+                    "value": "DarkRed",
+                    "description": "Background remains dark red"
+                },
+                "ConsoleFGColor": {
+                    "value": "Black",
+                    "description": "Default text black"
+                }
+            }
+        },
+        "PiskelLogo": {
+            "modelVersion": 2,
+            "piskel": {
+                "name": "AS2go",
+                "description": "",
+                "fps": 12,
+                "height": 15,
+                "width": 45,
+                "layers": [
+                    "{\"name\":\"Layer 1\",\"opacity\":1,\"frameCount\":1,\"chunks\":[{\"layout\":[[0]],\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC0AAAAPCAYAAABwfkanAAAA1UlEQVRIS2NkGIKAcQi6mWHU0fSKNZwh/UEm5D/MEQJP1sDVmZubw8VPnjxJUBybR5DNAMnDzAGJo5uJzIeZhdXRIAcjOxTGRzcUZoiRkdH/c+fOwc1C56M7HJfjKHZ0ONt1hp33rqJ4ilRHE+t5mLkUORoWMuiWgsSxJQ9QyKKHJijk8TkaWT1y8kA3h+jkgazRXUn7/8pfmgzIyQUmDwsZXMkD5mh0mmbJA1uaxpU2B4WjQY4jpfTAlxHRQxk9iVGt9KBXeUuuPaM1IrkhR6q+IRnSABRZAx+0nXUlAAAAAElFTkSuQmCC\"}]}"
+                ]
+            }
+        }
+    }
+}

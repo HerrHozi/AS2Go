@@ -4,7 +4,7 @@
 Starts the AS2Go demo workflow.
 
 .DESCRIPTION
-Runs the Attack Scenario To Go (AS2Go) demo sequence and optionally skips
+Runs the Attack Scenario to Go (AS2Go) demo sequence and optionally skips
 selected phases or user interactions. Use switches to run unattended,
 continue from a previous stage, or bypass specific attack steps.
 
@@ -75,7 +75,11 @@ PS> Start-AS2GoDemo -UnAttended -SkipPasswordSpray -SkipReconnaissance
 Runs unattended and skips selected phases.
 
 .NOTES
-Use Get-Help Start-AS2GoDemo -Full to view this help content.
+[!] AS2Go - IMPORTANT NOTICE
+You are about to simulate real-world attacks in a prepared Active Directory environment.
+Real attackers may spend days, weeks, months, or even years achieving what AS2Go demonstrates in minutes.
+Same techniques. Same attack paths. Different timelines.
+Use AS2Go only in explicitly authorized environments.
 #>
 
 Function Start-AS2GoDemo {
@@ -119,14 +123,20 @@ Function Start-AS2GoDemo {
     Write-Log -Message " "
     Write-Log -Message "Victim PC run on Windows $Script:WinVersion"
 
+
+    If (-not $SkipClearHost) { Clear-Host }
+    $answer = Show-Disclaimer
+
+    if ($answer -eq $Script:No) {
+        return
+    }   
     
     Clear-ExfiltrationFolder
 
-
-    Invoke-Output -Type  Header -M "Attack Scenario to GO - along the kill-chain (AS2Go)"
+    Invoke-Output -Type  Header -M "Attack Scenario to Go - along the kill-chain (AS2Go)"
     
-    $MoAD = Confirm-PoSHModuleAvailabliy -PSModule "ActiveDirectory"
-    $MoGPO = Confirm-PoSHModuleAvailabliy -PSModule "GroupPolicy"
+    $Script:MoAD = Test-PoSHModuleAvailability -PSModule "ActiveDirectory"
+    $Script:MoGPO = Test-PoSHModuleAvailability -PSModule "GroupPolicy"
 
     # check the correct directory and requirements
 
@@ -139,7 +149,7 @@ Function Start-AS2GoDemo {
     $FileVersionC = Get-FileVersion -fullname "$($Script:ASTools)\Certify.exe"
     #$FileVersionO = Get-FileVersion -fullname "C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
 
-    if ($MoGPO -eq "failed" -or $MoAD -eq "failed" -or $FileVersionM -eq "failed" -or $FileVersionP -eq "failed" -or $FileVersionR -eq "failed" -or $FileVersionN -eq "failed" -or $FileVersionC -eq "failed" -or $FileVersionO -eq "failed") {
+    if ($Script:MoGPO -eq $false -or $Script:MoAD -eq $false -or $FileVersionM -eq "failed" -or $FileVersionP -eq "failed" -or $FileVersionR -eq "failed" -or $FileVersionN -eq "failed" -or $FileVersionC -eq "failed" -or $FileVersionO -eq "failed") {
         [bool]$PreCheckFailed = $true
     }
 
@@ -210,6 +220,9 @@ Function Start-AS2GoDemo {
         #Update AS2Go.json config file
         Set-ASConfig -Setting "LastStart" -Value $TimeStamp
 
+
+
+
         If ($DeveloperMode) {
 
         }
@@ -253,13 +266,12 @@ Function Start-AS2GoDemo {
     If (-not $SkipClearHost) { Clear-Host }
 
     If ($Begin -eq $Script:Yes) {
-        $MyInfo = "          In this demo, I use the following three user accounts        "
+        $MyInfo = "This demo uses the following user & computer principals"
         $MyFGC = $Script:FGCHighLight
     }
     else {
-        $MyInfo = "          Still using these three (3) user accounts                    "
+        $MyInfo = "Still using the following user & computer principals"
         $MyFGC = "Darkblue"
-
     }
 
     Update-WindowTitle -NewTitle "Used Accounts"
@@ -344,27 +356,6 @@ Function Start-AS2GoDemo {
     }
 
 
-
-    # only for PosH Script testing hozi MyDebugHelp
-    If ($DeveloperMode) {
-        # function to test 
-        #Restart-VictimMachines
-        Write-host "START Run directy" -ForegroundColor Red
-
-
-        #Restart-VictimMachines
-
-       
-        #write-host $mydebug
-
-        #Invoke-Command -ScriptBlock {.\certify.exe find /vulnerable}
-        Write-host "END Run directy" -ForegroundColor Red
-        Write-Log -Message "Running dedicated function from Developer Mode section"
-        pause
-
-    }
-
-
     #endregion Attack Phase -  Brute Force Account 
 
     ################################################################################
@@ -375,247 +366,131 @@ Function Start-AS2GoDemo {
 
     #region Attack Phase - COMPROMISED User Account
 
-    Update-WindowTitle -NewTitle $Script:Phase05
-    #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
-    If (-not $SkipImages) { Show-Phases -Phase "phase_000.html" }
 
-    Do {
 
-        If ($SkipCompromisedAccount) { break }    
-  
+    Invoke-Output -Type HEADER -Message "ATTACK NAVIGATION"
+    Invoke-Output -Type H1 -Message "Choose your starting point in the attack chain.`n"
 
-        If (-not $SkipClearHost) { Clear-Host }
+    Invoke-output -Type Bullet -Message "[4] $Script:Phase04" 
+    Invoke-output -Type Bullet -Message "[5] $Script:Phase05"
+    Invoke-output -Type Bullet -Message "[6] $Script:Phase06"
+    Invoke-output -Type Bullet -Message "[7] $Script:Phase07"
+    #Invoke-output -Type Bullet -Message "[8] $Script:Phase08"
+    Invoke-output -Type Bullet -Message "[9] $Script:Phase09"   
+    Invoke-output -Type Bullet -Message "[1] $Script:Phase10"
+    Invoke-output -Type Bullet -Message "[E] $Script:Phase11"
+    Invoke-output -Type Bullet -Message "[T] $Script:Phase12"
 
-        Invoke-Output -Type  Header -M "Attack Phase - COMPROMISED User Account"
-        $Functionality = "This phase involves handling a compromised user account, determining if it has privileged access, `nand taking appropriate actions based on the account's sensitivity."
-        Invoke-Output -Type H1 -Message $Functionality
+    Show-CurrentPhase -Phase "phase_00.html"
 
-        If ($UnAttended) {
-            $answer = $Script:PrivledgeAccount
+    $Options = @(
+        [pscustomobject]@{
+            Label = "&4"
+            Help  = "Execute brute force or password spraying attacks to compromise user accounts"
+            Value = 4
+        },
+        [pscustomobject]@{
+            Label = "&5"
+            Help  = "Establish initial access using a compromised account"
+            Value = 5
+        },
+        [pscustomobject]@{
+            Label = "&6"
+            Help  = "Perform reconnaissance using a compromised account"
+            Value = 6
+        },
+        [pscustomobject]@{
+            Label = "&7"
+            Help  = "Execute privilege escalation techniques to gain administrative access"
+            Value = 7
+        },
+        [pscustomobject]@{
+            Label = "&9"
+            Help  = "Perform reconnaissance using a privileged account"
+            Value = 9
+        },
+        [pscustomobject]@{
+            Label = "&1"
+            Help  = "Access sensitive data using elevated privileges"
+            Value = 10
+        },
+        [pscustomobject]@{
+            Label = "&E"
+            Help  = "Exfiltrate sensitive data from compromised systems"
+            Value = 11
+        },
+        [pscustomobject]@{
+            Label = "&T"
+            Help  = "Execute domain compromise techniques and establish persistence"
+            Value = 12
         }
-        else {
+    )
+    $title = "Select an attack phase to start or continue your attack scenario."
+    $message = ""
+    $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
 
 
-
-            $title = "Was the compromised account a privileged account?"
-            $message = "Target scope:"
-            
-            $Options = @(
-                [pscustomobject] @{ 
-                    Label = "&Yes"
-                    Help  = 'the account had administrative or elevated privileges'
-                    Value = $Script:Yes 
-                },
-                [pscustomobject] @{ 
-                    Label = "&No"
-                    Help  = 'the account was a standard user account'
-                    Value = $Script:No 
-                }
-            )
-            
-            $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 1 -Title $title
-
-        }
-
-
-        If ($answer -eq $Script:Yes) {
-            Write-Log -Message "Starting with a PRIVLEDGE(!) COMPROMISED User Account"
-            $UserPic = "phase_008.html"
-            $Account = "PRIVLEDGE(!) Compromised "
-            $Script:PrivledgeAccount = $Script:Yes
-            $PrivilegeEscalation = $Script:PtT
-            $reconnaissance = $Script:Yes
-            Set-NewColorSchema -NewStage $Script:PtH
-            #Color Schema for the next command
-            #$fgcS = "Black" # Switch
-            #$fgcC = "Darkblue"   # Command
-            #$fgcF = "Black"
-            #$fgcV = "DarkMagenta" # Value
-            #$fgcH = "Darkblue" 
-        }
-        else {
+    if ($decision -eq 4) {
+        Invoke-ASPhase04BruteForceAttack -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase05InitialAccess -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
    
-            Write-Log -Message "Starting with a non-sensitive COMPROMISED User Account"
-            $UserPic = "phase_005.html"
-            $Account = "non-sensitive Compromised"
-            $Script:PrivledgeAccount = $Script:No
-            $PrivilegeEscalation = $Script:PtH
-            $reconnaissance = $Script:No
-            Set-NewColorSchema -NewStage $Script:InitialStart
-        }
-
-        #Pause
-        If (-not $SkipImages) { Show-Phases -Phase $UserPic }
-        Get-SessionsOnDC -server $Script:ASDC
-
-        If (-not $SkipClearHost) { Clear-Host }
-        Write-Host "____________________________________________________________________`n" 
-        Write-Host "        Starting with $Account User Account        "
-        Write-Host "____________________________________________________________________`n" 
-
-        $currentUser = $Global:ASVictim
-        $currentUser = $env:UserName
-
-        Write-Host -NoNewline "  Command: "
-        Write-Highlight -Text ("Get-ADUser ", "-Identity ", "$currentUser") -Color $fgcC, $fgcS, $fgcV
-
-        If ($UnAttended) {
-            If ($UseRUBEUS) { $answer = $Script:Yes }else { $answer = $Script:No }
-        }
-        else {
-            $question = "Would you like to run this step - Y or N? Default "
-            $answer = Get-Answer -question $question -defaultValue $Script:Yes
-        }
-
-        If ($answer -eq $Script:Yes) {
-            Write-Host "`n`n"
-            $error.Clear()
-            Try {
-                $attributes = @("AccountExpirationDate", "CannotChangePassword", "CanonicalName", "cn", "Created", "Department", "Description", "DisplayName", "EmployeeNumber", "Enabled", "Country", "l", "Manager", "MemberOf", "MobilePhone", "userAccountControl", "UserPrincipalName", "LastBadPasswordAttempt", "title")
-                get-aduser -Identity $currentUser -Properties $attributes | Format-List | Out-String -ErrorAction Stop
-  
-            }
-            catch {
-                $message = $_
-                Write-Host " "$message.CategoryInfo.Reason:" " -NoNewline
-                $message.Exception
-  
-                Write-Host ""
-                Write-host "  Account restrictions are preventing this user from signing in." -ForegroundColor $fgcH
-                Write-HosT "  Probably helpdesk user '$Global:ASHelpDeskUser' is member of the 'Protected Users' Group!`n`n" -ForegroundColor $fgcH
-                pause
-                #Stop-AS2GoDemo
-            }
-    
-
-
-    
-            Write-Host ""
-            Pause
-            If (-not $SkipClearHost) { Clear-Host }
-            invoke-output -type Header -message "Displays a list of currently cached Kerberos tickets"
-
-            Write-Host ""             
-            Write-Host -NoNewline "  Command: "
-            Write-Highlight -Text ('klist') -Color $fgcC
-            Write-Host ""           
-            If ($UnAttended) { Start-Sleep 1 } else { Pause }
-            Write-Host ""
-            $tickets = Get-KlistTicket
-            $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-            Invoke-Output -Type Info -Message "Last Ticket"
-            $tickets | Select-object -Last 1 | Format-List
-            
-            If ($UnAttended) { Start-Sleep 1 } else { Pause }
-            #If (-not $SkipClearHost) { Clear-Host }
-        }
-        elseIf ($answer -eq $Script:Exit) {
-            Stop-AS2GoDemo
-        }
-        else {
-        }
-
-        # If ($skipstep) {break}
-
-        #Invoke-Output -Type  Header -M "??? REPEAT | Attack Phase - COMPROMISED User Account ???"
-
-
-        If ($UnAttended) {
-            $repeat = $Script:No
-        }
-        else {
-            $title = "REPEAT | Attack Phase - $($Script:Phase05)"
-            $repeat = Show-DecisionPrompt -Default 1 -Title $title
-        }
-   
-    } Until ($repeat -eq $Script:No)
-
-
-
-    #endregion Attack Phase - COMPROMISED User Account
-
-    ################################################################################
-    ######                                                                     #####
-    ######                Attack Phase - RECONNAISSANCE                        #####
-    ######                                                                     #####
-    ################################################################################
-
-    If ($SkipReconnaissance) {
-        Write-Log -Message "Skipped Attack Phase - $($Script:Phase06)"
     }
-    else {
-        Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
+    elseif ($decision -eq 5) {
+        Invoke-ASPhase05InitialAccess -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+
+    }
+    elseif ($decision -eq 6) {
+        Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+
+    }
+    elseif ($decision -eq 7) {
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+
+    }
+    elseif ($decision -eq 9) {
+        Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+    }
+    elseif ($decision -eq 10) {
+        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+    }
+    elseif ($decision -eq 11) {
+        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+
+    }
+    elseif ($decision -eq 12) {
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
     }
 
-    ################################################################################
-    ######                                                                     #####
-    ######                Attack Phase - Privilege Escalation                  #####
-    ######                                                                     #####
-    ################################################################################
+    return
 
-    #https://www.beyondtrust.com/blog/entry/privilege-escalation-attack-defense-explained
-    #https://www.microsoft.com/en-us/security/blog/2019/05/09/detecting-credential-theft-through-memory-access-modelling-with-microsoft-defender-atp/
-
-
-    If ($SkipPrivilegeEscalation) {
-        Write-Log -Message "Skipped Attack Phase - $($Script:Phase07)"
-    }
-    else {
-        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
-    }
-
-
-    ################################################################################
-    ######                                                                     #####
-    ######      Attack Phase - RECONNAISSANCE  with privileged user            #####
-    ######                                                                     #####
-    ################################################################################
-
-
-    If ($SkipReconnaissance) {
-        Write-Log -Message "Skipped Attack Phase - $($Script:Phase09)"
-    }
-    else {
-        Invoke-ASPhase09ReconnaissancePriviledged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
-    }
-
-
-    ################################################################################
-    ######                                                                     #####
-    ######                Attack Phase - ACCESS SENSITIVE DATA                 #####
-    ######                                                                     #####
-    ################################################################################
-
-
-    If ($SkipSensitiveDataAccess) {
-        Write-Log -Message "Skipped Attack Phase - ACCESS SENSITIVE DATA "
-    }
-    else {
-        Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
-        Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
-    }
-
-    ################################################################################
-    ######                                                                     #####
-    ######                Attack Phase - DOMAIN COMPROMISED AND PERSISTENCE    #####
-    ######                                                                     #####
-    ################################################################################
-
-    #region Attack Phase -  DOMAIN COMPROMISED AND PERSISTENCE
-    If ($SkipDomainPersistence) {
-        Write-Log -Message "Skipped Attack Phase - DOMAIN COMPROMISED AND PERSISTENCE"
-    }
-    else {
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo
-    }
-    #endregion Attack Phase -  DOMAIN COMPROMISED AND PERSISTENCE
-
-    ################################################################################
-    ######                                                                     #####
-    ######                         CLEAN UP                                    #####
-    ######                                                                     #####
-    ################################################################################
-
+ 
     Stop-AS2GoDemo
 
 

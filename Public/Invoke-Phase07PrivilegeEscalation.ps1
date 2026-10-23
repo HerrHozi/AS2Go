@@ -70,13 +70,16 @@ function Invoke-ASPhase07PrivilegeEscalation {
         [Switch]$EnableLogging,
         [switch]$SkipImages,
         [switch]$SkipClearHost,
-        [switch]$AS2GoDemo
+        [switch]$AS2GoDemo,
+        [validateSet("PtH", "PtT", "Kerberoasting", "ESC1", "WDigest", "PsExec")]
+        [String]$Technique
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $info = Measure-FunctionRuntime -Begin
+    
+    $functionCallParameters = Get-FunctionCallParameters -FunctionName $MyInvocation.MyCommand.Name -BoundParameters $PSBoundParameters
+    $4logfile = $functionCallParameters.Parameters | Out-String
+    Write-Log -Message "    >> Used parameter: $4logfile"
 
     If (-not $AS2GoDemo) { 
         Set-NewColorSchema -NewStage $Script:InitialStart
@@ -88,7 +91,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
         
     Update-WindowTitle -NewTitle $Script:Phase07
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase07
-    If (-not $SkipImages) { Show-Phases -Phase "phase_007.html" }
+
+    Show-CurrentPhase -Phase "phase_07.html"
     If (-not $SkipClearHost) { Clear-Host }
     
     Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
@@ -99,17 +103,33 @@ function Invoke-ASPhase07PrivilegeEscalation {
     Invoke-Output -Type  Bullet "Gain remote code execution as Local System using PsExec"
     Invoke-Output -Type  Bullet "Extract credentials from process memory"
 
+    $Script:helpKerberoasting = "Run a Kerberoasting attack to request and crack service account TGS tickets."
+    $Script:helpESC1 = "Abuse Misconfigured Certificate Template Attack (ESC1)."
+    $Script:helpPsExec = "Abuse PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)."
+    $Script:helpPassTheTicket = "Abuse Pass-the-Ticket Attack."
+    $Script:helpPassTheHash = "Abuse Pass-the-Hash Attack."
+    $Script:helpSkip = "Skip Privilege Escalation."
+    $script:helpMemoryAccess = "Abuse Memory Access for Credential Theft."
+    $Script:helpEnableMemoryAccess = "Enable Memory Access for Credential Theft."
+    
+
 
     Do {
         # If ($skipstep) { break }     
 
         Set-NewColorSchema -NewStage $Script:InitialStart
-        $PrivilegeEscalation = New-PrivilegeEscalationRecommendation -computer $env:COMPUTERNAME
+        If ($unattended) {
+            $PrivilegeEscalation = $Technique
+        }
+        else {
+            $PrivilegeEscalation = New-PrivilegeEscalationRecommendation -computer $env:COMPUTERNAME
+        }
 
-        Invoke-Output -Type Header -Message "Privilege Escalation - Select an Attack Technique"
+
+        Invoke-Output -Type Header -Message "Select an Attack Technique"
 
         Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Hash Attack" -NoNewline; Write-Host " ** Coming Soon **" -ForegroundColor Yellow
-        Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack" -NoNewline; Write-Host " ** Coming Soon **" -ForegroundColor Yellow
+        Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack" -NoNewline
         Write-Host "  K " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Kerberoasting Attack"
         Write-Host "  1 " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Misconfigured Certificate Template Attack (ESC1)"
         Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)"
@@ -124,31 +144,51 @@ function Invoke-ASPhase07PrivilegeEscalation {
         else {
         
             $title = "Privilege Escalation"
-            $message = "Select the attack technique to execute."
+            $message = "Select the attack technique to execute. Options with unmet requirements are hidden."
+            
+            $Script:helpPassTheHash = $null 
+            $script:helpMemoryAccess = $null 
+            $Script:helpEnableMemoryAccess = $null 
+            
             $Options = @(
                 [pscustomobject] @{
                     Label = "&Kerberoasting"
-                    Help  = "Run a Kerberoasting attack to request and crack service account TGS tickets."
+                    Help  = $Script:helpKerberoasting
                     Value = "Kerberoasting"
                 },
                 [pscustomobject] @{
                     Label = "ESC&1"
-                    Help  = "Abuse Misconfigured Certificate Template Attack (ESC1)."
-                    Value = "C"
+                    Help  = $Script:helpESC1
+                    Value = $Script:PtC 
                 },
                 [pscustomobject] @{
                     Label = "PSE&xec"
-                    Help  = "Abuse PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)."
+                    Help  = $Script:helpPsExec
                     Value = "X"
                 },
                 [pscustomobject] @{
                     Label = "Pt&T"
-                    Help  = "Abuse Pass-the-Ticket Attack."
+                    Help  = $Script:helpPassTheTicket
                     Value = $Script:PtT
                 },
                 [pscustomobject] @{
+                    Label = "Pt&H"
+                    Help  = $Script:helpPassTheHash
+                    Value = $Script:PtH
+                },
+                [pscustomobject] @{
+                    Label = "&Memory Access"
+                    Help  = $Script:helpMemoryAccess
+                    Value = "M"
+                },
+                [pscustomobject] @{
+                    Label = "&Enable Memory Access"
+                    Help  = $Script:helpEnableMemoryAccess
+                    Value = "E"
+                },
+                [pscustomobject] @{
                     Label = "&Skip"
-                    Help  = "Skip  Privilege Escalation."
+                    Help  = $Script:helpSkip
                     Value = "S"
                 }
             )
@@ -158,31 +198,33 @@ function Invoke-ASPhase07PrivilegeEscalation {
 
         If ($answer -eq $Script:PtH) {
             #Starting Pass-the-Hash (PtH) Attack on VictimPC
-            If (-not $SkipImages) { Show-Phases -Phase "phase_007_PtH.html" }  
+
+            Show-CurrentPhase -Phase "phase_07_PtH.html"  
             Invoke-PtHAttack
         }
         elseif ($answer -eq $Script:PtT) {
-            If (-not $SkipImages) { Show-Phases -Phase "phase_007_PtT.html" } 
+
+            Show-CurrentPhase -Phase "ESC_PtT.html" 
             Invoke-PassTheTicketAttack
         }
-        elseif ($answer -eq "C" ) {
-            # If (-not $SkipImages) { Show-Phases -Phase phase_007_PtT.html } 
+        elseif ($answer -eq $Script:PtC  ) {
+
             Invoke-PrivilegeEscalationViaESC1
         }
         elseif ($answer -eq "Kerberoasting") {
-            #If (-not $SkipImages) { Show-Phases -Phase phase_007_PtT.html } 
+
             Invoke-KerberoastingAttack
         }
-        elseif ($answer -eq $CfM) {
-            #If (-not $SkipImages) { Show-Phases -Phase phase_007_PtT.html } 
+        elseif ($answer -eq "M") {
+
             New-CredentialTheftThroughMemoryAccess
         }
         elseif ($answer -eq "E") {
-            #If (-not $SkipImages) { Show-Phases -Phase phase_007_PtT.html } 
+
             Set-UseLogonCredential
         }
         elseif ($answer -eq "X") {
-            #   If (-not $SkipImages) { Show-Phases -Phase phase_007_PtT.html } 
+
             Invoke-PrivilegesEscalationViaLocalSystem
         }
         else {
@@ -201,9 +243,5 @@ function Invoke-ASPhase07PrivilegeEscalation {
    
     } Until ($repeat -eq $Script:No)
 
-
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -details $info
 }

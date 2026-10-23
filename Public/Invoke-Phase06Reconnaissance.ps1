@@ -84,7 +84,7 @@ function Invoke-ASPhase06Reconnaissance {
 
     Update-WindowTitle -NewTitle $Script:Phase06
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
-    If (-not $SkipImages) { Show-Phases -Phase "phase_006.html" }
+    Show-CurrentPhase -Phase "phase_06.html"
     Do {
         # If ($skipstep) { break }     
         If (-not $SkipClearHost) { Clear-Host }

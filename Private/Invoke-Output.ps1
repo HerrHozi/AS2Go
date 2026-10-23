@@ -73,16 +73,16 @@ function Invoke-Output {
             $level = "WARN" 
         }
         "Bullet" { 
-            Write-host "  • $Message " -ForegroundColor $Script:FGCSInfo -NoNewline
-            Write-host "$TextMaker" -ForegroundColor $Script:FGCMInfo
+            Write-host "  • $Message " -ForegroundColor $Script:FGCBullet -NoNewline
+            Write-host "$TextMaker" -ForegroundColor $Script:FGCTextMaker
             $level = "INFO"
         }
         "Success" {
             If ($NoExtraLines) {
-                Write-host "  [✅] $Message" # -ForegroundColor $Script:FGCWarning 
+                Write-host "  [✅] $Message" -ForegroundColor $Script:FGCSuccess
             }
             Else {
-                Write-host "`n  [✅] $Message`n`n" # -ForegroundColor $Script:FGCWarning 
+                Write-host "`n  [✅] $Message`n`n" -ForegroundColor $Script:FGCSuccess
             }   
 
             #Write-Host "`n  [✓] $Message`n`n" -ForegroundColor DarkGreen
@@ -99,7 +99,7 @@ function Invoke-Output {
         }
         "TextMaker" { 
             Write-host "`n  [i] $Message " -ForegroundColor $Script:FGCSInfo -NoNewline
-            Write-host "$TextMaker`n`n" -ForegroundColor $Script:FGCMInfo
+            Write-host "$TextMaker`n`n" -ForegroundColor $Script:FGCTextMaker
             $level = "INFO"
         }
         "Input" { 
@@ -109,7 +109,7 @@ function Invoke-Output {
             $level = "INFO"
         }
         "Quit" { 
-            Write-Host "`n  [~] $Message`n`n"           -ForegroundColor $Script:FGCInput
+            Write-Host "`n  [~] $Message`n`n"           -ForegroundColor $Script:FGCError
             $level = "INFO"
         }
         "Error" { 
@@ -117,7 +117,7 @@ function Invoke-Output {
             $level = "ERROR"
         }
         "H1" { 
-            Write-Host "$Message"    -ForegroundColor $Script:FGCWarning
+            Write-Host "$Message"    -ForegroundColor $Script:FGCH1
             $level = "INFO"
         }
         default { 

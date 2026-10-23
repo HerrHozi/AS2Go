@@ -6,10 +6,8 @@ function Stop-AS2GoDemo {
         [string]$NextStepReboot = $Script:No
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+
+    $info = Measure-FunctionRuntime -Begin
 
     If (-not $SkipClearHost) { Clear-Host }
 
@@ -22,7 +20,8 @@ function Stop-AS2GoDemo {
     $StartDate = Get-ASConfig -Setting "LastStart" 
     $EndDate = (Get-Date).toString("yyyy-MM-dd HH:mm:ss")
     $duration = NEW-TIMESPAN -Start $StartDate -End $EndDate
-    Write-host "finished after $duration [h]"
+
+    Invoke-Output -Type Info -Message "finished after $duration [h]"
 
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase50
     Set-ASConfig -Setting "LastFinished" -Value  $enddate
@@ -40,16 +39,12 @@ function Stop-AS2GoDemo {
     }
         
     If (-not $SkipImages) { 
-        #Show-Phases -Phase "phase_020.html" 
+        #Show-CurrentPhase -Phase "phase_020.html" 
     }
 
     If ($NextStepReboot -ne $Script:Yes) {
         return
     }
 
-    Write-Log -Message "    >> using "
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -details $info
 }

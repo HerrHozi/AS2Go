@@ -79,11 +79,11 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         [switch]$SkipDomainPersistence,
         [switch]$DeveloperMode
     )
-
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $info = Measure-FunctionRuntime -Begin
+    
+    $functionCallParameters = Get-FunctionCallParameters -FunctionName $MyInvocation.MyCommand.Name -BoundParameters $PSBoundParameters
+    $4logfile = $functionCallParameters.Parameters | Out-String
+    Write-Log -Message "    >> Used parameter: $4logfile"
 
     If ($DeveloperMode) {
         $SkipImages = $true
@@ -106,7 +106,8 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         Update-WindowTitle -NewTitle $Script:Phase12 
         
         Set-ASConfig -Setting "LastStage" -Value $Script:Phase12
-        If (-not $SkipImages) { Show-Phases -Phase "phase_012.html" }
+
+        Show-CurrentPhase -Phase "phase_12.html"
         
         Set-NewColorSchema -NewStage $Script:InitialStart
         If (-not $SkipClearHost) { Clear-Host }
@@ -130,14 +131,12 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         If ($answer -eq $Script:Yes) {
             If (-not $AS2GoDemo) { 
                 Invoke-ForestOverview 
-                Get-ForestInfo 
+                Get-ForestInfo
+                $Script:MoGPO = Test-PoSHModuleAvailability -PSModule "GroupPolicy" 
             }
             Start-Phase12DomainCompromise 
         }
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $info
 }

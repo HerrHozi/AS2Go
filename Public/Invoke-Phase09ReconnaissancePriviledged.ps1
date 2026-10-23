@@ -81,7 +81,7 @@ function Invoke-ASPhase09ReconnaissancePriviledged {
 
     Update-WindowTitle -NewTitle $Script:Phase09
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
-    If (-not $SkipImages) { Show-Phases -Phase "phase_009.html" }
+Show-CurrentPhase -Phase "phase_09.html"
 
     Do {
         # If ($skipstep) { break }     

@@ -38,6 +38,10 @@ function New-PrivilegeEscalationRecommendation {
     #https://www.stigviewer.com/stig/windows_10/2017-02-21/
 
 
+    If ($null -eq $Script:ASSAW) {
+        $Script:ASSAW = Get-ASConfig -Setting "mySAW" -ErrorAction SilentlyContinue
+    }
+
     [bool]$condition1 = $false
     [bool]$condition2 = $true
 
@@ -93,7 +97,7 @@ function New-PrivilegeEscalationRecommendation {
 
     If ($result -eq $true) {
         try {
-            [bool]$bAdminPC = Test-Path -Path "\\$Script:ASSAW\c$\temp" -ErrorAction Stop
+            [bool]$bAdminPC = Test-Path -Path "\\$Script:ASSAW\c$" -ErrorAction Stop
         }
         catch {
             [bool]$bAdminPC = $false
@@ -160,8 +164,10 @@ function New-PrivilegeEscalationRecommendation {
     Write-Host ""
     Write-Host "`n     CURRENT SITUATION - FROM AN ATTACKER'S PERSPECTIVE:`n" 
     
+$Global:ASVictim = whoami 
+
     Write-Host "     TOP: " -NoNewline -ForegroundColor Cyan
-    Write-Host "Victim User " -NoNewline
+    Write-Host "Compromised User " -NoNewline
     Write-Host "$Global:ASVictim " -NoNewline -ForegroundColor Yellow
     Write-Host "is member of the " -NoNewline
     Write-host "Local Admins!" -ForegroundColor Yellow
@@ -201,13 +207,13 @@ function New-PrivilegeEscalationRecommendation {
     
     If ($bAdminPC) {
         Write-Host "     TOP: " -NoNewline -ForegroundColor Cyan
-        Write-Host "Your user has access to " -NoNewline
-        Write-Host "\\$Script:ASSAW\c$\temp!" -ForegroundColor Yellow
+        Write-Host "Compromised user has access to Admin PC " -NoNewline
+        Write-Host "\\$Script:ASSAW\c$!" -ForegroundColor Yellow
     }
     else {
         Write-Host "     BAD: " -NoNewline -ForegroundColor Red
         Write-Host "Your user does NOT have access to share " -NoNewline
-        Write-Host "\\$Script:ASSAW\c$\temp!" -ForegroundColor Yellow
+        Write-Host "\\$Script:ASSAW\c$!" -ForegroundColor Yellow
     }
 
     [bool]$condition1 = $false

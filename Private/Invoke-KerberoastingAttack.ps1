@@ -29,7 +29,7 @@ function Invoke-KerberoastingAttack {
 
     Update-WindowTitle -NewTitle $Script:Phase27
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase27
-    #Show-Phases -Phase "phase_007.html"
+    #Show-CurrentPhase -Phase "phase_07.html"
     Do {
 
         If (-not $SkipClearHost) { Clear-Host }
