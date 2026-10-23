@@ -7,19 +7,33 @@ function Get-ComputerInformation {
     ################################################################################
 
 
-    Param([string] $computer)
+    Param(
+        [string] $computer
+        )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $summary = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
     try {
-        $property = Get-ADComputer -Identity $computer -Properties name, operatingSystem, operatingSystemVersion -ErrorAction Stop
+        $computerIdentity = $computer
+        $ipAddress = $null
+
+        if ([System.Net.IPAddress]::TryParse($computer, [ref]$ipAddress)) {
+            $fqdn = [System.Net.Dns]::GetHostEntry($ipAddress).HostName
+            $computerIdentity = $fqdn.Split('.')[0]
+        }
+        else
+        {
+            $fqdn = [System.Net.Dns]::GetHostEntry($computer).HostName
+            $computerIdentity = $fqdn.Split('.')[0]
+        }
+
+        $DNSDomain = $fqdn.Substring($fqdn.IndexOf('.') + 1)
+
+        $property = Get-ADComputer -Identity $computerIdentity -Properties SamAccountName, operatingSystem, operatingSystemVersion -Server $DNSDomain -ErrorAction Stop
     
-        $Name = $property.name.PadRight(16, [char]32)
+        $Name = $property.SamAccountName.PadRight(16, [char]32)
         $prefix = $property.operatingSystem.PadRight(33, [char]32)
         $suffix = $property.operatingSystemVersion
     
@@ -31,10 +45,8 @@ function Get-ComputerInformation {
     }
     
     Write-Log -Message "    >> Computer Info $summary"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+
+    Measure-FunctionRuntime -End -Details $Info 
 
     return $summary
 }

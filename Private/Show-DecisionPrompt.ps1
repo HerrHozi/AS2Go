@@ -4,7 +4,8 @@ Displays a menu prompt and returns the selected option.
 
 .DESCRIPTION
 Builds a console menu from the supplied options, collects the user's selection, and returns
-the corresponding option value.
+the corresponding option value. Options with a null, empty, or whitespace-only Help value are
+intentionally omitted from the menu.
 
 .COMPONENT
 Category: Sub Function
@@ -14,12 +15,6 @@ Builds console choices from the supplied options and returns the selected value.
 #>
 function Show-DecisionPrompt {
     
-    ################################################################################
-    #####                                                                      ##### 
-    #####    Show a custom Choice                                              #####             
-    #####                                                                      #####
-    ################################################################################
-
     param(
         [string]$Title = "Ready to proceed with this step?",
         [string]$Message = "Please select an option:",
@@ -38,10 +33,7 @@ function Show-DecisionPrompt {
         [int]$Default = 0
     )
     
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ($title.StartsWith("REPEAT |")) {
         [int]$total = 64
@@ -54,7 +46,7 @@ function Show-DecisionPrompt {
     $values = @()
     $choices = @()
     foreach ($opt in $Options) {
-        If ($null -ne $opt.help) {
+        if (-not [string]::IsNullOrWhiteSpace($opt.Help)) {
             $values += $opt.value
             $choices += New-Object System.Management.Automation.Host.ChoiceDescription "$($opt.label)", "$($opt.help)"
         }
@@ -64,10 +56,7 @@ function Show-DecisionPrompt {
     $result = $Host.UI.PromptForChoice('', $Message, $choices, $Default)
 
     Write-Log -Message "    >> $Title - User selected option: $( $values[$result])"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info 
     
     return $values[$result]
 }

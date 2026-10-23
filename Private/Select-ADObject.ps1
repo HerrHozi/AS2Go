@@ -28,6 +28,9 @@
     .PARAMETER AddOU
         Enables a context menu for creating an organizational unit under a selected domain, OU, or container.
 
+    .PARAMETER IncludeLinkedGPOs
+        Displays GPOs linked to each domain, OU, or container as selectable child entries.
+
     .PARAMETER IncludeUsers
         If specified, user objects are included in the browsable tree view.
 
@@ -87,6 +90,7 @@
         [switch]$LocalDomainOnly,
         [switch]$DomainSelectionOnly,
         [switch]$AddOU,
+        [switch]$IncludeLinkedGPOs,
         [switch]$IncludeUsers,
         [switch]$IncludeGroups,
         [switch]$IncludeComputers,
@@ -96,10 +100,10 @@
         [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)'
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    If ($Script:NotStandAlone) {
+        $Info = Measure-FunctionRuntime -Begin
+    }
+
 
     # =========================
     # Assemblies
@@ -382,6 +386,40 @@
 
                 $node.Nodes.Add($child) | Out-Null
             }
+
+            if ($IncludeLinkedGPOs -and $root.Properties['gPLink'].Count -gt 0) {
+                $gpoLinks = [regex]::Matches(
+                    [string]$root.Properties['gPLink'][0],
+                    '\[LDAP://(?<dn>[^;]+);\d+\]'
+                )
+
+                $gpoIndex = 0
+                foreach ($gpoLink in $gpoLinks) {
+                    $gpoDn = $gpoLink.Groups['dn'].Value
+                    $gpoRoot = [ADSI]"LDAP://$gpoDn"
+                    $gpoSearcher = New-Object System.DirectoryServices.DirectorySearcher($gpoRoot)
+                    $gpoSearcher.SearchScope = 'Base'
+                    $gpoSearcher.Filter = '(objectClass=groupPolicyContainer)'
+                    $null = $gpoSearcher.PropertiesToLoad.Add('displayName')
+                    $gpoResult = $gpoSearcher.FindOne()
+
+                    if (-not $gpoResult) { continue }
+
+                    $gpoDisplayName = [string]$gpoResult.Properties['displayname'][0]
+                    if ([string]::IsNullOrWhiteSpace($gpoDisplayName)) {
+                        $gpoDisplayName = $gpoDn
+                    }
+
+                    $gpoNode = New-Object System.Windows.Forms.TreeNode
+                    $gpoNode.Text = $gpoDisplayName
+                    $gpoNode.Name = $gpoDn
+                    $gpoNode.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; ObjectClass = 'groupPolicyContainer' }
+                    $gpoNode.ImageKey = 'GPO'
+                    $gpoNode.SelectedImageKey = 'GPO'
+                    $node.Nodes.Insert($gpoIndex, $gpoNode)
+                    $gpoIndex++
+                }
+            }
         }
     }
 
@@ -543,13 +581,22 @@
                     $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain -PassThru -ErrorAction Stop
                     Write-Log -Message "Created organizational unit '$($createdOU.DistinguishedName)'"
 
-                    $parentNode.Nodes.Clear()
-                    $parentNode.Nodes.Add("dummy") | Out-Null
-                    Get-ChildNodes $parentNode
-                    $newNode = $parentNode.Nodes | Where-Object { $_.Name -eq $createdOU.DistinguishedName } | Select-Object -First 1
-                    if ($newNode) {
-                        $newNode.EnsureVisible()
-                        $tree.SelectedNode = $newNode
+                    # Refresh the parent's child nodes so the new OU is shown immediately
+                    $tree.BeginUpdate()
+                    try {
+                        $parentNode.Nodes.Clear()
+                        $parentNode.Nodes.Add("dummy") | Out-Null
+                        Get-ChildNodes $parentNode
+                        $parentNode.Expand()
+
+                        $newNode = $parentNode.Nodes | Where-Object { $_.Name -eq $createdOU.DistinguishedName } | Select-Object -First 1
+                        if ($newNode) {
+                            $newNode.EnsureVisible()
+                            $tree.SelectedNode = $newNode
+                        }
+                    }
+                    finally {
+                        $tree.EndUpdate()
                     }
                 }
                 catch {
@@ -589,12 +636,13 @@
     $form.Controls.AddRange(@($tree, $statusLabel, $btnCancel, $btnOK))
 
     $null = $form.ShowDialog()
-
-    Write-Log -Message "    >> AD Object selected: $($form.Tag)"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
-
+    If ($Script:NotStandAlone) {
+        Write-Log -Message "    >> AD Object selected: $($form.Tag)"
+        Measure-FunctionRuntime -End -Details $Info
+    }
+    else {
+        Write-Host "    >> AD Object selected: $($form.Tag)"
+    }
     return $form.Tag
+    
 }

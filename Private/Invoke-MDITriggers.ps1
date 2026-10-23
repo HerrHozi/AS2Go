@@ -46,7 +46,7 @@ function Invoke-MDITriggers {
         switch ($decision) {
 
             "DNSZone" {
-                If ($MoDNS -ne "failed") {
+                If ($Script:MoDNS -ne "failed") {
                     Invoke-DNSZoneUpdate
                 }
                 else {

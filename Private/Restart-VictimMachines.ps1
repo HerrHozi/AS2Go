@@ -61,14 +61,6 @@ function Restart-VictimMachines {
         } 
     }
 
-Set-
-
-
-
-
-    # last, but not least
-    #Invoke-output -Type Bullet -Message "Try to reboot Local machine - $remotemachine"
-    #shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$env:COMPUTERNAME
 
     ######################## main code ############################
     $runtime = Get-RunTime -StartRunTime $StartRunTime

@@ -29,10 +29,8 @@ function Get-AS2GoSettings {
         [switch]$ReadOnly = $false
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
+
 
     Invoke-Output -Type Header -Message "Verify and Update global AS2Go Settings"
     Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
@@ -259,10 +257,7 @@ function Get-AS2GoSettings {
         }
 
         if ($ReadOnly) {
-            # Return a rich object in readonly mode (useful for callers)
-            $runtime = Get-RunTime -StartRunTime $StartRunTime
-            Write-Log -Message "    Run Time: $runtime [h] ###"
-            Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info 
 
             return [pscustomobject]@{
                 Settings = $Settings | Sort-Object Index
@@ -316,13 +311,5 @@ function Get-AS2GoSettings {
         Clear-Host
     } until ($repeat -eq $Script:No)
 
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
-
-    # Return final snapshot (useful for automation/tests)
-    #return [pscustomobject]@{
-    #    Settings = $Settings | Sort-Object Index
-    #    Config   = (Read-AS2GoConfig -Settings $Settings)
-    #}
+    Measure-FunctionRuntime -End -Details $Info 
 }

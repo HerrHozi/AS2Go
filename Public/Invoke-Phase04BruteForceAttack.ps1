@@ -78,58 +78,58 @@ function Invoke-ASPhase04BruteForceAttack {
     Update-WindowTitle -NewTitle $Script:Phase04
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase04
     
-    If (-not $SkipImages) { Show-Phases -Phase "phase_004.html" }
+        Show-CurrentPhase -Phase "phase_04.html"
     
-    Do {
-        # If ($skipstep) { break }            
+        Do {
+            # If ($skipstep) { break }            
         
-        If (-not $SkipClearHost) { Clear-Host }
-        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase04.toupper())"
-        Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+            If (-not $SkipClearHost) { Clear-Host }
+            Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase04.toupper())"
+            Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
                 
-        If ($AS2GoDemo) {
-            if ($UnAttended -eq $true) {
-                If ($SkipPasswordSpray -eq $false)
-                { $answer = $Script:Yes }
-                else
-                { $answer = $Script:No }
+            If ($AS2GoDemo) {
+                if ($UnAttended -eq $true) {
+                    If ($SkipPasswordSpray -eq $false)
+                    { $answer = $Script:Yes }
+                    else
+                    { $answer = $Script:No }
+                }
+                else {
+                    $answer = Show-DecisionPrompt
+                }
             }
             else {
-                $answer = Show-DecisionPrompt
+                $answer = $Script:Yes
             }
-        }
-        else {
-            $answer = $Script:Yes
-        }
 
-        If ($answer -eq $Script:Yes) {
-            New-PasswordSprayAttack
-        }
-        elseIf ($answer -eq $Script:Exit) {
-            Stop-AS2GoDemo
-        }
-        else {
-        }
+            If ($answer -eq $Script:Yes) {
+                New-PasswordSprayAttack
+            }
+            elseIf ($answer -eq $Script:Exit) {
+                Stop-AS2GoDemo
+            }
+            else {
+            }
 
-        If (-not $AS2GoDemo) { break }
+            If (-not $AS2GoDemo) { break }
 
-        #If (-not $SkipClearHost) { Clear-Host }
+            #If (-not $SkipClearHost) { Clear-Host }
 
 
-        If ($UnAttended) {
-            $repeat = $Script:No
-        }
-        else {
-            $title = "REPEAT | Attack Phase - $($Script:Phase04)"
-            $repeat = Show-DecisionPrompt -Default 1 -Title $title
-        }
+            If ($UnAttended) {
+                $repeat = $Script:No
+            }
+            else {
+                $title = "REPEAT | Attack Phase - $($Script:Phase04)"
+                $repeat = Show-DecisionPrompt -Default 1 -Title $title
+            }
 
-    } Until ($repeat -eq $Script:No)
+        } Until ($repeat -eq $Script:No)
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
-}
+        ######################## main code ############################
+        $runtime = Get-RunTime -StartRunTime $StartRunTime
+        Write-Log -Message "    Run Time: $runtime [h] ###"
+        Write-Log -Message "### End Function $CurrentFunction ###"
+    }

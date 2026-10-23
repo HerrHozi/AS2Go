@@ -45,10 +45,7 @@ Function Invoke-DemoAccounts {
       [string]$Server
    )
 
-   $CurrentFunction = Get-FunctionName
-   Write-Log -Message "### Start Function $CurrentFunction ###"
-   $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-   #################### main code | out- host #####################
+   $Info = Measure-FunctionRuntime -Begin
    
    If (-not $SkipClearHost) { Clear-Host }
    Invoke-Output -Type Header -Message "Add AS2Go Demo Accounts to the Lab"
@@ -124,15 +121,17 @@ Function Invoke-DemoAccounts {
    Set-ASConfig -Setting "MySearchBase" -Value $OrganizationalUnit
    Set-ASConfig -Setting "PreviousBase" -Value $OrganizationalUnit
 
+
+
    New-DemoAccount -TargetOU $OrganizationalUnit -path $FileWithDemoUsers -NumberOfUsers $recommendAmount -UPNSuffix $UPNSuffix -Scenario $Scenario -Server $Script:LogonServer
    Add-RandomUsersToAccountOperators -TargetOU $OrganizationalUnit -Server $Script:LogonServer
 
-   Invoke-Output -Type TextMaker -Message "Done - New Users available under" -TM $cname
+   $pw = Get-ASConfig -Setting "LastPW"
+   $VISecurePass = ConvertTo-SecureString -String $pw -AsPlainText -Force
+   Add-VictimAccount -TargetOU $OrganizationalUnit -UPNSuffix $UPNSuffix -Server $Script:LogonServer -AccountPassword $VISecurePass
 
-   ######################## main code ############################
-   $runtime = Get-RunTime -StartRunTime $StartRunTime
-   Write-Log -Message "    Run Time: $runtime [h] ###"
-   Write-Log -Message "### End Function $CurrentFunction ###"
+   Invoke-Output -Type TextMaker -Message "Done - New Users available under" -TM $cname
+   Measure-FunctionRuntime -End -Details $Info
 }
 
 

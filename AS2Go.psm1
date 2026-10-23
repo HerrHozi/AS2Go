@@ -6,7 +6,7 @@
 
 <#
 
-AS2Go is an acronym for Attack Scenario To Go. 
+AS2Go is an acronym for Attack Scenario to Go. 
  
 AS2Go is written in PowerShell and goes along the cyber kill chain, 
 with stops at Password Spray, Reconnaissance, Privilege Escalation, 
@@ -66,20 +66,26 @@ $Script:ConfigFile = Join-Path -Path $Script:AS2GOConfigDir -ChildPath "AS2Go.js
 $Script:ASTools = Join-Path -Path $ASModulePath -ChildPath "Tools"
 $Script:ASPhases = Join-Path -Path $ASModulePath -ChildPath "Phases"
 $Script:ASSetup = Join-Path -Path $ASModulePath -ChildPath "LabSetup"
+$Script:ASConfig = Join-Path -Path $ASModulePath -ChildPath "Config"
 
-$Global:PathPSCertutil = Join-Path -Path $Script:ASSetup -ChildPath "PSCertutil\PSCertutil.psd1"
-$Global:PathADCSGoat = Join-Path -Path $Script:ASSetup -ChildPath "ADCSGoat\ADCSGoat.psd1"
+$Global:PathPSCertutil = Join-Path -Path $ASModulePath -ChildPath "Modules\PSCertutil\PSCertutil.psd1"
+$Global:PathADCSGoat = Join-Path -Path $ASModulePath -ChildPath "Modules\ADCSGoat\ADCSGoat.psd1"
 
 $Script:AllDomainsDetails = @()
 $Script:DoaminTypes = @{}
 $Script:ADCS = @{}
 [bool]$Script:PoSH7 = $false
+[bool]$Script:NotStandAlone = $true
+[bool]$Script:MoAD = $false
+[bool]$Script:MoGPO = $false
+[bool]$Script:MoDNS = $false
 
 
 If ($PSVersionTable.PSVersion.Major -ge 7) {
     $Script:PoSH7 = $true
-    # --- Global header color for all Format-Table outputs ---
+    # --- Global header color for all Format-Table & Format-List outputs ---
     $PSStyle.Formatting.TableHeader = "`e[90m"   # DarkGray
+    $PSStyle.Formatting.FormatAccent = "`e[90m" # DarkGray
     #Cyan → "e[96m"
     #White → "e[97m"
 }
@@ -127,9 +133,9 @@ $Script:AllDomainsDetails = New-Object System.Collections.ArrayList
 
 $Script:Exit = "x"
 
-$Script:PtH = "H"
-$Script:PtT = "T"
-$PtC = "C"
+$Script:PtH = "PtH"
+$Script:PtT = "PtT"
+$Script:PtC = "ESC1"
 $KrA = "K"
 $CfM = "M"
 $Script:GoldenTicket = "GT"
@@ -139,15 +145,16 @@ $Script:PrivledgeAccount = $Script:No
 #$tmp = "$ASModulePath\AS2Go.tmp"
 $Script:RUBEUS = Join-Path -Path $Script:ASTools -ChildPath "Rubeus.exe"
 
-$Script:Phase04 = "Brute Force Or Pw Spray"
-$Script:Phase05 = "User Account Compromised"
+$Script:Phase04 = "Brute Force or Password Spray"
+$Script:Phase05 = "Initial Access"
 $Script:Phase06 = "Reconnaissance"
 $Script:Phase07 = "Privilege Escalation"
-$Script:Phase08 = "Priviledge Account Compromised"
-$Script:Phase09 = "Reconnaissance with Priviledge Account"
-$Script:Phase10 = "Access Sensitive Data"
-$Script:Phase11 = "Exfiltrate Data"
-$Script:Phase12 = "Domain Compromised & Persistence"
+$Script:Phase08 = "Privileged Account Compromise"
+$Script:Phase09 = "Reconnaissance with a Privileged Account"
+$Script:Phase10 = "Sensitive Data Access"
+$Script:Phase11 = "Data Exfiltration"
+$Script:Phase12 = "Domain Compromise & Persistence"
+
 
 $Script:Phase25 = "Misconfigured Certificate Template Attack (ESC1)"
 $Script:Phase27 = "Kerberoasting Attack"
@@ -369,6 +376,7 @@ $PublicFunctions = $PublicFunctionAsts.Name
 
 If ($env:AS2GO_EXPORT_PRIVATE -eq 1) {
     $ExportPrivateFunctions = $true
+    $Script:EnableLogging = $true
 }
 else {
     $ExportPrivateFunctions = $false
@@ -413,6 +421,9 @@ if ($ExportPrivateFunctions -and $PrivatePath) {
         }
     }
 }
+Write-Log -Message "--------------------------------------------------"
+Write-Log -Message "Loading AS2go Module"
+Write-Log -Message "--------------------------------------------------"
 
 Invoke-AS2GoDirectory -Directory $Script:AS2GoLogDir
 Invoke-AS2GoDirectory -Directory $Script:AS2GoTempDir
@@ -449,6 +460,8 @@ $logo | ForEach-Object {
 
 Show-PiskelFile -PiskelPath (Join-Path -Path $ASModulePath -ChildPath "AS2Go.piskel") -addshadow
 
+Initialize-ConsoleColors
+
 #Write-Host "`n"
 Write-Host "  Description: $($ASModuleManifest.Description) " -ForegroundColor Gray
 Write-Host "  Author: HerrHozi | Version: $($ASModuleManifest.Version) | Last Update: $ASModuleLastUpdate | $($ASModuleManifest.Copyright)" -ForegroundColor Gray
@@ -466,12 +479,20 @@ Write-HighlightedCode  -code "                   Invoke-ASPhase04BruteForceAttac
 Write-HighlightedCode  -code "                   Invoke-ASPhase07PrivilegeEscalation"
 Write-HighlightedCode  -code "                   Invoke-ASPhase12DomainCompromisePersistence"
 Write-HighlightedCode  -code "                   Start-AS2GoDemo"
-Write-HighlightedCode  -code "                   ASP07 -EnableLogging -SkipImages"
-Write-HighlightedCode  -code "                   ASP12 -EnableLogging -SkipImages -AS2GoDemo"
+Write-HighlightedCode  -code "                   ASP07 -EnableLogging -SkipImages -UnAttended -Technique PtT"
+Write-HighlightedCode  -code "                   ASP12 -EnableLogging -SkipImages"
 
 
 Write-host "`n"
 $host.ui.RawUI.WindowTitle = "$ASModuleName - $($ASModuleManifest.Version)"
+$Script:EnableLogging = $false
+
+
+
+
+
+
+
 
 
 

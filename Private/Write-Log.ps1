@@ -13,12 +13,6 @@ Writes the selected severity and message when module logging is enabled.
 #>
 Function Write-Log {
 
-    ################################################################################
-    #####                                                                      ##### 
-    #####    log all actions into a log file                                   #####
-    #####                                                                      #####
-    ################################################################################
-
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $False)]
@@ -36,9 +30,11 @@ Function Write-Log {
     )
 
     If ($EnableLogging -ne $true) { return }
+    
     $Stamp = (Get-Date).ToUniversalTime().ToString($Script:DateFormatLog)
     
     $Line = "$Stamp $Level $Message"
+    
     If ($logfile) {
         Add-Content $logfile -Value $Line
     }

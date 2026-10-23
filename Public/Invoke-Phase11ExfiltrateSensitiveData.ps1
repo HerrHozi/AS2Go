@@ -84,7 +84,7 @@ function Invoke-ASPhase11ExfiltrateSensitiveData {
         Update-WindowTitle -NewTitle $Script:Phase11 
         Set-ASConfig -Setting "LastStage" -Value $Script:Phase11 
 
-        If (-not $SkipImages) { Show-Phases -Phase "phase_011.html" }
+        Show-CurrentPhase -Phase "phase_11.html"
         If (-not $SkipClearHost) { Clear-Host }
         Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase11.toupper())"
         Invoke-Output -Type  Bullet "Attempt to exfiltrate sensitive data over an SMB share"

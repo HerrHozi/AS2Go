@@ -2,9 +2,36 @@
 
 ```Text
 Author:          Holger Zimmermann | <zimmermann.holger@live.de>
-Current Version: 2026.10.10.987
-Last Update:     2026-10-10
+Current Version: 2026.10.23.572
+Last Update:     2026-10-23
 ```
+
+- Version 2026.10.23.572
+  - Add Ptt
+
+- Version 2026.10.22.922
+  - Added Function Invoke-ASPhase05InitialAccess, Test-LocalAdministrator & Get-CurrentADuser
+
+- Version 2026.10.22.785
+  - TBD
+
+- Version 2026.10.21.1125
+  - Added Function Show-Disclaimer
+
+- Version 2026.10.20.1165
+  - Added Function Add-VictimUser
+
+- Version 2026.10.20.564
+  - Added Function Initialize-ConsoleColors 
+
+- Version 2026.10.14.832
+  - Changed Images and updated HTML files
+  - Updated Function Select-ADObject | now include GPOs
+  - Added Function Get-TargetGPO 
+
+- Version 2026.10.11.776
+  - Updated Invoke-ASPhase07PrivilegeEscalation & Invoke-PassTheTicketAttack 
+  - fixed code for -Unattended switch 
 
 - Version 2026.10.10.987
   - Added Function Get-KListTickets

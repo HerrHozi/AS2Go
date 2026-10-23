@@ -20,14 +20,13 @@ Function Set-NewBackgroundColor {
     ################################################################################
 
     Param(
-        [Parameter(Mandatory = $True)]$BgC,
-        [Parameter(Mandatory = $True)]$FgC
+        [Parameter(Mandatory = $True)]
+        $BgC,
+        [Parameter(Mandatory = $True)]
+        $FgC
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $AS2GoConsole = (Get-Host).UI.RawUI
     $AS2GoConsole.BackgroundColor = $BgC
@@ -36,8 +35,5 @@ Function Set-NewBackgroundColor {
     Write-Log -Message "    >> Set Background Color to '$Bgc'."
     Write-Log -Message "    >> Set Foreground Color to '$Fgc'."
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    $runtime = Measure-FunctionRuntime -End -Details $Info
 }

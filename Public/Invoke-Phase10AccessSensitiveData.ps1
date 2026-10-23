@@ -86,7 +86,7 @@ function Invoke-ASPhase10AccessSensitiveData {
         Update-WindowTitle -NewTitle $Script:Phase10 
         Set-ASConfig -Setting "LastStage" -Value $Script:Phase10 
 
-        If (-not $SkipImages) { Show-Phases -Phase "phase_010.html" }
+        Show-CurrentPhase -Phase "phase_10.html"
         If (-not $SkipClearHost) { Clear-Host }
 
         Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase10.toupper())"

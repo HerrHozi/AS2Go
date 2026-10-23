@@ -91,27 +91,13 @@ Function Invoke-FileEncryption {
     } |
     Select-Object -First 1
 
-    $encoder = Get-ChildItem 'Cert:\LocalMachine' -Recurse | Where-Object { $_.HasPrivateKey -eq $true -and $_.Subject -match "CN=$env:ComPUTERNAME." } | Select-Object -First 1
-    $AS2GoCert = $cert.Thumbprint
-
-    if ($AS2GoCert) {
-        Write-log -message "Simulation certificate found: $($encoder.Subject ) | $($encoder.Thumbprint)"
-    }
-    else {
-        Write-Host "No simulation certificate found – creating self-signed certificate '$encoderName'..." | Out-Host
-        New-SelfSignedCertificate -Subject "CN={$encoderName}" `
-            -CertStoreLocation 'Cert:\LocalMachine\My' `
-            -KeyExportPolicy Exportable -KeySpec Signature `
-            -KeyLength 2048 -KeyAlgorithm RSA -HashAlgorithm SHA256 | Out-Null
-        $encoder = Get-ChildItem Cert:\LocalMachine\My | Where-Object Subject -eq "CN={$encoderName}" | Select-Object -First 1
-        $AS2GoCert = $encoder.Thumbprint
+    if ($null -eq $cert) {
+        Invoke-Output -Type Warning -Message "No matching computer certificate with a private key found - aborting file encryption."
+        Write-Log -Message "File encryption aborted: No matching computer certificate with a private key found."
+        return
     }
 
-    #Write-Host "`nSimulation certificate thumbprint: $AS2GoCert`n" | Out-Host
-
-    # Load the certificate object used for key exchange
-    #$Cert = Get-ChildItem "Cert:\LocalMachine\My\$AS2GoCert" | Select-Object -First 1
-    #pause
+    Write-Log -Message "Simulation certificate found: $($cert.Subject) | $($cert.Thumbprint)"
 
     # Collect all files on the target share (simulation scope)
     $FilesToProcess = Get-ChildItem -Path $share -Recurse -Force -ErrorAction SilentlyContinue |

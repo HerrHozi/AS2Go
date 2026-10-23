@@ -1,16 +1,22 @@
 function Get-DirContent {
     param (
-        [string] $Path
+        [string] $Path,
+        [Switch] $SkipCommand
     )
 
     $CurrentFunction = Get-FunctionName
     Write-Log -Message "### Start Function $CurrentFunction ###"
     $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
     #################### main code | out- host ####################
-    Write-Host ""
-    Write-Host -NoNewline "  Command: "
-    Write-Highlight -Text ("Get-ChildItem ", "-Path ", $Path) -Color $fgcC, $fgcS, $fgcV
-    Write-Host ""
+    
+    If (-not $SkipCommand) {
+  
+        Invoke-Output -Type Command -Message "Next Command: " -NoNewline
+        $command = "Get-ChildItem -Path $Path"
+        Write-Syntax -Code $command
+    
+    }
+
 
     $maxAttempts = 3
     $attempt = 0

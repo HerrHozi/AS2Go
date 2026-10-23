@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers the initial setup and configuration of an AS2Go (Attack Scenario To Go) lab environment. AS2Go is a PowerShell-based Active Directory attack simulation framework designed for security training, blue team exercises, and detection engineering.
+This guide covers the initial setup and configuration of an AS2Go (Attack Scenario to Go) lab environment. AS2Go is a PowerShell-based Active Directory attack simulation framework designed for security training, blue team exercises, and detection engineering.
 
 ## Minimum Requirements
 

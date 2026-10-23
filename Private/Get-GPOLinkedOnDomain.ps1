@@ -6,17 +6,14 @@ function Get-GPOLinkedOnDomain {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+ $Info = Measure-FunctionRuntime -Begin
 
 
     $dn = Select-ADObject -DomainSelectionOnly -Title "Select Domain for GPO Manipulation"
     
-if ([string]::IsNullOrEmpty($dn)) {
-return
-}
+    if ([string]::IsNullOrEmpty($dn)) {
+        return
+    }
     
     $server = Get-BestDomainController -domain $dn
     $cn = Convert-FromDNToCN -DistinguishedName $dn
@@ -99,10 +96,7 @@ return
     }
 
     Write-Log -Message "    >> using GPO $($LinkedGPOs[[int]$gpo].DisplayName) {$($LinkedGPOs[[int]$gpo].ID)}"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info 
 
     return $TargetGPO
 }

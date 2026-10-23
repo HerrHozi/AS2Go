@@ -35,9 +35,9 @@ function Add-RandomUsersToAccountOperators {
     #Import-Module ActiveDirectory
 
     [int]$UserCount = Get-ASConfig -Setting "RandomAccountOperators"
-    $PasswordPlain = "!AS2Go-2026-is-Very-cool!"
+    $PasswordPlain = Get-ASConfig -Setting "LastPW"
 
-    Set-ASConfig -Setting "LastPW" -Value "!AS2Go-2026-is-Very-cool!"
+    #Set-ASConfig -Setting "LastPW" -Value $PasswordPlain
 
     # --- Resolve Account Operators (RID 548) ---
     $AOGroupSID = "S-1-5-32-548"
