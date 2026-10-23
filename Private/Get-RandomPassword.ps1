@@ -1,9 +1,6 @@
 function Get-RandomPassword {
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $chars = "abcdefghijkmnopqrstuvwxyzABCEFGHJKLMNPQRSTUVWXYZ1234567890".ToCharArray()
     $nums = "1234567890".ToCharArray()
@@ -17,10 +14,7 @@ function Get-RandomPassword {
     1..1 | ForEach-Object { $newPassword += $nums | Get-Random }
     1..1 | ForEach-Object { $newPassword += $schars | Get-Random }
     Write-Log -Message "    >> New Password: $newPassword"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
     
     return $newPassword
 }

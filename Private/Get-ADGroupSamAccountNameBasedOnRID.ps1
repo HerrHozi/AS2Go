@@ -9,10 +9,7 @@ function Get-ADGroupSamAccountNameBasedOnRID {
 
     Param([string] $RID, [string] $Domain = $null)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $GroupName = $null
     If ($null -ne $Domain) {
@@ -36,10 +33,7 @@ function Get-ADGroupSamAccountNameBasedOnRID {
     }
 
     Write-Log -Message "    >> Identified AD Group - $GroupName for RID $RID"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $GroupName
 }

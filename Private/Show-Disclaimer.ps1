@@ -28,7 +28,7 @@ function Show-Disclaimer {
 
     $info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type Header -M "AS2Go - SECURITY DISCLAIMER"
+    Write-AS2GoOutput -Type Header -M "AS2Go - SECURITY DISCLAIMER"
 
 
     Write-Host "[!] You are about to simulate real-world attack scenarios in a specially prepared Active Directory environment."
@@ -56,7 +56,7 @@ $Options = @(
     $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
 
     if ($decision -ne $Script:Yes) {
-        Invoke-output -Type Quit -Message "AS2Go terminated: Explicit authorization was not confirmed."
+        Write-AS2GoOutput -Type Quit -Message "AS2Go terminated: Explicit authorization was not confirmed."
     }
 
     Measure-FunctionRuntime -End -Details $info

@@ -130,7 +130,7 @@ function Initialize-AS2GoLabConfiguration {
     - Skip: Skips the Active Directory setup
 
     Related Functions:
-    - Invoke-NewAS2GoAssets
+    - Initialize-AS2GoAssets
     - Setup-ADBackupShare
     - Setup-ADDomain
     - Test-PoSHModuleAvailability
@@ -161,7 +161,8 @@ function Initialize-AS2GoLabConfiguration {
         }
     }
     
-    $CurrentFunction = Get-FunctionName
+    $Info = Measure-FunctionRuntime -Begin
+    $CurrentFunction = $Info.FunctionName
 
     Write-Log -Message "."
     Write-Log -Message "<< -- UniversalTime [UTC]"
@@ -175,8 +176,7 @@ function Initialize-AS2GoLabConfiguration {
     Write-Log -Message "    >> Using PowerShell version $($PSVersionTable.PSVersion.tostring())"
     Write-Log -Message " "
     
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+
 
     Clear-Host
     
@@ -192,25 +192,25 @@ function Initialize-AS2GoLabConfiguration {
     $Script:ExistingOUs = @{}
     $Script:LogonServer = ""
 
-    Invoke-Output -Type Header -Message "Initial AS2Go Environment Configuration"
-    Invoke-Output -Type H1 -Message "Requirements for the initial AS2Go lab configuration:`n"
-    Invoke-output -Type Bullet -Message "At least a single-domain Active Directory environment."
-    Invoke-output -Type Bullet -Message "At least one Domain Controller (DC)."
-    Invoke-Output -Type Bullet -Message "At least one domain-joined victim machine, such as a server or workstation."
-    Invoke-output -Type Bullet -Message "Initial configuration should preferably be executed on the victim machine."
-    Invoke-output -Type Bullet -Message "Administrative privileges are required."
-    Invoke-output -Type Bullet -Message "Enterprise Admin privileges are recommended for full configuration."
-    Invoke-output -Type Bullet -Message "AS2Go stores malicious tools, configuration files, logs, and related data under: " -Tm $script:AS2GoPublicDir
+    Write-AS2GoOutput -Type Header -Message "Initial AS2Go Environment Configuration"
+    Write-AS2GoOutput -Type H1 -Message "Requirements for the initial AS2Go lab configuration:`n"
+    Write-AS2GoOutput -Type Bullet -Message "At least a single-domain Active Directory environment."
+    Write-AS2GoOutput -Type Bullet -Message "At least one Domain Controller (DC)."
+    Write-AS2GoOutput -Type Bullet -Message "At least one domain-joined victim machine, such as a server or workstation."
+    Write-AS2GoOutput -Type Bullet -Message "Initial configuration should preferably be executed on the victim machine."
+    Write-AS2GoOutput -Type Bullet -Message "Administrative privileges are required."
+    Write-AS2GoOutput -Type Bullet -Message "Enterprise Admin privileges are recommended for full configuration."
+    Write-AS2GoOutput -Type Bullet -Message "AS2Go stores malicious tools, configuration files, logs, and related data under: " -Tm $script:AS2GoPublicDir
     
     $title = "Confirm the requirements" 
     $Message = "Proceed with the initial AS2Go environment configuration?"
  
     if ((Get-ASConfig -Setting "SkipRequirementsConfirmation") -ne "True") {
 
-        Invoke-Output -Type H1 -Message "`n[!] When Microsoft Defender for Endpoint (MDE) & Identity (MDI) is in your AD environment present please consider the following requirements:`n"
-        Invoke-output -Type Bullet -Message "MDI - Disable Microsoft XDR or set excclusion."
-        Invoke-output -Type Bullet -Message "MDE - Disable Real-time protection."
-        Invoke-output -Type Bullet -Message "MDE - Disable Cloud-Delivered protection."
+        Write-AS2GoOutput -Type H1 -Message "`n[!] When Microsoft Defender for Endpoint (MDE) & Identity (MDI) is in your AD environment present please consider the following requirements:`n"
+        Write-AS2GoOutput -Type Bullet -Message "MDI - Disable Microsoft XDR or set excclusion."
+        Write-AS2GoOutput -Type Bullet -Message "MDE - Disable Real-time protection."
+        Write-AS2GoOutput -Type Bullet -Message "MDE - Disable Cloud-Delivered protection."
 
 
 
@@ -236,7 +236,7 @@ function Initialize-AS2GoLabConfiguration {
         $FQDN = (Get-ADDomain).DNSRoot
     }
     else {
-        Invoke-Output -Type Error -Message "Computer '$env:COMPUTERNAME' is not part of a domain"
+        Write-AS2GoOutput -Type Error -Message "Computer '$env:COMPUTERNAME' is not part of a domain"
         $FQDN = '<FQDN>'
         If (-Not $DeveloperMode) { return }
     }
@@ -244,17 +244,17 @@ function Initialize-AS2GoLabConfiguration {
     $UPNSuffix = Get-ASConfig -Setting "LastUPNSuffix"
     $Script:LogonServer = Get-LogonServerFQDN
 
-    Invoke-ForestOverview 
+    Show-ForestOverview 
 
     $currentuser = whoami.exe
     $samaccountname = $currentuser.Split("\")[-1]
 
-    Invoke-output -Type Bullet -Message "Scenario:             " -TM $Scenario
-    Invoke-output -Type Bullet -Message "Target UPN Suffix:    " -TM $UPNSuffix
-    Invoke-output -Type Bullet -Message "Target Domain:        " -TM $FQDN
-    Invoke-output -Type Bullet -Message "Target OU:            " -TM "$FQDN/$AS2GoOU"
-    Invoke-output -Type Bullet -Message "Current Logon Server: " -TM $Script:LogonServer
-    Invoke-output -Type Bullet -Message "Current User:         " -TM $currentuser
+    Write-AS2GoOutput -Type Bullet -Message "Scenario:             " -TM $Scenario
+    Write-AS2GoOutput -Type Bullet -Message "Target UPN Suffix:    " -TM $UPNSuffix
+    Write-AS2GoOutput -Type Bullet -Message "Target Domain:        " -TM $FQDN
+    Write-AS2GoOutput -Type Bullet -Message "Target OU:            " -TM "$FQDN/$AS2GoOU"
+    Write-AS2GoOutput -Type Bullet -Message "Current Logon Server: " -TM $Script:LogonServer
+    Write-AS2GoOutput -Type Bullet -Message "Current User:         " -TM $currentuser
 
     $server = $Script:BestDCs[$FQDN]
     write-Log -Message "    >> Attempting to retrieve group membership for user '$samaccountname' from server '$server' for verification..."
@@ -263,7 +263,7 @@ function Initialize-AS2GoLabConfiguration {
 
     $test = $membership | where-object { $_.SID -like "*-512" -or $_.SID -like "*-519" }
     if ($test.Count -eq 0) {
-        Invoke-Output -type Warning -Message "To run this configuration, ensure the user is a member of the Enterprise Admins group or the Domain Admins group."
+        Write-AS2GoOutput -type Warning -Message "To run this configuration, ensure the user is a member of the Enterprise Admins group or the Domain Admins group."
         return
     }
 
@@ -277,18 +277,18 @@ function Initialize-AS2GoLabConfiguration {
 
     try {
         Import-Module $Global:PathADCSGoat -NoClobber -ErrorAction Stop
-        Invoke-Output -Type  Bullet -M "Imported PowerShell module: " -TM "ADCSGoat"
+        Write-AS2GoOutput -Type  Bullet -M "Imported PowerShell module: " -TM "ADCSGoat"
     } 
     catch {
-        Invoke-Output -Type  Error -M "Unable to import PowerShell module $Global:PathADCSGoat"
+        Write-AS2GoOutput -Type  Error -M "Unable to import PowerShell module $Global:PathADCSGoat"
     }
 
     try {
         Import-Module $Global:PathPSCertutil -NoClobber -ErrorAction Stop
-        Invoke-Output -Type  Bullet -M "Imported PowerShell module: " -TM "PSCertutil"
+        Write-AS2GoOutput -Type  Bullet -M "Imported PowerShell module: " -TM "PSCertutil"
     } 
     catch {
-        Invoke-Output -Type  Error -M "Unable to import PowerShell module $Global:PathPSCertutil"
+        Write-AS2GoOutput -Type  Error -M "Unable to import PowerShell module $Global:PathPSCertutil"
     }
 
     if ($Script:MoAD -eq $false -or $Script:MoGPO -eq $false -or $Script:MoDNS -eq $false) {
@@ -301,7 +301,7 @@ function Initialize-AS2GoLabConfiguration {
         Write-Log -Message "        >> Confirmed the warning with - $confirmed"
         If (-not $DeveloperMode) {
             If ($Script:MoAD -eq $false) {
-                Invoke-Output -Type  Error -Message "Active Directory module is not available. Please install the required module before proceeding."
+                Write-AS2GoOutput -Type  Error -Message "Active Directory module is not available. Please install the required module before proceeding."
                 return    
             }
         }
@@ -374,13 +374,13 @@ function Initialize-AS2GoLabConfiguration {
                 Invoke-BackUpShare
             }
             "MaliciousTools" {
-                Invoke-MaliciousToolsSetup
+                Initialize-AS2GoTools
             }
             "ADCS" {
                 Invoke-ADCSSetup -CTPreFix $Scenario
             }
             "Assets" {
-                Invoke-NewAS2GoAssets -AS2GoOU $AS2GoOU -Scenario $Scenario -UPNSuffix $UPNSuffix -Server $Script:LogonServer
+                Initialize-AS2GoAssets -AS2GoOU $AS2GoOU -Scenario $Scenario -UPNSuffix $UPNSuffix -Server $Script:LogonServer
             }
             "DemoUsers" {
                 Invoke-DemoAccounts -AS2GoOU $AS2GoOU -Scenario $Scenario -UPNSuffix $UPNSuffix -Server $Script:LogonServer
@@ -406,12 +406,9 @@ function Initialize-AS2GoLabConfiguration {
         }
     } Until ($repeat -eq $Script:No)
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
-    Invoke-Output -Type  Header -M "Any feedback is welcome - zimmermann.holger@live.de!"
+    Write-AS2GoOutput -Type  Header -M "Any feedback is welcome - zimmermann.holger@live.de!"
 
     Write-Log -Message "  >> Force garbage collection"
     [GC]::Collect()

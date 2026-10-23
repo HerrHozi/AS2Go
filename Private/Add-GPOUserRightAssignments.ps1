@@ -14,17 +14,14 @@ function Add-GPOUserRightAssignments {
         [String] $name
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If (-not $SkipClearHost) { Clear-Host }
 
 
 
-    Invoke-output -Type Header -Message "Add or Update User Rights Assignment"
-    Invoke-Output -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
+    Write-AS2GoOutput -Type Header -Message "Add or Update User Rights Assignment"
+    Write-AS2GoOutput -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
 
     If ($UnAttended) {
         $answer = $Script:Yes 
@@ -111,7 +108,7 @@ function Add-GPOUserRightAssignments {
             "SeTcbPrivilege = *S-1-1-0" | Add-Content -Path $infFilePath 
             "SeDebugPrivilege = *S-1-1-0" | Add-Content -Path $infFilePath 
             "SeRemoteInteractiveLogonRight = *S-1-1-0"  | Add-Content -Path $infFilePath
-            invoke-output -Type Success -Message "Added SeTcbPrivilege, SeDebugPrivilege and SeRemoteInteractiveLogonRight with trustee *S-1-1-0 (Everyone)" -noextralines
+            Write-AS2GoOutput -Type Success -Message "Added SeTcbPrivilege, SeDebugPrivilege and SeRemoteInteractiveLogonRight with trustee *S-1-1-0 (Everyone)" -noextralines
         }
         else {
             $updated = $false
@@ -119,26 +116,26 @@ function Add-GPOUserRightAssignments {
             If (-not $SeRemoteInteractiveLogonRight) {
                 $fileContent[$PrivilegeRightsl] += "`nSeRemoteInteractiveLogonRight = *S-1-1-0"
                 $fileContent | Set-Content $infFilePath
-                invoke-output -Type Success -Message "Added SeRemoteInteractiveLogonRight with trustee *S-1-1-0 (Everyone)" -noextralines
+                Write-AS2GoOutput -Type Success -Message "Added SeRemoteInteractiveLogonRight with trustee *S-1-1-0 (Everyone)" -noextralines
                 $updated = $true
             }
             else {
                 $fileContent[$SeRemoteInteractiveLogonRightL] = $SeRemoteInteractiveLogonRightV + ',*S-1-5-11'
                 $fileContent | Set-Content -Path $infFilePath
-                invoke-output -Type Success -Message "Modified SeRemoteInteractiveLogonRight with trustee *S-1-5-11 (Authenticated Users)" -noextralines
+                Write-AS2GoOutput -Type Success -Message "Modified SeRemoteInteractiveLogonRight with trustee *S-1-5-11 (Authenticated Users)" -noextralines
                 $updated = $true
             }
         
             If (-not $SeTcbPrivilege) {
                 $fileContent[$PrivilegeRightsl] += "`nSeTcbPrivilege = *S-1-1-0"
                 $fileContent | Set-Content $infFilePath
-                invoke-output -Type Success -Message "Added SeTcbPrivilege with trustee *S-1-1-0 (Everyone)" -noextralines
+                Write-AS2GoOutput -Type Success -Message "Added SeTcbPrivilege with trustee *S-1-1-0 (Everyone)" -noextralines
                 $updated = $true
             }
             else {
                 $fileContent[$SeTcbPrivilegeL] = $SeTcbPrivilegeV + ',*S-1-5-11'
                 $fileContent | Set-Content -Path $infFilePath
-                invoke-output -Type Success -Message "Modified SeTcbPrivilege with trustee *S-1-5-11 (Authenticated Users)" -noextralines
+                Write-AS2GoOutput -Type Success -Message "Modified SeTcbPrivilege with trustee *S-1-5-11 (Authenticated Users)" -noextralines
                 $updated = $true
             }
             
@@ -146,18 +143,18 @@ function Add-GPOUserRightAssignments {
             If (-not $SeDebugPrivilege) {
                 $fileContent[$PrivilegeRightsl] += "`nSeDebugPrivilege = *S-1-1-0"
                 $fileContent | Set-Content $infFilePath
-                invoke-output -Type Success -Message "Added SeDebugPrivilege with trustee *S-1-1-0 (Everyone)" -noextralines
+                Write-AS2GoOutput -Type Success -Message "Added SeDebugPrivilege with trustee *S-1-1-0 (Everyone)" -noextralines
                 $updated = $true
             }   
             else {
                 $fileContent[$SeDebugPrivilegeL] = $SeDebugPrivilegeV + ',*S-1-5-11'
                 $fileContent | Set-Content -Path $infFilePath
-                invoke-output -Type Success -Message "Modified SeDebugPrivilege with trustee *S-1-5-11 (Authenticated Users)" -noextralines
+                Write-AS2GoOutput -Type Success -Message "Modified SeDebugPrivilege with trustee *S-1-5-11 (Authenticated Users)" -noextralines
                 $updated = $true
             }
         
             If ($updated -eq $false) {
-                invoke-output -Type Info -Message "No changes needed, all privileges already assigned to *S-1-1-0 (Everyone) or *S-1-5-11 (Authenticated Users)" -noextralines
+                Write-AS2GoOutput -Type Info -Message "No changes needed, all privileges already assigned to *S-1-1-0 (Everyone) or *S-1-5-11 (Authenticated Users)" -noextralines
             }  
     
             if (-not $unAttended) { pause }
@@ -168,9 +165,6 @@ function Add-GPOUserRightAssignments {
         Write-Log -Message "    >> Skipped!"
     }
                   
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
    
 }

@@ -15,12 +15,9 @@ function Install-ADCSEnrollmentServices {
 
     Param([string] $Server)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type TextMaker -Message "Installing Windows Feature" -TM "ADCS-Web-Enrollment (IncludeManagementTools)"
+    Write-AS2GoOutput -Type TextMaker -Message "Installing Windows Feature" -TM "ADCS-Web-Enrollment (IncludeManagementTools)"
     
     Invoke-Command -ComputerName $Server -ScriptBlock {
         try {
@@ -31,7 +28,7 @@ function Install-ADCSEnrollmentServices {
         }
     }
     
-    Invoke-Output -Type TextMaker -Message "Installing Windows Role   " -TM "Certification Authority Web Enrollment"
+    Write-AS2GoOutput -Type TextMaker -Message "Installing Windows Role   " -TM "Certification Authority Web Enrollment"
     
     Invoke-Command -ComputerName $Server -ScriptBlock {
         Install-AdcsWebEnrollment -Force
@@ -39,8 +36,5 @@ function Install-ADCSEnrollmentServices {
 
     $Script:ADCSEnrollmentServiceMissing = $false
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

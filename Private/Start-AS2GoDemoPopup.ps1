@@ -1,4 +1,4 @@
-function Invoke-FakeRansomwarePopUp {
+function Start-AS2GoDemoPopup {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -11,10 +11,7 @@ function Invoke-FakeRansomwarePopUp {
         [string]$TargetFile = 'C:\Temp\your-files-have-been-encrypted.html'
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     try {
         $targetDrivePath = $TargetFile -replace ':', '$'
@@ -88,14 +85,11 @@ function Invoke-FakeRansomwarePopUp {
             Status       = 'Started'
         }
     
-        Invoke-Output -Type Success -Message "Encrypted - Go to Domain Controller --> $affectedDC" -noExtraLines  
+        Write-AS2GoOutput -Type Success -Message "Encrypted - Go to Domain Controller --> $affectedDC" -noExtraLines  
     }
     catch {
-        Invoke-Output -Type Info -Message "$($_.Exception.Message) But encrypted --> $affectedDC" -noExtraLines
+        Write-AS2GoOutput -Type Info -Message "$($_.Exception.Message) But encrypted --> $affectedDC" -noExtraLines
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

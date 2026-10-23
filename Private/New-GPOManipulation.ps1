@@ -13,10 +13,7 @@ function New-GPOManipulation {
         [String] $name
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $GPOManipulation = "M"
 
@@ -24,8 +21,8 @@ function New-GPOManipulation {
         $repeat = $Script:Yes
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -Type Header -Message "GPT Manipulation - Choose your Technique"
-        Invoke-Output -Type Bullet -Message "During this attack, AS2Go will only add these groups as member " -TM "Domain Users, Authenticated Users or Everyone"
+        Write-AS2GoOutput -Type Header -Message "GPT Manipulation - Choose your Technique"
+        Write-AS2GoOutput -Type Bullet -Message "During this attack, AS2Go will only add these groups as member " -TM "Domain Users, Authenticated Users or Everyone"
 
         If ($UnAttended) {
             $answer = $Script:Yes 
@@ -88,8 +85,5 @@ function New-GPOManipulation {
         Write-Log -Message "    >>  last technique: $answer"
     } Until ($repeat -eq $Script:No)
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

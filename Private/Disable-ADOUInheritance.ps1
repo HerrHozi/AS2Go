@@ -47,16 +47,13 @@ function Disable-ADOUInheritance {
         [string]$LogonServer
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type  Header -M "Disable AD OU Inheritance"
+    Write-AS2GoOutput -Type  Header -M "Disable AD OU Inheritance"
 
     $cname = Convert-FromDNToCN -DistinguishedName $TargetDN
 
-    Invoke-Output -Type  TextMaker -M "Disabling inheritance on OU:" -Tm $cname
+    Write-AS2GoOutput -Type  TextMaker -M "Disabling inheritance on OU:" -Tm $cname
 
     Write-Verbose "Target OU DN : $TargetDN"
     Write-Verbose "Target DC    : $LogonServer"
@@ -106,9 +103,6 @@ function Disable-ADOUInheritance {
         InheritedPermissionsRemain = [bool]($VerifyAcl.Access | Where-Object { $_.IsInherited })
     } | Out-Host
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
 }

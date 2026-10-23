@@ -8,10 +8,7 @@ function Get-RiskyEnrolledTemplates {
 
     Param([switch] $SuppressOutPut)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $PublishedPKITemplates = New-Object System.Collections.ArrayList
     $PublishedRiskyDN = New-Object System.Collections.ArrayList
@@ -77,10 +74,7 @@ function Get-RiskyEnrolledTemplates {
     $result = $PublishedRiskyDN | Select-Object Name | Select-Object -First 1
 
     Write-Log -Message "    >> using $($result.name)"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $result.name
 }

@@ -1,21 +1,36 @@
 <#
 .SYNOPSIS
-Presents PsExec command options for privilege escalation in the AS2Go lab.
+Starts a selected PsExec session for a privilege-context demonstration.
 
 .DESCRIPTION
-Displays PsExec command choices for Local System, Help Desk, or Domain Admin execution on the
-victim machine. The user can select a command to run or skip the workflow, then choose whether
-to repeat the selection.
+Updates the saved lab stage and presents Local System, Help Desk, Domain Admin, and Skip choices.
+Local System starts an interactive local pwsh.exe session using PsExec.
+The Help Desk and Domain Admin options launch a local cmd.exe session with the configured account credentials.
+Offers to repeat the selection after a command is started. Skip returns from the workflow.
 
-.FUNCTIONALITY
-This attack abuses the fact that the Local System account has extensive privileges on the Active Directory. 
-By using PsExec, an attacker can execute a command prompt with Local System privileges, 
-which can be used to further escalate privileges or perform malicious activities on the environment.
+.EXAMPLE
+Invoke-PrivilegeEscalationViaLocalSystem
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires PsExec and the permissions or account credentials needed by the selected session.
+No remote computer argument is supplied by this function.
 
 .COMPONENT
 Category: Main Function
+
+.FUNCTIONALITY
+Offers local PsExec sessions as Local System, the configured Help Desk user, or the configured Domain Admin.
+Starts the selected PowerShell or command prompt session and offers to repeat the selection.
 #>
-function Invoke-PrivilegesEscalationViaLocalSystem {
+function Invoke-PrivilegeEscalationViaLocalSystem {
 
     ################################################################################
     #####                                                                      ##### 
@@ -23,10 +38,7 @@ function Invoke-PrivilegesEscalationViaLocalSystem {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     Update-WindowTitle -NewTitle "PsExec Attack"
     Set-ASConfig -Setting "LastStage" -Value "PsExec Attack"
@@ -37,8 +49,8 @@ function Invoke-PrivilegesEscalationViaLocalSystem {
 
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -Type Header -Message "Select your preferred PSExec Command"
-        Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+        Write-AS2GoOutput -Type Header -Message "Select your preferred PSExec Command"
+        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
 
         Write-Host "`nEnter " -NoNewline 
@@ -108,8 +120,5 @@ function Invoke-PrivilegesEscalationViaLocalSystem {
 
     } Until ($repeat -eq $Script:No)
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

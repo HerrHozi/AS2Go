@@ -22,26 +22,23 @@ function Add-ADCSForAS2Go {
 
     Param([string] $server)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $TargetServer = $Script:BestDCs[(Get-ADForest).RootDomain]
-    Invoke-Output -Type TextMaker -Message "Installation will be performed on server" -TM $TargetServer 
+    Write-AS2GoOutput -Type TextMaker -Message "Installation will be performed on server" -TM $TargetServer 
     
     If ($Script:ADCSEnterpriseCAMissing) {
         Install-ADCSCertificateAuthority -Server $TargetServer
     }
     else {
-        Invoke-Output -Type Quit -Message "The Certification Authority is already installed."
+        Write-AS2GoOutput -Type Quit -Message "The Certification Authority is already installed."
     }
     
     if ($Script:ADCSEnrollmentServiceMissing) {
         Install-ADCSEnrollmentServices -Server $TargetServer
     }
     else {
-        Invoke-Output -Type Quit -Message "The Web Enrollment Service is already installed"
+        Write-AS2GoOutput -Type Quit -Message "The Web Enrollment Service is already installed"
     }
 
 
@@ -51,8 +48,5 @@ function Add-ADCSForAS2Go {
 
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

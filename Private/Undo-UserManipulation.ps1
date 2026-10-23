@@ -11,10 +11,7 @@ function Undo-UserManipulation {
         [int]$ThrottleLimit = 10
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $users = Get-ADUser `
         -Filter "*" `
@@ -25,7 +22,7 @@ function Undo-UserManipulation {
 
     $total = $users.Count
     if ($total -eq 0) {
-        Invoke-Output -Type Warning -Message "No disabled users found for tick '$TickValue' under $SearchBase"
+        Write-AS2GoOutput -Type Warning -Message "No disabled users found for tick '$TickValue' under $SearchBase"
         return
     }
     else {
@@ -58,7 +55,7 @@ function Undo-UserManipulation {
 
     
     $cname = Convert-FromDNToCN -DistinguishedName $SearchBase
-    Invoke-Output -Type Quit -Message "Press 'Q' at any time to abort Undo User Manipulation`n      for '$total' users under '$cname' with tick '$TickValue'"
+    Write-AS2GoOutput -Type Quit -Message "Press 'Q' at any time to abort Undo User Manipulation`n      for '$total' users under '$cname' with tick '$TickValue'"
 
     $startTime = Get-Date
 
@@ -150,20 +147,17 @@ function Undo-UserManipulation {
     $failed = $allResults | Where-Object { $_.Success -eq $false }
 
     if ($succeeded) {
-        Invoke-Output -Type TextMaker -Message "Successfully re-enabled $($succeeded.Count) users under $cname`:" -TM $($succeeded.Count)
+        Write-AS2GoOutput -Type TextMaker -Message "Successfully re-enabled $($succeeded.Count) users under $cname`:" -TM $($succeeded.Count)
     }
 
     if ($failed) {
-        Invoke-Output -Type Warning -Message "$($failed.Count) user(s) failed to re-enable:"
+        Write-AS2GoOutput -Type Warning -Message "$($failed.Count) user(s) failed to re-enable:"
         $failed | ForEach-Object {
-            Invoke-Output -Type Bullet -Message "$($_.User): $($_.Errors)"
+            Write-AS2GoOutput -Type Bullet -Message "$($_.User): $($_.Errors)"
         }
     }
 
-    Invoke-Output -Type Success -Message "Finished Undo User Manipulation for tick '$TickValue'."
+    Write-AS2GoOutput -Type Success -Message "Finished Undo User Manipulation for tick '$TickValue'."
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

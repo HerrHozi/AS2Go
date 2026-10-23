@@ -6,10 +6,7 @@ function Get-DomainsInForest {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
 $ForestDomains = Get-ADForest | Select-Object -ExpandProperty Domains | ForEach-Object {
     $Domain = Get-ADDomain -Identity $_ -Server $_
@@ -25,10 +22,7 @@ $ForestDomains = Get-ADForest | Select-Object -ExpandProperty Domains | ForEach-
 $4logfile = $ForestDomains | Format-Table -AutoSize | out-string
     Write-Log -Message "    >> Found the following domains in the forest: $4logfile"
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $ForestDomains
 }

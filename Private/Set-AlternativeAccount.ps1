@@ -20,13 +20,10 @@ function Set-AlternativeAccount {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type Header "Step 2 - Define a Subject Alternative Name (SAN)"
-    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Header "Step 2 - Define a Subject Alternative Name (SAN)"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
   
     $previousDN = Get-ASConfig -Setting "LastAltUser"
 
@@ -34,7 +31,7 @@ function Set-AlternativeAccount {
         $previousCN = Convert-FromDNToCN -DistinguishedName $previousDN
         $HelpP = "Use the target account from previous selection."
         $message = "Use current account ($previousCN) or a select a different one:"
-        Invoke-Output -Type TextMaker -Message "Current SAN Target Account:" -Tm $previousCN
+        Write-AS2GoOutput -Type TextMaker -Message "Current SAN Target Account:" -Tm $previousCN
     }
     else {
         $message = "Select new Alternative Account:"
@@ -54,7 +51,7 @@ function Set-AlternativeAccount {
         $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0
         Set-ASConfig -Setting "LastAltUser" -Value $result
         $CN = Convert-FromDNToCN -DistinguishedName $result
-        Invoke-Output -Type TextMaker -Message "New SAN Target Account:" -Tm $CN
+        Write-AS2GoOutput -Type TextMaker -Message "New SAN Target Account:" -Tm $CN
     }
     elseif ($Decision -eq "BuiltInAdmin") {
         $dn = Select-ADObject -DomainSelectionOnly -Title "Select Domain for Built-in Admin"
@@ -68,18 +65,15 @@ function Set-AlternativeAccount {
         
         Set-ASConfig -Setting "LastAltUser" -Value $details.DN
         $CN = Convert-FromDNToCN -DistinguishedName $details.DN
-        Invoke-Output -Type TextMaker -Message "Built-in Admin SAN Target Account from Domain:" -Tm $CN
+        Write-AS2GoOutput -Type TextMaker -Message "Built-in Admin SAN Target Account from Domain:" -Tm $CN
         $result = $details.DN
     }
     else {
-        Invoke-Output -Type Info -message "Keep previous SAN Target Account!" 
+        Write-AS2GoOutput -Type Info -message "Keep previous SAN Target Account!" 
         $result = $previousDN   
     }   
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $result
 }

@@ -1,20 +1,35 @@
 <#
 .SYNOPSIS
-Runs extended Active Directory reconnaissance tasks.
+Demonstrates additional reconnaissance and honeytoken authentication activity.
 
 .DESCRIPTION
-Enumerates privileged group members, attempts a DNS zone transfer, and lists NetBIOS sessions
-on the domain controller. The workflow also triggers honeytoken activity and supports attended
-or unattended execution.
+Enumerates DNSAdmins and Enterprise Admins memberships using configured group information.
+Copies an ls -d domain command to the clipboard and opens nslookup for the user to perform a DNS zone transfer.
+Runs NetSess against the configured DC and attempts an AD query with the selected honeytoken and a random password.
+Attended mode pauses between steps; unattended mode uses timed delays but does not enter commands into nslookup.
 
-.FUNCTIONALITY
-Enumerates privileged group members, attempts a DNS zone transfer, and lists DC NetBIOS sessions.
-Triggers honeytoken activity as part of extended Active Directory reconnaissance.
+.EXAMPLE
+Invoke-ReconnaissanceExtended
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires initialized privileged-group and honeytoken settings, NetSess, and access to the configured DC.
 
 .COMPONENT
 Category: Main Function
+
+.FUNCTIONALITY
+Enumerates DNSAdmins and Enterprise Admins, opens nslookup for a manual zone transfer, and lists DC NetBIOS sessions.
+Attempts a honeytoken-authenticated AD query with a random password to demonstrate detection activity.
 #>
-function Start-ReconnaissanceExtended {
+function Invoke-ReconnaissanceExtended {
 
     $Info = Measure-FunctionRuntime -Begin
     ####
@@ -30,7 +45,7 @@ function Start-ReconnaissanceExtended {
     }
 
 
-    Invoke-Output -Type  Header -M "TRY to enumerate 10 members of the '$($Script:GroupDNSA.samaccountname)' group"
+    Write-AS2GoOutput -Type  Header -M "TRY to enumerate 10 members of the '$($Script:GroupDNSA.samaccountname)' group"
  
 
     Write-Host      -NoNewline "  Command: "
@@ -43,7 +58,7 @@ function Start-ReconnaissanceExtended {
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -Type  Header -M "TRY to enumerate 10 members of the '$($Script:GroupEA.samaccountname)' group"
+    Write-AS2GoOutput -Type  Header -M "TRY to enumerate 10 members of the '$($Script:GroupEA.samaccountname)' group"
 
     
     Write-Host      -NoNewline "  Command: "
@@ -58,8 +73,8 @@ function Start-ReconnaissanceExtended {
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -Type  Header -Message "TRY to perform a domain zone transfer"
-    Invoke-Output -Type H1 -Message "This step attempts to perform a domain zone transfer using nslookup.`n"
+    Write-AS2GoOutput -Type  Header -Message "TRY to perform a domain zone transfer"
+    Write-AS2GoOutput -Type H1 -Message "This step attempts to perform a domain zone transfer using nslookup.`n"
 
     Write-Host      -NoNewline "  Command: "
     Write-Highlight -Text "nslookup | ", "ls ", "-d ", "$Script:ASFQDN" `
@@ -77,8 +92,8 @@ function Start-ReconnaissanceExtended {
     Start-Process nslookup
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -Type  Header -Message "TRY to list NetBIOS sessions on Domain Controller"
-    Invoke-Output -Type H1 -Message "This step attempts to list NetBIOS sessions on the domain controller using NetSess.exe.`n" 
+    Write-AS2GoOutput -Type  Header -Message "TRY to list NetBIOS sessions on Domain Controller"
+    Write-AS2GoOutput -Type H1 -Message "This step attempts to list NetBIOS sessions on the domain controller using NetSess.exe.`n" 
 
     Write-Host      -NoNewline "  Command: "
     Write-Highlight -Text ".\NetSess.exe ", "$Script:ASDC" `

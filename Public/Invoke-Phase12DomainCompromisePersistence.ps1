@@ -60,6 +60,10 @@ Runs Phase 12 with developer defaults (logging on, images skipped, no clear-host
 .NOTES
 Alias: P12, Compromise
 Part of: AS2Go attack phase orchestration
+
+.FUNCTIONALITY
+Executes the Domain Compromise and Persistence phase within an Active Directory environment.
+Demonstrates various attack techniques and persistence mechanisms.
 #>
 function Invoke-ASPhase12DomainCompromisePersistence {
 
@@ -77,7 +81,9 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         [switch]$SkipClearHost,
         [switch]$AS2GoDemo,
         [switch]$SkipDomainPersistence,
-        [switch]$DeveloperMode
+        [switch]$DeveloperMode,
+        [validateSet("Encrypt", "Reboot", "BackdoorUser", "GPT", "UserManipulation", "GroupManipulation")]
+        [String]$DomainPersistence
     )
     $info = Measure-FunctionRuntime -Begin
     
@@ -111,15 +117,16 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         
         Set-NewColorSchema -NewStage $Script:InitialStart
         If (-not $SkipClearHost) { Clear-Host }
-        Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase12.toupper())"
-        Invoke-Output -Type  Bullet "Create a persistent backdoor domain account"
-        Invoke-Output -Type  Bullet "Perform user account manipulation (disable accounts and/or reset passwords)"
-        Invoke-Output -Type  Bullet "Perform Tier 0 group membership manipulation (remove all admins except backdoor and break-glass accounts)"
-        Invoke-Output -Type  Bullet "Tamper with Group Policy Template (GPT) files to push malicious settings"
-        Invoke-Output -Type  Bullet "Encrypt backup files stored on the domain controller"
-        Invoke-Output -Type  Bullet "Export the DPAPI master key for offline decryption of secrets"
-        Invoke-Output -Type  Bullet "Forge a Kerberos Golden Ticket for long-term domain persistence"
-        Invoke-Output -Type  Bullet "Reboot all available machines in the domain"
+        Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase12.toupper())"
+        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+        Write-AS2GoOutput -Type  Bullet "Create a persistent backdoor domain account"
+        Write-AS2GoOutput -Type  Bullet "Perform user account manipulation (disable accounts and/or reset passwords)"
+        Write-AS2GoOutput -Type  Bullet "Perform Tier 0 group membership manipulation (remove all admins except backdoor and break-glass accounts)"
+        Write-AS2GoOutput -Type  Bullet "Tamper with Group Policy Template (GPT) files to push malicious settings"
+        Write-AS2GoOutput -Type  Bullet "Encrypt backup files stored on the domain controller"
+        Write-AS2GoOutput -Type  Bullet "Export the DPAPI master key for offline decryption of secrets"
+        Write-AS2GoOutput -Type  Bullet "Forge a Kerberos Golden Ticket for long-term domain persistence"
+        Write-AS2GoOutput -Type  Bullet "Reboot all available machines in the domain"
 
         If ($UnAttended) {
             $answer = $Script:Yes
@@ -130,11 +137,11 @@ function Invoke-ASPhase12DomainCompromisePersistence {
 
         If ($answer -eq $Script:Yes) {
             If (-not $AS2GoDemo) { 
-                Invoke-ForestOverview 
+                Show-ForestOverview 
                 Get-ForestInfo
                 $Script:MoGPO = Test-PoSHModuleAvailability -PSModule "GroupPolicy" 
             }
-            Start-Phase12DomainCompromise 
+            Invoke-Phase12DomainCompromise 
         }
     }
 

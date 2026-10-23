@@ -22,12 +22,9 @@ function Get-AS2GoGroups {
 
     Param([Parameter(Mandatory)][string]$Server)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type H1 -Message "`nOverview AS2Go Groups"
+    Write-AS2GoOutput -Type H1 -Message "`nOverview AS2Go Groups"
 
     $results = Get-ADGroup -Filter 'adminDescription -like "AS2GoAdmins" -or adminDescription -like "AS2GoHelpDesk" -or adminDescription -like "AS2GoVictims"' `
         -Server $server `
@@ -36,16 +33,13 @@ function Get-AS2GoGroups {
     Measure-Object | 
     Select-Object -ExpandProperty Count
 
-    Invoke-Output -Type Bullet -Message "Identified AS2Go Groups in the domain $((Get-ADDomain).DNSRoot)" -TM $results 
+    Write-AS2GoOutput -Type Bullet -Message "Identified AS2Go Groups in the domain $((Get-ADDomain).DNSRoot)" -TM $results 
 
     If ($results -gt 0) {
-        Invoke-Output -Type Bullet -Message "Here is an example:"
+        Write-AS2GoOutput -Type Bullet -Message "Here is an example:"
         Get-ADGroup -Filter 'adminDescription -like "AS2GoAdmins" -or adminDescription -like "AS2GoHelpDesk" -or adminDescription -like "AS2GoVictims"' -Server $server -Properties * | Select-Object Name, Description | Sort-Object  Name | Format-Table -AutoSize | Out-Host
     }
 
     Write-Log -Message "    >> Found $results AS2Go Groups "
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

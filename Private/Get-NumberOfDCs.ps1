@@ -22,10 +22,7 @@ function Get-NumberofDCs {
 
     Param([string] $param1, [string] $param2)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
 
     $script:ErrorForestInfo = $null
@@ -60,10 +57,7 @@ function Get-NumberofDCs {
     $logfile = $Script:DCsPerDomain | Out-String
     Write-log -Message "    >> Number of DCs per Domain: $logfile"
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $Script:DCsPerDomain
 }

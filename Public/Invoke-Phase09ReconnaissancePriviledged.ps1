@@ -66,10 +66,7 @@ function Invoke-ASPhase09ReconnaissancePriviledged {
         [switch]$AS2GoDemo
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
     
     If (-not $AS2GoDemo) { 
         Set-NewColorSchema -NewStage $Script:InitialStart
@@ -81,14 +78,14 @@ function Invoke-ASPhase09ReconnaissancePriviledged {
 
     Update-WindowTitle -NewTitle $Script:Phase09
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
-Show-CurrentPhase -Phase "phase_09.html"
+    Show-CurrentPhase -Phase "phase_09.html"
 
     Do {
         # If ($skipstep) { break }     
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -Type  Header -Message "Attack Phase - $($Script:Phase09)"
-        Invoke-Output -Type  H1 -Message "Use the newly gained privileges to collect reconnaissance `nand configuration data from the current logon server."
+        Write-AS2GoOutput -Type  Header -Message "Attack Phase - $($Script:Phase09)"
+        Write-AS2GoOutput -Type  H1 -Message "Use the newly gained privileges to collect reconnaissance `nand configuration data from the current logon server."
  
 
         If ($UnAttended) {
@@ -103,9 +100,9 @@ Show-CurrentPhase -Phase "phase_09.html"
     
             If (-not $SkipClearHost) { Clear-Host }
 
-            Invoke-output -Type Header -Message "Show Services and Processes on Logon Server"
+            Write-AS2GoOutput -Type Header -Message "Show Services and Processes on Logon Server"
             $Functionality = "Displays services and processes from the current logon server for reconnaissance. `n"
-            Invoke-Output -Type H1 -Message $Functionality
+            Write-AS2GoOutput -Type H1 -Message $Functionality
 
             $server = $env:LOGONSERVER.replace("\", "")
 
@@ -141,7 +138,7 @@ Show-CurrentPhase -Phase "phase_09.html"
             }
 
             If ($answer -eq $Script:Yes) {
-                Start-ReconnaissanceExtended
+                Invoke-ReconnaissanceExtended
             }
         }
         elseIf ($answer -eq $Script:Exit) {
@@ -162,8 +159,5 @@ Show-CurrentPhase -Phase "phase_09.html"
    
     } Until ($repeat -eq $Script:No)  
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

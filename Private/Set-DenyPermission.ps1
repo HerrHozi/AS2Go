@@ -22,15 +22,12 @@ function Set-DenyPermission {
 
     Param([string]$TargetDN, [string]$Trustee, [string] $LogonServer)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type  Header -Message "Set DENY permission for $Trustee"
+    Write-AS2GoOutput -Type  Header -Message "Set DENY permission for $Trustee"
 
     $cname = Convert-FromDNToCN -DistinguishedName $TargetDN
-    Invoke-Output -Type  TextMaker -M "on OU:" -Tm $cname
+    Write-AS2GoOutput -Type  TextMaker -M "on OU:" -Tm $cname
 
     # --- Get OU Security Descriptor from correct DC ---
     $OUObject = Get-ADObject `
@@ -95,8 +92,5 @@ function Set-DenyPermission {
     Select-Object @{N = 'SamAccountName'; E = { $Trustee } }, IdentityReference, AccessControlType, ActiveDirectoryRights, IsInherited | Format-Table -AutoSize | Out-String
     Write-Log -Message "    >> New ACL Settings: $4logfile"
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

@@ -25,10 +25,7 @@ function Get-BestDomainController {
         [string] $Domain
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ($Domain -match 'OU=|CN=|DC=' ) {
         $result = Convert-FromDNToCN -DistinguishedName $Domain
@@ -47,10 +44,7 @@ function Get-BestDomainController {
 
 
     Write-Log -Message "    >> Best DC for '$domain' is '$bestdc'!"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $bestdc
 }

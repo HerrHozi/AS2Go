@@ -23,10 +23,7 @@ function Set-TextMarker {
   
     Param($OldFormat, [string] $column, [string] $value, [string] $color, [string] $column2, [string] $value2)
   
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
   
     If ($OldFormat.count -eq 1) {
         $oldformat | Format-Table | out-host
@@ -102,8 +99,5 @@ function Set-TextMarker {
     }
     Write-Host ""
     Write-Log -Message "    >> using column: $column - value: $value - color: $color"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

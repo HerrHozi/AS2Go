@@ -15,10 +15,7 @@ Function Get-Answer {
 
     Param([string] $question, [string] $defaultValue)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
   
     If ($question.ToLower().Contains("repeat")) {
@@ -32,10 +29,7 @@ Function Get-Answer {
     if ($prompt -eq "") { $prompt = $defaultValue.trim() } 
 
     Write-Log -Message "    >> Q:$question  A:$prompt"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $prompt.ToUpper()
 }

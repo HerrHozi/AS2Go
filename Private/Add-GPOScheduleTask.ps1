@@ -13,15 +13,12 @@ function Add-GPOScheduleTask {
         [String] $name
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-output -Type Header -Message "Add a Malicious Scheduled Task"
-    Invoke-Output -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
+    Write-AS2GoOutput -Type Header -Message "Add a Malicious Scheduled Task"
+    Write-AS2GoOutput -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
 
     If ($UnAttended) {
         $answer = $Script:Yes 
@@ -67,8 +64,5 @@ function Add-GPOScheduleTask {
         Write-Log -Message "    >> Skipped!"
     }
                   
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

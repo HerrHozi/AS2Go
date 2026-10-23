@@ -9,10 +9,7 @@ function Search-ProcessForAS2GoUsers {
 
     Param([string] $user)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
     
     [bool]$foundUser = $false
 
@@ -20,10 +17,7 @@ function Search-ProcessForAS2GoUsers {
     If ($result) { $foundUser = $true }
 
     Write-Log -Message "    >> found $user - $foundUser!"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $foundUser
 }

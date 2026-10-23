@@ -72,7 +72,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
         [switch]$SkipClearHost,
         [switch]$AS2GoDemo,
         [validateSet("PtH", "PtT", "Kerberoasting", "ESC1", "WDigest", "PsExec")]
-        [String]$Technique
+        [String]$PrivilegeEscalation
     )
 
     $info = Measure-FunctionRuntime -Begin
@@ -95,13 +95,13 @@ function Invoke-ASPhase07PrivilegeEscalation {
     Show-CurrentPhase -Phase "phase_07.html"
     If (-not $SkipClearHost) { Clear-Host }
     
-    Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
-    Invoke-Output -Type  Bullet "Reuse captured NTLM hashes to authenticate via Pass-the-Hash"
-    Invoke-Output -Type  Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
-    Invoke-Output -Type  Bullet "Roast Kerberos service tickets to recover weak (service) account passwords"
-    Invoke-Output -Type  Bullet "Abuse an ESC1-vulnerable certificate template to impersonate privileged users"
-    Invoke-Output -Type  Bullet "Gain remote code execution as Local System using PsExec"
-    Invoke-Output -Type  Bullet "Extract credentials from process memory"
+    Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
+    Write-AS2GoOutput -Type  Bullet "Reuse captured NTLM hashes to authenticate via Pass-the-Hash"
+    Write-AS2GoOutput -Type  Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
+    Write-AS2GoOutput -Type  Bullet "Roast Kerberos service tickets to recover weak (service) account passwords"
+    Write-AS2GoOutput -Type  Bullet "Abuse an ESC1-vulnerable certificate template to impersonate privileged users"
+    Write-AS2GoOutput -Type  Bullet "Gain remote code execution as Local System using PsExec"
+    Write-AS2GoOutput -Type  Bullet "Extract credentials from process memory"
 
     $Script:helpKerberoasting = "Run a Kerberoasting attack to request and crack service account TGS tickets."
     $Script:helpESC1 = "Abuse Misconfigured Certificate Template Attack (ESC1)."
@@ -119,17 +119,17 @@ function Invoke-ASPhase07PrivilegeEscalation {
 
         Set-NewColorSchema -NewStage $Script:InitialStart
         If ($unattended) {
-            $PrivilegeEscalation = $Technique
+            $PrivilegeEscalation = $PrivilegeEscalation
         }
         else {
-            $PrivilegeEscalation = New-PrivilegeEscalationRecommendation -computer $env:COMPUTERNAME
+            $null = New-PrivilegeEscalationRecommendation -computer $env:COMPUTERNAME
         }
 
 
-        Invoke-Output -Type Header -Message "Select an Attack Technique"
+        Write-AS2GoOutput -Type Header -Message "Select an Attack Technique"
 
         Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Hash Attack" -NoNewline; Write-Host " ** Coming Soon **" -ForegroundColor Yellow
-        Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack" -NoNewline
+        Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack"
         Write-Host "  K " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Kerberoasting Attack"
         Write-Host "  1 " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Misconfigured Certificate Template Attack (ESC1)"
         Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)"
@@ -225,10 +225,10 @@ function Invoke-ASPhase07PrivilegeEscalation {
         }
         elseif ($answer -eq "X") {
 
-            Invoke-PrivilegesEscalationViaLocalSystem
+            Invoke-PrivilegeEscalationViaLocalSystem
         }
         else {
-            Invoke-Output -Type Info -Message "Privilege Escalation was skipped."
+            Write-AS2GoOutput -Type Info -Message "Privilege Escalation was skipped."
         }
 
         #If (-not $SkipClearHost) { Clear-Host }

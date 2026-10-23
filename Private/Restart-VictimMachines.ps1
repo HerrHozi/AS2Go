@@ -1,11 +1,8 @@
 function Restart-VictimMachines {
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    #Invoke-Output -Type Header -Message "TRY to reboot all DCs and Victim machine"
+    #Write-AS2GoOutput -Type Header -Message "TRY to reboot all DCs and Victim machine"
 
     $Script:AllDCs | Select-Object Online, Root_Domain, FQDN, RODC, OperatingSystem | ft
 
@@ -40,30 +37,27 @@ function Restart-VictimMachines {
                 If ($env:COMPUTERNAME -ne $computer.name) {
                     If ($os -like 'Windows 1*') {
                         # only for Windows 10 machines
-                        Invoke-output -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
+                        Write-AS2GoOutput -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
                         net use \\$remotemachine\ipc$
                         shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
                     }
                     elseif ($os -like 'Windows 7*') {
-                        Invoke-output -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
+                        Write-AS2GoOutput -Type Bullet -Message "Try to reboot Windows PC     - $remotemachine"
                         shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
                     }
                     else {
-                        Invoke-output -Type Bullet -Message "Try to reboot Windows Server - $remotemachine"
+                        Write-AS2GoOutput -Type Bullet -Message "Try to reboot Windows Server - $remotemachine"
                         shutdown /r /f /c $commment /t $Script:ASTime2Reboot /m \\$remotemachine
                     }
                 }
             } #end if Test-Connection
             Else {
-                Invoke-Output -Type Warning -Message "Remote machine $remotemachine is down!"
+                Write-AS2GoOutput -Type Warning -Message "Remote machine $remotemachine is down!"
             } 
 
         } 
     }
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

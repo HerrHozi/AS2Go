@@ -20,25 +20,19 @@ function Get-BreakGlassAccount {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type H1 -Message "`nCurrent Break Glass Account"
+    Write-AS2GoOutput -Type H1 -Message "`nCurrent Break Glass Account"
     
     $previousDN = Get-ASConfig -Setting "BreakGlassAccount"
 
     If ($previousDN -match 'OU=|CN=|DC=' ) {
         $previousCN = Convert-FromDNToCN -DistinguishedName $previousDN
-        Invoke-Output -Type Bullet -Message "Identified Break Glass Account" -TM $previousCN
+        Write-AS2GoOutput -Type Bullet -Message "Identified Break Glass Account" -TM $previousCN
     }
     else {
-        Invoke-Output -Type Warning -Message "No Break Glass Account identified."
+        Write-AS2GoOutput -Type Warning -Message "No Break Glass Account identified."
     }
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

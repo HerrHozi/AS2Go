@@ -23,11 +23,11 @@ function Get-GPOSettings {
         
         Invoke-Item $htmlfile 
 
-        Invoke-output -type TextMaker -Message "Saved GPO settings for '$name' to" -TextMaker  $htmlfile     
+        Write-AS2GoOutput -type TextMaker -Message "Saved GPO settings for '$name' to" -TextMaker  $htmlfile     
 
     }
     else {
-        invoke-output -type Warning -Message "To display the updated Group Policy Settings the GroupPolicy module is required!"
+        Write-AS2GoOutput -type Warning -Message "To display the updated Group Policy Settings the GroupPolicy module is required!"
     }
     Measure-FunctionRuntime -End -Details $Info 
 }

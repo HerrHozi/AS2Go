@@ -18,10 +18,7 @@ function Show-PiskelFile {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     Add-Type -AssemblyName System.Drawing
 
@@ -247,10 +244,7 @@ public class VTConsole {
         $bitmap.Dispose()
         $memoryStream.Dispose()
     }
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    #Add-SAFunctionRunTime -Function $CurrentFunction -Runtime $runtime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }
 
 

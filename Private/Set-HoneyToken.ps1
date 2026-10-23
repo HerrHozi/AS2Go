@@ -20,13 +20,10 @@ function Set-HoneyToken {
     #####                                                                      #####
     ################################################################################
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
-    Invoke-Output -Type Header "Select a honeytoken account that will be monitored by MDI."
-    Invoke-Output -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Header "Select a honeytoken account that will be monitored by MDI."
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     $previousDN = Get-ASConfig -Setting "Honeytoken"
 
@@ -34,7 +31,7 @@ function Set-HoneyToken {
         $previousCN = Convert-FromDNToCN -DistinguishedName $previousDN
         $HelpP = "Use the scope from previous selection/attack."
         $message = "Use current account ($previousCN) or select new:"
-        Invoke-Output -Type TextMaker -Message "Current Honeytoken:" -Tm $previousCN
+        Write-AS2GoOutput -Type TextMaker -Message "Current Honeytoken:" -Tm $previousCN
     }
     else {
         $message = "Select new Honeytoken:"
@@ -53,14 +50,11 @@ function Set-HoneyToken {
         $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0
         Set-ASConfig -Setting "Honeytoken" -Value $result
         $result = Convert-FromDNToCN -DistinguishedName $result
-        Invoke-Output -Type TextMaker -Message "New Honeytoken:" -Tm $result
+        Write-AS2GoOutput -Type TextMaker -Message "New Honeytoken:" -Tm $result
     }
     else {
-        Invoke-Output -Type Info -message "Keep previous Honeytoken!"    
+        Write-AS2GoOutput -Type Info -message "Keep previous Honeytoken!"    
     }   
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

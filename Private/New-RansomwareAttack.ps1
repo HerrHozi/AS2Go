@@ -2,10 +2,8 @@ function New-RansomwareAttack {
 
     Param([string]$BackupShare)
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
+    $CurrentFunction = $Info.FunctionName
 
     #prepare the simulation
     $TargetPath = $Script:DefautExfiltrationFolder
@@ -20,7 +18,7 @@ function New-RansomwareAttack {
     }
 
     if (-not (Test-Path -Path $FolderToEncrypt -PathType Container)) {
-        Invoke-Output -Type Warning -Message "Unable to create folder '$FolderToEncrypt' - aborting simulation."
+        Write-AS2GoOutput -Type Warning -Message "Unable to create folder '$FolderToEncrypt' - aborting simulation."
         Write-Log -Message "### Exit Function $CurrentFunction ###"
         return
     }
@@ -33,7 +31,7 @@ function New-RansomwareAttack {
     Get-Item $FolderToEncrypt\*.* | Out-File -FilePath $newFile -Append
     Copy-Item -Path "$TargetPath\$filePrefix.txt" -Destination $FolderToEncrypt -Recurse
 
-    Invoke-Output -Type TextMaker -Message "Starting to encrypt all files in folder" -TextMaker $FolderToEncrypt
+    Write-AS2GoOutput -Type TextMaker -Message "Starting to encrypt all files in folder" -TextMaker $FolderToEncrypt
 
     $question = "Do you REALLY want to run this step? [Y/N] Default "
     $answer = Get-Answer -question $question -defaultValue $Script:No
@@ -42,21 +40,18 @@ function New-RansomwareAttack {
         $affectedDC = $BackupShare.split("\")[2]
         $sourceFile = Join-Path -Path $Script:ASSetup -ChildPath "Encryption\preview.html"
           
-        Invoke-OutPut -Type Info -Message "Content of file '$FolderToEncrypt\$filePrefix.txt' before encryption:"
+        Write-AS2GoOutput -Type Info -Message "Content of file '$FolderToEncrypt\$filePrefix.txt' before encryption:"
         Invoke-Item "$FolderToEncrypt\$filePrefix.txt"
         Invoke-FileEncryption -share $FolderToEncrypt
-        Invoke-Output -Type Textmaker -Message "The following file is one of the files that were encrypted: --> " -TM "$FolderToEncrypt\$filePrefix.txt" 
+        Write-AS2GoOutput -Type Textmaker -Message "The following file is one of the files that were encrypted: --> " -TM "$FolderToEncrypt\$filePrefix.txt" 
         Invoke-Item "$FolderToEncrypt\$filePrefix.txt"
 
         foreach ($computer in $Script:AllDCs) {
             $affectedDC = $computer.FQDN
-            Invoke-FakeRansomwarePopUp -ComputerName $affectedDC -SourceFile $sourceFile
+            Start-AS2GoDemoPopup -ComputerName $affectedDC -SourceFile $sourceFile
 
         }
 
     }
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

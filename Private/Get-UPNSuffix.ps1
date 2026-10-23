@@ -17,10 +17,7 @@ function Get-UPNSuffix {
         [string] $Domain 
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     If ([string]::IsNullOrEmpty($Domain)) {
         $domain = (Get-ADDomain).DNSRoot
@@ -93,10 +90,7 @@ function Get-UPNSuffix {
     Set-ASConfig -Setting "LastUPNSuffix" -Value $Decision
 
     Write-Log -Message "    >> Selectec UPN suffix $Decision"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $Decision
 }

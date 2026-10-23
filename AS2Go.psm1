@@ -344,7 +344,7 @@ $Script:ToolGUIDScheduledTask = "{CAB54552-DEEA-4691-817E-ED4A4D1AFC72}"
 
 ##########################################################################
 
-Set-Alias Pause Invoke-NextStep -Force
+Set-Alias Pause Wait-AS2GoUserInput -Force
 
 $ScriptDir = New-Object System.Collections.ArrayList
 
@@ -425,13 +425,13 @@ Write-Log -Message "--------------------------------------------------"
 Write-Log -Message "Loading AS2go Module"
 Write-Log -Message "--------------------------------------------------"
 
-Invoke-AS2GoDirectory -Directory $Script:AS2GoLogDir
-Invoke-AS2GoDirectory -Directory $Script:AS2GoTempDir
-Invoke-AS2GoDirectory -Directory $Script:AS2GoConfigDir
-Invoke-AS2GoDirectory -Directory (Join-Path -Path $script:AS2GoPublicDir -ChildPath "MaliciousTools")
-Invoke-AS2GoDirectory -Directory $Script:DefautCleanUpFolder
-Invoke-AS2GoDirectory -Directory $Script:DefautExfiltrationFolder
-Invoke-AS2GoDirectory -Directory $Script:AS2GOTicketsDir
+Initialize-AS2GoDirectory -Directory $Script:AS2GoLogDir
+Initialize-AS2GoDirectory -Directory $Script:AS2GoTempDir
+Initialize-AS2GoDirectory -Directory $Script:AS2GoConfigDir
+Initialize-AS2GoDirectory -Directory (Join-Path -Path $script:AS2GoPublicDir -ChildPath "MaliciousTools")
+Initialize-AS2GoDirectory -Directory $Script:DefautCleanUpFolder
+Initialize-AS2GoDirectory -Directory $Script:DefautExfiltrationFolder
+Initialize-AS2GoDirectory -Directory $Script:AS2GOTicketsDir
 
 If (-not (Test-Path -Path $Script:ConfigFile)) {
     copy-item "$ASModulePath\AS2GO.json" -Destination $Script:ConfigFile

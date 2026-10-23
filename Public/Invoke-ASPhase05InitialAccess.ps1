@@ -82,12 +82,12 @@ function Invoke-ASPhase05InitialAccess {
     # If ($skipstep) { break }            
         
     If (-not $SkipClearHost) { Clear-Host }
-    Invoke-Output -Type  Header -M "Attack Phase - $($Script:Phase05.toupper())"
-    Invoke-Output -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase05.toupper())"
+    Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
                 
 
-    invoke-output -Type Command -M "begin code for 5"
+    Write-AS2GoOutput -Type Command -M "begin code for 5"
 
     Update-WindowTitle -NewTitle $Script:Phase05
 
@@ -103,9 +103,9 @@ pause
 
         If (-not $SkipClearHost) { Clear-Host }
 
-        Invoke-Output -Type  Header -M "Attack Phase - COMPROMISED User Account"
+        Write-AS2GoOutput -Type  Header -M "Attack Phase - COMPROMISED User Account"
         $Functionality = "This phase involves handling a compromised user account, determining if it has privileged access, `nand taking appropriate actions based on the account's sensitivity."
-        Invoke-Output -Type H1 -Message $Functionality
+        Write-AS2GoOutput -Type H1 -Message $Functionality
 
         If ($UnAttended) {
             $answer = $Script:PrivledgeAccount
@@ -210,7 +210,7 @@ pause
             Write-Host ""
             Pause
             If (-not $SkipClearHost) { Clear-Host }
-            invoke-output -type Header -message "Displays a list of currently cached Kerberos tickets"
+            Write-AS2GoOutput -type Header -message "Displays a list of currently cached Kerberos tickets"
 
             Write-Host ""             
             Write-Host -NoNewline "  Command: "
@@ -220,7 +220,7 @@ pause
             Write-Host ""
             $tickets = Get-KlistTicket
             $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-            Invoke-Output -Type Info -Message "Last Ticket"
+            Write-AS2GoOutput -Type Info -Message "Last Ticket"
             $tickets | Select-object -Last 1 | Format-List
             
             If ($UnAttended) { Start-Sleep 1 } else { Pause }
@@ -234,7 +234,7 @@ pause
 
         # If ($skipstep) {break}
 
-        #Invoke-Output -Type  Header -M "??? REPEAT | Attack Phase - COMPROMISED User Account ???"
+        #Write-AS2GoOutput -Type  Header -M "??? REPEAT | Attack Phase - COMPROMISED User Account ???"
 
 
         If ($UnAttended) {

@@ -27,10 +27,7 @@ function Add-RandomUsersToAccountOperators {
         [string] $Server
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     #Import-Module ActiveDirectory
 
@@ -74,8 +71,5 @@ function Add-RandomUsersToAccountOperators {
 
         Write-Log -Message "    >> User added to Account Operators $cname"
     }
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

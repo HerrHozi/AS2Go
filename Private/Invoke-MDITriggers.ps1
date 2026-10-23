@@ -1,16 +1,33 @@
 <#
 .SYNOPSIS
-Configures Active Directory settings for Microsoft Defender for Identity detections.
+Prepares DNS and honeytoken settings for Defender for Identity demonstrations.
 
 .DESCRIPTION
-Offers DNS zone-transfer and honeytoken setup steps that enable selected Microsoft Defender
-for Identity detections; each step can be selected or skipped.
+Displays a repeatable setup menu for DNS zone-transfer settings and honeytoken account selection.
+The DNS workflow reviews primary zones, previews changes, and can allow transfers to any server after confirmation.
+The honeytoken workflow selects an existing AD user and saves its distinguished name in the module configuration.
+Skips DNS setup when the DNS module status is failed. Selecting Skip exits the menu.
+
+.EXAMPLE
+Invoke-MDITriggers
+Runs this workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Does not configure Defender for Identity itself or register the selected user as a honeytoken in that service.
 
 .COMPONENT
 Category: Main Function
 
 .FUNCTIONALITY
-Offers DNS zone-transfer and honeytoken setup to enable Microsoft Defender for Identity detections.
+Offers DNS zone-transfer setup and selection of an existing honeytoken account for later detection demonstrations.
+Can allow transfers to any server and stores the selected honeytoken in the AS2Go configuration.
 #>
 function Invoke-MDITriggers {
 
@@ -23,9 +40,9 @@ function Invoke-MDITriggers {
     ################################################################################
 
 
-    Invoke-Output -Type Header "Configure settings to enable MDI specific detections"
+    Write-AS2GoOutput -Type Header "Configure settings to enable MDI specific detections"
     $Functionality = (Get-Help 'Invoke-MDITriggers').Functionality
-    Invoke-Output -Type H1 -Message $Functionality
+    Write-AS2GoOutput -Type H1 -Message $Functionality
     
     $title = "MDI Triggers"
     $message = "Follow listed order for optimal execution."
@@ -47,10 +64,10 @@ function Invoke-MDITriggers {
 
             "DNSZone" {
                 If ($Script:MoDNS -ne "failed") {
-                    Invoke-DNSZoneUpdate
+                    Set-AS2GoDnsZoneConfiguration
                 }
                 else {
-                    Invoke-Output -Type Warning -Message "DNSServer PowerShell module is not available. Cannot proceed with DNS Zone Update."
+                    Write-AS2GoOutput -Type Warning -Message "DNSServer PowerShell module is not available. Cannot proceed with DNS Zone Update."
                 }
             }
             "HoneyToken" {

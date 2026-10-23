@@ -25,10 +25,7 @@ function Get-ADCSEnterpriseCA {
         [string]$Server
     )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
 
     # Get all Enterprise CAs from AD
 
@@ -132,13 +129,13 @@ function Get-ADCSEnterpriseCA {
 
     # Nice overview
 
-    Invoke-Output -Type H1 -Message "Identitfied Enterprise CAs [$($final.count)]"
+    Write-AS2GoOutput -Type H1 -Message "Identitfied Enterprise CAs [$($final.count)]"
     if ($null -ne $final) {
         $final | Sort-Object IsRootCA, CAName | Format-Table CAName, Server, Online, HasTemplates, IsRootCA, ParentCA
         $Script:ADCSEnterpriseCAMissing = $false
     }
     else {
-        Invoke-Output -Type Info -Message "No Enterprise CA found."
+        Write-AS2GoOutput -Type Info -Message "No Enterprise CA found."
     }
 
 
@@ -146,8 +143,5 @@ function Get-ADCSEnterpriseCA {
     Write-Log -Message "    >> Identified the following Get Enterprise CAs under Forest '$ConfigNC': $4logfile"
 
 
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

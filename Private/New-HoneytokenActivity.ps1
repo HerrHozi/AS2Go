@@ -1,9 +1,6 @@
 function New-HoneytokenActivity {
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
+    $Info = Measure-FunctionRuntime -Begin
     
     $Script:ASHoneyToken = Get-ASConfig -Setting "honeytoken"
     
@@ -22,12 +19,9 @@ function New-HoneytokenActivity {
     }
     Catch {
         $cn = Convert-FromDNToCN -DistinguishedName $Script:ASHoneyToken
-        Invoke-output -Type Textmaker -Message "Honeytoken activity: Attempted to login and authenticate" -Tm "$cn"
+        Write-AS2GoOutput -Type Textmaker -Message "Honeytoken activity: Attempted to login and authenticate" -Tm "$cn"
     }
         
     Write-Log -Message "    >> Used $Script:ASHoneyToken with password $randowmPW"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 }

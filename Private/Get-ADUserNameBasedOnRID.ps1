@@ -12,10 +12,7 @@ function Get-ADUserNameBasedOnRID {
         [string] $Server
         )
 
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host ####################
+    $Info = Measure-FunctionRuntime -Begin
 
     $UserName = $null
     $UserName = (Get-ADUser -Filter * -Properties name -Server $Server | Where-Object { ($_.SID -like "*$RID") }).name
@@ -34,10 +31,7 @@ function Get-ADUserNameBasedOnRID {
     }
 
     Write-Log -Message "    >> using AD Group - $UserName"
-    ######################## main code ############################
-    $runtime = Get-RunTime -StartRunTime $StartRunTime
-    Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+    Measure-FunctionRuntime -End -Details $Info
 
     return $UserName
 }
