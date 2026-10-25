@@ -5,6 +5,31 @@ Displays consistently formatted AS2Go console output.
 .DESCRIPTION
 Formats typed messages with the module's console conventions and forwards applicable output
 to the logging helper.
+Command displays a command with syntax highlighting without executing it. String literals are blue.
+NextCommand displays a label, using "Next Command" when Message is omitted.
+
+.PARAMETER Type
+Output style. Use Command for highlighted command text or NextCommand for a command introduction.
+
+.PARAMETER Message
+Text to display, or command text to highlight when Type is Command.
+
+.PARAMETER TextMaker
+Additional highlighted text for output styles that support it.
+
+.PARAMETER NoExtraLines
+Suppresses surrounding blank lines for supported output styles, including Command and NextCommand.
+
+.PARAMETER NoNewLine
+Leaves the cursor on the same line for Command and NextCommand output.
+
+.EXAMPLE
+Write-AS2GoOutput -Type NextCommand -NoNewLine
+Displays the default command introduction without a final newline.
+
+.EXAMPLE
+Write-AS2GoOutput -Type Command -Message "Get-Command -Module 'AS2Go'"
+Displays the command with syntax highlighting without executing it.
 
 .COMPONENT
 Category: Sub Function
@@ -12,7 +37,8 @@ Category: Sub Function
 .FUNCTIONALITY
 Renders typed console messages and forwards them to logging.
 #>
-function Write-AS2GoOutput {
+function 
+Write-AS2GoOutput {
 
     ################################################################################
     #####                                                                      ##### 
@@ -24,7 +50,7 @@ function Write-AS2GoOutput {
     Param(
         [Parameter(Mandatory = $false, Position = 0)]
         [Alias('T')]
-        [ValidateSet("Info", "Input", "Success", "Warning", "Error", "CodeSnippet", "Command", "TextMaker", "Header", "Bullet", "Quit", "H1" )]
+        [ValidateSet("Info", "Input", "Success", "Warning", "Error", "CodeSnippet", "Command", "NextCommand", "TextMaker", "Header", "Bullet", "Quit", "H1" )]
         [string] $Type = "Info",
         [Parameter(Mandatory = $false, Position = 1)]
         [Alias('M')]
@@ -58,12 +84,62 @@ function Write-AS2GoOutput {
             Write-Host "`n  [>] $Message`n"           -ForegroundColor $Script:FGCCommand 
             $level = "INFO"
         }
-        "Command" {
+        "NextCommand" {
+            if (-not $PSBoundParameters.ContainsKey('Message')) {
+                $Message = "Next Command"
+            }
+            if (-not $NoExtraLines) { Write-Host "" }
             If ($NoNewLine) {
-                Write-Host "`n  [>] $Message"           -ForegroundColor $Script:FGCCommand -NoNewline
+                Write-Host "  [>] $Message" -ForegroundColor $Script:FGCCommand -NoNewline
             }
             else {
-                Write-Host "`n  [>] $Message`n`n"           -ForegroundColor $Script:FGCCommand 
+                Write-Host "  [>] $Message" -ForegroundColor $Script:FGCCommand
+                if (-not $NoExtraLines) { Write-Host "" }
+            }
+            $level = "INFO"
+        }
+        "Command" {
+            $tokens = $null
+            $parseErrors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseInput(
+                [string]$Message, [ref]$tokens, [ref]$parseErrors
+            )
+            if (-not $NoExtraLines) { Write-Host "" }
+            $position = 0
+            foreach ($token in $tokens) {
+                if ($token.Kind -eq 'EndOfInput') { continue }
+                $start = $token.Extent.StartOffset
+                if ($start -gt $position) {
+                    Write-Host $Message.Substring($position, $start - $position) -NoNewline -ForegroundColor Gray
+                }
+                $color = switch ([string]$token.Kind) {
+                    'StringLiteral' { 'Blue'; break }
+                    'HereStringLiteral' { 'Blue'; break }
+                    'StringExpandable' { 'Green'; break }
+                    'HereStringExpandable' { 'Green'; break }
+                    'Variable' { 'Green'; break }
+                    'Number' { 'Yellow'; break }
+                    'Parameter' { 'DarkGray'; break }
+                    'Comment' { 'DarkGray'; break }
+                    default {
+                        if ($token.TokenFlags -band [System.Management.Automation.Language.TokenFlags]::CommandName) {
+                            'Yellow'
+                        }
+                        elseif ($token.TokenFlags -band [System.Management.Automation.Language.TokenFlags]::Keyword) {
+                            'Cyan'
+                        }
+                        else { 'Gray' }
+                    }
+                }
+                Write-Host $token.Text -NoNewline -ForegroundColor $color
+                $position = $token.Extent.EndOffset
+            }
+            if ($position -lt $Message.Length) {
+                Write-Host $Message.Substring($position) -NoNewline -ForegroundColor Gray
+            }
+            if (-not $NoNewLine) {
+                Write-Host ""
+                if (-not $NoExtraLines) { Write-Host "" }
             }
             $level = "INFO"
         }

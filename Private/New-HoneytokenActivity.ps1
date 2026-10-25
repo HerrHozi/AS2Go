@@ -4,13 +4,14 @@ function New-HoneytokenActivity {
     
     $Script:ASHoneyToken = Get-ASConfig -Setting "honeytoken"
     
-    If ($script:ASHoneyToken -eq $null -or $script:ASHoneyToken -notlike "CN=*") {
+    If ($null -eq $script:ASHoneyToken -or $script:ASHoneyToken -notlike "CN=*") {
         Write-Log -Message "No honeytoken configured. Skipping honeytoken activity."
         return
     }
-    
-    $randowmPW = Get-RandomPassword 
-
+        
+    Write-AS2GoOutput -Type Header -Message "Execute Honeytoken Activity"
+    Write-AS2GoOutput -Type H1 -Message "Generated random password for honeytoken activity"
+    $randowmPW = Get-RandomPassword
 
     Try {
         $HTSecurePass = ConvertTo-SecureString -String $randowmPW -AsPlainText -Force
@@ -19,9 +20,7 @@ function New-HoneytokenActivity {
     }
     Catch {
         $cn = Convert-FromDNToCN -DistinguishedName $Script:ASHoneyToken
-        Write-AS2GoOutput -Type Textmaker -Message "Honeytoken activity: Attempted to login and authenticate" -Tm "$cn"
+        Write-AS2GoOutput -Type Textmaker -Message "Attempted to login and authenticate for principal " -Tm "$cn"
     }
-        
-    Write-Log -Message "    >> Used $Script:ASHoneyToken with password $randowmPW"
     Measure-FunctionRuntime -End -Details $Info
 }

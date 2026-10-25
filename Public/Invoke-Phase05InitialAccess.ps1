@@ -85,16 +85,19 @@ function Invoke-ASPhase05InitialAccess {
     Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase05.toupper())"
     Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
-                
+              
 
-    Write-AS2GoOutput -Type Command -M "begin code for 5"
 
     Update-WindowTitle -NewTitle $Script:Phase05
 
+    Write-AS2GoOutput -Type H1 -Message "`nChecking local administrator status"
+    Test-LocalAdministrator | Format-List
+
+    Write-AS2GoOutput -Type H1 -M "Retrieving current AD user information"
     Get-CurrentADUserInfo | Format-List
 
 
-    Test-LocalAdministrator | Format-List
+
     <#
 pause
     Do {
@@ -249,7 +252,10 @@ pause
 
 
 #>
-
-
+If($AS2GoDemo) {
+    if (-not $UnAttended) {
+        pause
+    }
+}
     Measure-FunctionRuntime -End -Details $Info 
 }

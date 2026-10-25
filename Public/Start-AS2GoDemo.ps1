@@ -263,9 +263,13 @@ Function Start-AS2GoDemo {
     }
 
     #read values from AS2Go.json config file
-    Get-AS2GoSettings -ReadOnly
+    $null = Get-AS2GoSettings -ReadOnly
     
     $UseCase = Get-ASConfig -Setting "usecase"
+
+
+                    Show-ForestOverview 
+                Get-ForestInfo
 
     If (-not $SkipClearHost) { Clear-Host }
 
@@ -375,56 +379,56 @@ Function Start-AS2GoDemo {
     Write-AS2GoOutput -Type HEADER -Message "ATTACK NAVIGATION"
     Write-AS2GoOutput -Type H1 -Message "Choose your starting point in the attack chain.`n"
 
-    Write-AS2GoOutput -Type Bullet -Message "[4] $Script:Phase04" 
-    Write-AS2GoOutput -Type Bullet -Message "[5] $Script:Phase05"
-    Write-AS2GoOutput -Type Bullet -Message "[6] $Script:Phase06"
-    Write-AS2GoOutput -Type Bullet -Message "[7] $Script:Phase07"
+    Write-AS2GoOutput -Type Bullet -Message "[P] $Script:Phase04" 
+    Write-AS2GoOutput -Type Bullet -Message "[I] $Script:Phase05"
+    Write-AS2GoOutput -Type Bullet -Message "[R] $Script:Phase06"
+    Write-AS2GoOutput -Type Bullet -Message "[E] $Script:Phase07"
     #Write-AS2GoOutput -Type Bullet -Message "[8] $Script:Phase08"
-    Write-AS2GoOutput -Type Bullet -Message "[9] $Script:Phase09"   
-    Write-AS2GoOutput -Type Bullet -Message "[1] $Script:Phase10"
-    Write-AS2GoOutput -Type Bullet -Message "[E] $Script:Phase11"
-    Write-AS2GoOutput -Type Bullet -Message "[T] $Script:Phase12"
+    Write-AS2GoOutput -Type Bullet -Message "[V] $Script:Phase09"   
+    Write-AS2GoOutput -Type Bullet -Message "[S] $Script:Phase10"
+    Write-AS2GoOutput -Type Bullet -Message "[X] $Script:Phase11"
+    Write-AS2GoOutput -Type Bullet -Message "[D] $Script:Phase12"
 
     Show-CurrentPhase -Phase "phase_00.html"
 
     $Options = @(
         [pscustomobject]@{
-            Label = "&4"
+            Label = "S&pray"
             Help  = "Execute brute force or password spraying attacks to compromise user accounts"
             Value = 4
         },
         [pscustomobject]@{
-            Label = "&5"
+            Label = "&Initial"
             Help  = "Establish initial access using a compromised account"
             Value = 5
         },
         [pscustomobject]@{
-            Label = "&6"
+            Label = "&Recon"
             Help  = "Perform reconnaissance using a compromised account"
             Value = 6
         },
         [pscustomobject]@{
-            Label = "&7"
+            Label = "&Escalate"
             Help  = "Execute privilege escalation techniques to gain administrative access"
             Value = 7
         },
         [pscustomobject]@{
-            Label = "&9"
+            Label = "&Privileged"
             Help  = "Perform reconnaissance using a privileged account"
             Value = 9
         },
         [pscustomobject]@{
-            Label = "&1"
+            Label = "&Sensitive"
             Help  = "Access sensitive data using elevated privileges"
             Value = 10
         },
         [pscustomobject]@{
-            Label = "&E"
+            Label = "E&xfil"
             Help  = "Exfiltrate sensitive data from compromised systems"
             Value = 11
         },
         [pscustomobject]@{
-            Label = "&T"
+            Label = "&Domain"
             Help  = "Execute domain compromise techniques and establish persistence"
             Value = 12
         }
@@ -434,62 +438,72 @@ Function Start-AS2GoDemo {
     $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
 
 
+    $privilegeEscalationParameters = @{}
+    if (-not [string]::IsNullOrEmpty($PrivilegeEscalation)) {
+        $privilegeEscalationParameters.PrivilegeEscalation = $PrivilegeEscalation
+    }
+
+    $domainPersistenceParameters = @{}
+    if (-not [string]::IsNullOrEmpty($DomainPersistence)) {
+        $domainPersistenceParameters.DomainPersistence = $DomainPersistence
+    }
+
     if ($decision -eq 4) {
         Invoke-ASPhase04BruteForceAttack -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase05InitialAccess -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @privilegeEscalationParameters
         Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
    
     }
     elseif ($decision -eq 5) {
         Invoke-ASPhase05InitialAccess -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @privilegeEscalationParameters
         Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
 
     }
     elseif ($decision -eq 6) {
         Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @privilegeEscalationParameters
         Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
 
     }
     elseif ($decision -eq 7) {
-        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @privilegeEscalationParameters
         Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
 
     }
     elseif ($decision -eq 9) {
         Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
     }
     elseif ($decision -eq 10) {
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
     }
     elseif ($decision -eq 11) {
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
 
     }
     elseif ($decision -eq 12) {
-        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation
+        Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation @domainPersistenceParameters
     }
 
     return

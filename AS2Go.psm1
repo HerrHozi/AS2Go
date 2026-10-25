@@ -474,17 +474,17 @@ Write-Host "'AS2Go'`n`n" -ForegroundColor DarkCyan
 #Write-Host "  Version:         $($ASModuleManifest.Version) | Last Update: $ASModuleLastUpdate | Author: $($ASModuleManifest.Author) " -ForegroundColor Gray
 Write-Host "`n  [>] Quick-Start: " -NoNewline -ForegroundColor Gray 
 
-Write-HighlightedCode  -code "Initialize-AS2GoLabConfiguration"
-Write-HighlightedCode  -code "                   Invoke-ASPhase04BruteForceAttack"
-Write-HighlightedCode  -code "                   Invoke-ASPhase07PrivilegeEscalation"
-Write-HighlightedCode  -code "                   Invoke-ASPhase12DomainCompromisePersistence"
-Write-HighlightedCode  -code "                   Start-AS2GoDemo"
-Write-HighlightedCode  -code "                   ASP07 -EnableLogging -SkipImages -UnAttended -Technique PtT"
-Write-HighlightedCode  -code "                   ASP12 -EnableLogging -SkipImages"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "Initialize-AS2GoLabConfiguration"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase04BruteForceAttack"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase07PrivilegeEscalation"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase12DomainCompromisePersistence"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Start-AS2GoDemo"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   ASP07 -EnableLogging -SkipImages -UnAttended -Technique PtT"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   ASP12 -EnableLogging -SkipImages"
 
 
 Write-host "`n"
-$host.ui.RawUI.WindowTitle = "$ASModuleName - $($ASModuleManifest.Version)"
+Update-WindowTitle "$ASModuleName - $($ASModuleManifest.Version)"
 $Script:EnableLogging = $false
 
 

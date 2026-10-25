@@ -119,6 +119,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         If (-not $SkipClearHost) { Clear-Host }
         Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase12.toupper())"
         Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+        Write-Host ""
         Write-AS2GoOutput -Type  Bullet "Create a persistent backdoor domain account"
         Write-AS2GoOutput -Type  Bullet "Perform user account manipulation (disable accounts and/or reset passwords)"
         Write-AS2GoOutput -Type  Bullet "Perform Tier 0 group membership manipulation (remove all admins except backdoor and break-glass accounts)"

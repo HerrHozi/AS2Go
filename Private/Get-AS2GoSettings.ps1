@@ -257,7 +257,7 @@ function Get-AS2GoSettings {
         }
 
         if ($ReadOnly) {
-    Measure-FunctionRuntime -End -Details $Info 
+            Measure-FunctionRuntime -End -Details $Info 
 
             return [pscustomobject]@{
                 Settings = $Settings | Sort-Object Index

@@ -3,7 +3,7 @@
 Runs Phase 09 of the AS2Go attack simulation: Privileged Reconnaissance.
 
 .DESCRIPTION
-Invoke-ASPhase09ReconnaissancePriviledged executes a reconnaissance phase focused on privileged
+Invoke-ASPhase09ReconnaissancePrivileged executes a reconnaissance phase focused on privileged
 infrastructure context. The function prepares the phase, optionally shows visuals, and performs
 interactive or unattended reconnaissance actions against the logon server.
 
@@ -32,24 +32,26 @@ Prevents clearing the console during phase execution.
 Runs the phase in AS2Go demo mode and skips selected setup interactions.
 
 .EXAMPLE
-Invoke-ASPhase09ReconnaissancePriviledged
+Invoke-ASPhase09ReconnaissancePrivileged
 
 Runs Phase 09 interactively.
 
 .EXAMPLE
-Invoke-ASPhase09ReconnaissancePriviledged -UnAttended -EnableLogging
+Invoke-ASPhase09ReconnaissancePrivileged -UnAttended -EnableLogging
 
 Runs Phase 09 without prompts and with logging enabled.
 
 .EXAMPLE
-Invoke-ASPhase09ReconnaissancePriviledged -SkipImages -SkipClearHost
+Invoke-ASPhase09ReconnaissancePrivileged -SkipImages -SkipClearHost
 
 Runs Phase 09 without phase visuals and without clearing the host.
 
 .NOTES
 Part of: AS2Go attack phase orchestration
 #>
-function Invoke-ASPhase09ReconnaissancePriviledged {
+function Invoke-ASPhase09ReconnaissancePrivileged {
+         
+
 
     ################################################################################
     #####                                                                      ##### 

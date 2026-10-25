@@ -143,7 +143,7 @@ function Initialize-AS2GoLabConfiguration {
     .LINK
     https://learn.microsoft.com/en-us/powershell/scripting/developer/help/writing-help-for-powershell-functions
     #>
-
+    [Alias("Initialize-AS2GoDemo")]
     param(
         [string] $AS2GoOU = "AS2Go", 
         [ValidatePattern('^\S+$')]
