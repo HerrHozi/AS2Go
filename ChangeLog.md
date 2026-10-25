@@ -2,9 +2,15 @@
 
 ```Text
 Author:          Holger Zimmermann | <zimmermann.holger@live.de>
-Current Version: 2026.10.23.732
-Last Update:     2026-10-23
+Current Version: 2026.10.25.792
+Last Update:     2026-10-25
 ```
+
+- Version 2026.10.25.792
+  - Improved the Start-As2GoDemo process
+
+- Version 2026.10.23.1132
+  - Improved the Start-As2GoDemo process
 
 - Version 2026.10.23.732
   - new help and function names
@@ -269,7 +275,7 @@ Last Update:     2026-10-23
   - Updated Function New-PasswordSprayAttack & Invoke-PasswordSprayAttack
 
 - Version 2025.10.1.801
-  - Updated Posh Module for function Invoke-ASPhase09ReconnaissancePriviledged
+  - Updated Posh Module for function Invoke-ASPhase09ReconnaissancePrivileged
   - Added Function Get-DomainType
 
 - Version 2025.9.30.1279

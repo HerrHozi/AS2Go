@@ -8,9 +8,9 @@ function Get-DirContent {
     
     If (-not $SkipCommand) {
   
-        Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
+        Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
         $command = "Get-ChildItem -Path $Path"
-        Write-Syntax -Code $command
+        Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
     
     }
 

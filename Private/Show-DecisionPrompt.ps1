@@ -38,7 +38,7 @@ function Show-DecisionPrompt {
     If ($title.StartsWith("REPEAT |")) {
         [int]$total = 64
         $text = " $title "
-        $chars = [int](($total - $text.Length) / 2)
+        $chars = [Math]::Max(0, [int](($total - $text.Length) / 2))
         $separator = ':' * $chars
         $title = "$separator $text $separator"
     }

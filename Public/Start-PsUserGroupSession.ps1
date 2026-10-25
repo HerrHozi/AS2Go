@@ -1,32 +1,31 @@
 <#
 .SYNOPSIS
-Verifies and updates global AS2Go settings.
+Small PowerShell Helpers That Make Better Demo Code.
 
 .DESCRIPTION
-Loads and normalizes saved settings, refreshes available domain and host defaults, and syncs
-the values to script variables. In interactive mode, displays the settings and lets the user
-review or edit them; ReadOnly mode returns the settings and configuration without prompting.
+While developing AS2Go, my PowerShell module for Active Directory attack simulations in authorized labs, I kept running into the same tasks: formatting output, prompting for choices, displaying commands, and remembering settings.
 
-.PARAMETER ReadOnly
+.PARAMETER EnableLogging
 Returns the loaded settings and configuration without displaying the interactive review menu.
-
-.FUNCTIONALITY
-Displays an AS2Go presentation introduction and agenda, then prompts for a slide-navigation choice.
 
 .COMPONENT
 Category: Main Function
+
+.FUNCTIONALITY
+From a CMD demo to a PowerShell 7 module
+for Active Directory attack simulation
 #>
 function Start-PsUserGroupSession {
-
+    
+    [Alias("PsUG")]
     Param(
-        [switch] $EnableLogging,
-        [switch] $StartRecording
+        [Alias("StartRecording")]
+        [switch] $EnableLogging
     )
   
-    $host.ui.RawUI.WindowTitle = "PoSH User Group | AS2Go"
-
     $info = Measure-FunctionRuntime -Begin
 
+    Update-WindowTitle -NewTitle "PoSH User Group | AS2Go"
     Initialize-ConsoleColors
     Set-NewBackgroundColor -BgC $Script:ConsoleBGColor -FgC $Script:ConsoleFGColor
 
@@ -35,16 +34,22 @@ function Start-PsUserGroupSession {
     Write-Log -Message "    >> Used parameter: $4logfile"
     
     Write-AS2GoOutput -Type Header -Message "AS2Go | Attack Scenario to Go"
-    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type H1 -Message $(
+        (Get-Help (Get-FunctionName)).Functionality
+        )
+
 
     #Write-AS2GoOutput TextMaker -Message "This session covers version"  -TextMaker $($ASModuleManifest.version).ToString()
     Write-AS2GoOutput TextMaker -Message "Speaker:"  -TextMaker "Holger Zimmermann (HerrHozi)"
     Write-AS2GoOutput -Type H1 -Message "Agenda:`n"
-    Write-AS2GoOutput -Type Bullet -Message "Topic 1"
-    Write-AS2GoOutput -Type Bullet -Message "Topic 2"
+    Write-AS2GoOutput -Type Bullet -Message "Reusable interactive menus with keyboard shortcuts, default choices, and return values."
+    Write-AS2GoOutput -Type Bullet -Message "Consistent logging of function execution and elapsed time."
+    Write-AS2GoOutput -Type Bullet -Message "Enable IntelliSense for private PowerShell functions in VS Code."
+    Write-AS2GoOutput -Type Bullet -Message "Visual selection of AD objects across domains, with optional Tier 0 highlighting."
+    Write-AS2GoOutput -Type Bullet -Message "Consistent console output with headings, highlights, status messages, and integrated logging."
+    Write-AS2GoOutput -Type Bullet -Message "incl. Color-coded console display of code without executing it."
+    Write-AS2GoOutput -Type Command -Message "  [>] get-command -Module AS2Go | Where-Object {`$_.Name -like 'Start*'}"
 
-
-    Write-HighlightedCode -code "get-command -Module 'AS2Go' | Where-Object {`$_.Name -like 'Start*'}"
     #Write-host "get-command -Module 'AS2Go' | Where-Object {`$_.Name -like 'Start*'}"
     
  

