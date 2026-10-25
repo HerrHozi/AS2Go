@@ -2,9 +2,12 @@
 
 ```Text
 Author:          Holger Zimmermann | <zimmermann.holger@live.de>
-Current Version: 2026.10.25.792
+Current Version: 2026.10.25.796
 Last Update:     2026-10-25
 ```
+
+- Version 2026.10.25.796
+  - Improved the Start-As2GoDemo process
 
 - Version 2026.10.25.792
   - Improved the Start-As2GoDemo process
