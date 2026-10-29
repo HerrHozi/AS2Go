@@ -10,7 +10,7 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermannn.holger@live.de
-Current Version: 2026.10.29.203
+Current Version: 2026.10.29.736
 Last Update:     2026-10-29
 ```
 
