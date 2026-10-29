@@ -27,14 +27,14 @@ function Set-SecureAccessWorkstation {
         $options = @(
             [pscustomobject]@{ Label = "&Previous Secure Access Workstation"; Help = $helpPrevious; Value = "Previous" },
             [pscustomobject]@{ Label = "Select &new Secure Access Workstation"; Help = "Choose a computer to use as the Secure Access Workstation."; Value = "New" },
-            [pscustomobject]@{ Label = "&Type new Secure Access Workstation"; Help = "Manually enter the host name of the Secure Access Workstation."; Value = "Type" }
+            [pscustomobject]@{ Label = "&Type new Secure Access Workstation"; Help = "Manually enter the host name of the Secure Access Workstation."; Value = "Type" },
             [pscustomobject]@{ Label = "&Skip"; Help = "Skip selecting a Secure Access Workstation."; Value = "Skip" }
         )
     }
     else {
         $message = "Select a computer to use as the Secure Access Workstation:"
         $options = @(
-            [pscustomobject]@{ Label = "Select Secure Access Workstation"; Help = "Choose a computer to use as the Secure Access Workstation."; Value = "New" },
+            [pscustomobject]@{ Label = "Select &new Secure Access Workstation"; Help = "Choose a computer to use as the Secure Access Workstation."; Value = "New" },
             [pscustomobject]@{ Label = "&Type new Secure Access Workstation"; Help = "Manually enter the host name of the Secure Access Workstation."; Value = "Type" },
             [pscustomobject]@{ Label = "&Skip"; Help = "Skip selecting a Secure Access Workstation."; Value = "Skip" }
         )

