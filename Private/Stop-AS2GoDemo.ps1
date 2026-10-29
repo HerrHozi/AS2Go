@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+Closes the AS2Go demonstration, displays its duration, and records completion time and status in the configuration.
+
+.FUNCTIONALITY
+Closes the AS2Go demonstration, displays its duration, and records completion time and status in the configuration.
+Runs the exfiltration-folder cleanup workflow before returning.
+#>
 function Stop-AS2GoDemo {
 
     [CmdletBinding()]
@@ -8,6 +16,9 @@ function Stop-AS2GoDemo {
 
 
     $info = Measure-FunctionRuntime -Begin
+
+    Write-AS2GoOutput -Type Header -Message "Stop-AS2GoDemo"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     If (-not $SkipClearHost) { Clear-Host }
 

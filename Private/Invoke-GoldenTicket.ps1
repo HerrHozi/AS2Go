@@ -26,9 +26,9 @@ Requires Mimikatz, initialized AS2Go domain settings, and the rights needed for 
 Category: Main Function
 
 .FUNCTIONALITY
-Selects a domain and ticket identity, then offers DCSync retrieval or confirmation of the krbtgt hash.
-Creates and injects a Golden Ticket, inspects cached tickets, and tests access to the DC admin share.
-Changes the info attribute of up to ten domain users to demonstrate directory access.
+Demonstrates how a compromised krbtgt hash can be used to forge and inject a Kerberos Golden Ticket.
+Offers DCSync hash retrieval, selects a ticket identity, and inspects cached tickets after injection.
+Tests DC administrative-share access and attempts to change the info attribute of up to ten domain users.
 #>
 Function Invoke-GoldenTicket {
 
@@ -66,6 +66,7 @@ Function Invoke-GoldenTicket {
     $lastGTU = $temp.PadRight(24, [char]32)
 
     Write-AS2GoOutput -Type Header -Message "Select an (fake) account for the Golden Ticket attack, for "
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     Write-Host "     - the Administrator   $s500 enter:   " -NoNewline; Write-Host "A"-ForegroundColor Yellow
     Write-Host "     - the Fake User       $sFakeUser enter:   " -NoNewline; Write-Host "F"-ForegroundColor Yellow

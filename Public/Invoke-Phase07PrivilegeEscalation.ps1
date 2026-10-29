@@ -16,6 +16,10 @@ Depending on the selected option, the phase can trigger attacks and actions such
 - Enabling memory access settings
 - Privilege escalation to SYSTEM (for example via PsExec workflow) (coming soon)
 
+.PARAMETER Preview
+Browses descriptions and workflow steps offline without executing actions.
+Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
+
 .PARAMETER UnAttended
 Runs the phase without interactive confirmation prompts.
 
@@ -65,6 +69,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
     #https://www.microsoft.com/en-us/security/blog/2019/05/09/detecting-credential-theft-through-memory-access-modelling-with-microsoft-defender-atp/
     [Alias("ASP07", "ESC")]
     Param (  
+        [switch]$Preview,
         [switch]$UnAttended,
         [switch]$Continue,
         [Switch]$EnableLogging,
@@ -74,6 +79,11 @@ function Invoke-ASPhase07PrivilegeEscalation {
         [validateSet("PtH", "PtT", "Kerberoasting", "ESC1", "WDigest", "PsExec")]
         [String]$PrivilegeEscalation
     )
+    if ($Preview) {
+        Show-AS2GoPreview -FunctionName 'Invoke-ASPhase07PrivilegeEscalation' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
+        return
+    }
+
 
     $info = Measure-FunctionRuntime -Begin
     

@@ -168,7 +168,7 @@ function Get-AS2GoSettings {
         (New-AS2GoSetting -Index 12 -Label "OU for BD User"             -Key "BDUsersOU"     -InputType ADObject -ScriptVar "ASOUofBackDoorUser"),
         (New-AS2GoSetting -Index 13 -Label "Tickets UNC Path (suffix)"  -Key "ticketsPath"   -InputType Text    -ScriptVar "ASTicketsUNCPath"),
         (New-AS2GoSetting -Index 14 -Label "Tickets Directory"          -Key "ticketsDir"    -InputType Text    -ScriptVar "ASTicketsDirectory"),
-        (New-AS2GoSetting -Index 15 -Label "NTDS Dit File (Backup)"     -Key "OfflineDITFile"-InputType Text    -ScriptVar "ASOfflineDITFile"),
+        (New-AS2GoSetting -Index 15 -Label "NTDS Dit File (Backup)"     -Key "BackupShare"-InputType Text    -ScriptVar "ASBackupShare"),
         (New-AS2GoSetting -Index 16 -Label "Tools (e.g. Certity, Rubeus)" -Key "Tools"        -InputType Folder  -ScriptVar "ASTools")
         # (New-AS2GoSetting -Index 17 -Label "OpenSSL start path"         -Key "OpenSSL"       -InputType Text    -ScriptVar "ASOPenSSL")
     )

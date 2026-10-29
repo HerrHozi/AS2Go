@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+Offers changes to a selected GPO: local group membership, scheduled tasks, or sensitive user rights.
+
+.FUNCTIONALITY
+Offers changes to a selected GPO: local group membership, scheduled tasks, or sensitive user rights.
+Demonstrates how writable Group Policy Template files can spread privileged settings to computers applying the GPO.
+#>
 function New-GPOManipulation {
 
     ################################################################################
@@ -22,6 +30,7 @@ function New-GPOManipulation {
         If (-not $SkipClearHost) { Clear-Host }
 
         Write-AS2GoOutput -Type Header -Message "GPT Manipulation - Choose your Technique"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
         Write-AS2GoOutput -Type Bullet -Message "During this attack, AS2Go will only add these groups as member " -TM "Domain Users, Authenticated Users or Everyone"
 
         If ($UnAttended) {

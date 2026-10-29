@@ -51,6 +51,7 @@ $ASModuleName = $MyInvocation.MyCommand.ScriptBlock.Module.Name
 
 $ASModuleManifest = (Test-ModuleManifest -Path $(join-path $ASModulePath -ChildPath "\$ASModuleName.psd1"))
 $ASModuleLastUpdate = $ASModuleManifest.PrivateData.PSData.LastUpdate
+$Script:SensitiveInfos = "c:\temp\as2go\daily-work.txt"
 
 $script:AS2GoPublicDir = Join-Path -Path $env:PUBLIC -ChildPath "AS2Go"
 $Script:AS2GoLogDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Logs"
@@ -79,9 +80,14 @@ $Script:ADCS = @{}
 [bool]$Script:MoAD = $false
 [bool]$Script:MoGPO = $false
 [bool]$Script:MoDNS = $false
+[bool]$Script:FileVersionM = $false
+[bool]$Script:FileVersionP = $false
+[bool]$Script:FileVersionR = $false
+[bool]$Script:FileVersionN = $false
+[bool]$Script:FileVersionC = $false
 
 
-If ($PSVersionTable.PSVersion.Major -ge 7) {
+If ($PSVersionTable.PSVersion -ge [version]'7.2') {
     $Script:PoSH7 = $true
     # --- Global header color for all Format-Table & Format-List outputs ---
     $PSStyle.Formatting.TableHeader = "`e[90m"   # DarkGray

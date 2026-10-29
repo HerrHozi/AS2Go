@@ -28,13 +28,15 @@ function Set-SecureAccessWorkstation {
             [pscustomobject]@{ Label = "&Previous Secure Access Workstation"; Help = $helpPrevious; Value = "Previous" },
             [pscustomobject]@{ Label = "Select &new Secure Access Workstation"; Help = "Choose a computer to use as the Secure Access Workstation."; Value = "New" },
             [pscustomobject]@{ Label = "&Type new Secure Access Workstation"; Help = "Manually enter the host name of the Secure Access Workstation."; Value = "Type" }
+            [pscustomobject]@{ Label = "&Skip"; Help = "Skip selecting a Secure Access Workstation."; Value = "Skip" }
         )
     }
     else {
         $message = "Select a computer to use as the Secure Access Workstation:"
         $options = @(
             [pscustomobject]@{ Label = "Select Secure Access Workstation"; Help = "Choose a computer to use as the Secure Access Workstation."; Value = "New" },
-            [pscustomobject]@{ Label = "&Type new Secure Access Workstation"; Help = "Manually enter the host name of the Secure Access Workstation."; Value = "Type" }
+            [pscustomobject]@{ Label = "&Type new Secure Access Workstation"; Help = "Manually enter the host name of the Secure Access Workstation."; Value = "Type" },
+            [pscustomobject]@{ Label = "&Skip"; Help = "Skip selecting a Secure Access Workstation."; Value = "Skip" }
         )
     }
 
@@ -80,9 +82,14 @@ function Set-SecureAccessWorkstation {
             Write-AS2GoOutput -Type TextMaker -Message "New Secure Access Workstation:" -Tm $computerName
         }
     }
-    else {
+    elseif ($Decision -eq "Previous") {
         $sawComputerName = $previousSAW
         Write-AS2GoOutput -Type Info -Message "Keep previous Secure Access Workstation!"
+    }
+
+    else {
+        return
+        Write-log -Message "Skipping Secure Access Workstation selection."
     }
 
     if (-not [string]::IsNullOrWhiteSpace([string]$sawComputerName)) {

@@ -17,7 +17,7 @@ function Show-DecisionPrompt {
     
     param(
         [string]$Title = "Ready to proceed with this step?",
-        [string]$Message = "Please select an option:",
+        [string]$Message = "", #Options with unmet requirements are hidden.",
         [object[]]$Options = @(
             [pscustomobject] @{ 
                 Label = "&Yes"
@@ -25,7 +25,7 @@ function Show-DecisionPrompt {
                 Value = $Script:Yes 
             },
             [pscustomobject] @{ 
-                Label = "&No"
+                Label = "&Skip"
                 Help  = 'Skip this step'
                 Value = $Script:No 
             }
@@ -33,6 +33,8 @@ function Show-DecisionPrompt {
         [int]$Default = 0
     )
     
+
+
     $Info = Measure-FunctionRuntime -Begin
 
     If ($title.StartsWith("REPEAT |")) {

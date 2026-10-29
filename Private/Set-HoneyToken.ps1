@@ -12,7 +12,7 @@ Category: Main Function
 .FUNCTIONALITY
 Prompts for a honeytoken user, then stores the selected distinguished name.
 #>
-function Set-HoneyToken {
+function Set-Honeytoken {
 
     ################################################################################
     #####                                                                      ##### 

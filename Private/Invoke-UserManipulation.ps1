@@ -45,7 +45,7 @@ Requires permission to change the target users. No protected-account exclusions 
 Category: Main Function
 
 .FUNCTIONALITY
-Disables users, resets passwords, or performs both operations within the specified AD search base.
+Disables users, resets passwords, or both in the specified AD search base, without protected-account exclusions.
 Marks changed accounts in adminDescription and reports results, progress, and available DC metrics.
 #>
 function Invoke-UserManipulation {
@@ -72,6 +72,10 @@ function Invoke-UserManipulation {
     )
 
     $Info = Measure-FunctionRuntime -Begin
+
+    Write-AS2GoOutput -Type Header -Message "Invoke-UserManipulation"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
 
     # Auto-generate password if none given
     if ([string]::IsNullOrWhiteSpace($NewPassword)) {

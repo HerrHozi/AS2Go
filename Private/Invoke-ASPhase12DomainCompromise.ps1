@@ -10,7 +10,7 @@ Other options export domain DPAPI backup keys, forge and inject a Golden Ticket,
 Exit invokes the demo-closing workflow. Unattended mode selects the backdoor step followed by the reboot step.
 
 .EXAMPLE
-Invoke-Phase12DomainCompromise
+Invoke-ASPhase12DomainCompromise
 Runs this workflow using the initialized AS2Go module configuration.
 
 .INPUTS
@@ -28,11 +28,11 @@ The default menu sequence does not execute every listed action automatically.
 Category: Main Function
 
 .FUNCTIONALITY
-Offers a privileged backdoor account, GPO changes, group membership removal, and user disabling or password resets.
-Also offers file encryption, domain DPAPI backup-key export, and Golden Ticket creation and injection.
-Runs the selected workflow, restarts configured victim machines, or closes the AS2Go demonstration.
+Offers backdoor creation, GPO changes, privileged membership removal, and user disabling or password resets.
+Also offers staged file encryption, domain DPAPI backup-key export, and Golden Ticket creation and injection.
+Runs the selected workflow, requests restarts of configured victim machines, or closes the demonstration.
 #>
-function Invoke-Phase12DomainCompromise {
+function Invoke-ASPhase12DomainCompromise {
 
     ################################################################################
     #####                                                                      ##### 
@@ -57,6 +57,7 @@ function Invoke-Phase12DomainCompromise {
     Do {
 
         Write-AS2GoOutput -Type Header -Message "Select a Final Action"
+        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
         Write-Host "   B " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicBackdoor"
         Write-Host "   T " -ForegroundColor Yellow -NoNewline; Write-Host "- $topicGPT"
@@ -75,7 +76,7 @@ function Invoke-Phase12DomainCompromise {
         }
         else {
 
-            If(-not $Script:MoGPO){
+            If (-not $Script:MoGPO) {
                 $topicGPT = $null
             }
 
@@ -134,6 +135,7 @@ function Invoke-Phase12DomainCompromise {
         switch ($answer) {
 
             "B" {
+
                 If (-not $SkipClearHost) { Clear-Host }
                 Write-AS2GoOutput -Type  Header -M "Create a backdoor account with elevated group memberships for persistence"
 
@@ -263,7 +265,7 @@ function Invoke-Phase12DomainCompromise {
 
                 If ($answer -eq $Script:Yes) {
                     #run functions
-                    New-RansomwareAttack -BackupShare $Script:ASOfflineDITFile
+                    New-RansomwareAttack -BackupShare $Script:ASBackupShare
                     If ($UnAttended) { Start-Sleep 2 } else { Pause }
                 }
                 #endregion  Step - ran ransomware attack?

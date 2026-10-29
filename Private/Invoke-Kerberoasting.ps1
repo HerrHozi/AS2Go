@@ -40,6 +40,7 @@ function Invoke-Kerberoasting {
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
+    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
 
     $dnsdomain = $env:USERDNSDOMAIN
     $bestdc = $Script:BestDCs[$dnsdomain]

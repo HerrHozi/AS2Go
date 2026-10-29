@@ -11,7 +11,11 @@ The phase includes tasks such as:
 - Listing services on the logon server
 - Listing processes on the logon server
 - Running extended reconnaissance tasks
-- Optionally repeating the phase loop
+- Running the phase once per invocation
+
+.PARAMETER Preview
+Browses descriptions and workflow steps offline without executing actions.
+Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
 Runs the phase without interactive confirmation prompts.
@@ -50,16 +54,17 @@ Runs Phase 09 without phase visuals and without clearing the host.
 Part of: AS2Go attack phase orchestration
 #>
 function Invoke-ASPhase09ReconnaissancePrivileged {
-         
+
 
 
     ################################################################################
-    #####                                                                      ##### 
-    #####    Phase 09 - Reconnaissance - After Privileged Escalation           #####                                        
+    #####                                                                      #####
+    #####    Phase 09 - Reconnaissance - After Privileged Escalation           #####
     #####                                                                      #####
     ################################################################################
-    
-    Param (  
+
+    Param (
+        [switch]$Preview,
         [switch]$UnAttended,
         [switch]$Continue,
         [Switch]$EnableLogging,
@@ -67,12 +72,17 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
         [switch]$SkipClearHost,
         [switch]$AS2GoDemo
     )
+    if ($Preview) {
+        Show-AS2GoPreview -FunctionName 'Invoke-ASPhase09ReconnaissancePrivileged' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
+        return
+    }
+
 
     $Info = Measure-FunctionRuntime -Begin
-    
-    If (-not $AS2GoDemo) { 
+
+    If (-not $AS2GoDemo) {
         Set-NewColorSchema -NewStage $Script:InitialStart
-        Get-AS2GoSettings  
+        Get-AS2GoSettings
         Get-forestinfo
     }
 
@@ -82,84 +92,70 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
     Show-CurrentPhase -Phase "phase_09.html"
 
-    Do {
-        # If ($skipstep) { break }     
+    If (-not $SkipClearHost) { Clear-Host }
+
+    Write-AS2GoOutput -Type  Header -Message "Attack Phase - $($Script:Phase09)"
+    Write-AS2GoOutput -Type  H1 -Message "Use the newly gained privileges to collect reconnaissance `nand configuration data from the current logon server."
+
+
+    If ($UnAttended) {
+        $answer = $Script:Yes
+    }
+    else {
+        $question = "Would you like to run this step - Y or N? Default "
+        $answer = Get-Answer -question $question -defaultValue $Script:Yes
+    }
+
+    If ($answer -eq $Script:Yes) {
+
         If (-not $SkipClearHost) { Clear-Host }
 
-        Write-AS2GoOutput -Type  Header -Message "Attack Phase - $($Script:Phase09)"
-        Write-AS2GoOutput -Type  H1 -Message "Use the newly gained privileges to collect reconnaissance `nand configuration data from the current logon server."
- 
+        Write-AS2GoOutput -Type Header -Message "Show Services and Processes on Logon Server"
+        $Functionality = "Displays services and processes from the current logon server for reconnaissance. `n"
+        Write-AS2GoOutput -Type H1 -Message $Functionality
+
+        $server = $env:LOGONSERVER.replace("\", "")
+
+        Write-Host      -NoNewline "  Commands: "
+        Write-Highlight -Text " Get-Service ", "-ComputerName ", "$server ", "| " , "Out-GridView ", "-Title " , "Services  on $server"`
+            -Color $fgcC, $fgcS, $fgcV, $fgcF, $fgcC, $fgcS, $fgcV
+
+        Write-Host      -NoNewline "            "
+        Write-Highlight -Text " Get-Process ", "-ComputerName ", "$server ", "| " , "Out-GridView ", "-Title " , "Processes on $server"`
+            -Color $fgcC, $fgcS, $fgcV, $fgcF, $fgcC, $fgcS, $fgcV
+        Write-Host ""
+
+
+        If ($UnAttended) {
+            $answer = $Script:No
+        }
+        else {
+            $question = "Do you want to run these steps - Y or N? Default "
+            $answer = Get-Answer -question $question -defaultValue $Script:Yes
+        }
+
+        If ($answer -eq $Script:Yes) {
+            Invoke-Command -ComputerName $server -ScriptBlock { Get-Service | Sort-Object Name } | Out-GridView -Title "Services on $server"
+            Invoke-Command -ComputerName $server -ScriptBlock { Get-Process | Sort-Object Name } | Out-GridView -Title "Processes on $server"
+        }
 
         If ($UnAttended) {
             $answer = $Script:Yes
         }
         else {
-            $question = "Would you like to run this step - Y or N? Default "
+            $question = "Further reconnaissance tasks - Y or N? Default "
             $answer = Get-Answer -question $question -defaultValue $Script:Yes
         }
 
         If ($answer -eq $Script:Yes) {
-    
-            If (-not $SkipClearHost) { Clear-Host }
-
-            Write-AS2GoOutput -Type Header -Message "Show Services and Processes on Logon Server"
-            $Functionality = "Displays services and processes from the current logon server for reconnaissance. `n"
-            Write-AS2GoOutput -Type H1 -Message $Functionality
-
-            $server = $env:LOGONSERVER.replace("\", "")
-
-            Write-Host      -NoNewline "  Commands: "
-            Write-Highlight -Text " Get-Service ", "-ComputerName ", "$server ", "| " , "Out-GridView ", "-Title " , "Services  on $server"`
-                -Color $fgcC, $fgcS, $fgcV, $fgcF, $fgcC, $fgcS, $fgcV
-
-            Write-Host      -NoNewline "            " 
-            Write-Highlight -Text " Get-Process ", "-ComputerName ", "$server ", "| " , "Out-GridView ", "-Title " , "Processes on $server"`
-                -Color $fgcC, $fgcS, $fgcV, $fgcF, $fgcC, $fgcS, $fgcV 
-            Write-Host ""
-
-
-            If ($UnAttended) {
-                $answer = $Script:No
-            }
-            else {
-                $question = "Do you want to run these steps - Y or N? Default "
-                $answer = Get-Answer -question $question -defaultValue $Script:Yes
-            }
-
-            If ($answer -eq $Script:Yes) {
-                Invoke-Command -ComputerName $server -ScriptBlock { Get-Service | Sort-Object Name } | Out-GridView -Title "Services on $server"
-                Invoke-Command -ComputerName $server -ScriptBlock { Get-Process | Sort-Object Name } | Out-GridView -Title "Processes on $server"
-            } 
-
-            If ($UnAttended) {
-                $answer = $Script:Yes
-            }
-            else {
-                $question = "Further reconnaissance tasks - Y or N? Default "
-                $answer = Get-Answer -question $question -defaultValue $Script:Yes
-            }
-
-            If ($answer -eq $Script:Yes) {
-                Invoke-ReconnaissanceExtended
-            }
+            Invoke-ReconnaissanceExtended
         }
-        elseIf ($answer -eq $Script:Exit) {
-            Stop-AS2GoDemo
-        }
-        else {
-        }
-
-        #If (-not $SkipClearHost) { Clear-Host }
-
-        If ($UnAttended) {
-            $repeat = $Script:No
-        }
-        else {
-            $title = "REPEAT | Attack Phase - $($Script:Phase09)"
-            $repeat = Show-DecisionPrompt -Default 1 -Title $title
-        }
-   
-    } Until ($repeat -eq $Script:No)  
+    }
+    elseIf ($answer -eq $Script:Exit) {
+        Stop-AS2GoDemo
+    }
+    else {
+    }
 
     Measure-FunctionRuntime -End -Details $Info
 }

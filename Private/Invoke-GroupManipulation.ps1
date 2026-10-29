@@ -26,8 +26,8 @@ Requires initialized AS2Go settings and permission to change the selected group 
 Category: Main Function
 
 .FUNCTIONALITY
-Selects an AD scope and finds privileged groups using the configured group RIDs.
-After confirmation, removes direct members while retaining the protected break-glass and backdoor account SIDs.
+Demonstrates administrative lockout by removing direct members from configured privileged groups in a chosen scope.
+After confirmation, retains memberships matching the protected break-glass and backdoor account SIDs.
 #>
 function Invoke-GroupManipulation {
 
@@ -38,6 +38,7 @@ function Invoke-GroupManipulation {
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
+    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
 
     $BGA = "S-1-5-21-18515944-1610616278-1029250612-500"
     $BDA = "S-1-5-21-18515944-1610616278-1029250612-500"
@@ -103,6 +104,7 @@ function Invoke-GroupManipulation {
     }
 
     Write-AS2GoOutput -Type Header -Message "Identified privileged groups"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
    
     If ($groups) {
 

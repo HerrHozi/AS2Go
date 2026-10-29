@@ -61,7 +61,7 @@
           "Value": "DC=WS19-CHILD01,DC=WS19-ROOT,DC=CORP"
         },
         {
-          "Name": "OfflineDITFile",
+          "Name": "BackupShare",
           "Value": "\\\\CH01-DC19-01\\AD-Backup"
         },
         {

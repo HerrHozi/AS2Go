@@ -1,3 +1,12 @@
+<#
+.SYNOPSIS
+Edits the selected GPO to add Domain Users to built-in Administrators and Remote Desktop Users groups.
+
+.FUNCTIONALITY
+Edits the selected GPO to add Domain Users to built-in Administrators and Remote Desktop Users groups.
+Also adds the configured backdoor account to Administrators when resolved.
+Demonstrates excessive local access through Group Policy Preferences on computers applying this GPO.
+#>
 function Add-GPOMemberToBuiltinGroups {
 
     ################################################################################
@@ -18,6 +27,7 @@ function Add-GPOMemberToBuiltinGroups {
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type Header -Message "Add or Update Built-in Admin Group Members"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     Write-AS2GoOutput -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
     
     If ($UnAttended) {
@@ -72,7 +82,7 @@ function Add-GPOMemberToBuiltinGroups {
             Write-Log -Message "    >> found file: $xmlFilePath"
         }
 
-        Set-gPCmachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDLocalUaG -TOOLGUID $Script:ToolGUIDLocalUaG -Server $domainDNS
+        Set-GPCMachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDLocalUaG -TOOLGUID $Script:ToolGUIDLocalUaG -Server $domainDNS
         Start-Sleep 1
             
         [xml]$xml = Get-Content $xmlFilePath

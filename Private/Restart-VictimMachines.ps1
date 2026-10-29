@@ -1,6 +1,17 @@
+<#
+.SYNOPSIS
+Demonstrates service disruption by requesting forced restarts of reachable configured victim machines.
+
+.FUNCTIONALITY
+Demonstrates service disruption by requesting forced restarts of reachable configured victim machines.
+Uses the configured restart delay and warning message, skips the local computer, and reports unreachable targets.
+#>
 function Restart-VictimMachines {
 
     $Info = Measure-FunctionRuntime -Begin
+
+    Write-AS2GoOutput -Type Header -Message "Restart-VictimMachines"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     #Write-AS2GoOutput -Type Header -Message "TRY to reboot all DCs and Victim machine"
 

@@ -143,14 +143,20 @@ function Initialize-AS2GoLabConfiguration {
     .LINK
     https://learn.microsoft.com/en-us/powershell/scripting/developer/help/writing-help-for-powershell-functions
     #>
-    [Alias("Initialize-AS2GoDemo")]
+    [Alias("Initialize-AS2GoDemo", "ASP00")]
     param(
+        [switch]$Preview,
         [string] $AS2GoOU = "AS2Go", 
         [ValidatePattern('^\S+$')]
         [string] $Scenario = "AS2Go",
         [Switch] $EnableLogging,
         [Switch] $DeveloperMode
     )
+    if ($Preview) {
+        Show-AS2GoPreview -FunctionName 'Initialize-AS2GoLabConfiguration' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
+        return
+    }
+
 
     If ($DeveloperMode) {
         $EnableLogging = $true
@@ -270,8 +276,6 @@ function Initialize-AS2GoLabConfiguration {
     $Script:MoAD = Test-PoSHModuleAvailability -PSModule "ActiveDirectory"
     $Script:MoGPO = Test-PoSHModuleAvailability -PSModule "GroupPolicy"
     $Script:MoDNS = Test-PoSHModuleAvailability -PSModule "DnsServer"
-
-
 
 
 
@@ -404,8 +408,13 @@ function Initialize-AS2GoLabConfiguration {
             }
 
         }
+        
+        if ($decision -notmatch 'Q|Verify') {
+            Set-ASConfig -Setting "LastConfig" -Value $(Get-Date -Format 'yyyy-MM-dd')
+        }
+    
+    
     } Until ($repeat -eq $Script:No)
-
     Measure-FunctionRuntime -End -Details $Info
 
     Write-AS2GoOutput -Type  Header -M "Any feedback is welcome - zimmermann.holger@live.de!"

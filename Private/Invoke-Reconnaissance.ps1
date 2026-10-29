@@ -53,7 +53,7 @@ function Invoke-Reconnaissance {
     Write-Highlight -Text "Get-ADGroupMember ", "-Identity """, $Script:GroupDA.samaccountname, """ -Recursive |", " Select-Object", " -First", " 10 |", " Format-Table" `
         -Color    $fgcC, $fgcS, $fgcV, $fgcS, $fgcC, $fgcS, $fgcV, $fgcC  
 
-    Get-PriviledgeGroupMember -Group $Script:GroupDA
+    Get-PrivilegeGroupMember -Group $Script:GroupDA
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }

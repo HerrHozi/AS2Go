@@ -33,14 +33,15 @@ function Initialize-AS2GoTools {
     Write-AS2GoOutput -Type Header -Message "Prepare folder for Malicious Tools"
     $Functionality = (Get-Help $CurrentFunction).Functionality
     Write-AS2GoOutput -Type H1 -Message $Functionality
-    Write-AS2GoOutput -Type H1 -Message "Steps to do:`n"
     Write-AS2GoOutput -Type Bullet -Message "Define or create a folder to store malicious tools, such as Rubeus, Certify"
     Write-AS2GoOutput -Type Bullet -Message "Microsoft Defender: Disable real-time monitoring."
     Write-AS2GoOutput -Type Bullet -Message "Microsoft Defender: Add exclusions for the tools folder."
     Write-AS2GoOutput -Type Bullet -Message "Extract malicious tools to the designated folder."
 
-    $answer = Show-DecisionPrompt
-    If ($answer -ne $script:Yes) { return }
+    If ($Script:Yes -ne $(Show-DecisionPrompt)) {
+        Write-Log -Message "User chose not to proceed this operation"
+        return
+    }
 
     $defaultFolder = "$($Script:AS2GoPublicDir)\MaliciousTools"
     $title = "Confirm or change folder for malicious tools."

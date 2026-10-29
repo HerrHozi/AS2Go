@@ -6,9 +6,13 @@
     This function performs a password spray attack by attempting to authenticate multiple Active Directory users
     with one or more passwords. It provides multiple scope options (Forest, Root Domain, Current Domain, or specific OU)
     and allows the user to configure the attack parameters interactively or in unattended mode.
-    
+
     The function performs password spray attacks using both standard authentication methods and Rubeus (if available).
     It checks domain password policies to calculate maximum safe spray attempts without locking accounts.
+
+.PARAMETER Preview
+Browses descriptions and workflow steps offline without executing actions.
+Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
     When specified, skips all interactive prompts and uses default values for automated execution.
@@ -35,7 +39,7 @@
     Invoke-ASPhase04BruteForceAttack
 
 .FUNCTIONALITY
-    Executes a password spray attack against Active Directory users, 
+    Executes a password spray attack against Active Directory users,
     attempting to authenticate multiple accounts with one or more passwords within the specified scope.
 
 #>
@@ -43,13 +47,14 @@
 function Invoke-ASPhase04BruteForceAttack {
 
     ################################################################################
-    #####                                                                      ##### 
-    #####    Run the Attack Phase - Brute Force Account                        #####                               
+    #####                                                                      #####
+    #####    Run the Attack Phase - Brute Force Account                        #####
     #####                                                                      #####
     ################################################################################
-    
+
     [Alias("ASP04", "PwSpray")]
-    Param (  
+    Param (
+        [switch]$Preview,
         [switch]$UnAttended,
         [switch]$Continue,
         [Switch]$EnableLogging,
@@ -60,6 +65,11 @@ function Invoke-ASPhase04BruteForceAttack {
         [Alias("DelevoperMode")]
         [switch]$DeveloperMode
     )
+    if ($Preview) {
+        Show-AS2GoPreview -FunctionName 'Invoke-ASPhase04BruteForceAttack' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
+        return
+    }
+
 
     $Info = Measure-FunctionRuntime -Begin
 
@@ -71,59 +81,42 @@ function Invoke-ASPhase04BruteForceAttack {
 
     If (-not $AS2GoDemo) { Set-NewColorSchema -NewStage $Script:InitialStart }
     If (-not $SkipClearHost) { Clear-Host }
-    
+
     Update-WindowTitle -NewTitle $Script:Phase04
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase04
-    
-        Show-CurrentPhase -Phase "phase_04.html"
-    
-        Do {
-            # If ($skipstep) { break }            
-        
-            If (-not $SkipClearHost) { Clear-Host }
-            Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase04.toupper())"
-            Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
-                
-            If ($AS2GoDemo) {
-                if ($UnAttended -eq $true) {
-                    If ($SkipPasswordSpray -eq $false)
-                    { $answer = $Script:Yes }
-                    else
-                    { $answer = $Script:No }
-                }
-                else {
-                    $answer = Show-DecisionPrompt
-                }
-            }
-            else {
-                $answer = $Script:Yes
-            }
-
-            If ($answer -eq $Script:Yes) {
-                New-PasswordSprayAttack
-            }
-            elseIf ($answer -eq $Script:Exit) {
-                Stop-AS2GoDemo
-            }
-            else {
-            }
-
-            If (-not $AS2GoDemo) { break }
-
-            #If (-not $SkipClearHost) { Clear-Host }
+    Show-CurrentPhase -Phase "phase_04.html"
 
 
-            If ($UnAttended) {
-                $repeat = $Script:No
-            }
-            else {
-                $title = "REPEAT | Attack Phase - $($Script:Phase04)"
-                $repeat = Show-DecisionPrompt -Default 1 -Title $title
-            }
-
-        } Until ($repeat -eq $Script:No)
+    If (-not $SkipClearHost) { Clear-Host }
+    Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase04.toupper())"
+    Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
 
-        Measure-FunctionRuntime -End -Details $Info
+    If ($AS2GoDemo) {
+        if ($UnAttended -eq $true) {
+            If ($SkipPasswordSpray -eq $false)
+            { $answer = $Script:Yes }
+            else
+            { $answer = $Script:No }
+        }
+        else {
+            $answer = Show-DecisionPrompt
+        }
     }
+    else {
+        $answer = $Script:Yes
+    }
+
+    If ($answer -eq $Script:Yes) {
+        New-PasswordSprayAttack
+    }
+    elseIf ($answer -eq $Script:Exit) {
+        Stop-AS2GoDemo
+    }
+    else {
+    }
+
+
+    Measure-FunctionRuntime -End -Details $Info
+}

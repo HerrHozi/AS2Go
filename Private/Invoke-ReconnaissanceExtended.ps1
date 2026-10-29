@@ -52,7 +52,7 @@ function Invoke-ReconnaissanceExtended {
     Write-Highlight -Text ("Get-ADGroupMember ", "-Identity ", "'$($Script:GroupDNSA.sid)' ", "-Recursive | ", "FT") `
         -Color $fgcC, $fgcS, $fgcV, $fgcC, $fgcS
     Write-Host ""
-    Get-PriviledgeGroupMember -group $Script:GroupDNSA
+    Get-PrivilegeGroupMember -group $Script:GroupDNSA
     Write-Host ""
     Write-Host ""
     
@@ -67,7 +67,7 @@ function Invoke-ReconnaissanceExtended {
     
     #Write-Host " Get-ADGroupMember -Identity 'Enterprise Admins' -Recursive | ft" -ForegroundColor $Script:FGCCommand
     Write-Host ""
-    Get-PriviledgeGroupMember -group $Script:GroupEA
+    Get-PrivilegeGroupMember -group $Script:GroupEA
     Write-Host ""
     
     
