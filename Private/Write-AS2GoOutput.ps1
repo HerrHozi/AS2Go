@@ -144,8 +144,14 @@ Write-AS2GoOutput {
             $level = "INFO"
         }
         "Warning" { 
-            $warn = [char]0x26A0
-            Write-Host "`n  [!] WARNING: $Message`n`n"  -ForegroundColor $Script:FGCWarning
+            If ($NoExtraLines) {
+                Write-host "  [!] " -NoNewline -ForegroundColor $Script:FGCWarning
+                Write-Warning $Message
+            }
+            Else {
+                Write-host "`n  [!] " -NoNewline -ForegroundColor $Script:FGCWarning
+                Write-Warning "$Message`n`n"
+            }   
             $level = "WARN" 
         }
         "Bullet" { 
@@ -193,7 +199,7 @@ Write-AS2GoOutput {
             $level = "ERROR"
         }
         "H1" { 
-            Write-Host "$Message"    -ForegroundColor $Script:FGCH1
+            Write-Host "$Message`n"    -ForegroundColor $Script:FGCH1
             $level = "INFO"
         }
         default { 

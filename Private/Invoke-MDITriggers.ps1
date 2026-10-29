@@ -58,7 +58,6 @@ function Invoke-MDITriggers {
 
  
         $decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
-        Clear-Host
         
         switch ($decision) {
 
@@ -71,7 +70,7 @@ function Invoke-MDITriggers {
                 }
             }
             "HoneyToken" {
-                Set-HoneyToken
+                Set-Honeytoken
             }
             $Script:Skip {
                 Write-Log -Message "Skipped MDI specific detections!"

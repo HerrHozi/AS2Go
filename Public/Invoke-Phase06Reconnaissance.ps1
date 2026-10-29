@@ -7,13 +7,17 @@ Invoke-ASPhase06Reconnaissance executes the reconnaissance phase in the AS2Go wo
 It prepares phase context, optionally displays phase visuals, and runs baseline reconnaissance
 tasks with optional extended reconnaissance.
 
-In AS2Go demo mode, execution is interactive (or unattended) and can be repeated.
+In AS2Go demo mode, execution is interactive (or unattended) and runs once per invocation.
 Outside demo mode, the phase runs once with default confirmation behavior.
 
 The phase includes actions such as:
 - Collecting reconnaissance and configuration data
 - Running standard reconnaissance tasks
 - Optionally running extended reconnaissance tasks
+
+.PARAMETER Preview
+Browses descriptions and workflow steps offline without executing actions.
+Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
 Runs the phase without interactive confirmation prompts.
@@ -54,12 +58,13 @@ Part of: AS2Go attack phase orchestration
 function Invoke-ASPhase06Reconnaissance {
 
     ################################################################################
-    #####                                                                      ##### 
-    #####    Phase 06 - Reconnaissance with non privileged user                #####                               
+    #####                                                                      #####
+    #####    Phase 06 - Reconnaissance with non privileged user                #####
     #####                                                                      #####
     ################################################################################
-    
-    Param (  
+
+    Param (
+        [switch]$Preview,
         [switch]$UnAttended,
         [switch]$Continue,
         [Switch]$EnableLogging,
@@ -67,77 +72,66 @@ function Invoke-ASPhase06Reconnaissance {
         [switch]$SkipClearHost,
         [switch]$AS2GoDemo
     )
+    if ($Preview) {
+        Show-AS2GoPreview -FunctionName 'Invoke-ASPhase06Reconnaissance' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
+        return
+    }
+
 
     $Info = Measure-FunctionRuntime -Begin
-    
-    If (-not $AS2GoDemo) { 
+
+    If (-not $AS2GoDemo) {
         Set-NewColorSchema -NewStage $Script:InitialStart
-        Get-AS2GoSettings 
+        Get-AS2GoSettings
     }
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    
+
 
     Update-WindowTitle -NewTitle $Script:Phase06
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
     Show-CurrentPhase -Phase "phase_06.html"
-    Do {
-        # If ($skipstep) { break }     
-        If (-not $SkipClearHost) { Clear-Host }
-        
-        Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase06.toupper())"
-        $Functionality = "This phase involves collecting reconnaissance and configuration data with a non-privileged user."
-        Write-AS2GoOutput -Type H1 -Message $Functionality
+    If (-not $SkipClearHost) { Clear-Host }
 
-        If ($AS2GoDemo) {
-            If ($UnAttended) {
-                $answer = $Script:Yes
-            }
-            else {
-                $question = "Would you like to run this step - Y or N? Default "
-                $answer = Get-Answer -question $question -defaultValue $Script:Yes
-            }
+    Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase06.toupper())"
+    $Functionality = "This phase involves collecting reconnaissance and configuration data with a non-privileged user."
+    Write-AS2GoOutput -Type H1 -Message $Functionality
+
+    If ($AS2GoDemo) {
+        If ($UnAttended) {
+            $answer = $Script:Yes
         }
         else {
-            $answer = $Script:Yes
+            $question = "Would you like to run this step - Y or N? Default "
+            $answer = Get-Answer -question $question -defaultValue $Script:Yes
+        }
+    }
+    else {
+        $answer = $Script:Yes
+    }
+
+    If ($answer -eq $Script:Yes) {
+        Invoke-Reconnaissance
+        $reconnaissance = $Script:No
+
+        If ($UnAttended) {
+            $answer = $reconnaissance
+        }
+        else {
+            $question = "Further reconnaissance tasks - Y or N? Default "
+            $answer = Get-Answer -question $question -defaultValue $reconnaissance
         }
 
         If ($answer -eq $Script:Yes) {
-            Invoke-Reconnaissance
-            $reconnaissance = $Script:No
-
-            If ($UnAttended) {
-                $answer = $reconnaissance
-            }
-            else {
-                $question = "Further reconnaissance tasks - Y or N? Default "
-                $answer = Get-Answer -question $question -defaultValue $reconnaissance
-            }
-
-            If ($answer -eq $Script:Yes) {
-                Invoke-ReconnaissanceExtended
-            }
+            Invoke-ReconnaissanceExtended
         }
-        elseIf ($answer -eq $Script:Exit) {
-            Stop-AS2GoDemo
-        }
-        else {
-        }
-
-        If (-not $AS2GoDemo) { break }
-        #        If (-not $SkipClearHost) { Clear-Host }
-        #        Write-AS2GoOutput -Type  Header -M "??? REPEAT | Attack Phase - $($Script:Phase06)  ???"
-
-        If ($UnAttended) {
-            $repeat = $Script:No
-        }
-        else {
-            $title = "REPEAT | Attack Phase - $($Script:Phase06)"
-            $repeat = Show-DecisionPrompt -Default 1 -Title $title
-        }
-
-    } Until ($repeat -eq $Script:No)  
+    }
+    elseIf ($answer -eq $Script:Exit) {
+        Stop-AS2GoDemo
+    }
+    else {
+    }
 
     Measure-FunctionRuntime -End -Details $Info
 }

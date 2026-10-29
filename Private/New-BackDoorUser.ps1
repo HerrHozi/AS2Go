@@ -9,9 +9,9 @@ Creates and enables an account, attempts to assign privileged group memberships,
 Category: Main Function
 
 .FUNCTIONALITY
-Creates and enables a backdoor AD account, then attempts to assign privileged group memberships.
-On success, displays generated credentials, checks group memberships, and tests account sign-in.
-Attempts to launch PowerShell under the new account.
+Creates an enabled backdoor account with a non-expiring password and attempts privileged group assignments.
+Demonstrates persistence through administrative access; displays credentials and tests group membership and sign-in.
+Attempts to open PowerShell as the new account.
 #>
 function New-BackDoorUser {
     
@@ -22,6 +22,10 @@ function New-BackDoorUser {
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
+
+    Write-AS2GoOutput -Type Header -Message "New-BackDoorUser"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
 
     $FirstName = Get-Date -Format HHmmss
     $LastName = Get-Date -Format yyyyMMdd

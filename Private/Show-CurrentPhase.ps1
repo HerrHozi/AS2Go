@@ -21,9 +21,19 @@ Function Show-CurrentPhase {
 
     If (-not $SkipImages) { 
 
-        $fullpath = Join-Path $Script:ASPhases -ChildPath $Phase  
-        Invoke-Item $fullpath
-        Write-Log -Message "    Opened File: $fullpath"
+        If ($Phase.tolower().StartsWith("http")) {
+
+            Start-Process $Phase
+            Write-Log -Message "    Opened link: $Phase"
+
+        }
+        else {
+            $fullpath = Join-Path $Script:ASPhases -ChildPath $Phase  
+            Invoke-Item $fullpath
+            Write-Log -Message "    Opened File: $fullpath"
+        }
+
+
     }
     else {
         Write-Log -Message "    Skipped displaying phase: $Phase"

@@ -1,3 +1,12 @@
+<#
+.SYNOPSIS
+Edits the selected GPO security template to assign debug, operating-system, and remote-interactive-logon rights.
+
+.FUNCTIONALITY
+Edits the selected GPO security template to assign debug, operating-system, and remote-interactive-logon rights.
+Adds Everyone for missing assignments or Authenticated Users to existing assignments.
+Demonstrates dangerous privilege delegation through policy settings on computers applying this GPO.
+#>
 function Add-GPOUserRightAssignments {
 
     ################################################################################
@@ -21,6 +30,7 @@ function Add-GPOUserRightAssignments {
 
 
     Write-AS2GoOutput -Type Header -Message "Add or Update User Rights Assignment"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     Write-AS2GoOutput -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
 
     If ($UnAttended) {
@@ -64,7 +74,7 @@ function Add-GPOUserRightAssignments {
         }
         
 
-        Set-gPCmachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDSecurity -TOOLGUID $Script:ToolGUIDComputerPolicySettings -server $server
+        Set-GPCMachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDSecurity -TOOLGUID $Script:ToolGUIDComputerPolicySettings -server $server
 
         $FileContent = Get-Content -Path $infFilePath
 

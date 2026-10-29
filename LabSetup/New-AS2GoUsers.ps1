@@ -111,7 +111,7 @@ $TimeSpan = New-TimeSpan -Days 7 -Hours 0 -Minutes 0
 #Service to create SPN
 $services = ("HTTPS","FTP","CIFS","kafka","MSSQL","POP3","HTTP")
 
-Function New-AG2GoUserAccount()
+Function New-AS2GoUserAccount()
 {
 
 param([string] $sUserPrincipalName, 
@@ -184,7 +184,7 @@ if ($SkipVictim -eq $false)
   $bthumbnailPhoto     = $VIPhoto
   $sPath               = $AS2GoUser[2].Path
 
-  New-AG2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $VISecurePass
+  New-AS2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $VISecurePass
   $sName = $sSamAccountName
 
   Add-ADGroupMember -Identity $VIGroup -Members $sName
@@ -206,7 +206,7 @@ if ($SkipHelpDesk -eq $false)
   $sPath               = $AS2GoUser[1].Path
 
   
-  New-AG2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $HDSecurePass
+  New-AS2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $HDSecurePass
   $sName = $sSamAccountName
   Add-ADGroupMember -Identity $HDGroup  -Members $sName
   Set-ADUser $sName -Replace @{thumbnailPhoto=([byte[]](Get-Content $bthumbnailPhoto -Encoding byte))} -Manager $HDManager -Initials "HD" -Title "Helpdesk" -Department "Tier 1"
@@ -223,7 +223,7 @@ if ($SkipHelpDesk -eq $false)
   $bthumbnailPhoto     = $HDPhoto
   $sPath               = $AS2GoUser[0].SVCAccounts
 
-  New-AG2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $HDSecurePass
+  New-AS2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $HDSecurePass
   $sName = $sSamAccountName
     Add-ADGroupMember -Identity $ProtectedUser -Members $sName
   Add-ADGroupMember -Identity $DomainAdmins  -Members $sName
@@ -254,7 +254,7 @@ if ($SkipDomainAdmin -eq $false)
   $bthumbnailPhoto     = $DAPhoto
   $sPath               = $AS2GoUser[0].Path
 
-  New-AG2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $DASecurePass
+  New-AS2GoUserAccount -sUserPrincipalName $sUserPrincipalName -sName $sName -sSamaccountName $sSamAccountName -sFirstName $sFirstName -sLastname $sLastname -sDisplayName $sDisplayName -sPath $sPath -secure_string_pwd $DASecurePass
 
   $sName = $sSamAccountName
   Add-ADGroupMember -Identity $DomainAdmins -Members $sName

@@ -10,8 +10,8 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermannn.holger@live.de
-Current Version: 2026.10.25.796
-Last Update:     2026-10-25
+Current Version: 2026.10.29.203
+Last Update:     2026-10-29
 ```
 
 AS2Go (**Attack Scenario to Go**) is a PowerShell-based Active Directory attack simulation and training framework designed for demos, workshops, security awareness sessions, and purple team exercises.
@@ -199,3 +199,28 @@ If you share improvements, include:
 ## Acknowledgments
 
 Thanks to the security community and tool authors whose research and utilities support realistic defensive training labs.
+
+## Offline preview
+
+```powershell
+Start-AS2GoDemo -Preview
+Invoke-ASPhase07PrivilegeEscalation -Preview
+Initialize-AS2GoLabConfiguration -Preview
+```
+
+Every public function accepts `-Preview`. Preview returns before live initialization,
+configuration writes, AD queries or external tools. It does not require domain membership.
+The existing module-import initialization is unchanged.
+
+Preview uses a separate numbered navigation menu built from workflow calls and help in
+the source files. Choose a step to view its description and child steps; Enter returns
+or exits, and `?` displays menu help. Leaf steps show literal planned source commands.
+Expressions remain literal and are never executed. Kerberoasting includes an offline
+domain-choice prompt and placeholder values for the domain, DC and output location.
+
+`-Preview -UnAttended` prints the reachable workflow without prompting. The live
+workflow's technique, continuation and skip parameters are not evaluated in preview:
+this is a source browser, not a simulation of runtime conditions or AD results.
+The existing `-Simulation` switch retains its original meaning.
+
+Run offline checks with `./Tests/Preview.Tests.ps1`.

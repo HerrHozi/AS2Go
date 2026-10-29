@@ -18,7 +18,7 @@ function Set-BreakGlassAccount {
     Write-AS2GoOutput -Type Header -Message "Define a Break Glass Account"
     Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
 
-    #start main code
+   
     $previousDN = Get-ASConfig -Setting "BreakGlassAccount"
 
     If ($previousDN -match 'OU=|CN=|DC=' ) {
@@ -36,7 +36,8 @@ function Set-BreakGlassAccount {
 
     $Options = @(
         [pscustomobject] @{ Label = "&Previous Break Glass Account"; Help = $HelpP ; Value = "Previous" },
-        [pscustomobject] @{ Label = "Select &new Break Glass Account"; Help = "Choose a dedicated Break Glass Account."; Value = "New" }
+        [pscustomobject] @{ Label = "Select &new Break Glass Account"; Help = "Choose a dedicated Break Glass Account."; Value = "New" },
+        [pscustomobject] @{ Label = "&Skip"; Help = "Skip selecting a Break Glass Account."; Value = "Skip" }
     )
     $Decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $Title
 
@@ -46,9 +47,12 @@ function Set-BreakGlassAccount {
         $result = Convert-FromDNToCN -DistinguishedName $result
         Write-AS2GoOutput -Type TextMaker -Message "New Break Glass Account:" -Tm $result
     }
-    else {
+    elseif ($Decision -eq "Previous") {
         Write-AS2GoOutput -Type Info -message "Keep previous Break Glass Account!"    
-    }   
+    }
+    else {
+        Write-AS2GoOutput -Type Info -message "Skipping Break Glass Account selection!"
+    }
     #end main code
     
     Measure-FunctionRuntime -End -Details $Info 

@@ -1,4 +1,4 @@
-function Set-gPCmachineExtensionNames {
+function Set-GPCMachineExtensionNames {
 
     ################################################################################
     #####                                                                      ##### 
@@ -35,7 +35,7 @@ function Set-gPCmachineExtensionNames {
             $skipUpdate = $true
         }
         else {
-            $newvalue = New-GpCExtention -CSEGUID $Script:CSEGUIDScheduledTask -TOOLGUID $Script:ToolGUIDScheduledTask -OldValue $gpo.gPCmachineExtensionNames
+            $newvalue = New-GPCExtension -CSEGUID $Script:CSEGUIDScheduledTask -TOOLGUID $Script:ToolGUIDScheduledTask -OldValue $gpo.gPCmachineExtensionNames
         }
     }
     elseif ($TOOLGUID -eq $Script:ToolGUIDLocalUaG) {
@@ -44,7 +44,7 @@ function Set-gPCmachineExtensionNames {
             $skipUpdate = $true
         }
         else {
-            $newvalue = New-GpCExtention -CSEGUID $Script:CSEGUIDLocalUaG -TOOLGUID $Script:ToolGUIDLocalUaG -OldValue $gpo.gPCmachineExtensionNames
+            $newvalue = New-GPCExtension -CSEGUID $Script:CSEGUIDLocalUaG -TOOLGUID $Script:ToolGUIDLocalUaG -OldValue $gpo.gPCmachineExtensionNames
         }
     }
     elseif ($TOOLGUID -eq $Script:ToolGUIDComputerPolicySettings) {
@@ -53,7 +53,7 @@ function Set-gPCmachineExtensionNames {
             $skipUpdate = $true
         }
         else {
-            $newvalue = New-GpCExtention -CSEGUID $Script:CSEGUIDSecurity -TOOLGUID $Script:ToolGUIDComputerPolicySettings -OldValue $gpo.gPCmachineExtensionNames
+            $newvalue = New-GPCExtension -CSEGUID $Script:CSEGUIDSecurity -TOOLGUID $Script:ToolGUIDComputerPolicySettings -OldValue $gpo.gPCmachineExtensionNames
         }
 
     }

@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+Adds a scheduled-task entry to the selected GPO template in SYSVOL and registers its policy extension.
+
+.FUNCTIONALITY
+Adds a scheduled-task entry to the selected GPO template in SYSVOL and registers its policy extension.
+Demonstrates how writable Group Policy Preferences can distribute scheduled tasks to computers applying the GPO.
+#>
 function Add-GPOScheduleTask {
 
     ################################################################################
@@ -18,6 +26,7 @@ function Add-GPOScheduleTask {
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type Header -Message "Add a Malicious Scheduled Task"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     Write-AS2GoOutput -Type TextMaker -Message "Affected GPO" -TM "'$name' {$ID}"
 
     If ($UnAttended) {
@@ -56,7 +65,7 @@ function Add-GPOScheduleTask {
             Add-TaskElementToFileScheduleTaskXml -xmlFilePath $xmlFilePath
         }
         
-        Set-gPCmachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDScheduledTask -TOOLGUID $ToolGUIDScheduledTask -Server $server
+        Set-GPCMachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDScheduledTask -TOOLGUID $ToolGUIDScheduledTask -Server $server
         if (-not $unAttended) { pause }
     
     }

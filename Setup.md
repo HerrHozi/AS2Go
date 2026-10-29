@@ -1,348 +1,202 @@
 # AS2Go Lab Setup Guide
 
-## Overview
+## Scope and Safety
 
-This guide covers the initial setup and configuration of an AS2Go (Attack Scenario to Go) lab environment. AS2Go is a PowerShell-based Active Directory attack simulation framework designed for security training, blue team exercises, and detection engineering.
+AS2Go (Attack Scenario to Go) demonstrates known Active Directory attack techniques for security training and detection validation. Use it only in an isolated, explicitly authorized lab with non-production accounts and sample data. Do not run it in production.
 
-## Minimum Requirements
+Live setup changes Active Directory, certificate services, DNS settings, and file shares, depending on the selected options. Some scenarios change permissions, establish persistence, encrypt files, or restart systems. Take coordinated snapshots before configuration and before running scenarios.
 
-### Infrastructure
-- **Active Directory Domain Controller (DC)** — Windows Server with Active Directory Domain Services
-- **Member Server or Client** — Windows Server or Client OS joined to the domain
-- **Isolated Network** — No internet access or restricted egress to prevent unintended exposure
-- **System Snapshots** — Recommended before and after each lab run
+Editing this guide or reviewing the source does not require a domain-joined computer. Offline preview also does not require domain membership. Live initialization checks domain membership and normally stops on a computer outside the domain.
 
-### Software & Prerequisites
-- **PowerShell 7.1 or higher** — Installed on all lab systems
-- **ActiveDirectory PowerShell Module** — For domain management
-- **GroupPolicy PowerShell Module** — For GPO operations
-- **AS2Go Module** — Import locally or from PowerShell Gallery
+## 1. Prepare the Lab
 
-### Permissions
-- **Enterprise Admin** or **Domain Admin** credentials
-- **Elevated privileges (Run as Administrator)** on the member server/client
-- **Local Administrator** rights on systems running simulation phases
+| Component | Purpose |
+| --- | --- |
+| Active Directory test domain with at least one DC and working DNS | Directory services and lab targets |
+| Domain-joined Windows member server or workstation | Victim machine and preferred execution point for initial configuration |
+| Additional workstation for SAW/PAW scenarios | Administrative activity used by selected scenarios |
+| AD Certificate Services | Required for certificate-based scenarios; configurable through setup |
+| Defender for Identity, Defender for Endpoint, or a SIEM | Optional monitoring for validating detections |
 
-### Optional Tools (for advanced phases)
-Depending on which attack phases you want to simulate:
-- Certify.exe
-- Mimikatz.exe
-- Rubeus.exe
-- NetSess.exe
-- PsExec.exe
+Use an isolated network with restricted egress. Obtain installation packages before disconnecting the lab, or use controlled access during preparation. The member computer must resolve the lab domain and controllers through lab DNS. Remote setup requires the applicable management connections, including PowerShell remoting and SMB for backup-share setup.
 
-These tools are placed in the `./Tools/` directory and referenced by various attack functions.
+For live initialization, open an elevated PowerShell session using a lab account in Domain Admins or Enterprise Admins. The initializer checks that group membership; Enterprise Admin privileges are recommended for full configuration. Local elevation alone does not grant directory permissions. Later scenarios may use different identities: follow their prompts rather than running every phase as the setup administrator.
 
----
+Check actual computer membership rather than relying on the username shown by `whoami.exe`:
 
-## Lab Architecture (Minimum Setup)
-
-```
-┌─────────────────────────────────────────┐
-│  Domain: contoso.com (or your domain)   │
-├─────────────────────────────────────────┤
-│                                         │
-│  ┌──────────────────────────────────┐  │
-│  │  Domain Controller (DC)          │  │
-│  │  • Hosts Active Directory        │  │
-│  │  • Hosts DNS                     │  │
-│  │  • Hosts ADCS (Certificate Auth) │  │
-│  │  • Hosts backup share (optional) │  │
-│  └──────────────────────────────────┘  │
-│              ↕ (Network)                │
-│  ┌──────────────────────────────────┐  │
-│  │  Member Server / Client          │  │
-│  │  • Lab init execution point      │  │
-│  │  • Attack scenario simulator     │  │
-│  │  • Telemetry consumer            │  │
-│  └──────────────────────────────────┘  │
-│                                         │
-│  ┌──────────────────────────────────┐  │
-│  │  Monitoring (optional)           │  │
-│  │  • Defender for Identity (MDI)   │  │
-│  │  • Microsoft Sentinel / SIEM     │  │
-│  │  • Event Log aggregation         │  │
-│  └──────────────────────────────────┘  │
-│                                         │
-└─────────────────────────────────────────┘
-```
-
----
-
-## Step-by-Step Setup
-
-### Step 1: Prepare the Environment
-
-1. **Create or use an existing isolated lab domain**
-   - Domain name: `contoso.com` (or your test domain)
-   - Ensure there is at least one functional Domain Controller
-
-2. **Join a member server or client to the domain**
-   - Use a clean image or snapshot
-   - Ensure network connectivity to the DC
-   - Verify domain membership with `whoami.exe` (should show `DOMAIN\username`)
-
-3. **Verify network connectivity**
-   ```powershell
-   # From member server/client, verify DC connectivity
-   nslookup <DCName>
-   nltest /dclist:contoso
-   ```
-
-### Step 2: Install PowerShell 7.1+ and Required Modules
-
-1. **Install PowerShell 7.1 or higher**
-   ```powershell
-   # Download from: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
-   # Or via winget:
-   winget install Microsoft.PowerShell
-   ```
-
-2. **Verify PowerShell version**
-   ```powershell
-   $PSVersionTable.PSVersion
-   # Should be 7.1 or higher
-   ```
-
-3. **Install required PowerShell modules**
-   ```powershell
-   # On the Domain Controller and member server:
-   Add-WindowsFeature RSAT-AD-PowerShell
-   Add-WindowsFeature RSAT-GroupPolicy-PowerShell
-   
-   # Or install manually:
-   Install-Module ActiveDirectory -Force
-   Install-Module GroupPolicy -Force
-   ```
-
-4. **Verify module availability**
-   ```powershell
-   Get-Module -ListAvailable | Select-Object Name, Version
-   # Should include: ActiveDirectory, GroupPolicy
-   ```
-
-### Step 3: Import the AS2Go Module
-
-**On the member server/client with Enterprise Admin rights:**
-
-#### Option A: Import from Local Path
 ```powershell
-# Navigate to the AS2Go module directory
-$AS2GoPath = "C:\Path\To\AS2Go\2026.05.11.755"
-Import-Module "$AS2GoPath\AS2Go.psd1" -Force -Verbose
+Get-CimInstance -ClassName Win32_ComputerSystem |
+    Select-Object Name, Domain, PartOfDomain
 
-# Verify successful import
+# Replace the example domain with your lab domain.
+Resolve-DnsName -Name 'contoso.com'
+nltest.exe /dsgetdc:contoso.com
+```
+
+## 2. Install PowerShell and Management Tools
+
+The module manifest declares PowerShell 7.1 as its minimum version. Install a supported PowerShell 7 release meeting this requirement on the execution computer and start `pwsh.exe` for AS2Go.
+
+Install the Windows management tools providing `ActiveDirectory`, `GroupPolicy`, and `DnsServer`. These are Windows/RSAT components, not modules to install through `Install-Module ActiveDirectory` or `Install-Module GroupPolicy`.
+
+On Windows Server, install the relevant features from elevated **Windows PowerShell**:
+
+```powershell
+Install-WindowsFeature -Name RSAT-AD-PowerShell, GPMC, RSAT-DNS-Server
+```
+
+On a supported Windows client, use **Optional Features** to install:
+
+- RSAT: Active Directory Domain Services and Lightweight Directory Services Tools
+- RSAT: Group Policy Management Tools
+- RSAT: DNS Server Tools
+
+Follow Microsoft's [RSAT installation instructions](https://learn.microsoft.com/en-us/windows-server/administration/install-remote-server-administration-tools) for your Windows edition and platform. See also [Installing PowerShell on Windows](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows).
+
+In PowerShell 7, verify availability and importability before live setup:
+
+```powershell
+$PSVersionTable.PSVersion
+Get-Module -ListAvailable -Name ActiveDirectory, GroupPolicy, DnsServer
+Import-Module -Name ActiveDirectory -SkipEditionCheck -ErrorAction Stop
+Import-Module -Name GroupPolicy -SkipEditionCheck -ErrorAction Stop
+Import-Module -Name DnsServer -SkipEditionCheck -ErrorAction Stop
+```
+
+## 3. Import AS2Go
+
+Keep the complete local module structure, including `Public`, `Private`, `Modules`, and `LabSetup`:
+
+```powershell
+# Replace this path with your local AS2Go folder.
+$AS2GoPath = 'C:\Labs\AS2Go'
+Import-Module -Name (Join-Path -Path $AS2GoPath -ChildPath 'AS2Go.psd1') -Force
 Get-Command -Module AS2Go | Select-Object Name
 ```
 
-#### Option B: Install from PowerShell Gallery
+Alternatively, install the published package:
+
 ```powershell
-Install-Module -Name AS2Go -Scope CurrentUser -Force
-Import-Module AS2Go -Force
+Install-Module -Name AS2Go -Scope CurrentUser
+Import-Module -Name AS2Go -Force
 ```
 
-### Step 4: Initialize the Lab Configuration
+The published package may differ from this checkout. Inspect its commands and parameters with `Get-Command` and `Get-Help`.
 
-**Execute on: Member Server / Client (with elevated PowerShell + Enterprise Admin credentials)**
+Import creates runtime directories below `$env:PUBLIC\AS2Go` and copies the bundled configuration to `Config\AS2Go.json` if that file does not already exist. Reimporting preserves an existing runtime configuration. Review saved hostnames, domains, accounts, UPN suffixes, and paths for your lab; bundled values may refer to the author's environment.
 
-Run the initialization function with default parameters:
+## 4. Review the Workflow Offline (Optional)
+
+With a checkout supporting `-Preview`, browse setup and demo steps before using the lab:
 
 ```powershell
-Initialize-2GoLabConfiguration
+Initialize-AS2GoLabConfiguration -Preview
+Start-AS2GoDemo -Preview
+
+# Print the demo workflow without interactive navigation.
+Start-AS2GoDemo -Preview -UnAttended
 ```
 
-#### What This Function Does
+Preview returns before live function initialization, AD queries, configuration writes, and tool execution. Module-import directory/configuration initialization still occurs. Preview shows source descriptions and planned commands; it does not validate connectivity, permissions, runtime choices, or detection results. `-Simulation` and `-DeveloperMode` are not substitutes for preview.
 
-The `Initialize-2GoLabConfiguration` function presents an interactive menu to configure:
+## 5. Initialize the Lab
 
-1. **Verify Configuration**
-   - Checks that all required AS2Go components are correctly deployed
-
-2. **Break Glass Account**
-   - Designates an account excluded from all attack scenarios (e.g., production critical account)
-
-3. **AS2Go Assets**
-   - Creates dedicated Active Directory groups (e.g., AS2Go-Admins, AS2Go-Users)
-   - Creates organizational units (OUs) for tiered asset management
-   - Sets up demo user containers
-
-4. **Demo Users**
-   - Creates sample user accounts for privilege escalation and manipulation scenarios
-
-5. **AD Certificate Services (ADCS)**
-   - Installs Active Directory Certificate Services on the DC
-   - Configures a Certification Authority (CA)
-   - Sets up a Web Enrollment Service
-   - Creates intentionally vulnerable certificate templates (e.g., ESC1 scenario)
-
-6. **Share**
-   - Creates a backup share on the DC
-   - Simulates a backup repository with demo backup files
-   - Used for reconnaissance and lateral movement scenarios
-
-7. **MDI Triggers**
-   - Configures DNS zone transfers (insecure for lab simulation)
-   - Sets up honeytokens for Defender for Identity detection tuning
-
-#### Optional Parameters
+On the domain-joined victim machine, use the elevated administrative PowerShell 7 session:
 
 ```powershell
-# Custom OU name and scenario abbreviation
-Initialize-2GoLabConfiguration -AS2GoOU "SecurityLab" -Scenario "SL"
+Initialize-AS2GoLabConfiguration
 
-# Enable logging for troubleshooting
-Initialize-2GoLabConfiguration -EnableLogging
-
-# Developer mode (timestamps for testing)
-Initialize-2GoLabConfiguration -DeveloperMode
+# Optional custom naming and logging:
+Initialize-AS2GoLabConfiguration -AS2GoOU 'SecurityLab' -Scenario 'SL' -EnableLogging
 ```
 
-#### Follow the Menu in Recommended Order
+The implemented setup parameters are `Preview`, `AS2GoOU`, `Scenario`, `EnableLogging`, and `DeveloperMode`. The UPN suffix comes from the saved `LastUPNSuffix` setting; `UPNSuffix` is not a parameter of this command. Developer mode enables logging and can use timestamp-based naming; it still performs live actions.
 
-1. Verify Configuration (validate pre-requisites)
-2. Break Glass Account (define protected account)
-3. AS2Go Assets (create OUs and groups)
-4. Demo Users (create user accounts)
-5. ADCS (certificate infrastructure)
-6. Share (backup simulation)
-7. MDI Triggers (detection tuning)
+Review the requirements confirmation and discovered forest, domain, controller, and account information. Work through the menu in its displayed order, revisiting **Verify Config** afterward:
 
----
+| Menu option | Action and considerations |
+| --- | --- |
+| Verify Config | Displays configured accounts, tiering assets, groups, demo users, and AD CS inventory. This is an informational review, not a comprehensive pass/fail test. |
+| Malicious Tools | Selects the tools folder, disables Defender real-time monitoring, adds a folder exclusion, attempts to copy archives, and guides manual extraction. These protection changes require explicit lab authorization and may be blocked by managed security policy. |
+| BGA | Stores the selected break-glass account for exclusion by scenario logic. This does not replace isolation or snapshots. |
+| SAW | Selects or records the Secure Access Workstation hostname; it does not provision or harden a workstation. |
+| AS2Go Assets | Creates dedicated tiering OUs and AD groups. Review the naming and scope. |
+| Demo Users | Creates demonstration accounts. Review the selected OU and account details. |
+| ADCS | Offers CA/Web Enrollment setup and intentionally vulnerable certificate templates, including ESC1 demonstrations. |
+| Share | Creates `AD-Backup` on the configured DC, copies sample backup files, and saves its UNC path as `BackupShare`. Requires remote administration and share access. |
+| MDI Triggers | Configures lab DNS zone transfers and honeytoken-related settings for detection exercises. |
+| Quit | Returns from setup. |
 
-## Step 5: Verify the Lab is Ready
+Selected phases use `Certify.exe`, `Mimikatz.exe`, `Rubeus.exe`, `NetSess.exe`, and `PsExec.exe`. Archives may be absent from your checkout. See [Tools/README.md](Tools/README.md) for sources and tested versions. Place required executables in the configured tools folder. Setup offers `$env:PUBLIC\AS2Go\MaliciousTools` as its default destination, separate from the repository's `Tools` folder.
 
-After initialization completes, verify that all components are in place:
+Coordinate endpoint-protection settings with the lab owner and detection objectives. The tools menu changes Defender settings after confirmation; setup also displays protection-related prerequisites. Record approved changes and restore them after the exercise. Do not weaken protections on production systems.
+
+## 6. Verify Readiness
+
+Reopen **Verify Config** and compare its output with the intended lab. Its completion message alone does not establish that every component works. The current honeytoken display reads the break-glass setting, so verify honeytoken configuration independently.
+
+Use read-only checks as appropriate:
 
 ```powershell
-# Check that AS2Go AD objects were created
-Get-ADOrganizationalUnit -Filter "Name -like 'AS2Go*'"
+Get-ADDomain | Select-Object DNSRoot, DistinguishedName
+Get-ADOrganizationalUnit -Filter "Name -eq 'AS2Go'"
+Get-ADGroup -Filter "Name -like '*AS2Go*'"
 
-# Check that demo users exist
-Get-ADUser -Filter "Name -like 'AS2Go*'" -SearchBase "DC=contoso,DC=com"
-
-# Check that ADCS is installed on the DC
-Get-ADCSTemplate | Where-Object { $_.Name -like "*AS2Go*" }
-
-# Check that shares exist on DC
-Get-SmbShare -Name "AD-Backup" -CimSession <DCName>
-
-# Check Active Directory groups
-Get-ADGroup -Filter "Name -like 'AS2Go*'"
+# Replace the hostname with the configured lab DC.
+Get-ChildItem -LiteralPath '\\DC01.contoso.com\AD-Backup'
 ```
 
----
+Adjust filters for custom OU/scenario names. Verify demo users in their configured OU; names need not begin with `AS2Go`. For certificate scenarios, review the CA, enrollment service, and intended template status in the ADCS menu. Confirm monitoring receives telemetry, then snapshot the prepared lab.
 
-## Step 6: Run Attack Scenarios
+## 7. Run an Authorized Scenario
 
-With the lab initialized, you can now run individual attack phases:
+Review help and expected impact before live execution:
 
 ```powershell
-# List all available phase commands
-Get-Command -Module AS2Go | Where-Object { $_.Name -like "Invoke-*Phase*" }
+Get-Command -Module AS2Go -Name 'Invoke-ASPhase*'
+Get-Help -Name Start-AS2GoDemo -Full
 
-# Start the full guided demo
+# Start the interactive live workflow after preparation.
 Start-AS2GoDemo
 
-# Or run individual phases (e.g., Phase 4 - Brute Force)
-Invoke-ASPhase04BruteForceAttack
-
-# Non-interactive mode
-Start-AS2GoDemo -UnAttended
-
-# Continue from a saved state
+# Troubleshooting output or continuation from the saved stage:
+Start-AS2GoDemo -EnableLogging -SkipImages -SkipClearHost
 Start-AS2GoDemo -Continue
-
-# Enable troubleshooting output
-Start-AS2GoDemo -EnableLogging -SkipImages
 ```
 
----
+Individual phases are available, for example `Invoke-ASPhase04BruteForceAttack`. Commands perform live actions when `-Preview` is absent. Use `-UnAttended` only after reviewing and authorizing the workflow: it suppresses prompts where possible and does not make execution harmless.
 
-## Safety Practices & Best Practices
+Record phases, timestamps, expected alerts, observed telemetry, and failures. Use only fake sensitive data for data-access demonstrations. The Phase 10 sample-file path is configured through `PrivateData.SensitiveInfos` in `AS2Go.psd1`.
 
-✓ **Do:**
-- Use isolated, non-routed lab networks
-- Snapshot systems before each attack run
-- Use non-production accounts and test data only
-- Restrict internet egress in the lab
-- Document each run (time, phases executed, expected alerts, observed alerts)
-- Review logs and artifacts in the `CleanUp/` folder after each run
-- Test detections and refine incident response playbooks
+## Runtime Files and Reset
 
-✗ **Don't:**
-- Run AS2Go in production environments
-- Run without proper isolation and network segmentation
-- Execute without elevated privileges when required
-- Share lab credentials or artifacts externally
-- Leave lab systems on the internet or publicly accessible
+Default runtime locations below `$env:PUBLIC\AS2Go`:
 
----
+| Folder | Contents |
+| --- | --- |
+| `Config` | Persisted `AS2Go.json` settings |
+| `Logs` | Module logs, including `AS2Go.log` |
+| `Temp` | Temporary working files |
+| `MaliciousTools` | Default tools destination offered by setup |
+| `CleanUp` | Generated artifacts for review and cleanup |
+| `Exfiltration` | Output used by exfiltration demonstrations |
+| `Tickets` | Ticket-related artifacts |
 
-## Cleanup and Reset
+Configured paths may differ. Archive required evidence securely before resetting. Logs and artifacts can contain sensitive lab information; sanitize them before sharing.
 
-To remove AS2Go lab artifacts and reset for the next run:
-
-1. **Review generated files**
-   ```powershell
-   # Navigate to cleanup folder
-   Get-ChildItem "$AS2GoPath\CleanUp\" | Select-Object Name, LastWriteTime, Length
-   ```
-
-2. **Archive logs and artifacts**
-   ```powershell
-   # Archive for future reference before cleanup
-   Copy-Item "$AS2GoPath\CleanUp\*" -Destination "C:\Labs\Archive\Run-$(Get-Date -Format yyyyMMdd-HHmmss)\" -Recurse
-   ```
-
-3. **Restore from snapshot**
-   - Restore the VM snapshot created before lab initialization
-   - Or manually remove AS2Go objects from Active Directory
-
----
+Deleting runtime files does not undo AD, DNS, AD CS, GPO, share, or endpoint-protection changes. Restore coordinated lab snapshots, or review and reverse each change manually. Confirm protection settings and exclusions are restored as intended. Include the execution computer's persisted configuration in the reset plan.
 
 ## Troubleshooting
 
-### Issue: "Computer is not part of a domain"
-- **Solution:** Ensure the member server/client is domain-joined. Run `nltest /dclist:contoso` to verify.
+| Symptom | Checks |
+| --- | --- |
+| Computer is not part of a domain | Check `Win32_ComputerSystem.PartOfDomain`. Join the execution computer to the test domain for live initialization; use preview for offline review. |
+| Management module unavailable | Install the corresponding Windows/RSAT component and verify import in PowerShell 7. |
+| Access denied | Check local elevation, Domain Admins/Enterprise Admins membership, and target permissions. Reopen the session after changing group membership. |
+| Remote setup or share creation fails | Check lab DNS, selected controller, remoting/SMB connectivity, firewall rules, and target permissions. |
+| External tool or archive missing | Check configured tools path, filenames, manual extraction, and quarantine events. |
+| Unexpected lab names or stale paths | Review `$env:PUBLIC\AS2Go\Config\AS2Go.json`; importing preserves an existing file. |
+| Unsupported setup parameter | Inspect `Get-Command -Name Initialize-AS2GoLabConfiguration -Syntax` and installed version. Source help may contain legacy examples. |
+| Verification completes but assets are missing | Inspect each inventory section and verify the service or object independently. |
 
-### Issue: "ActiveDirectory module not found"
-- **Solution:** Install RSAT tools: `Add-WindowsFeature RSAT-AD-PowerShell` (requires elevation on DC)
-
-### Issue: "Access Denied" or permission errors
-- **Solution:** Run PowerShell as Administrator. Verify user is a member of Enterprise Admins or Domain Admins.
-
-### Issue: "Module not found" when importing AS2Go
-- **Solution:** Verify the path to AS2Go.psd1 and check PowerShell execution policy: `Get-ExecutionPolicy`
-
-### Issue: Initialize function hangs or times out
-- **Solution:** Check network connectivity to DC. Verify DNS resolution. Run with `-EnableLogging` for detailed output.
-
----
-
-## Next Steps
-
-1. ✅ Initialize the lab using `Initialize-2GoLabConfiguration`
-2. ✅ Verify all components were created
-3. ✅ Snapshot the initialized state
-4. ✅ Start monitoring telemetry (Defender, Sentinel, SIEM)
-5. ✅ Run `Start-AS2GoDemo` to execute attack scenarios
-6. ✅ Observe and validate detections
-7. ✅ Document findings and reset from snapshot
-
----
-
-## Additional Resources
-
-- **AS2Go GitHub:** https://github.com/HerrHozi/AS2Go
-- **Author:** Holger Zimmermann
-- **Blog:** https://herrhozi.com
-- **License:** MIT
-
----
-
-## Support
-
-For issues, feature requests, or improvements:
-- Open an issue on GitHub
-- Include reproduction steps, lab setup details, and relevant logs
-- Sanitize any sensitive information before sharing
+For more detail, use setup's `-EnableLogging` switch and review the runtime logs. Report issues through [AS2Go on GitHub](https://github.com/HerrHozi/AS2Go) with sanitized reproduction steps, module version, and relevant errors.

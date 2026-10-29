@@ -5,7 +5,7 @@ Prepares a domain controller share containing simulated AD backup data.
 .DESCRIPTION
 Uses the configured preferred controller for the current domain and creates the remote AD-Backup SMB share.
 The helper creates C:\temp\as2go when needed and grants Domain Admins modify/change access.
-Copies the lab ShareContent files into the share, displays its contents, and stores its UNC path as OfflineDITFile.
+Copies the lab ShareContent files into the share, displays its contents, and stores its UNC path as BackupShare.
 Reports access-denied and other failures rather than proceeding as though share creation succeeded.
 
 .EXAMPLE
@@ -45,15 +45,43 @@ function Invoke-BackUpShare {
     $Functionality = (Get-Help $CurrentFunction).Functionality
     Write-AS2GoOutput -Type H1 -Message $Functionality
 
-    $TargetServer = $Script:BestDCs[(Get-ADDomain).DNSRoot]
 
+    $value = Get-ASConfig -Setting "BackupShare"
+    Write-AS2GoOutput -Type TextMaker -Message "Current Backup Share:" -Tm $value
+
+    If ($Script:Yes -ne $(Show-DecisionPrompt)) {
+        Write-Log -Message "User chose not to proceed this operation"
+        return
+    }
+
+
+    $server = Select-ADObject -Title "Select Domain Controller" -LocalDomainOnly -IncludeComputers
+
+    If ($null -eq $server){
+        #$TargetServer = $Script:BestDCs[(Get-ADDomain).DNSRoot]
+        Write-AS2GoOutput -Type Info -Message "Please select a computer"
+        return
+    }
+    else {
+    $CN = Convert-FromDNToCN $server
+    $dnsdomain = $CN.split("/")[0]
+    $computer = Get-ADComputer -Identity $server -Server $dnsdomain
+    $TargetServer = $computer.DNSHostName
+    }
+ 
+    
+    
+    Write-Host
     Write-AS2GoOutput -Type Bullet -Message "Target Domain Controller:" -TM $TargetServer
+    
     try {
         New-BackUpShare -Server $TargetServer -ErrorAction Stop
+
+        get-childitem -Recurse | Add-Content "\\$TargetServer\AD-Backup\ntds.dit"
         Copy-Item "$Script:ASSetup\ShareContent\*.*" -Destination "\\$TargetServer\AD-Backup" -Force -ErrorAction Stop
         Get-ChildItem -Path      "\\$TargetServer\AD-Backup" -ErrorAction Stop | Out-Host
         Write-AS2GoOutput -Type TextMaker -Message "Done - New Share is available" -TM  "\\$TargetServer\AD-Backup"
-        Set-ASConfig -Setting "OfflineDITFile" -Value "\\$TargetServer\AD-Backup" -ErrorAction Stop
+        Set-ASConfig -Setting "BackupShare" -Value "\\$TargetServer\AD-Backup" -ErrorAction Stop
     }
     catch [System.UnauthorizedAccessException] {
         Write-AS2GoOutput -Type Error -Message "No permission to create or write backup share on $TargetServer. Use an account with local admin/share permissions."

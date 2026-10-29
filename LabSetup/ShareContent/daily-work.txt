@@ -1,0 +1,7 @@
+
+
+AS2Go simulated sensitive information.
+
+me@as2go.com ('23eefg35!')
+
+No real credentials are stored in this file.

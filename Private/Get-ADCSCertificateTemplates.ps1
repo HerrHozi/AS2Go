@@ -12,7 +12,7 @@ Category: Sub Function
 .FUNCTIONALITY
 Queries Active Directory for matching templates and displays their names and metadata.
 #>
-function Get-ADCSCertifcateTemplates {
+function Get-ADCSCertificateTemplates {
 
     ################################################################################
     #####                                                                      ##### 

@@ -12,7 +12,7 @@ Category: Sub Function
 .FUNCTIONALITY
 Stores the read-write and read-only controller totals for every domain.
 #>
-function Get-NumberofDCs {
+function Get-NumberOfDCs {
 
     ################################################################################
     #####                                                                      ##### 

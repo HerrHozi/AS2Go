@@ -8,6 +8,10 @@ Runs the Attack Scenario to Go (AS2Go) demo sequence and optionally skips
 selected phases or user interactions. Use switches to run unattended,
 continue from a previous stage, or bypass specific attack steps.
 
+.PARAMETER Preview
+Browses descriptions and workflow steps offline without executing actions.
+Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
+
 .PARAMETER UnAttended
 Runs the workflow without interactive prompts where possible.
 
@@ -40,9 +44,6 @@ Skips the reconnaissance phase.
 
 .PARAMETER SkipPrivilegeEscalation
 Skips the privilege escalation phase.
-
-.PARAMETER SkipSensitiveDataAccess
-Skips the sensitive data access phase.
 
 .PARAMETER SkipDataExfiltration
 Skips the data exfiltration phase.
@@ -84,6 +85,7 @@ Use AS2Go only in explicitly authorized environments.
 
 Function Start-AS2GoDemo {
     Param (  
+        [switch]$Preview,
         [switch]$UnAttended,
         [switch]$Continue,
         [Switch]$EnableLogging,
@@ -95,7 +97,6 @@ Function Start-AS2GoDemo {
         [switch]$SkipPwSpayWithRubeus,
         [switch]$SkipReconnaissance,
         [switch]$SkipPrivilegeEscalation,
-        [switch]$SkipSensitiveDataAccess,
         [switch]$SkipDataExfiltration,
         [switch]$SkipDomainPersistence,
         [switch]$SkipForgeAuthCertificates, 
@@ -107,6 +108,11 @@ Function Start-AS2GoDemo {
         [validateSet("Encrypt", "Reboot", "BackdoorUser", "GPT", "UserManipulation", "GroupManipulation")]
         [String]$DomainPersistence
     )
+    if ($Preview) {
+        Show-AS2GoPreview -FunctionName 'Start-AS2GoDemo' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
+        return
+    }
+
 
 
     #[bool]$showStep = $true # show the steps in an image
@@ -133,7 +139,13 @@ Function Start-AS2GoDemo {
 
     if ($answer -eq $Script:No) {
         return
-    }   
+    }
+    
+    $result = Get-ASConfig -Setting "LastConfig"
+    If ($null -eq $result) {
+    Write-AS2GoOutput -Type Warning -M "No previous configuration found. Run 'Initialize-AS2GoLabConfiguration' first."
+        return
+    }
     
     Clear-ExfiltrationFolder
 
@@ -146,14 +158,14 @@ Function Start-AS2GoDemo {
 
     $Script:ASTools = Get-ASConfig -Setting "Tools"
 
-    $FileVersionM = Get-FileVersion -fullname "$($Script:ASTools)\mimikatz.exe"
-    $FileVersionP = Get-FileVersion -fullname "$($Script:ASTools)\PsExec.exe"
-    $FileVersionR = Get-FileVersion -fullname "$($Script:ASTools)\Rubeus.exe"
-    $FileVersionN = Get-FileVersion -fullname "$($Script:ASTools)\NetSess.exe"
-    $FileVersionC = Get-FileVersion -fullname "$($Script:ASTools)\Certify.exe"
-    #$FileVersionO = Get-FileVersion -fullname "C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
+    $Script:FileVersionM = Get-FileVersion -fullname "$($Script:ASTools)\mimikatz.exe"
+    $Script:FileVersionP = Get-FileVersion -fullname "$($Script:ASTools)\PsExec.exe"
+    $Script:FileVersionR = Get-FileVersion -fullname "$($Script:ASTools)\Rubeus.exe"
+    $Script:FileVersionN = Get-FileVersion -fullname "$($Script:ASTools)\NetSess.exe"
+    $Script:FileVersionC = Get-FileVersion -fullname "$($Script:ASTools)\Certify.exe"
 
-    if ($Script:MoGPO -eq $false -or $Script:MoAD -eq $false -or $FileVersionM -eq "failed" -or $FileVersionP -eq "failed" -or $FileVersionR -eq "failed" -or $FileVersionN -eq "failed" -or $FileVersionC -eq "failed" -or $FileVersionO -eq "failed") {
+
+    if (-not $Script:MoGPO -or -not $Script:MoAD -or -not $Script:FileVersionM -or -not $Script:FileVersionP -or -not $Script:FileVersionR -or -not $Script:FileVersionN -or -not $Script:FileVersionC) {
         [bool]$PreCheckFailed = $true
     }
 
@@ -187,25 +199,7 @@ Function Start-AS2GoDemo {
 
 
         If (-not $SkipClearHost) { Clear-Host }
-        Write-Host "____________________________________________________________________`n" 
-        Write-Host "        $ASModuleName   Version $($ASModuleManifest.Version)             "
-        Write-Host "                                                                    "
-        Write-Host "        Attack Scenario to Go | along the kill-chain                " -ForegroundColor yellow
-        Write-Host "                                                                    "
-        Write-Host "        created by Holger Zimmermann | last update $ASModuleLastUpdate      "
-        Write-Host "                                                                    "
-        Write-Host "        Used tools & requirements:                                  "
-        Write-Host "                                                                    "
-        Write-Host "        ●  PoSH modules:  ActiveDirectory & GroupPolicy             "
-        Write-Host "                                                                    "
-        Write-Host "        ●  NetSess.exe    $FileVersionN                             "
-        Write-Host "        ●  Mimikatz.exe   $FileVersionM                             "
-        Write-Host "                                                                    "
-        Write-Host "        ●  Rubeus.exe     $FileVersionR                             "
-        Write-Host "        ●  Certify.exe    $FileVersionC                             "
-        Write-Host "                                                                    "
-        Write-Host "        ●  PsExec.exe     $FileVersionP                             "
-        Write-Host "____________________________________________________________________`n" 
+
 
         $TimeStamp = (Get-Date).toString("yyyy-MM-dd HH:mm:ss")
         $lastVictim = Get-ASConfig -Setting "LastVictim"

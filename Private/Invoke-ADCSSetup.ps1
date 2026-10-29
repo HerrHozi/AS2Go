@@ -104,7 +104,7 @@ function Invoke-ADCSSetup {
             } 
 
 
-            Get-ADCSCertifcateTemplates -CTPrefix $CTPreFix -Server $TargetServer
+            Get-ADCSCertificateTemplates -CTPrefix $CTPreFix -Server $TargetServer
             
             If ($Script:ADCSASGoCTemplatesMissing) {
                 Write-AS2GoOutput -Type TextMaker -Message "Installation will be performed on server" -TM $TargetServer
@@ -116,7 +116,7 @@ function Invoke-ADCSSetup {
                 }
                 
                 Write-AS2GoOutput -Type Success "Templates with prefix $CTPreFix PUBLISHED successfully."
-                Get-ADCSCertifcateTemplates -CTPrefix $CTPreFix -Server $TargetServer
+                Get-ADCSCertificateTemplates -CTPrefix $CTPreFix -Server $TargetServer
 
             }
             else {

@@ -26,7 +26,7 @@ function Show-ForestOverview {
     $CurrentFunction = $Info.FunctionName
     
     $Script:DoaminTypes = Get-DomainType
-    $Script:DCsPerDomain = Get-NumberofDCs
+    $Script:DCsPerDomain = Get-NumberOfDCs
     $Script:BestDCs = Set-BestDomainController
     $Forest = Get-ADForest
 

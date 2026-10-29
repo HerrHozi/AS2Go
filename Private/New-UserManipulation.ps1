@@ -1,6 +1,18 @@
+<#
+.SYNOPSIS
+Demonstrates account disruption by disabling users, resetting passwords, or both in a selected AD scope.
+
+.FUNCTIONALITY
+Demonstrates account disruption by disabling users, resetting passwords, or both in a selected AD scope.
+Displays domain password policies and offers a shared replacement password for password resets.
+No backdoor or break-glass account exclusions are applied; these accounts can also be affected within the scope.
+#>
 function New-UserManipulation {
 
     $Info = Measure-FunctionRuntime -Begin
+
+    Write-AS2GoOutput -Type Header -Message "New-UserManipulation"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     
     $Forest = Get-ADForest
     $Script:DoaminTypes = Get-DomainType

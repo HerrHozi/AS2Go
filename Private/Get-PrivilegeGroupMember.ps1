@@ -1,4 +1,4 @@
-function Get-PriviledgeGroupMember {
+function Get-PrivilegeGroupMember {
 
     Param([PSCustomObject[]] $Group)
 

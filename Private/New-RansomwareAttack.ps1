@@ -1,8 +1,20 @@
+<#
+.SYNOPSIS
+Copies exfiltration-folder files into a timestamped backup-share subfolder and adds a demonstration ransom note.
+
+.FUNCTIONALITY
+Copies exfiltration-folder files into a timestamped backup-share subfolder and adds a demonstration ransom note.
+After confirmation, encrypts the copied files with a machine certificate and attempts popups on configured DCs.
+Demonstrates ransomware impact on staged copies; encryption requires a suitable certificate.
+#>
 function New-RansomwareAttack {
 
     Param([string]$BackupShare)
 
     $Info = Measure-FunctionRuntime -Begin
+
+    Write-AS2GoOutput -Type Header -Message "New-RansomwareAttack"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     $CurrentFunction = $Info.FunctionName
 
     #prepare the simulation
