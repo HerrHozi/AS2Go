@@ -180,8 +180,16 @@ Write-AS2GoOutput {
             $level = "INFO"
         }
         "TextMaker" { 
-            Write-host "`n  [i] $Message " -ForegroundColor $Script:FGCSInfo -NoNewline
-            Write-host "$TextMaker`n`n" -ForegroundColor $Script:FGCTextMaker
+
+            If ($NoExtraLines) {
+                Write-host "  [i] $Message " -ForegroundColor $Script:FGCSInfo -NoNewline
+                Write-host "$TextMaker" -ForegroundColor $Script:FGCTextMaker
+            }
+            Else { 
+                Write-host "`n  [i] $Message " -ForegroundColor $Script:FGCSInfo -NoNewline
+                Write-host "$TextMaker`n`n" -ForegroundColor $Script:FGCTextMaker
+            } 
+
             $level = "INFO"
         }
         "Input" { 

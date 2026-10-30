@@ -2,6 +2,9 @@
 .SYNOPSIS
 Selects the UPN suffix for new demo accounts.
 
+.COMPONENT
+Category: Sub Function
+
 .FUNCTIONALITY
 Keeps the saved suffix or prompts for a new one and returns the selected value.
 #>

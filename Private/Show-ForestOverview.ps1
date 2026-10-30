@@ -7,7 +7,7 @@ Collects domain details, domain classifications, controller counts, and preferre
 then displays a formatted forest overview.
 
 .COMPONENT
-Category: Main Function
+Category: Sub Function
 
 .FUNCTIONALITY
 Combines domain details, domain types, controller counts, and preferred DCs in a forest summary.
@@ -35,8 +35,6 @@ function Show-ForestOverview {
     }
 
     Write-AS2GoOutput -Type Header -Message "Identified the following domains"
-    $Functionality = (Get-Help $CurrentFunction).Functionality
-    Write-AS2GoOutput -Type H1 -Message $Functionality
 
     $overview = $AllDomainsDetails |
     Select-Object `

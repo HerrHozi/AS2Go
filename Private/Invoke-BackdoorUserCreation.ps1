@@ -51,6 +51,8 @@ function Invoke-BackdoorUserCreation {
     }
 
     If ($answer -ne $Script:Yes) {
+        Write-Log -Message "User chose not to proceed with Backdoor user creation."
+        Measure-FunctionRuntime -End -Details $Info
         return
     }
 

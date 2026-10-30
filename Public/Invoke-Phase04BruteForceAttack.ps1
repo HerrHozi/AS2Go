@@ -38,10 +38,13 @@ Uses a separate preview menu; runtime selection and skip parameters are not eval
 .LINK
     Invoke-ASPhase04BruteForceAttack
 
+
+.COMPONENT
+    Category: Main Function
+
 .FUNCTIONALITY
     Executes a password spray attack against Active Directory users,
     attempting to authenticate multiple accounts with one or more passwords within the specified scope.
-
 #>
 
 function Invoke-ASPhase04BruteForceAttack {
