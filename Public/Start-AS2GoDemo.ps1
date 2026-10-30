@@ -48,9 +48,6 @@ Skips the privilege escalation phase.
 .PARAMETER SkipDataExfiltration
 Skips the data exfiltration phase.
 
-.PARAMETER SkipDomainPersistence
-Skips the domain persistence phase.
-
 .PARAMETER SkipForgeAuthCertificates
 Skips the certificate forging phase.
 
@@ -98,7 +95,6 @@ Function Start-AS2GoDemo {
         [switch]$SkipReconnaissance,
         [switch]$SkipPrivilegeEscalation,
         [switch]$SkipDataExfiltration,
-        [switch]$SkipDomainPersistence,
         [switch]$SkipForgeAuthCertificates, 
         [switch]$SkipKerberoastingAttack,
         [switch]$DeveloperMode,

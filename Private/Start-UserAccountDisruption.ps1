@@ -5,9 +5,11 @@ Disables AD users, resets their passwords, or performs both operations.
 .DESCRIPTION
 Selects enabled users for Disable and all users in the search base for other actions.
 Runs LDAP DirectoryEntry operations in parallel to disable accounts, reset passwords, or perform both.
+Excludes the current backdoor user in $global:BDUser and the configured break-glass account from all actions.
+Refuses to proceed when the configured break-glass account cannot be resolved.
 Each successful change writes TickValue to adminDescription. A missing NewPassword is replaced with a random password.
 Displays progress, DC CPU and LDAP timing when available, and per-user success or error messages.
-Q can stop processing. This low-level function does not exclude backdoor or break-glass accounts.
+Q can stop processing. An unset break-glass account setting does not add a break-glass exclusion.
 
 .PARAMETER SearchBase
 Distinguished name of the OU or domain subtree containing the target users.
@@ -28,7 +30,7 @@ Value written to adminDescription after a successful change. Defaults to the cur
 Maximum concurrent account-processing operations, from 1 through 100. Defaults to 5.
 
 .EXAMPLE
-Invoke-UserManipulation -SearchBase "OU=Demo Accounts,OU=AS2Go,DC=example,DC=com" -Server "DC01.example.com" -Action Disable
+Start-UserAccountDisruption -SearchBase "OU=Demo Accounts,OU=AS2Go,DC=example,DC=com" -Server "DC01.example.com" -Action Disable
 Disables enabled users in the selected demo-account OU and marks successful changes.
 
 .INPUTS
@@ -39,16 +41,16 @@ Console messages and output from invoked commands; no dedicated result object is
 
 .NOTES
 Private AS2Go function. Run from an initialized AS2Go module session.
-Requires permission to change the target users. No protected-account exclusions are applied in this function.
+Requires permission to change the target users. The configured break-glass account is resolved from its distinguished name and excluded.
 
 .COMPONENT
-Category: Main Function
+Category: Sub Function
 
 .FUNCTIONALITY
-Disables users, resets passwords, or both in the specified AD search base, without protected-account exclusions.
+Disables users, resets passwords, or both in the specified AD search base, excluding the current backdoor and configured break-glass accounts.
 Marks changed accounts in adminDescription and reports results, progress, and available DC metrics.
 #>
-function Invoke-UserManipulation {
+function Start-UserAccountDisruption {
 
     ################################################################################
     ######                                                                     #####
@@ -73,9 +75,29 @@ function Invoke-UserManipulation {
 
     $Info = Measure-FunctionRuntime -Begin
 
-    Write-AS2GoOutput -Type Header -Message "Invoke-UserManipulation"
-    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
-    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
+    $protectedBackdoorUser = [string]$global:BDUser
+    if ([string]::IsNullOrWhiteSpace($protectedBackdoorUser)) {
+        Write-AS2GoOutput -Type Warning -Message "Backdoor user is not configured; refusing to manipulate users."
+        #Measure-FunctionRuntime -End -Details $Info
+        #return
+    }
+
+    $protectedUserNames = @($protectedBackdoorUser | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $breakGlassDN = [string](Get-ASConfig -Setting "BreakGlassAccount")
+    
+    if (-not [string]::IsNullOrWhiteSpace($breakGlassDN)) {
+        $breakGlassAccount = Get-ADUserDetails -SearchByDN -Identifier $breakGlassDN
+        if ([string]::IsNullOrWhiteSpace($breakGlassAccount.SamAccountName) -or $breakGlassAccount.SamAccountName -eq "Account Not Found") {
+            Write-AS2GoOutput -Type Warning -Message "Configured break-glass account could not be resolved; refusing to manipulate users."
+            Measure-FunctionRuntime -End -Details $Info
+            return
+        }
+        $protectedUserNames += $breakGlassAccount.SamAccountName
+    }
+
+    # Write-AS2GoOutput -Type Header -Message "Start-UserAccountDisruption"
+    # Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    # Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
 
     # Auto-generate password if none given
     if ([string]::IsNullOrWhiteSpace($NewPassword)) {
@@ -89,12 +111,6 @@ function Invoke-UserManipulation {
             -Server $Server `
             -Properties SamAccountName, SID
 
-        $total = $users.Count
-
-        if ($total -eq 0) {
-            Write-AS2GoOutput -Type Warning -Message "No enabled users found under $SearchBase"
-            return
-        }
     }
     else {
         $users = Get-ADUser `
@@ -103,7 +119,14 @@ function Invoke-UserManipulation {
             -Server $Server `
             -Properties SamAccountName, SID
 
-        $total = $users.Count
+    }
+
+    $users = @($users | Where-Object { $_.SamAccountName -notin $protectedUserNames })
+
+    $total = @($users).Count
+    if ($total -eq 0) {
+        Write-AS2GoOutput -Type Warning -Message "No eligible users found under $SearchBase"
+        return
     }
 
     $cname = Convert-FromDNToCN -DistinguishedName $SearchBase
