@@ -30,7 +30,7 @@ Author: AS2Go / me@mrhozi.com. License: MIT.
 Credit: Encryption/FileStream pattern based on work by Ryan Ries.
 
 .COMPONENT
-Category: Main Function
+Category: Sub Function
 
 .FUNCTIONALITY
 Recursively encrypts files in the selected path using AES and an existing machine certificate.
@@ -48,11 +48,6 @@ Function Invoke-FileEncryption {
         return
     }
 
-    #$encoderName = "AS2Go"
-
-    #Get-ChildItem 'Cert:\LocalMachine\my' -Recurse | Where-Object { $_.HasPrivateKey -eq $true -and $_.Subject -match $env:ComPUTERNAME } | Format-Table Thumbprint, Subject, HasPrivateKey, PsPath
-
-    #Get-ChildItem Cert:\LocalMachine\My | Format-Table Thumbprint, Subject | Out-Host
     Write-Host "`n"
 
     $cert = Get-ChildItem 'Cert:\LocalMachine' -Recurse |
@@ -142,62 +137,4 @@ Function Start-FileEncryption {
     Write-AS2GoOutput -Type Bullet -Message "Encoded file" -TM $FileToEncrypt.FullName
 }
 
-Function Start-FileEncryption_Old {
-    <#
-    .Synopsis
-        Encrypts a single file using AES-256-CBC with an RSA-encrypted session key.
-        The encrypted output is written to $env:TEMP and then replaces the original.
-        The original can be restored using the private key of the provided certificate.
-    #>
-    Param(
-        [Parameter(Mandatory)][System.IO.FileInfo]$FileToEncrypt,
-        [Parameter(Mandatory)][System.Security.Cryptography.X509Certificates.X509Certificate2]$Cert
-    )
-
-    # Build temp output path safely
-    $tempPath = [System.IO.Path]::Combine($Script:AS2GOTempDir, $FileToEncrypt.Name)
-
-    # Set up AES-256-CBC and wrap the session key with the certificate's public RSA key
-    $aes = [System.Security.Cryptography.AesManaged]::new()
-    $aes.KeySize = 256
-    $aes.BlockSize = 128
-    $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
-
-    $keyFormatter = [System.Security.Cryptography.RSAPKCS1KeyExchangeFormatter]::new($Cert.PublicKey.Key)
-    $encryptedKey = $keyFormatter.CreateKeyExchange($aes.Key, $aes.GetType())
-
-    # File layout: [4 bytes keyLen][4 bytes ivLen][encryptedKey][iv][ciphertext]
-    try {
-        $writer = [System.IO.FileStream]::new($tempPath, [System.IO.FileMode]::Create)
-
-        $writer.Write([System.BitConverter]::GetBytes($encryptedKey.Length), 0, 4)
-        $writer.Write([System.BitConverter]::GetBytes($aes.IV.Length), 0, 4)
-        $writer.Write($encryptedKey, 0, $encryptedKey.Length)
-        $writer.Write($aes.IV, 0, $aes.IV.Length)
-
-        $cryptoStream = [System.Security.Cryptography.CryptoStream]::new(
-            $writer,
-            $aes.CreateEncryptor(),
-            [System.Security.Cryptography.CryptoStreamMode]::Write
-        )
-
-        $reader = [System.IO.FileStream]::new($FileToEncrypt.FullName, [System.IO.FileMode]::Open)
-        $reader.CopyTo($cryptoStream)   # replaces the manual block-read loop
-
-        $cryptoStream.FlushFinalBlock()
-    }
-    catch {
-        Write-Error "Encryption failed for '$($FileToEncrypt.FullName)': $_"
-        return
-    }
-    finally {
-        $reader?.Close()
-        $cryptoStream?.Close()
-        $writer?.Close()
-        $aes.Dispose()
-    }
-
-    # Overwrite the original with the encrypted copy
-    Copy-Item -Path $tempPath -Destination $FileToEncrypt.FullName -Force
-}
 
