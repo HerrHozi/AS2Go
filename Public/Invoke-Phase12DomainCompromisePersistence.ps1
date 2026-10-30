@@ -281,7 +281,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
                 $repeat = $Script:Yes
             }
             "Encrypt" {
-                Invoke-DomainEncryptionAttack
+                Invoke-Encryption
                 $repeat = $Script:Yes
             }
             "MasterKey" {

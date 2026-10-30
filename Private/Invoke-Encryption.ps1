@@ -1,20 +1,44 @@
 <#
 .SYNOPSIS
-Copies exfiltration-folder files into a timestamped backup-share subfolder and adds a demonstration ransom note.
+Encrypts critical Domain Controller assets for strategic leverage.
+
+.DESCRIPTION
+Launches a ransomware demonstration that encrypts critical files on Domain Controllers to
+demonstrate data confidentiality impact and extortion capabilities of domain compromise.
+
+.EXAMPLE
+Invoke-Encryption
+Runs the domain encryption attack workflow using the initialized AS2Go module configuration.
+
+.INPUTS
+None. This function does not declare pipeline input.
+
+.OUTPUTS
+Console messages and output from invoked commands; no dedicated result object is defined.
+
+.NOTES
+Private AS2Go function. Run from an initialized AS2Go module session.
+Encryption is performed on explicitly authorized target systems only.
+
+.COMPONENT
+Category: Main Function
 
 .FUNCTIONALITY
 Copies exfiltration-folder files into a timestamped backup-share subfolder and adds a demonstration ransom note.
 After confirmation, encrypts the copied files with a machine certificate and attempts popups on configured DCs.
 Demonstrates ransomware impact on staged copies; encryption requires a suitable certificate.
 #>
-function New-RansomwareAttack {
+function Invoke-Encryption {
 
-    Param([string]$BackupShare)
+    $info = Measure-FunctionRuntime -Begin
 
-    $Info = Measure-FunctionRuntime -Begin
+    If (-not $SkipClearHost) { Clear-Host }
 
-    Write-AS2GoOutput -Type Header -Message "New-RansomwareAttack"
+    Write-AS2GoOutput -Type Header -M "Encrypt critical Domain Controller assets for strategic leverage"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+
+
+    $BackupShare = $Script:ASBackupShare
     $CurrentFunction = $Info.FunctionName
 
     #prepare the simulation
@@ -45,8 +69,7 @@ function New-RansomwareAttack {
 
     Write-AS2GoOutput -Type TextMaker -Message "Starting to encrypt all files in folder" -TextMaker $FolderToEncrypt
 
-    $question = "Do you REALLY want to run this step? [Y/N] Default "
-    $answer = Get-Answer -question $question -defaultValue $Script:No
+    $answer = Show-DecisionPrompt -Default 1
 
     If ($answer -eq $Script:Yes) {
         $affectedDC = $BackupShare.split("\")[2]
@@ -61,9 +84,8 @@ function New-RansomwareAttack {
         foreach ($computer in $Script:AllDCs) {
             $affectedDC = $computer.FQDN
             Start-AS2GoDemoPopup -ComputerName $affectedDC -SourceFile $sourceFile
-
         }
-
     }
-    Measure-FunctionRuntime -End -Details $Info
+
+    Measure-FunctionRuntime -End -Details $info
 }
