@@ -21,7 +21,8 @@ function Start-PsUserGroupSession {
     Param(
         [switch]$Preview,
         [Alias("StartRecording")]
-        [switch] $EnableLogging
+        [switch] $EnableLogging,
+        [switch] $SafeMode
     )
     if ($Preview) {
         Show-AS2GoPreview -FunctionName 'Start-PsUserGroupSession' -UnAttended:([bool]$PSBoundParameters['UnAttended'])

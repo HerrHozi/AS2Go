@@ -1,5 +1,7 @@
 # AS2Go – External Tools
 
+AS2Go-Tools_v2.zip and AS2Go-Tools_v2.7z (PW: HerrHozi!)
+
 This document lists the sources for the external tools used with AS2Go.
 The links point to the respective project or download pages. Download the latest
 available version from each source and select the appropriate Windows architecture.

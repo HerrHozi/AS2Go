@@ -1,5 +1,5 @@
 function Get-AuthorInfo {
-    param([switch]$Preview)
+    param([switch]$Preview, [switch]$SafeMode)
 
     if ($Preview) {
         Show-AS2GoPreview -FunctionName 'Get-AuthorInfo' -UnAttended:([bool]$PSBoundParameters['UnAttended'])

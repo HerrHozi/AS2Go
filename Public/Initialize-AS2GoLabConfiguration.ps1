@@ -150,7 +150,8 @@ function Initialize-AS2GoLabConfiguration {
         [ValidatePattern('^\S+$')]
         [string] $Scenario = "AS2Go",
         [Switch] $EnableLogging,
-        [Switch] $DeveloperMode
+        [Switch] $DeveloperMode,
+        [switch] $SafeMode
     )
     if ($Preview) {
         Show-AS2GoPreview -FunctionName 'Initialize-AS2GoLabConfiguration' -UnAttended:([bool]$PSBoundParameters['UnAttended'])

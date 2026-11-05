@@ -17,7 +17,7 @@ System.String. Returns the constant value "C".
 Displays host compatibility and security conditions relevant to privilege escalation.
 
 .COMPONENT
-Category: Main Function
+Category: Sub Function
 #>
 function New-PrivilegeEscalationRecommendation {
 
@@ -28,12 +28,11 @@ function New-PrivilegeEscalationRecommendation {
     ################################################################################
 
 
-    Param([string] $computer)
+    Param(
+        [string] $computer
+    )
 
     $Info = Measure-FunctionRuntime -Begin
-
-    #https://www.stigviewer.com/stig/windows_10/2017-02-21/
-
 
     If ($null -eq $Script:ASSAW) {
         $Script:ASSAW = Get-ASConfig -Setting "mySAW" -ErrorAction SilentlyContinue
@@ -46,21 +45,30 @@ function New-PrivilegeEscalationRecommendation {
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type  Header -M "Choose your Type of Privilege Escalation"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
-    write-host ""
+    Write-Host "`n     ... please be patient, while checking your environment ... " -ForegroundColor Yellow
 
-    Write-Host "     ... please be patient, while checking your environment ... " -ForegroundColor Yellow
 
-    $overview = Get-ComputerInformation -computer $computer
-    $temp = $overview.Replace("        ", " ")
-    $overview = $temp.Replace("      ", " ")
+    If ($env:COMPUTERNAME -eq $computer) {
+        Write-log -Message "Running on the target computer itself."
+        $localComputerInformation = Get-LocalComputerInformation
+        $version = $localComputerInformation.Version
+        $OSBuild = $localComputerInformation.OSBuild
+
+    }
+    else {
+        $overview = Get-ComputerInformation -computer $computer
+        $temp = $overview.Replace("        ", " ")
+        $overview = $temp.Replace("      ", " ")
     
-    $version = Get-OSVersion -computer $computer
-    [int]$OSBuild = Get-OSBuild -computer $computer
+        $version = Get-OSVersion -computer $computer
+        [int]$OSBuild = Get-OSBuild -computer $computer
+    }
 
+
+ 
+ 
     #only for testing
     #$OSBuild = 22621
-    
-
 
     $le = [char]0x2264
     $ge = [char]0x2265
@@ -135,17 +143,16 @@ function New-PrivilegeEscalationRecommendation {
 
 
     #If (-not $SkipClearHost) { Clear-Host }
+    Clear-Host
     Write-AS2GoOutput -Type  Header -M "Choose your Type of Privilege Escalation"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     write-host ""
     
-    Write-host "     current Victim PC Name & OS:  $overview - " -NoNewline
-    Write-host $version -ForegroundColor Yellow
-    Write-Host
+    Write-AS2GoOutput -Type Header -Message "Local (Victim) Computer Information"
+    $localComputerInformation | Format-List | out-host
 
+    Write-AS2GoOutput -Type Header -Message "Attack Compatibility Matrix"
     $space = "  "
-    Write-Host "`n     ATTACK COMPATIBILITY MATRIX:`n"
-
     Write-Host "$space           ║        Win 10       |        Win11 "
     Write-Host "$space           ║  $le $workingWinVersion  |  $ge $LimitedWinVersion  |   21H2   | $ge 22H2 "
     Write-Host "$space  ═════════╬══════════════════════════════════════════"
@@ -158,10 +165,43 @@ function New-PrivilegeEscalationRecommendation {
     Write-Host "   * CIFS on remote Admin PC works, but LDAP authentication will fail."
     Write-Host "     Pass-the-Ticket attack is therefore possible!" -ForegroundColor Yellow
 
-    Write-Host ""
-    Write-Host "`n     CURRENT SITUATION - FROM AN ATTACKER'S PERSPECTIVE:`n" 
+
+
+
+
+Write-AS2GoOutput -Type Info -Message "Attack Compatibility Matrix (updated)"
+
+$space = "  "
+
+Write-Host "$space             ║      Client OS      |           Server OS              "
+Write-Host "$space             ║  Win 10  |  Win 11  |  2019   |  2022   |  2025        "
+Write-Host "$space  ═══════════╬════════════════════════════════════════════════════════"
+Write-Host "$space   PtH       ║   OK*    |   OK*    |   OK*   |   OK*   | Limited*   Pass-the-Hash Attack" -ForegroundColor Yellow
+Write-Host "$space   PtT       ║   OK     | Limited  |   OK    |   OK    | Limited    Pass-the-Ticket Attack" -ForegroundColor Gray
+Write-Host "$space   PtC       ║   OK     |   OK     |   OK    |   OK    |   OK       Abuse misconfigured Certificate Template" -ForegroundColor Yellow
+Write-Host "$space   WDigest   ║   OK     |   OK     |   OK    |   OK    |   OK       Credential Theft through Memory Access" -ForegroundColor Gray
+Write-Host "$space   SPN       ║   OK     |   OK     |   OK    |   OK    | Limited    Kerberoasting Attack" -ForegroundColor Yellow
+Write-Host ""
+
+Write-Host "   OK       = Technically supported / possible from an OS perspective." -ForegroundColor Gray
+Write-Host "   Limited  = Restricted by default OS hardening, but not fully prevented." -ForegroundColor Gray
+Write-Host ""
+Write-Host "   * Pass-the-Hash remains possible if an NTLM hash is obtained from another" -ForegroundColor Yellow
+Write-Host "     source and the target service still accepts NTLM authentication." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "   PtC requires a vulnerable or misconfigured Active Directory Certificate" -ForegroundColor Yellow
+Write-Host "     Services (AD CS) certificate template; the client OS itself supports it." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "   WDigest assumes:" -ForegroundColor Yellow
+Write-Host "     HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest\UseLogonCredential = 1" -ForegroundColor Yellow
+
+
+
+
+
+    Write-AS2GoOutput -Type Header -Message "CURRENT SITUATION FROM AN ATTACKER'S PERSPECTIVE"
     
-$Global:ASVictim = whoami 
+    $Global:ASVictim = whoami 
 
     Write-Host "     TOP: " -NoNewline -ForegroundColor Cyan
     Write-Host "Compromised User " -NoNewline
@@ -401,4 +441,42 @@ $Global:ASVictim = whoami
 
     return "C"
 
+}
+
+
+
+function Write-AS2GoAttackMatrix {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$Matrix
+    )
+
+    $rowIndex = 0
+
+    foreach ($line in $Matrix) {
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            Write-Host ""
+            continue
+        }
+
+        $color = if ($line -match '^\s*Attack\s*║') {
+            'Cyan'
+        }
+        elseif ($line -match '^\s*═') {
+            'DarkGray'
+        }
+        else {
+            if ($rowIndex % 2 -eq 0) {
+                'Yellow'
+            }
+            else {
+                'Gray'
+            }
+
+            $rowIndex++
+        }
+
+        Write-Host $line -ForegroundColor $color
+    }
 }

@@ -27,13 +27,13 @@ function Show-AS2GoPreview {
         Write-Host "`n$description"
     }
 
-    if ($FunctionName -eq 'Invoke-Kerberoasting') {
+    if ($FunctionName -eq 'Start-Kerberoasting') {
         Write-Host "`n  .\Rubeus.exe kerberoast /ldapfilter:admincount=1 /domain:<domain> /dc:<dc> /outfile:<exfiltration>\KR-<domain>.hashes.txt"
         if (-not $UnAttended) {
             $options = @(
-                [pscustomobject]@{Label='Current &User Domain'; Help='Preview the current user domain; no domain lookup is performed.'; Value='User'},
-                [pscustomobject]@{Label='Specific &Domain'; Help='Enter a domain for display only.'; Value='Domain'},
-                [pscustomobject]@{Label='&Skip'; Help='Return to the previous menu.'; Value='Skip'}
+                [pscustomobject]@{Label = 'Current &User Domain'; Help = 'Preview the current user domain; no domain lookup is performed.'; Value = 'User' },
+                [pscustomobject]@{Label = 'Specific &Domain'; Help = 'Enter a domain for display only.'; Value = 'Domain' },
+                [pscustomobject]@{Label = '&Skip'; Help = 'Return to the previous menu.'; Value = 'Skip' }
             )
             $choice = Show-AS2GoPreviewChoice -Title 'Kerberoasting Attack - Select Target Domain' -Options $options
             if ($choice -eq 'Skip') { return }
@@ -56,7 +56,7 @@ function Show-AS2GoPreview {
             # Infrastructure and formatting helpers are not workflow steps.
             if ($name -match '^(Get-(AS2GoSettings|Function|ASConfig|RunTime)|Set-(ASConfig|NewColor|NewBackground|BestDomain|AttackScope)|New-PrivilegeEscalationRecommendation)') { continue }
             $targetHelp = $target.ScriptBlock.Ast.GetHelpContent()
-            if (($target.ScriptBlock.File -like '*Public*') -or ($targetHelp -and $targetHelp.Component -match 'Main Function') -or $name -eq 'Invoke-Kerberoasting') {
+            if (($target.ScriptBlock.File -like '*Public*') -or ($targetHelp -and $targetHelp.Component -match 'Main Function') -or $name -eq 'Start-Kerberoasting') {
                 $children += $name
             }
         }
@@ -82,9 +82,9 @@ function Show-AS2GoPreview {
     do {
         $options = @()
         for ($i = 0; $i -lt $children.Count; $i++) {
-            $options += [pscustomobject]@{Label=$children[$i]; Help='Show description and planned steps without execution.'; Value=$children[$i]}
+            $options += [pscustomobject]@{Label = $children[$i]; Help = 'Show description and planned steps without execution.'; Value = $children[$i] }
         }
-        $options += [pscustomobject]@{Label='Back / Exit'; Help='Return to the previous menu.'; Value='Back'}
+        $options += [pscustomobject]@{Label = 'Back / Exit'; Help = 'Return to the previous menu.'; Value = 'Back' }
         $choice = Show-AS2GoPreviewChoice -Title "$FunctionName — Preview" -Options $options
         if ($choice -ne 'Back') { Show-AS2GoPreview -FunctionName $choice -Visited ($Visited + $FunctionName) }
     } until ($choice -eq 'Back')

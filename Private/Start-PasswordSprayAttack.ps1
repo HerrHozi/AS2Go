@@ -24,7 +24,7 @@ Also tries the user's SamAccountName as its password when the supplied password 
 Maximum concurrent credential checks, from 1 through 100. Defaults to 15.
 
 .EXAMPLE
-Invoke-PasswordSprayAttack -SearchBase "OU=Demo Accounts,OU=AS2Go,DC=example,DC=com" -Server "DC01.example.com" -Password "LabPassword123!"
+Start-PasswordSprayAttack -SearchBase "OU=Demo Accounts,OU=AS2Go,DC=example,DC=com" -Server "DC01.example.com" -Password "LabPassword123!"
 Tests the supplied lab password against enabled users below the demo-account OU.
 
 .INPUTS
@@ -38,13 +38,13 @@ Private AS2Go function. Run from an initialized AS2Go module session.
 Failed credential checks count as authentication attempts and may affect account lockout counters.
 
 .COMPONENT
-Category: Main Function
+Category: Sub Function
 
 .FUNCTIONALITY
 Tests a supplied password against enabled accounts in the specified AD search base.
 Optionally tries each account name as its password and reports successful checks with parallel progress tracking.
 #>
-function Invoke-PasswordSprayAttack {
+function Start-PasswordSprayAttack {
 
     ################################################################################
     ######                                                                     #####
@@ -85,8 +85,6 @@ function Invoke-PasswordSprayAttack {
     
     $cname = Convert-FromDNToCN -DistinguishedName $SearchBase
     Write-AS2GoOutput -Type Quit -Message "Press 'Q' at any time to abort Passwort Spray `n      for '$total' users under '$cname'!"
-
-
 
     $startTime = Get-Date
     $expectedUsers = @($users | ForEach-Object { "$domain\$($_.SamAccountName)" })

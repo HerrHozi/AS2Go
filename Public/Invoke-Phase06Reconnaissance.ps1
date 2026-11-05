@@ -70,7 +70,8 @@ function Invoke-ASPhase06Reconnaissance {
         [Switch]$EnableLogging,
         [switch]$SkipImages,
         [switch]$SkipClearHost,
-        [switch]$AS2GoDemo
+        [switch]$AS2GoDemo,
+        [switch]$SafeMode
     )
     if ($Preview) {
         Show-AS2GoPreview -FunctionName 'Invoke-ASPhase06Reconnaissance' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
@@ -95,8 +96,10 @@ function Invoke-ASPhase06Reconnaissance {
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase06.toupper())"
-    $Functionality = "This phase involves collecting reconnaissance and configuration data with a non-privileged user."
-    Write-AS2GoOutput -Type H1 -Message $Functionality
+
+    Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
+    #$Functionality = "This phase involves collecting reconnaissance and configuration data with a non-privileged user."
+    #Write-AS2GoOutput -Type H1 -Message $Functionality
 
     If ($AS2GoDemo) {
         If ($UnAttended) {

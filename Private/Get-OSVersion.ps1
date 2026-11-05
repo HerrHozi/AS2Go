@@ -7,19 +7,19 @@ function Get-OSVersion {
     ################################################################################
 
 
-    Param([string] $computer)
+    Param(
+        [string] $computer
+    )
 
     $Info = Measure-FunctionRuntime -Begin
-
-
 
 
     try {
         $property = Get-ADComputer -Identity  $computer -Properties name, operatingSystem, operatingSystemVersion    -ErrorAction Stop
 
-if ($property.operatingSystemVersion -match '\((\d+)\)') {
-    $value = "V" + $matches[1]
-}
+        if ($property.operatingSystemVersion -match '\((\d+)\)') {
+            $value = "V" + $matches[1]
+        }
 
     }
     catch {
@@ -33,10 +33,11 @@ if ($property.operatingSystemVersion -match '\((\d+)\)') {
     $Script:WinVersion = @{
 
         #Win 11
-V26100 = "24H2"     # Windows 11 2024 Update
-V22631 = "23H2"     # Windows 11 2023 Update
-V22621 = "22H2"     # Windows 11 2022 Update
-V22000 = "21H2"     # Original Release (2021)
+        V26200 = "25H2"     # Windows 11 2025 Update
+        V26100 = "24H2"     # Windows 11 2024 Update
+        V22631 = "23H2"     # Windows 11 2023 Update
+        V22621 = "22H2"     # Windows 11 2022 Update
+        V22000 = "21H2"     # Original Release (2021)
 
         #Win 10
         V19045 = "22H2"
@@ -57,23 +58,17 @@ V22000 = "21H2"     # Original Release (2021)
 
 
 
-        # Windows Server 2025 (LTSC)
-#V26100 = "24H2"
+        # Windows Server 2025 (LTSC) shares build V26100 with Windows 11 24H2.
 
-# Windows Server 2022 (LTSC)
-V20348 = "21H2"
+        # Windows Server 2022 (LTSC)
+        V20348 = "21H2"
 
-# Windows Server 2022 (AC)
-V25398 = "23H2"
+        # Windows Server 2022 (AC)
+        V25398 = "23H2"
 
-# Windows Server 2019 (LTSC)
-#V17763 = "2019 / 1809"
+        # Windows Server 2019 (LTSC) shares build V17763 with Windows 10 1809.
 
-# Windows Server (SAC releases)
-#V18362 = "1903 (SAC)"
-#V18363 = "1909 (SAC)"
-#V19041 = "2004 (SAC)"
-#V19042 = "20H2 (SAC)"
+        # Windows Server SAC releases share their builds with Windows 10: V18362, V18363, V19041, and V19042.
 
     }
     

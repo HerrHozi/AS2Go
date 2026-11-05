@@ -70,7 +70,8 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
         [Switch]$EnableLogging,
         [switch]$SkipImages,
         [switch]$SkipClearHost,
-        [switch]$AS2GoDemo
+        [switch]$AS2GoDemo,
+        [switch]$SafeMode
     )
     if ($Preview) {
         Show-AS2GoPreview -FunctionName 'Invoke-ASPhase09ReconnaissancePrivileged' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
