@@ -75,7 +75,8 @@ function Invoke-ASPhase10AccessSensitiveData {
         [Switch]$EnableLogging,
         [switch]$SkipImages,
         [switch]$SkipClearHost,
-        [switch]$AS2GoDemo
+        [switch]$AS2GoDemo,
+        [switch]$SafeMode
     )
     if ($Preview) {
         Show-AS2GoPreview -FunctionName 'Invoke-ASPhase10AccessSensitiveData' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
@@ -105,11 +106,26 @@ function Invoke-ASPhase10AccessSensitiveData {
 
     If ($UnAttended) {
         $answer = $Script:Yes
+        if ($SafeMode) {
+            $answer = $Script:No
+        }
     }
     else {
-        $answer = Show-DecisionPrompt
+        $promptParams = @{}
+        if ($SafeMode) {
+            $promptParams.Options = @(
+                [pscustomobject]@{
+                    Label = '&Skip'
+                    Help  = 'Skip this step in Safe Mode'
+                    Value = $Script:No
+                }
+            )
+        }
+        $answer = Show-DecisionPrompt @promptParams
     }
 
+    
+    
     If ($answer -eq $Script:Yes) {
         $server = $($Script:ASBackupShare).Split(".")[0]
         $fakeditfile = Join-Path -Path $Script:ASBackupShare -ChildPath "ntds.dit"

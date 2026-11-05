@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="AS2Go since May 2026: offline preview, SafeMode, clearer demonstrations, and practical defender workshops.">
+<title>AS2Go — From Attack Simulation to Repeatable Defender Workshops</title>
+<style>
+:root{color-scheme:light;--paper:#f5f4f0;--card:#fff;--ink:#182b39;--muted:#526573;--line:#d7dfe1;--accent:#006779;--soft:#eaf5f5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--accent);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}.masthead{max-width:1180px;margin:auto;padding:24px 36px;display:flex;justify-content:space-between;gap:20px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}.brand{font-weight:800}.draft{color:var(--muted)}header{background:#102635;color:#fff;padding:72px max(36px,calc((100vw - 1108px)/2)) 64px;border-bottom:5px solid #28b9c9}.eyebrow{color:#78d8e2;font-size:12px;text-transform:uppercase;letter-spacing:.18em;font-weight:700}h1{font-size:clamp(36px,5.2vw,66px);line-height:1.12;letter-spacing:-.045em;max-width:970px;margin:20px 0 24px}header .intro{font-size:21px;line-height:1.6;color:#cfdee5;max-width:760px}.meta{font-size:13px;color:#acc3ce;margin-top:30px}.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px;padding:48px 36px 70px}aside nav{position:sticky;top:28px;font-size:13px;line-height:1.5}nav strong{display:block;text-transform:uppercase;letter-spacing:.12em;font-size:11px;margin-bottom:16px}nav a{display:block;padding:8px 0;text-decoration:none;color:var(--muted)}article{max-width:780px;min-width:0}h2{font-size:29px;line-height:1.25;letter-spacing:-.025em;margin:46px 0 18px;scroll-margin-top:24px}h2:first-child{margin-top:0}p{margin:0 0 20px}.lead{font-size:21px}blockquote{margin:30px 0;border-left:4px solid #1c94a6;padding:12px 24px;background:var(--soft);font-size:22px;line-height:1.5}blockquote p{margin:0}.note{padding:22px 24px;background:var(--soft);border:1px solid #bedcde;border-radius:8px;margin:26px 0}.note strong{display:block;margin-bottom:6px}.note p:last-child{margin-bottom:0}.review{background:#fff5e5;border-color:#e5cb98;font-size:14px}pre{background:#102635;color:#d8f4f5;padding:22px 24px;border-radius:8px;overflow:auto;font:14px/1.65 Consolas,monospace}code{font: .88em Consolas,monospace}p code,li code,td code{background:#e6edef;padding:2px 5px;border-radius:3px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:14px;margin:24px 0}th{text-align:left;background:#e7eeef}th,td{padding:14px 16px;vertical-align:top;border-bottom:1px solid var(--line)}td:first-child{font-weight:650;width:25%}ol,ul{padding-left:24px}li{padding-left:5px;margin-bottom:12px}.footer{border-top:1px solid var(--line);padding-top:24px;margin-top:40px;font-size:14px;color:var(--muted)}.tags{font-size:12px;letter-spacing:.04em;color:var(--muted);margin-top:26px}button{border:1px solid var(--line);border-radius:6px;padding:9px 14px;background:var(--card);color:var(--ink);font:inherit;font-size:12px;cursor:pointer;margin-top:22px}@media(max-width:800px){.masthead{padding:18px 22px}.layout{display:block;padding:30px 22px}header{padding:44px 22px}aside nav{position:static;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:30px}nav a{display:inline-block;margin-right:16px}h2{font-size:26px}.draft{letter-spacing:0}}@media print{body{background:white;font-size:11pt;color:#111}.masthead,aside,.review{display:none}header{background:white;color:#111;padding:0 0 20px;border-bottom:2px solid #555}header .intro,.eyebrow,.meta{color:#444}h1{font-size:30pt}.layout{display:block;padding:25px 0}article{max-width:none}pre{white-space:pre-wrap;background:#eee;color:#111}h2{break-after:avoid}table,.note,blockquote{break-inside:avoid}a{color:inherit}header .intro{font-size:14pt}}
+</style>
+</head>
+<body>
+<div class="masthead"><span class="brand">Herr HoZi / AS2Go</span><span class="draft">Offline editorial draft · November 2026</span></div>
+<header>
+<div class="eyebrow">Active Directory · Detection Engineering · PowerShell</div>
+<h1>AS2Go — From Attack Simulation to Repeatable Defender Workshops</h1>
+<p class="intro">Offline preview, SafeMode, and a clearer demo experience: how AS2Go has evolved since May, and what that means for your next defender workshop.</p>
+<div class="meta">Holger Zimmermann · 5 November 2026 · Follow-up to AS2Go 2026</div>
+</header>
+<div class="layout">
+<aside><nav aria-label="Article contents"><strong>In this article</strong><a href="#since-may">Since May</a><a href="#preview">Offline preview</a><a href="#safemode">SafeMode</a><a href="#workflow">Clearer demonstrations</a><a href="#impact">Operational impact</a><a href="#workshop">A defender workshop</a><a href="#next">Try it in your lab</a><button type="button" onclick="window.print()">Print / Save as PDF</button></nav></aside>
+<article>
+<section id="since-may">
+<h2>The next step after the introduction</h2>
+<p class="lead">In May, I introduced the updated AS2Go PowerShell module and its approach to demonstrating Active Directory attack paths. Since then, I have continued working on how those demonstrations are prepared, explained, and run.</p>
+<p>The <a href="https://herrhozi.com/2026/05/21/as2go/">original AS2Go 2026 post</a> covered the module structure, the kill-chain approach, and scenarios such as Kerberoasting, AD CS ESC1, and domain persistence. Those remain part of the story.</p>
+<p>This follow-up focuses on the experience around those techniques: exploring the workflow before execution, limiting selected actions with SafeMode, and making demonstrations easier to follow.</p>
+<blockquote><p>A useful workshop gives defenders something to investigate, explain, and improve.</p></blockquote>
+</section>
+<section id="preview">
+<h2>Explore the workflow before running it</h2>
+<p>One of the additions since May is an offline preview. It lets you browse workflow descriptions and source steps without executing the workflow itself.</p>
+<pre><code># Browse the workflow without running its actions
+Start-AS2GoDemo -Preview
+
+# Explore a specific phase
+Invoke-ASPhase07PrivilegeEscalation -Preview</code></pre>
+<p>The preview uses a separate navigation path. It inspects the available functions and displays descriptions or source expressions rather than running the attack steps. The preview path does not perform workflow setup, Active Directory queries, or external tool execution.</p>
+<p>This is useful when preparing a session: review the sequence, decide which steps need explanation, and identify the prerequisites to check in the lab. Preview does not demonstrate that an attack would succeed or that a detection would fire.</p>
+</section>
+<section id="safemode">
+<h2>SafeMode: more control during a demonstration</h2>
+<p>SafeMode is another addition in the current development build. The main demo passes <code>-SafeMode</code> to the phases it invokes. Selected steps then restrict their execution choices, allowing the presenter to explain an action and skip it.</p>
+<p>For example, the current interactive confirmation in Phase 12 offers only Skip when SafeMode is enabled. Phases 10 and 11 also skip their main data-access or copy action in SafeMode, including their unattended branches. Selected Pass-the-Ticket and PsExec prompts have additional restrictions.</p>
+<div class="note"><strong>Preview and SafeMode serve different purposes</strong><p>Preview browses the workflow without executing its actions. SafeMode participates in the normal workflow and applies restrictions where implemented. Setup, queries, logging, and other operations can still occur.</p></div>
+<div class="table-wrap"><table><thead><tr><th scope="col">Mode</th><th scope="col">What to expect</th><th scope="col">Best use</th></tr></thead><tbody><tr><td>Preview</td><td>Offline navigation through descriptions and source steps.</td><td>Preparation and explanation before execution.</td></tr><tr><td>SafeMode</td><td>Normal workflow with selected execution choices restricted or skipped.</td><td>Guided demonstrations in a prepared, authorized lab.</td></tr><tr><td>Lab execution</td><td>Selected actions can run and generate observable activity.</td><td>Testing behavior, telemetry, and detections.</td></tr></tbody></table></div>
+<p><strong>SafeMode is not a universal dry-run or a production safety boundary.</strong> Its coverage depends on the phase and execution path. In the reviewed build, Phase 12's unattended branch bypasses the interactive Skip restriction. Do not combine SafeMode with <code>-UnAttended</code> and assume that every action is blocked.</p>
+<p>For a walkthrough that must not execute workflow actions, use Preview. For execution, use an isolated lab with test accounts, test data, and a reset plan.</p>
+</section>
+<section id="workflow">
+<h2>Make the demonstration easier to follow</h2>
+<p>The October changes include revisions to the demo entry point, function help, console output, and the Pass-the-Ticket workflow. Ticket inspection helpers were also added to support working with Kerberos ticket information.</p>
+<p>The current development work continues that direction with consistent phase pages and more specific explanations of what each phase demonstrates. During a workshop, those explanations help connect a technical action with the security lesson behind it.</p>
+<p>The data-access phase is a good example. Its sample password file demonstrates why plaintext password storage matters. The backup-copy phase uses simulated backup data to demonstrate exposure through accessible shares. These are teaching scenarios; a sample <code>.dit</code> file is not evidence that a real Active Directory database was extracted.</p>
+</section>
+<section id="impact">
+<h2>Explain operational impact one action at a time</h2>
+<p>Domain compromise and persistence were already covered in May. Since then, Phase 12 and its supporting functions have been reorganized and revised, including backdoor-account creation, account disruption, Group Policy Template manipulation, encryption, and reboot actions.</p>
+<p>The revised menu also includes a way to select or change the configured break-glass account. Specific account-disruption and group-manipulation routines contain exclusions for designated accounts. Those exclusions should be understood in the context of each action; they do not guarantee that a lab remains recoverable.</p>
+<p>For a defender workshop, focus on one question at a time. Who can change a privileged group? What activity is visible when a policy template changes? Which response would contain the incident, and which recovery steps would still be required?</p>
+</section>
+<section id="workshop">
+<h2>Turn a demonstration into a defender exercise</h2>
+<p>A practical session can follow this sequence:</p>
+<ol><li><strong>Choose one learning objective.</strong> Define the behavior you want to explain or the detection you want to investigate.</li><li><strong>Review the workflow.</strong> Use Preview to inspect the relevant phase and discuss prerequisites.</li><li><strong>Prepare the isolated lab.</strong> Verify the selected mode and action, test identities, telemetry collection, and reset procedure.</li><li><strong>Run the selected activity.</strong> Record the time, source, target, account, and observed outcome.</li><li><strong>Compare expectations with evidence.</strong> Review events, alerts, and response actions in the connected security tools.</li><li><strong>Reset and repeat.</strong> Change one condition and investigate how the result differs.</li></ol>
+<p>This is a suggested workshop method, not an automated AS2Go reporting feature. An action completing does not prove that monitoring detected it. An action failing does not, by itself, prove that a security control blocked it.</p>
+</section>
+<section id="next">
+<h2>Try it in your lab</h2>
+<p>AS2Go continues to bring together Active Directory findings, attacker behavior, and defensive visibility. The recent changes make it easier to prepare the explanation around an attack path and choose which parts to explore or execute.</p>
+<p>Start with the preview. Review SafeMode's coverage for the build you are using. Then select a focused lab exercise and examine the evidence it produces.</p>
+<p>AS2Go remains intended for isolated, explicitly authorized lab and test environments. It is not intended for production use.</p>
+<p>Feedback is especially useful when it includes the module version, lab prerequisites, expected behavior, and what you actually observed.</p>
+<div class="footer"><strong>Project links</strong><ul><li><a href="https://github.com/HerrHozi/AS2Go">AS2Go on GitHub</a></li><li><a href="https://www.powershellgallery.com/packages/AS2Go">AS2Go on the PowerShell Gallery</a></li><li><a href="https://herrhozi.com/2026/05/21/as2go/">Read the May 2026 introduction</a></li></ul></div>
+<div class="tags">AS2Go · Active Directory · SafeMode · PowerShell · Purple Team · Detection Engineering</div>
+</section>
+<div class="note review"><strong>Editorial review note — remove before publication</strong><p>This draft reflects the local development source and ChangeLog reviewed on 5 November 2026, with manifest version 2026.11.2.576. It includes uncommitted development changes, including SafeMode. Availability in a published GitHub or PowerShell Gallery release has not been verified. SafeMode behavior was reviewed statically; no attack scenarios were executed. This HTML is self-contained; external links require internet access.</p></div>
+</article>
+</div>
+</body>
+</html>

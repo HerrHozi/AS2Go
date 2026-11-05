@@ -32,7 +32,7 @@
     - Optional Rubeus integration for Kerberos-based attacks
 
 .LINK
-    Invoke-PasswordSprayAttack
+    Start-PasswordSprayAttack
 
 #>
 function New-PasswordSprayAttack {
@@ -187,7 +187,7 @@ function New-PasswordSprayAttack {
         foreach ($domain in $domains) {
             $DomainSearchBase = (Get-ADDomain -Server $domain).DistinguishedName
             $runtime = Measure-Command {
-                Invoke-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $domain -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword
+                Start-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $domain -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword
             }
             Write-log -Message "Finished in $($runtime.TotalSeconds) seconds."
         }
@@ -195,7 +195,7 @@ function New-PasswordSprayAttack {
     else {
         $server = Get-BestDomainController -domain $DomainSearchBase
         $runtime = Measure-Command {
-            Invoke-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $server -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword 
+            Start-PasswordSprayAttack -SearchBase $DomainSearchBase -Password $PasswordToTest -Server $server -IncludeSamAccountNameAsPassword:$IncludeSamAccountNameAsPassword 
         }
         Write-log -Message "Finished in $($runtime.TotalSeconds) seconds."
     }

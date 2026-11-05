@@ -57,23 +57,28 @@ function Invoke-PassTheTicketAttack {
     #
     If ($UnAttended) { Start-Sleep 2 } else { 
     
-        $Options = @(
-            [pscustomobject] @{
-                Label = "&Yes"
-                Help  = "All prerequisites are met. Proceed with the PtT simulation."
-                Value = $Script:Yes
-            },
-            [pscustomobject] @{
-                Label = "&Skip"
-                Help  = "The Admin PC is not ready. Skip the PtT simulation."
-                Value = $Script:No
-            }
-        )
 
-        $title = "Is the Admin PC ($Script:ASSAW) ready for the Pass-the-Ticket (PtT) attack?"
-        $message = "Please confirm that the following prerequisites are met:`n  • Endpoint protection is disabled in the test environment.`n  • Fresh Kerberos tickets are available on the Admin PC."
+$Options = @(
+    [pscustomobject] @{
+        Label = "&Skip"
+        Help  = "The Admin PC is not ready. Skip the PtT simulation."
+        Value = $Script:No
+    }
+)
 
-        $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
+if (-not $SafeMode) {
+    $Options += [pscustomobject] @{
+        Label = "&Yes"
+        Help  = "All prerequisites are met. Proceed with the PtT simulation."
+        Value = $Script:Yes
+    }
+}
+
+$title = "Is the Admin PC ($Script:ASSAW) ready for the Pass-the-Ticket (PtT) attack?"
+$message = "Please confirm that the following prerequisites are met:`n  • Endpoint protection is disabled in the test environment.`n  • Fresh Kerberos tickets are available on the Admin PC."
+
+# Default index must stay valid for both cases: last option ("Yes" if present, otherwise "Skip").
+$decision = Show-DecisionPrompt -Message $message -Options $Options -Default ($Options.Count - 1) -Title $title
   
     
         If ($decision -eq $Script:No) {

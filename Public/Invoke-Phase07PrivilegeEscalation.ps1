@@ -56,6 +56,10 @@ Runs Phase 07 without phase visuals and without clearing the host.
 .NOTES
 Alias: P07, ESC
 Part of: AS2Go attack phase orchestration
+.FUNCTIONALITY
+Lets you select and run a privilege-escalation technique: Pass-the-Ticket, Kerberoasting, ESC1, or PsExec as SYSTEM.
+Demonstrates how stolen tickets, weak service passwords, or a vulnerable certificate template grant admin access.
+Pass-the-Hash and credential theft via memory access are listed as selectable options reserved for future activation.
 #>
 function Invoke-ASPhase07PrivilegeEscalation {
 
@@ -77,7 +81,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
         [switch]$SkipClearHost,
         [switch]$AS2GoDemo,
         [validateSet("PtH", "PtT", "Kerberoasting", "ESC1", "WDigest", "PsExec")]
-        [String]$PrivilegeEscalation
+        [String]$PrivilegeEscalation,
+        [switch]$SafeMode
     )
     if ($Preview) {
         Show-AS2GoPreview -FunctionName 'Invoke-ASPhase07PrivilegeEscalation' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
@@ -106,6 +111,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
     If (-not $SkipClearHost) { Clear-Host }
     
     Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
+        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+
     Write-AS2GoOutput -Type  Bullet "Reuse captured NTLM hashes to authenticate via Pass-the-Hash"
     Write-AS2GoOutput -Type  Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
     Write-AS2GoOutput -Type  Bullet "Roast Kerberos service tickets to recover weak (service) account passwords"
@@ -122,7 +129,9 @@ function Invoke-ASPhase07PrivilegeEscalation {
     $script:helpMemoryAccess = "Abuse Memory Access for Credential Theft."
     $Script:helpEnableMemoryAccess = "Enable Memory Access for Credential Theft."
     
+    $answer = Show-DecisionPrompt
 
+    If ($answer -eq $Script:No) { return }
 
     Do {
         # If ($skipstep) { break }     
@@ -199,7 +208,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
                 [pscustomobject] @{
                     Label = "&Skip"
                     Help  = $Script:helpSkip
-                    Value = "S"
+                    Value = $Script:No
                 }
             )
             $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
@@ -243,15 +252,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
 
         #If (-not $SkipClearHost) { Clear-Host }
 
-        If ($UnAttended) {
-            $repeat = $Script:No
-        }
-        else {
-            $title = "REPEAT | Phase 07 - Privilege Escalation"
-            $repeat = Show-DecisionPrompt -Default 1 -Title $title
-        }
    
-    } Until ($repeat -eq $Script:No)
+    } Until ($answer -eq $Script:No)
 
     Measure-FunctionRuntime -End -details $info
 }

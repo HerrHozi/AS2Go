@@ -1,34 +1,80 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Brute Force Or Pw Spray</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AS2Go · Password Spray</title>
   <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-    }
-
-    #maincontainer {
-      width: 1204px;
-      height: 487px;
-      margin: 10px;
-    }
-
-    #maincontainer img {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+    :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
+    body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 "Segoe UI",system-ui,sans-serif; }
+    .top { display:flex; align-items:center; gap:12px; padding:12px 20px; background:var(--raised); border-bottom:1px solid var(--border); }
+    .brand-mark { width:36px; height:36px; object-fit:contain; border-radius:7px; flex-shrink:0; }
+    .title, .host { color:var(--dim); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+    .brand { font:inherit; }
+    .host { margin-left:auto; }
+    button { padding:5px 10px; border:1px solid var(--border); border-radius:4px; background:transparent; color:var(--dim); font:inherit; cursor:pointer; }
+    button:hover, button:focus-visible { color:var(--bright); border-color:var(--link); }
+    main { max-width:1280px; margin:0 auto; padding:16px; }
+    .diagram { margin:0 0 8px; }
+    .diagram img { display:block; width:100%; height:auto; border:1px solid var(--border); border-radius:12px; }
+    .panel { padding:14px 16px; margin-bottom:16px; background:var(--raised); border:1px solid var(--border); border-radius:8px; }
+    nav { display:flex; flex-wrap:wrap; gap:10px 20px; }
+    a { color:var(--link); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; text-underline-offset:3px; }
+    a:hover { color:var(--bright); }
+    h1 { margin:0 0 8px; color:var(--bright); font-size:24px; }
+    h2 { margin:0 0 8px; color:var(--dim); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+    p { margin:0; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .eyebrow { display:block; margin-bottom:6px; color:var(--link); font:700 12px Consolas,"Courier New",monospace; letter-spacing:.06em; }
+    footer { max-width:1280px; margin:0 auto; padding:0 16px 24px; color:var(--dim); font-size:12px; }
+    @media(max-width:640px) { .top { flex-wrap:wrap; padding:10px 16px; } .host { margin-left:0; flex:1 1 auto; } .grid { grid-template-columns:1fr; gap:0; } }
+    @media print { button { display:none; } body { --bg:#fff; --raised:#fff; --text:#0f172a; --dim:#475569; --bright:#020617; --border:#cbd5e1; --link:#0369a1; } }
   </style>
 </head>
-
-<body>
-
-  <div id="maincontainer">
-    <img src="./phase_04.png" alt="Brute Force Or Pw Spray">
-  </div>
+<body data-theme="dark">
+  <header class="top">
+    <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
+    <span class="title"><span class="brand">AS2Go</span> · Password Spray</span>
+    <span class="host">Cyber Kill Chain</span>
+    <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
+  </header>
+  <main>
+    <figure class="diagram" aria-label="AS2Go attack scenario: Password Spray">
+      <img src="./phase_04.png" alt="AS2Go attack scenario: Password Spray">
+    </figure>
+    <nav class="panel" aria-label="Password Spray references">
+      <a href="https://en.hackndo.com/password-spraying-lockout/" target="_blank" rel="noopener noreferrer">Spray passwords, avoid lockouts</a>
+      <a href="https://www.paloaltonetworks.com/cyberpedia/password-spraying" target="_blank" rel="noopener noreferrer">Password Spraying Explained</a>
+      <a href="https://attack.mitre.org/techniques/T1110/003/" target="_blank" rel="noopener noreferrer">MITRE T1110.003</a>
+      <a href="https://learn.microsoft.com/en-us/defender-xdr/alert-classification-suspicious-ip-password-spray" target="_blank" rel="noopener noreferrer">Detection and Investigation</a>
+    </nav>
+    <section class="panel">
+      <span class="eyebrow">PHASE 04</span>
+      <h1>Password Spray</h1>
+      <p>This phase demonstrates password spraying against Active Directory accounts in the selected lab scope, showing how weak passwords can provide an initial foothold.</p>
+    </section>
+    <div class="grid">
+      <section class="panel">
+        <h2>What this phase shows</h2>
+        <p>Reviews forest password policies and account lockout thresholds, selects a domain or forest scope, and tests configured password candidates. Preview stays offline; Safe Mode allows the phase to be skipped only.</p>
+      </section>
+      <section class="panel">
+        <h2>Security lesson</h2>
+        <p>Account lockout alone does not eliminate password spraying. Reduce weak passwords, monitor authentication failures across accounts, and investigate successful sign-ins that follow suspicious attempts.</p>
+      </section>
+    </div>
+  </main>
+  <footer>AS2Go · Attack Scenario to Go · For explicitly authorized lab environments.</footer>
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    toggle.addEventListener('click', () => {
+      const light = document.body.dataset.theme !== 'light';
+      document.body.dataset.theme = light ? 'light' : 'dark';
+      toggle.setAttribute('aria-pressed', String(light));
+      toggle.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+    });
+  </script>
 </body>
-
 </html>

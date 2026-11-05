@@ -71,28 +71,44 @@ function Invoke-PrivilegeEscalationViaLocalSystem {
 
         $title = "Privilege Escalation"
         $message = "Select the attack technique to execute."
+
+        If ($SafeMode) {
+        
         $Options = @(
-            [pscustomobject] @{
-                Label = "&Local System"
-                Help  = "Run a PsExec attack to execute a command prompt with Local System privileges."
-                Value = "LocalSystem"
-            },
-            [pscustomobject] @{
-                Label = "&HelpDeskUser"
-                Help  = "Run a PsExec attack to execute a command prompt with Help Desk User privileges."
-                Value = "HelpDeskUser"
-            },
-            [pscustomobject] @{
-                Label = "&Domain Admin"
-                Help  = "Run a PsExec attack to execute a command prompt with Domain Admin privileges."
-                Value = "DomainAdmin"
-            },
+
             [pscustomobject] @{
                 Label = "&Skip"
                 Help  = "Skip Privilege Escalation."
                 Value = "S"
             }
         )
+        }
+        else
+        {
+            $Options = @(
+                [pscustomobject] @{
+                    Label = "&Local System"
+                    Help  = "Run a PsExec attack to execute a command prompt with Local System privileges."
+                    Value = "LocalSystem"
+                },
+                [pscustomobject] @{
+                    Label = "&HelpDeskUser"
+                    Help  = "Run a PsExec attack to execute a command prompt with Help Desk User privileges."
+                    Value = "HelpDeskUser"
+                },
+                [pscustomobject] @{
+                    Label = "&Domain Admin"
+                    Help  = "Run a PsExec attack to execute a command prompt with Domain Admin privileges."
+                    Value = "DomainAdmin"
+                },
+                [pscustomobject] @{
+                    Label = "&Skip"
+                    Help  = "Skip Privilege Escalation."
+                    Value = "S"
+                }
+            )
+        }
+        
         $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
                 
         write-host "`n"

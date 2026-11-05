@@ -88,7 +88,8 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         [switch]$AS2GoDemo,
         [switch]$DeveloperMode,
         [validateSet("Encrypt", "Reboot", "BackdoorUser", "GPT", "UserManipulation", "GroupManipulation")]
-        [String]$DomainPersistence
+        [String]$DomainPersistence,
+        [switch]$SafeMode
     )
     
     if ($Preview) {
@@ -145,7 +146,17 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         $answer = $Script:Yes
     }
     else {
-        $answer = Show-DecisionPrompt
+        $promptParams = @{}
+        if ($SafeMode) {
+            $promptParams.Options = @(
+                [pscustomobject]@{
+                    Label = '&Skip'
+                    Help  = 'Skip this step in Safe Mode'
+                    Value = $Script:No
+                }
+            )
+        }
+        $answer = Show-DecisionPrompt @promptParams
     }
 
     If ($answer -ne $Script:Yes) {

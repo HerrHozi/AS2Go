@@ -20,7 +20,7 @@ Console messages and output from invoked commands; no dedicated result object is
 
 .NOTES
 Private AS2Go function. Run from an initialized AS2Go module session.
-Uses the same Rubeus, domain-context, and initialized module settings as Invoke-Kerberoasting.
+Uses the same Rubeus, domain-context, and initialized module settings as Start-Kerberoasting.
 
 .COMPONENT
 Category: Main Function
@@ -42,30 +42,29 @@ function Invoke-KerberoastingAttack {
     Update-WindowTitle -NewTitle $Script:Phase27
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase27
     #Show-CurrentPhase -Phase "phase_07.html"
-    Do {
 
-        If (-not $SkipClearHost) { Clear-Host }
+    If (-not $SkipClearHost) { Clear-Host }
 
-        Write-AS2GoOutput -Type  Header -M "Privilege Escalation via Kerberoasting"
-        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type  Header -M "Privilege Escalation via Kerberoasting"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-        Invoke-Kerberoasting    
+    $promptParams = @{}
+    if ($safemode) {
+        $promptParams.Options = @(
+            [pscustomobject]@{
+                Label = '&Skip'
+                Help  = 'Skip this step in Safe Mode'
+                Value = $Script:No
+            }
+        )
+    }
+    $answer = Show-DecisionPrompt @promptParams
+    if ($answer -eq $Script:No) {
+        return
+    }
 
-        #If (-not $SkipClearHost) { Clear-Host }
 
+    Start-Kerberoasting    
 
-        If ($UnAttended) {
-            $repeat = $Script:No
-        }
-        else {
-        $title = "REPEAT | Privilege Escalation - Kerberoasting Attack"
-        $repeat = Show-DecisionPrompt -Default 1 -Title $title
-        }
-
-    } Until ($repeat -eq $Script:No)
-
-    Write-Log -Message "    >> using $CAtemplate"
     Measure-FunctionRuntime -End -Details $Info
-
-    #
 }
