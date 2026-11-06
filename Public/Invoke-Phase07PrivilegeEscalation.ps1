@@ -8,7 +8,7 @@ It initializes phase context, optionally shows visuals, and presents an attack s
 can be run interactively or in unattended mode using an automatic recommendation.
 
 Depending on the selected option, the phase can trigger attacks and actions such as:
-- Pass-the-Hash (PtH) (coming soon)
+- Overpass-the-Hash with a captured NTLM hash (PtH)
 - Pass-the-Ticket (PtT) (coming soon)
 - Kerberoasting
 - Misconfigured Certificate Template attack (ESC1)
@@ -57,9 +57,9 @@ Runs Phase 07 without phase visuals and without clearing the host.
 Alias: P07, ESC
 Part of: AS2Go attack phase orchestration
 .FUNCTIONALITY
-Lets you select and run a privilege-escalation technique: Pass-the-Ticket, Kerberoasting, ESC1, or PsExec as SYSTEM.
-Demonstrates how stolen tickets, weak service passwords, or a vulnerable certificate template grant admin access.
-Pass-the-Hash and credential theft via memory access are listed as selectable options reserved for future activation.
+Lets you select a privilege-escalation technique: Overpass-the-Hash, Pass-the-Ticket, Kerberoasting, or ESC1.
+Demonstrates how a stolen NTLM hash, tickets, or vulnerable certificate templates can grant admin access.
+Credential theft via memory access and PsExec as SYSTEM are listed as options reserved for future activation.
 #>
 function Invoke-ASPhase07PrivilegeEscalation {
 
@@ -147,7 +147,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
 
         Write-AS2GoOutput -Type Header -Message "Select an Attack Technique"
 
-        Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Hash Attack" -NoNewline; Write-Host " ** Coming Soon **" -ForegroundColor Yellow
+        Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Hash Attack"
         Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack"
         Write-Host "  K " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Kerberoasting Attack"
         Write-Host "  1 " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Misconfigured Certificate Template Attack (ESC1)"
@@ -165,7 +165,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
             $title = "Privilege Escalation"
             $message = "Select the attack technique to execute. Options with unmet requirements are hidden."
             
-            $Script:helpPassTheHash = $null 
+            #$Script:helpPassTheHash = $null 
             $script:helpMemoryAccess = $null 
             $Script:helpEnableMemoryAccess = $null 
             
@@ -216,10 +216,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
         }
 
         If ($answer -eq $Script:PtH) {
-            #Starting Pass-the-Hash (PtH) Attack on VictimPC
-
             Show-CurrentPhase -Phase "phase_07_PtH.html"  
-            Invoke-PtHAttack
+            Invoke-OverPassTheHashAttack
         }
         elseif ($answer -eq $Script:PtT) {
 
