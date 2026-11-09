@@ -86,6 +86,8 @@ function Invoke-Encryption {
             Start-AS2GoDemoPopup -ComputerName $affectedDC -SourceFile $sourceFile
         }
     }
+    
+    if (-not $Script:Unattended) { pause }
 
     Measure-FunctionRuntime -End -Details $info
 }

@@ -1,60 +1,65 @@
 <#
 .SYNOPSIS
-Extracts logon session details from an existing text log.
+Converts an LSASS logon-session text dump into session objects.
 
 .DESCRIPTION
-Returns one object per Authentication Id block. Reads session metadata, the NTLM value
-from the msv section, and the username from the kerberos section. Domain contains the
-NetBIOS domain from the session header; FQDN contains the domain from the kerberos section.
-Missing fields and literal (null) values are returned as $null. LogonTime remains a string.
-Only reads the supplied file; does not collect credentials or authenticate.
+Parses the supplied text file and returns one object per Authentication Id block. Reads
+session metadata, the NTLM value from the msv section, and the username and domain from
+the kerberos section. Domain contains the NetBIOS domain from the session header; FQDN
+contains the domain from the kerberos section. Missing fields and literal (null) values
+are returned as $null. LogonTime remains a string. Reads the file only; it does not
+access LSASS, collect credentials, or authenticate.
 
 .PARAMETER Path
-Path to the existing log file. Defaults to C:\Users\Public\AS2Go\Exfiltration\test.log.
+Path to the text dump file. Defaults to C:\Users\Public\AS2Go\Exfiltration\test.log.
+
+.PARAMETER Unique
+Returns the newest session per domain SID, limited to sessions with an NTLM value.
 
 .OUTPUTS
 System.Management.Automation.PSCustomObject
 
 .EXAMPLE
-$Sessions = @(Get-LogonSessionFromFile)
+$Sessions = @(ConvertFrom-CredentialDump)
 Collects the logon sessions in an array, including when zero or one session is found.
 
 .COMPONENT
 Category: Utility Function
 
 .FUNCTIONALITY
-Extracts session metadata, NetBIOS domain, msv NTLM, and Kerberos username and FQDN from a text log.
+Parses LSASS logon-session text into objects with session metadata, NTLM, username, and domain details.
 #>
-function Get-LogonSessionFromFile {
+function ConvertFrom-CredentialDump {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]$Path = 'C:\Users\Public\AS2Go\Exfiltration\test.log',
-        [Switch]$EnableLogging
+        [Switch]$Unique
     )
 
     $info = Measure-FunctionRuntime -Begin
     try {
-        Write-AS2GoOutput -Type Header -Message 'Read Logon Sessions'
+        Write-AS2GoOutput -Type Header -Message 'Analyze LSASS Dump'
         Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
         $Session = $null
+        $Sessions = [System.Collections.Generic.List[object]]::new()
         $Section = $null
         foreach ($Line in (Get-Content -LiteralPath $Path -ErrorAction Stop)) {
             if ($Line -match '^\s*Authentication Id\s*:') {
                 if ($null -ne $Session) {
-                    [pscustomobject]$Session
+                    $Sessions.Add([pscustomobject]$Session)
                 }
                 $Session = [ordered]@{
-                    Session = $null
+                    Session     = $null
                     LogonServer = $null
-                    LogonTime = $null
-                    SID = $null
-                    NTLM = $null
-                    Username = $null
-                    Domain = $null
-                    FQDN = $null
+                    LogonTime   = $null
+                    SID         = $null
+                    NTLM        = $null
+                    Username    = $null
+                    Domain      = $null
+                    FQDN        = $null
                 }
                 $Section = $null
                 continue
@@ -82,11 +87,32 @@ function Get-LogonSessionFromFile {
                 }
             }
         }
+
+
         if ($null -ne $Session) {
-            [pscustomobject]$Session
+            $Sessions.Add([pscustomobject]$Session)
         }
+
+        if ($Unique) {
+            $Sessions |
+            Where-Object {
+                $null -ne $_.NTLM -and
+                $_.SID -like 'S-1-5-21-*'
+            } |
+            Sort-Object -Property LogonTime -Descending |
+            Group-Object -Property SID |
+            ForEach-Object {
+                $_.Group[0]
+            }
+        }
+        else {
+            $Sessions
+        }
+
+
     }
     finally {
+        write-log -Message "Finished processing logon sessions from file: $Path found $($Session -ne $null ? 'with valid sessions' : 'with no valid sessions')"
         Measure-FunctionRuntime -End -Details $info
     }
 }
@@ -95,7 +121,7 @@ function Get-LogonSessionFromFile {
 
 
 
-$results = Get-LogonSessionFromFile -Path "C:\Users\Public\AS2Go\MaliciousTools\test.log" -EnableLogging
+$results = ConvertFrom-CredentialDump -Path "C:\Users\Public\AS2Go\MaliciousTools\test.log" -EnableLogging
 
 $uniqueResults =
     $results |
@@ -160,3 +186,4 @@ $BestPrincipal = foreach ($Rid in 519, 512, 548) {
 }
 
 $BestPrincipal | Select-Object Domain, Username, NTLM, GroupMembershipRids
+#>

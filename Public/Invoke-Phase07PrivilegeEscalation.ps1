@@ -111,7 +111,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
     If (-not $SkipClearHost) { Clear-Host }
     
     Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
-        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     Write-AS2GoOutput -Type  Bullet "Reuse captured NTLM hashes to authenticate via Pass-the-Hash"
     Write-AS2GoOutput -Type  Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
@@ -128,10 +128,13 @@ function Invoke-ASPhase07PrivilegeEscalation {
     $Script:helpSkip = "Skip Privilege Escalation."
     $script:helpMemoryAccess = "Abuse Memory Access for Credential Theft."
     $Script:helpEnableMemoryAccess = "Enable Memory Access for Credential Theft."
-    
-    $answer = Show-DecisionPrompt
 
-    If ($answer -eq $Script:No) { return }
+    If (-not $unattended) {
+        $answer = Show-DecisionPrompt
+        If ($answer -eq $Script:No) { return }
+    }
+
+
 
     Do {
         # If ($skipstep) { break }     
@@ -248,7 +251,10 @@ function Invoke-ASPhase07PrivilegeEscalation {
             Write-AS2GoOutput -Type Info -Message "Privilege Escalation was skipped."
         }
 
-        #If (-not $SkipClearHost) { Clear-Host }
+        if ($UnAttended) {
+            $answer = $Script:No
+        }
+
 
    
     } Until ($answer -eq $Script:No)

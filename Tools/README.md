@@ -22,13 +22,13 @@ Executable files are not included with this README.
 
 The following versions were used for testing:
 
-| Tool | Release | Last Build |
-| --- | --- | --- |
-| `NetSess.exe` | 2.0.0.46 | 20220105 |
-| `Mimikatz.exe` | 2.2.0.0 | 20220809 |
-| `Rubeus.exe` | 2.3.3.0 | 20251009 |
-| `Certify.exe` | 2.0.0.0 | 20251009 |
-| `PsExec.exe` | 2.4 | 20220719 |
+| Tool | Release | Last Build | SHA-256 |
+| --- | --- | --- | --- |
+| `NetSess.exe` | 2.0.0.46 | 20220105 | `DDEEEDC8AB9AB3B90C2E36340D4674FDA3B458C0AFD7514735B2857F26B14C6D` |
+| `Mimikatz.exe` | 2.2.0.0 | 20220919 | `61C0810A23580CF492A6BA4F7654566108331E7A4134C968C2D6A05261B2D8A1` |
+| `Rubeus.exe` | 2.3.3.0 | 20251009 | `D13E01E6108EDF892B952482B987431429407B951756163511E6DE22D4B139B5` |
+| `Certify.exe` | 2.0.0.0 | 20251009 | `E25CBD8B2B1B42F31E7D0E43AE0D0700C24D34753302DB2D742C6D157BA502A4` |
+| `PsExec.exe` | 2.4.3 | 20220719 | `CBC86048C9C5A9DE697D29EA3650BECABBFAE5A6FC276785EECA3AAD938F3292` |
 
 These are the tested versions, which may differ from the latest available releases.
 

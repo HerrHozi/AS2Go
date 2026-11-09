@@ -6,6 +6,9 @@ Inventories Enterprise CAs registered in Active Directory.
 Reads enterprise CA objects and correlates their certificates, server availability, and
 published certificate templates.
 
+.PARAMETER InventoryOnly
+Displays the inventory without updating the AD CS setup state.
+
 .COMPONENT
 Category: Sub Function
 
@@ -22,14 +25,15 @@ function Get-ADCSEnterpriseCA {
 
     Param(
         [Parameter(ValueFromPipeline, Mandatory)]
-        [string]$Server
+        [string]$Server,
+        [switch]$InventoryOnly
     )
 
     $Info = Measure-FunctionRuntime -Begin
 
     # Get all Enterprise CAs from AD
 
-    $ConfigNC = (Get-ADRootDSE).ConfigurationNamingContext
+    $ConfigNC = (Get-ADRootDSE -Server $Server).ConfigurationNamingContext
 
     $cas = Get-ADObject -LDAPFilter "(objectClass=pKIEnrollmentService)" `
         -SearchBase "CN=Public Key Services,CN=Services,$ConfigNC"  `
@@ -114,7 +118,8 @@ function Get-ADCSEnterpriseCA {
 
     # Join status back into hierarchy
     $final = $hierarchy | ForEach-Object {
-        $st = $status | Where-Object { $_.Server -eq $_.Server } | Select-Object -First 1
+        $caServer = $_.Server
+        $st = $status | Where-Object { $_.Server -eq $caServer } | Select-Object -First 1
         [PSCustomObject]@{
             CAName       = $_.CAName
             Server       = $_.Server
@@ -132,7 +137,9 @@ function Get-ADCSEnterpriseCA {
     Write-AS2GoOutput -Type H1 -Message "Identitfied Enterprise CAs [$($final.count)]"
     if ($null -ne $final) {
         $final | Sort-Object IsRootCA, CAName | Format-Table CAName, Server, Online, HasTemplates, IsRootCA, ParentCA
-        $Script:ADCSEnterpriseCAMissing = $false
+        if (-not $InventoryOnly) {
+            $Script:ADCSEnterpriseCAMissing = $false
+        }
     }
     else {
         Write-AS2GoOutput -Type Info -Message "No Enterprise CA found."

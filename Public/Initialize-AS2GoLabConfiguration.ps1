@@ -159,6 +159,14 @@ function Initialize-AS2GoLabConfiguration {
     }
 
 
+    $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = [Security.Principal.WindowsPrincipal]::new($currentIdentity)
+
+    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-AS2GoOutput -Type Error -Message "This function must be run as Administrator."
+        return
+    }
+
     If ($DeveloperMode) {
         $EnableLogging = $true
         $Script:TimeStamp = (Get-Date).ToString('HHmmss')
@@ -394,7 +402,7 @@ function Initialize-AS2GoLabConfiguration {
                 Invoke-MDITriggers
             }
             "Verify" {
-                Invoke-VerifyConfiguration
+                Invoke-VerifyConfiguration -CTPrefix $Scenario
             }
             "BGA" {
                 Set-BreakGlassAccount

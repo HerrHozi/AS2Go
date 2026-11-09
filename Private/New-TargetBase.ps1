@@ -13,7 +13,7 @@ function New-TargetBase {
 
     $Info = Measure-FunctionRuntime -Begin
 
-    $previousDN = Get-KeyValue "PreviousBase"
+    $previousDN = Get-ASConfig -Setting "PreviousBase"
 
     If ($previousDN -match 'OU=|CN=|DC=' ) {
         $previousCN = Convert-FromDNToCN -DistinguishedName $previousDN

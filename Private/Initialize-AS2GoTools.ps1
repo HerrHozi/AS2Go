@@ -23,10 +23,43 @@ function Initialize-AS2GoTools {
     $Info = Measure-FunctionRuntime -Begin
     $CurrentFunction = $Info.FunctionName
 
+$Tools = @(
+    [PSCustomObject]@{
+        Tool     = 'NetSess.exe'
+        Release  = '2.0.0.46'
+        LastBuild = '20220105'
+        SHA256   = 'DDEEEDC8AB9AB3B90C2E36340D4674FDA3B458C0AFD7514735B2857F26B14C6D'
+    }
+    [PSCustomObject]@{
+        Tool     = 'Mimikatz.exe'
+        Release  = '2.2.0.0'
+        LastBuild = '20220919'
+        SHA256   = '61C0810A23580CF492A6BA4F7654566108331E7A4134C968C2D6A05261B2D8A1'
+    }
+    [PSCustomObject]@{
+        Tool     = 'Rubeus.exe'
+        Release  = '2.3.3.0'
+        LastBuild = '20251009'
+        SHA256   = 'D13E01E6108EDF892B952482B987431429407B951756163511E6DE22D4B139B5'
+    }
+    [PSCustomObject]@{
+        Tool     = 'Certify.exe'
+        Release  = '2.0.0.0'
+        LastBuild = '20251009'
+        SHA256   = 'E25CBD8B2B1B42F31E7D0E43AE0D0700C24D34753302DB2D742C6D157BA502A4'
+    }
+    [PSCustomObject]@{
+        Tool     = 'PsExec.exe'
+        Release  = '2.4.3'
+        LastBuild = '20220719'
+        SHA256   = 'CBC86048C9C5A9DE697D29EA3650BECABBFAE5A6FC276785EECA3AAD938F3292'
+    }
+)
+
+
     $MaliciousTools = @(
-        (Join-Path -Path $Script:ASTools -ChildPath 'AS2Go-Tools_v2.7z'),
-        (Join-Path -Path $Script:ASTools -ChildPath 'AS2Go-Tools_v2.zip'),
-        (Join-Path -Path $Script:ASTools -ChildPath '_readme.md')
+        (Join-Path -Path $Script:ASTools -ChildPath 'AS2Go-Tools_v3.zip'),
+        (Join-Path -Path $Script:ASTools -ChildPath 'README.md')
     )
 
     If (-not $SkipClearHost) { Clear-Host }
@@ -90,10 +123,12 @@ function Initialize-AS2GoTools {
         Write-AS2GoOutput -Type Success -Message "Copied $tool to $defaultFolder." -noextralines
     }
 
-    ## AS2Go-Tools_v2.zip and AS2Go-Tools_v2.7z (PW: HerrHozi!)
+    ## AS2Go-Tools_v3.zip and AS2Go-Tools_v3.7z (PW: HerrHozi!)
     Write-Host
-    Write-AS2GoOutput -Type H1 -Message "The password-protected ZIP or 7z archive contains the following tools:"
+    Write-AS2GoOutput -Type H1 -Message "The password-protected ZIP archive contains the following tools:"
     Write-Host
+
+    $Tools | Format-Table Tool, Release, LastBuild, SHA256 -AutoSize | out-host
 
     Write-AS2GoOutput -Type Bullet -Message "NetSess.exe    Release: 2.0.0.46 (last build 20220105)"
     Write-AS2GoOutput -Type Bullet -Message "Mimikatz.exe   Release: 2.2.0.0  (last build 20220809)"
@@ -101,11 +136,11 @@ function Initialize-AS2GoTools {
     Write-AS2GoOutput -Type Bullet -Message "Certify.exe    Release: 2.0.0.0  (last build 20251009)"
     Write-AS2GoOutput -Type Bullet -Message "PsExec.exe     Release: 2.4      (last build 20220719)"
 
-    Write-AS2GoOutput -Type TextMaker -Message "Please extract manually the tools from the ZIP or 7z archive to the folder '$defaultFolder'.`n      The archive password is: " -TM "HerrHozi!"
+    Write-AS2GoOutput -Type TextMaker -Message "Please extract manually the tools from the ZIP archive to the folder '$defaultFolder'.`n      The archive password is: " -TM "HerrHozi!"
     Invoke-Item $defaultFolder
 
-    $title = "Confirm that the malicious tools have been extracted from one of the following archives:"
-    $message = "AS2Go-Tools_v2.7z or AS2Go-Tools_v2.zip"
+    $title = "Confirm that the malicious tools have been extracted from the following archive:"
+    $message = "AS2Go-Tools_v3.zip"
     $Options = @(
         [pscustomobject] @{ Label = "&OK"; Help = "Files have been extracted."; Value = "OK" },
         [pscustomobject] @{ Label = "&Cancel"; Help = "Return to the main setup."; Value = "Skip" }

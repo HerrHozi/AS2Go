@@ -268,7 +268,13 @@ function Get-AS2GoSettings {
         # Show settings
         Show-AS2GoSettingsTable -Settings $Settings
 
+        If (-not $unattended) {
         $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+        }
+        else
+        {
+            $decision = "Yes"
+        }
 
         switch ($decision) {
             "Yes" { $repeat = $Script:No }

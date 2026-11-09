@@ -14,7 +14,6 @@ function Get-DirContent {
     
     }
 
-
     $maxAttempts = 3
     $attempt = 0
     $isSuccess = $false
@@ -24,6 +23,7 @@ function Get-DirContent {
         Try {
             Get-ChildItem -Path $Path -ErrorAction Stop | Out-Host
             $isSuccess = $true
+            $script:AccessToDC += @("$Path")
             Write-AS2GoOutput -Type  Success -M "Accessed path $Path successfully!"
         }
         Catch {
