@@ -34,21 +34,15 @@ function Start-PsUserGroupSession {
 
     Update-WindowTitle -NewTitle "PoSH User Group | AS2Go"
     Initialize-ConsoleColors
-    Set-NewBackgroundColor -BgC $Script:ConsoleBGColor -FgC $Script:ConsoleFGColor
-
     $functionCallParameters = Get-FunctionCallParameters -FunctionName $MyInvocation.MyCommand.Name -BoundParameters $PSBoundParameters
     $4logfile = $functionCallParameters.Parameters | Out-String
     Write-Log -Message "    >> Used parameter: $4logfile"
     
     Write-AS2GoOutput -Type Header -Message "AS2Go | Attack Scenario to Go"
-    Write-AS2GoOutput -Type H1 -Message $(
-        (Get-Help (Get-FunctionName)).Functionality
-        )
-
-
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     #Write-AS2GoOutput TextMaker -Message "This session covers version"  -TextMaker $($ASModuleManifest.version).ToString()
     Write-AS2GoOutput TextMaker -Message "Speaker:"  -TextMaker "Holger Zimmermann (HerrHozi)"
-    Write-AS2GoOutput -Type H1 -Message "Agenda:`n"
+    Write-AS2GoOutput -Type H1 -Message "Agenda:"
     Write-AS2GoOutput -Type Bullet -Message "Reusable interactive menus with keyboard shortcuts, default choices, and return values."
     Write-AS2GoOutput -Type Bullet -Message "Consistent logging of function execution and elapsed time."
     Write-AS2GoOutput -Type Bullet -Message "Enable IntelliSense for private PowerShell functions in VS Code."
@@ -57,6 +51,23 @@ function Start-PsUserGroupSession {
     Write-AS2GoOutput -Type Bullet -Message "incl. Color-coded console display of code without executing it."
     Write-AS2GoOutput -Type Command -Message "  [>] get-command -Module AS2Go | Where-Object {`$_.Name -like 'Start*'}"
 
+    write-as2gooutput -Type Bullet -Message "vd"
+
+    $results = Get-ChildItem -Path . -Filter *.html -Recurse | Get-Random -Count 5
+
+    $title = "Example: Reusable interactive menus with keyboard shortcuts"
+    $message = "Select an HTML file."
+
+    $options = New-HelpOptions -InputObject $results -Label "Name" -Help "LastWriteTime" -Value "Fullname"
+    $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+    Invoke-Item $answer
+
+    $results = Get-ChildItem -Path . -Filter *.html -Recurse | Get-Random -Count 5
+    $options = New-HelpOptions -InputObject $results -Label "Name" -Help "LastWriteTime" -Value "IndexOf" -AddSkip
+    $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+    $results[$answer]
+
+    #ctrl + shift + p --> Debug Restart
     #Write-host "get-command -Module 'AS2Go' | Where-Object {`$_.Name -like 'Start*'}"
     
  

@@ -1,71 +1,163 @@
-<#
-.SYNOPSIS
-Displays the configured AS2Go lab assets and AD CS inventory.
-
-.DESCRIPTION
-Displays the saved break-glass setting, then inventories tiering OUs, AS2Go groups, and demo users in the current domain.
-Inventories enterprise CAs and Web Enrollment services using a preferred root-domain controller.
-Calls Get-Honeytoken and prints a completion message; this is an informational review, not a pass/fail validator.
-The current Get-Honeytoken helper reads BreakGlassAccount rather than Honeytoken, so that section repeats that setting.
-
-.PARAMETER param1
-Reserved string parameter; currently unused.
-
-.PARAMETER param2
-Reserved string parameter; currently unused.
-
-.EXAMPLE
-Invoke-VerifyConfiguration
-Runs this workflow using the initialized AS2Go module configuration.
-
-.INPUTS
-None. This function does not declare pipeline input.
-
-.OUTPUTS
-Console messages and output from invoked commands; no dedicated result object is defined.
-
-.NOTES
-Private AS2Go function. Run from an initialized AS2Go module session.
-Requires initialized module settings and directory access. The completion message does not certify that all prerequisites passed.
-
-.COMPONENT
-Category: Main Function
-
-.FUNCTIONALITY
-Reviews break-glass configuration, tiering OUs, AS2Go groups, demo users, and AD CS infrastructure.
-Displays CA reachability and template status; the current honeytoken display repeats the break-glass setting.
-#>
 function Invoke-VerifyConfiguration {
+    <#
+    .SYNOPSIS
+    Reviews the configuration of the AS2Go lab.
 
-    ################################################################################
-    #####                                                                      ##### 
-    #####    Description                ######                                 
-    #####                                                                      #####
-    ################################################################################
+    .DESCRIPTION
+    Checks the configured tools, accounts, Secure Access Workstation, and simulated AD backup share.
+    Inventories directory assets, enterprise CAs, and scenario templates. Checks the Web Enrollment
+    Windows feature on the forest-root DC and zone transfer settings on the setup DNS server.
+    Reports missing settings and failed queries while continuing with the other checks.
 
-    Param([string] $param1, [string] $param2)
+    .PARAMETER Param1
+    Reserved string parameter.
 
-    $Info = Measure-FunctionRuntime -Begin
-    $CurrentFunction = $Info.FunctionName
-    If (-not $SkipClearHost) { Clear-Host }
-    
-    Write-AS2GoOutput -Type Header -Message "Check if all AS2GO Active Directory requirements are met."
-    $Functionality = (Get-Help $CurrentFunction).Functionality
-    Write-AS2GoOutput -Type H1 -Message $Functionality
+    .PARAMETER Param2
+    Reserved string parameter.
 
-    Get-BreakGlassAccount
+    .PARAMETER CTPrefix
+    Certificate template prefix to look up. Defaults to AS2Go.
 
-    $TargetServer = Get-BestDomainController -Domain (Get-ADDomain).DNSRoot
-    Get-TieringAssets -Server $TargetServer
-    Get-AS2GoGroups -Server $TargetServer
-    Get-DemoAccounts -Server $TargetServer
+    .EXAMPLE
+    Invoke-VerifyConfiguration -CTPrefix AS2Go
+    Reviews the lab and displays certificate templates with the AS2Go prefix.
 
-    $bestDC = Get-BestDomainController -Domain (Get-ADForest).RootDomain
-    Get-ADCSEnterpriseCA -Server $bestDC 
-    Get-ADCSEnrollmentServices -Server $bestDC
-    
-    Get-Honeytoken
+    .OUTPUTS
+    Console messages and inventory output.
 
-    Write-AS2GoOutput -Type Success "Environment check completed successfully."
-    Measure-FunctionRuntime -End -Details $Info
+    .COMPONENT
+    Category: Main Function
+
+    .FUNCTIONALITY
+    Checks tools, accounts, workstation access, directory assets, AD CS, the backup share, and DNS zone transfers.
+    #>
+    param(
+        [string]$Param1,
+        [string]$Param2,
+        [string]$CTPrefix = 'AS2Go'
+    )
+
+    $info = Measure-FunctionRuntime -Begin
+    if (-not $SkipClearHost) { Clear-Host }
+
+    Write-AS2GoOutput -Type Header -Message 'Verify the AS2Go lab configuration'
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+
+    $templatePrefix = $CTPrefix
+    $checks = [ordered]@{
+        'Lab tools' = {
+            $toolsPath = Get-ASConfig -Setting 'Tools'
+            if ([string]::IsNullOrWhiteSpace($toolsPath)) {
+                Write-AS2GoOutput -Type Warning -Message 'No tools folder is configured.'
+            }
+            elseif (-not (Test-Path -LiteralPath $toolsPath -PathType Container)) {
+                Write-AS2GoOutput -Type Warning -Message "Tools folder is unavailable: $toolsPath"
+            }
+            else {
+                foreach ($tool in 'NetSess.exe', 'Mimikatz.exe', 'Rubeus.exe', 'Certify.exe', 'PsExec.exe') {
+                    if (Test-Path -LiteralPath (Join-Path $toolsPath $tool) -PathType Leaf) {
+                        Write-AS2GoOutput -Type Bullet -Message "Found $tool"
+                    }
+                    else {
+                        Write-AS2GoOutput -Type Warning -Message "Missing $tool in $toolsPath"
+                    }
+                }
+            }
+        }
+        'Break-glass account' = {
+            Get-BreakGlassAccount
+        }
+        'Secure Access Workstation' = {
+            $workstation = Get-ASConfig -Setting 'mySAW'
+            if ([string]::IsNullOrWhiteSpace($workstation)) {
+                Write-AS2GoOutput -Type Warning -Message 'No Secure Access Workstation is configured.'
+            }
+            elseif (Test-NetConnection -ComputerName $workstation -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue) {
+                Write-AS2GoOutput -Type Success -Message "WinRM is reachable on $workstation (TCP 5985)."
+            }
+            else {
+                Write-AS2GoOutput -Type Warning -Message "WinRM is not reachable on $workstation (TCP 5985)."
+            }
+        }
+        'Directory assets' = {
+            $domainController = Get-BestDomainController -Domain (Get-ADDomain).DNSRoot
+            if (-not $domainController) { throw 'No controller was found for the current domain.' }
+            Get-TieringAssets -Server $domainController
+            Get-AS2GoGroups -Server $domainController
+            Get-DemoAccounts -Server $domainController
+        }
+        'Enterprise CAs and certificate templates' = {
+            $rootController = Get-BestDomainController -Domain (Get-ADForest).RootDomain
+            if (-not $rootController) { throw 'No controller was found for the forest root domain.' }
+            Get-ADCSEnterpriseCA -Server $rootController -InventoryOnly
+            Get-ADCSCertificateTemplates -Server $rootController -CTPrefix $templatePrefix -InventoryOnly
+        }
+        'AD CS Web Enrollment feature' = {
+            $rootController = Get-BestDomainController -Domain (Get-ADForest).RootDomain
+            if (-not $rootController) { throw 'No controller was found for the forest root domain.' }
+            $feature = Invoke-Command -ComputerName $rootController -ScriptBlock {
+                Get-WindowsFeature -Name 'ADCS-Web-Enrollment' -ErrorAction Stop
+            }
+            if ($feature.Installed) {
+                Write-AS2GoOutput -Type Success -Message "AD CS Web Enrollment feature is installed on $rootController."
+            }
+            else {
+                Write-AS2GoOutput -Type Warning -Message "AD CS Web Enrollment feature is not installed on $rootController."
+            }
+        }
+        'AD backup share' = {
+            $backupShare = Get-ASConfig -Setting 'BackupShare'
+            if ([string]::IsNullOrWhiteSpace($backupShare)) {
+                Write-AS2GoOutput -Type Warning -Message 'No AD backup share is configured.'
+            }
+            elseif (-not (Test-Path -LiteralPath $backupShare -PathType Container)) {
+                Write-AS2GoOutput -Type Warning -Message "AD backup share is unavailable: $backupShare"
+            }
+            else {
+                foreach ($file in 'ntds.dit', 'daily-work.txt') {
+                    if (Test-Path -LiteralPath (Join-Path $backupShare $file) -PathType Leaf) {
+                        Write-AS2GoOutput -Type Bullet -Message "Found $file in $backupShare"
+                    }
+                    else {
+                        Write-AS2GoOutput -Type Warning -Message "Missing $file in $backupShare"
+                    }
+                }
+            }
+        }
+        'DNS zone transfers' = {
+            $dnsServer = $Script:LogonServer
+            if (-not $dnsServer) { throw 'No logon server is available for the DNS query.' }
+            $rootDomain = (Get-ADForest).RootDomain
+            $zones = @(Get-DnsServerZone -ComputerName $dnsServer | Where-Object {
+                $_.ZoneType -eq 'Primary' -and ($_.ZoneName -eq $rootDomain -or $_.ZoneName -like "*.$rootDomain")
+            })
+            if ($zones.Count -eq 0) {
+                Write-AS2GoOutput -Type Warning -Message "No primary DNS zones for $rootDomain were found on $dnsServer."
+            }
+            foreach ($zone in $zones) {
+                if ($zone.SecureSecondaries -eq 'TransferAnyServer') {
+                    Write-AS2GoOutput -Type Bullet -Message "$($zone.ZoneName) on $dnsServer allows transfers to any server."
+                }
+                else {
+                    Write-AS2GoOutput -Type Warning -Message "$($zone.ZoneName) on $dnsServer does not allow transfers to any server."
+                }
+            }
+        }
+        'MDI honeytoken' = {
+            Get-Honeytoken
+        }
+    }
+
+    $ErrorActionPreference = 'Stop'
+    foreach ($check in $checks.GetEnumerator()) {
+        try {
+            & $check.Value
+        }
+        catch {
+            Write-AS2GoOutput -Type Warning -Message "$($check.Key) could not be verified: $($_.Exception.Message)"
+        }
+    }
+
+    Write-AS2GoOutput -Type Info -Message 'Lab configuration review finished. See the results above.'
+    Measure-FunctionRuntime -End -Details $info
 }

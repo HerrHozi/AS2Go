@@ -40,8 +40,8 @@ function Invoke-GroupManipulation {
     $Info = Measure-FunctionRuntime -Begin
     Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
 
-    $BGA = "S-1-5-21-18515944-1610616278-1029250612-500"
-    $BDA = "S-1-5-21-18515944-1610616278-1029250612-500"
+    #$BGA = "S-1-5-21-18515944-1610616278-1029250612-500"
+    #$BDA = "S-1-5-21-18515944-1610616278-1029250612-500"
 
     $targetDN = New-TargetBase
 
@@ -52,9 +52,10 @@ function Invoke-GroupManipulation {
         $BGAccount = Get-ADUserDetails -SearchByDN -Identifier $BreakGlassAccountDN
         $BGA = $BGAccount.SID
     }
+
+    
     else {
         Set-BreakGlassAccount
-        Write-Log -Message "No Break Glass Account specified in configuration. Please set the value for 'BreakGlassAccount' in the configuration file." -Type Warning
     }
 
     if ($LastBDUserDN) {

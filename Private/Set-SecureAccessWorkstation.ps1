@@ -99,7 +99,33 @@ function Set-SecureAccessWorkstation {
             Write-AS2GoOutput -Type Success -Message "WinRM is reachable on $sawComputerName (TCP 5985)."
         }
         else {
-            Write-AS2GoOutput -Type Warning -Message "WinRM is not reachable on $sawComputerName (TCP 5985)."
+            Write-AS2GoOutput -Type Warning -Message "WinRM is not reachable on $sawComputerName (TCP 5985)." -NoExtraLines
+
+            $options = @(
+                [pscustomobject]@{
+                    Label = "&Yes"
+                    Help  = "Enable PowerShell Remoting on $sawComputerName using DCOM."
+                    Value = $Script:Yes
+                },
+                [pscustomobject]@{
+                    Label = "&No"
+                    Help  = "Skip enabling PowerShell Remoting on $sawComputerName."
+                    Value = $Script:No
+                }
+            )
+            $decision = Show-DecisionPrompt -Message "Do you want to enable PowerShell Remoting on '$sawComputerName'?" `
+                -Options $options -Default 1 -Title "Enable PowerShell Remoting"
+
+            if ($decision -eq $Script:Yes) {
+                $opt = New-CimSessionOption -Protocol Dcom
+                $sess = New-CimSession -ComputerName $sawComputerName -SessionOption $opt
+                Invoke-CimMethod -CimSession $sess -ClassName Win32_Process -MethodName Create `
+                    -Arguments @{ CommandLine = 'powershell.exe -NoProfile -Command "Enable-PSRemoting -Force"' }
+            }
+            else {
+                Write-AS2GoOutput -Type Info -Message "Skipped enabling PowerShell Remoting on $sawComputerName."
+            }
+
         }
     }
 

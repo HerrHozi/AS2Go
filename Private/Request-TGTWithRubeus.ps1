@@ -15,10 +15,9 @@ function Request-TGTWithRubeus {
     
     If (-not $SkipClearHost) { Clear-Host }
 
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host "            FIRST try to connect to a DC c$ share            "
-    Write-Host "____________________________________________________________________`n" 
-    
+    Write-AS2GoOutput -Type Header -Message "Step 3 - Attempt to access a DC's C$ share"
+
+  
     $directory = "\\$Script:ASDC\c$"
     Get-DirContent -Path $directory
     If (-not $UnAttended) { pause }
@@ -46,12 +45,13 @@ function Request-TGTWithRubeus {
     $tickets | Select-object -Last 1 | Format-List
     If (-not $UnAttended) { pause }
 
-    Write-Host "____________________________________________________________________`n" 
-    Write-Host "            Now try again to connect to a DC c$ share            "
-    Write-Host "____________________________________________________________________`n" 
+    Write-AS2GoOutput -Type Header -Message "Step 5 - Attempt to access a DC's C$ share after requesting TGT"
     
-    $directory = "\\$Script:ASDC\c$"
-    Get-DirContent -Path $directory
+    #$directory = "\\$Script:ASDC\c$"
+    #Get-DirContent -Path $directory
+
+    Test-AccessToOneDCPerDomain
+
     If (-not $UnAttended) { pause }
     If (-not $SkipClearHost) { Clear-Host }
 

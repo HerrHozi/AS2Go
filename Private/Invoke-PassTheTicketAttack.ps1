@@ -54,31 +54,45 @@ function Invoke-PassTheTicketAttack {
     Write-AS2GoOutput -Type Bullet -Message "Step #2 - harvest tickets on Admin PC"
     Write-AS2GoOutput -Type Bullet -Message "Step #3 - run PtT to become Domain Admin"
 
+
+
+
+
     #
     If ($UnAttended) { Start-Sleep 2 } else { 
     
 
-$Options = @(
-    [pscustomobject] @{
-        Label = "&Skip"
-        Help  = "The Admin PC is not ready. Skip the PtT simulation."
-        Value = $Script:No
-    }
-)
+        $Options = @(
+            [pscustomobject] @{
+                Label = "&Skip"
+                Help  = "The Admin PC is not ready. Skip the PtT simulation."
+                Value = $Script:No
+            }
+        )
 
-if (-not $SafeMode) {
-    $Options += [pscustomobject] @{
-        Label = "&Yes"
-        Help  = "All prerequisites are met. Proceed with the PtT simulation."
-        Value = $Script:Yes
-    }
-}
+        if (-not $SafeMode) {
+            $Options += [pscustomobject] @{
+                Label = "&Yes"
+                Help  = "All prerequisites are met. Proceed with the PtT simulation."
+                Value = $Script:Yes
+            }
+           
+            Try {
+                $status = Invoke-Command -ComputerName $Script:ASSAW -ScriptBlock { Get-MpComputerStatus | Select-Object AMRunningMode, RealTimeProtectionEnabled, AntivirusEnabled }
+                Write-AS2GoOutput -Type H1 -Message "`nRetrieved endpoint protection status from Admin PC '$Script:ASSAW'."
+                $status | Select-Object RealTimeProtectionEnabled, AntivirusEnabled, AMRunningMode | fl | out-host
+            }
+            Catch {
+                Write-AS2GoOutput -Type Warning -Message "Failed to retrieve endpoint protection status from Admin PC $Script:ASSAW."
+            }
 
-$title = "Is the Admin PC ($Script:ASSAW) ready for the Pass-the-Ticket (PtT) attack?"
-$message = "Please confirm that the following prerequisites are met:`n  • Endpoint protection is disabled in the test environment.`n  • Fresh Kerberos tickets are available on the Admin PC."
+        }
 
-# Default index must stay valid for both cases: last option ("Yes" if present, otherwise "Skip").
-$decision = Show-DecisionPrompt -Message $message -Options $Options -Default ($Options.Count - 1) -Title $title
+        $title = "Is the Admin PC ($Script:ASSAW) ready for the Pass-the-Ticket (PtT) attack?"
+        $message = "Please confirm that the following prerequisites are met:`n  • Endpoint protection is disabled in the test environment.`n  • Fresh Kerberos tickets are available on the Admin PC."
+
+        # Default index must stay valid for both cases: last option ("Yes" if present, otherwise "Skip").
+        $decision = Show-DecisionPrompt -Message $message -Options $Options -Default ($Options.Count - 1) -Title $title
   
     
         If ($decision -eq $Script:No) {
@@ -111,7 +125,7 @@ $decision = Show-DecisionPrompt -Message $message -Options $Options -Default ($O
 
     #todo 
     #Invoke-Command -ComputerName $computer -ScriptBlock {Set-MpPreference -DisableRealtimeMonitoring $true}
-    #Invoke-Command -ComputerName $computer -ScriptBlock {Get-MpComputerStatus | Select-Object AMRunningMode, RealTimeProtectionEnabled, AntivirusEnabled}
+    #Invoke-Command -ComputerName $Script:ASSAW -ScriptBlock { Get-MpComputerStatus | Select-Object AMRunningMode, RealTimeProtectionEnabled, AntivirusEnabled }
     #Invoke-Command -ComputerName $computer -ScriptBlock {Set-MpPreference -DisableRealtimeMonitoring $false}
 
     #cleanup
@@ -220,24 +234,24 @@ $decision = Show-DecisionPrompt -Message $message -Options $Options -Default ($O
     $candidate = $bestPtTUser.principal
     Write-AS2GoOutput -Type Textmaker -Message "Because both a TGT and a service ticket were present,`n      the primary Pass-the-Ticket candidate was identified as:" -TM $candidate
 
-    $title = "Confirm or change the account whose tickets will be copied"
-    $message = ">> $candidate"
+    #$options = New-HelpOptions -InputObject $uniqueAccounts -Label "Principal" -Help "UniqueTicketTypes" -Value "Principal" -AddSkip
 
-    $Options = @(
-        [pscustomobject] @{ Label = "&OK"; Help = "Use default candidate."; Value = "OK" },
-        [pscustomobject] @{ Label = "&Select a different candidate"; Help = "Type a new candidate."; Value = "New" }   
-        #[pscustomobject] @{ Label = "&Cancel"; Help = "Return to main setup."; Value = "Skip" }
-    )
+    #   $index = [array]::IndexOf($uniqueAccounts.Principal, $candidate)
+    $title = "Confirm or change the account whose tickets will be copied"
+    $message = ""
 
     If (-not $UnAttended) {
-        $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
-    }
-    
-    Write-Host
 
-    If ($answer -eq "New") {
-        $candidate = Write-AS2GoOutput -Type Input -Message "Enter the new candidate"
+        $index = [array]::IndexOf($uniqueAccounts.Principal, $candidate)
+        $options = New-HelpOptions -InputObject $uniqueAccounts -Label "Principal" -Help "UniqueTicketTypes" -Value "Principal" -AddSkip
+        $candidate = Show-DecisionPrompt -Options $options -Default $index -Title $title #-Message $message
+
+        If ($candidate -eq $Script:NO) {
+            Measure-FunctionRuntime -End -Details $Info
+            return
+        }
     }
+
 
     Write-AS2GoOutput -Type Header -Message "Copy tickets from Admin PC for candidate '$candidate'"
     #If ($UnAttended) { Start-Sleep 2 } else { Pause }
@@ -331,15 +345,9 @@ $decision = Show-DecisionPrompt -Message $message -Options $Options -Default ($O
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     If (-not $SkipClearHost) { Clear-Host }
       
-    Write-AS2GoOutput -Type Header -Message "Attempting to access a domain controller’s C$ share in each domain"
+    Test-AccessToOneDCPerDomain
 
-    Foreach ($domain in  (Get-ADForest).domains) {
-        $DC = Get-BestDomainController -Domain $domain
-        $directory = "\\$DC\c$"
-        Get-DirContent -Path $directory
-    }
-   
-    
+
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
     Measure-FunctionRuntime -End -Details $Info

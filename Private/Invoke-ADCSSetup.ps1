@@ -59,7 +59,13 @@ function Invoke-ADCSSetup {
 
     do {
 
-        #Get-ADCSComponents
+        If ($Script:ADCSEnrollmentServiceMissing -eq $false) {
+            $default = 0
+        }
+        else {
+            $default = 1
+        }
+
 
         $Options = @(
             [pscustomobject] @{ Label = "Install AD&CS"; Help = "Install one Certification Authority & Web Enrollment services."; Value = "ADCS" },
@@ -69,11 +75,19 @@ function Invoke-ADCSSetup {
 
         $title = "AS2Go - Configure ADCS for AS2GO"
         $message = "Select an option to configure ADCS for AS2GO."
-        $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 1 -Title $title
+        $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default $default -Title $title
 
         If ($answer -eq 'ADCS') {
             Add-ADCSForAS2Go
             Write-AS2GoOutput -Type Success "ADCS setup completed successfully."
+
+            Write-AS2GoOutput -Type Warning -Message "Manual follow-up steps (not automated):" -NoExtraLines
+            Write-AS2GoOutput -Type Info -Message "Configure the following Group Policy setting:" -NoExtraLines
+            Write-AS2GoOutput -Type Bullet -Message "Enable 'Certificate Services Client - Auto-Enrollment'"
+            Write-AS2GoOutput -Type Bullet -Message "  Path: Computer Configuration > Policies > Windows Settings > Security Settings > Public Key Policies > Certificate Services Client - Auto-Enrollment"
+            Write-AS2GoOutput -Type Bullet -Message "    Configuration Model: Enabled"
+            Write-AS2GoOutput -Type Bullet -Message "    Select: Renew expired certificates, update pending certificates, and remove revoked certificates"
+            Write-AS2GoOutput -Type Bullet -Message "    Select: Update certificates that use certificate templates"
         }
         elseif ($answer -eq 'Templates') {
             

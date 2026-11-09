@@ -6,6 +6,9 @@ Finds AS2Go certificate templates by prefix.
 Queries Active Directory for templates matching the supplied prefix and displays their names
 and metadata.
 
+.PARAMETER InventoryOnly
+Displays the inventory without updating the AD CS setup state.
+
 .COMPONENT
 Category: Sub Function
 
@@ -25,28 +28,34 @@ function Get-ADCSCertificateTemplates {
         [Parameter(ValueFromPipeline, Mandatory)]
         [string]$Server,
         [Parameter(ValueFromPipeline, Mandatory)]
-        [string] $CTPrefix
+        [string] $CTPrefix,
+        [switch] $InventoryOnly
     )
 
     $Info = Measure-FunctionRuntime -Begin
 
-    $ConfigNC = (Get-ADRootDSE).ConfigurationNamingContext
-    $script:CTemplates = Get-ADObject -LDAPFilter "(&(objectClass=pKICertificateTemplate)(name=$CTPrefix*))" `
+    $ConfigNC = (Get-ADRootDSE -Server $Server).ConfigurationNamingContext
+    $escapedPrefix = $CTPrefix.Replace('\', '\5c').Replace('*', '\2a').Replace('(', '\28').Replace(')', '\29').Replace([string][char]0, '\00')
+    $templates = @(Get-ADObject -LDAPFilter "(&(objectClass=pKICertificateTemplate)(name=$escapedPrefix*))" `
         -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,$ConfigNC"  `
         -Properties Name, whenChanged, CanonicalName   `
-        -Server $Server
+        -Server $Server)
 
-    Write-AS2GoOutput -Type H1 -Message "`n`nIdentitfied $($script:CTemplates.count) 'AS2Go' Certificate Templates"
+    if (-not $InventoryOnly) {
+        $Script:CTemplates = $templates
+        $Script:ADCSASGoCTemplatesMissing = $templates.Count -eq 0
+    }
 
-    If ($null -ne $script:CTemplates ) {
-        $script:CTemplates | Select-Object Name, @{N = 'whenChanged'; E = { $_.whenChanged } }, @{N = 'CanonicalName'; E = { $_.CanonicalName } } | out-host
-        $Script:ADCSASGoCTemplatesMissing = $false
+    Write-AS2GoOutput -Type H1 -Message "Found $($templates.Count) certificate templates with prefix '$CTPrefix'."
+
+    if ($templates.Count -gt 0) {
+        $templates | Select-Object Name, whenChanged, CanonicalName | Out-Host
     }
     else {
-        #Write-AS2GoOutput -Type Info -Message "No AS2GO specific certificate Templates found."
+        Write-AS2GoOutput -Type Warning -Message "No certificate templates with prefix '$CTPrefix' were found."
     }
     
-    $4logfile = $script:CTemplates | Select-Object Name, @{N = 'whenChanged'; E = { $_.whenChanged } }, @{N = 'CanonicalName'; E = { $_.CanonicalName } } | Format-Table | out-string 
+    $4logfile = $templates | Select-Object Name, whenChanged, CanonicalName | Format-Table | Out-String
     Write-Log -Message "    >> Identified the following AS2GO specific certificate Template withing Forest '$ConfigNC': $4logfile"
   
     Measure-FunctionRuntime -End -Details $Info
