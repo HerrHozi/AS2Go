@@ -1,110 +1,185 @@
+<#
+.SYNOPSIS
+Browses an AS2Go workflow offline.
+
+.DESCRIPTION
+Reads the function's help and PowerShell command syntax tree to build a preview.
+Shows eligible AS2Go calls as menu items and displays literal commands for steps without a submenu.
+Kerberoasting offers a display-only domain choice. Runtime conditions and skip switches are not evaluated.
+
+.PARAMETER FunctionName
+Name of the AS2Go function to preview.
+
+.PARAMETER UnAttended
+Displays reachable steps without prompting.
+
+.PARAMETER Visited
+Tracks the current navigation path to prevent recursive calls from looping.
+
+.COMPONENT
+Category: Sub Function
+
+.FUNCTIONALITY
+Shows AS2Go workflow descriptions and commands without running the workflow or connecting to Active Directory.
+#>
 function Show-AS2GoPreview {
-    <#
-    .SYNOPSIS
-    Browses workflow source and help without executing workflow code.
-    .DESCRIPTION
-    Uses the parsed call graph for offline navigation. Source expressions are displayed
-    literally and are never evaluated. No workflow setup, AD queries or tools run.
-    #>
+
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'EnableLogging',
+        Justification = 'Write-Log reads this variable from the calling scope.')]
     param(
-        [Parameter(Mandatory)][string]$FunctionName,
+        [Parameter(Mandatory)]
+        [string]$FunctionName,
         [switch]$UnAttended,
         [string[]]$Visited = @()
     )
 
-    if ($FunctionName -in $Visited) { return }
-    $command = Get-Command -Name $FunctionName -CommandType Function -ErrorAction Stop
-    $ast = $command.ScriptBlock.Ast
-    Write-Host "`n______________________________________________________________________" -ForegroundColor DarkGray
-    Write-Host "`n  $FunctionName — Preview Mode" -ForegroundColor Cyan
-    Write-Host '______________________________________________________________________' -ForegroundColor DarkGray
-    Write-Host '  [Preview] Execution disabled. No AD connection required.' -ForegroundColor Yellow
-    $help = $ast.GetHelpContent()
-    if ($help) {
-        $description = $help.Functionality
-        if (-not $description) { $description = $help.Description }
-        if (-not $description) { $description = $help.Synopsis }
-        Write-Host "`n$description"
-    }
+    # Keep the shared output and timing helpers from writing logs during preview.
+    $EnableLogging = $false
+    $info = Measure-FunctionRuntime -Begin
 
-    if ($FunctionName -eq 'Start-Kerberoasting') {
-        Write-Host "`n  .\Rubeus.exe kerberoast /ldapfilter:admincount=1 /domain:<domain> /dc:<dc> /outfile:<exfiltration>\KR-<domain>.hashes.txt"
-        if (-not $UnAttended) {
-            $options = @(
-                [pscustomobject]@{Label = 'Current &User Domain'; Help = 'Preview the current user domain; no domain lookup is performed.'; Value = 'User' },
-                [pscustomobject]@{Label = 'Specific &Domain'; Help = 'Enter a domain for display only.'; Value = 'Domain' },
-                [pscustomobject]@{Label = '&Skip'; Help = 'Return to the previous menu.'; Value = 'Skip' }
-            )
-            $choice = Show-AS2GoPreviewChoice -Title 'Kerberoasting Attack - Select Target Domain' -Options $options
-            if ($choice -eq 'Skip') { return }
-            $domain = '<domain>'
-            if ($choice -eq 'Domain') { $domain = Read-Host 'Domain (display only)' }
-            Write-Host "[Preview] Target: $domain. Execution skipped." -ForegroundColor Yellow
+    try {
+        if ($FunctionName -in $Visited) { return }
+
+        $command = Get-Command -Name $FunctionName -CommandType Function -ErrorAction Stop
+        $ast = $command.ScriptBlock.Ast
+
+        Write-AS2GoOutput -Type Header -Message "$FunctionName - Preview Mode"
+        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+
+        $help = $ast.GetHelpContent()
+        if ($help) {
+            $description = $help.Functionality
+            if (-not $description) { $description = $help.Description }
+            if (-not $description) { $description = $help.Synopsis }
+            Write-AS2GoOutput -Type Info -Message $description -NoExtraLines
         }
-        return
-    }
 
-    # Only inspect command ASTs. Never invoke or expand source expressions.
-    $calls = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true))
-    $children = @()
-    foreach ($call in $calls) {
-        $name = $call.GetCommandName()
-        if (-not $name -or $name -eq $FunctionName -or $name -in $children) { continue }
-        $target = Get-Command -Name $name -CommandType Function -ErrorAction SilentlyContinue
-        if (-not $target -or $target.ModuleName -ne $command.ModuleName) { continue }
-        if ($name -match '^(Invoke-|New-|Add-|Remove-|Set-|Restart-|Install-|Export-|Request-|Search-|Get-)') {
-            # Infrastructure and formatting helpers are not workflow steps.
-            if ($name -match '^(Get-(AS2GoSettings|Function|ASConfig|RunTime)|Set-(ASConfig|NewColor|NewBackground|BestDomain|AttackScope)|New-PrivilegeEscalationRecommendation)') { continue }
-            $targetHelp = $target.ScriptBlock.Ast.GetHelpContent()
-            if (($target.ScriptBlock.File -like '*Public*') -or ($targetHelp -and $targetHelp.Component -match 'Main Function') -or $name -eq 'Start-Kerberoasting') {
-                $children += $name
+        if ($FunctionName -eq 'Start-Kerberoasting') {
+            Write-AS2GoOutput -Type Command -Message '.\Rubeus.exe kerberoast /ldapfilter:admincount=1 /domain:<domain> /dc:<dc> /outfile:<exfiltration>\KR-<domain>.hashes.txt'
+            if (-not $UnAttended) {
+                $options = @(
+                    [pscustomobject]@{ Label = 'Current User Domain'; Help = 'Use a placeholder for the current user domain.'; Value = 'User' }
+                    [pscustomobject]@{ Label = 'Specific Domain'; Help = 'Enter a domain for display only.'; Value = 'Domain' }
+                    [pscustomobject]@{ Label = 'Skip'; Help = 'Return to the previous menu.'; Value = 'Skip' }
+                )
+                $choice = Show-AS2GoPreviewChoice -Title 'Kerberoasting Attack - Select Target Domain' -Options $options
+                if ($choice -eq 'Skip') { return }
+
+                $domain = '<domain>'
+                if ($choice -eq 'Domain') {
+                    $domain = Read-Host 'Domain (display only)'
+                }
+                Write-AS2GoOutput -Type Info -Message "Preview target: $domain" -NoExtraLines
             }
+            return
         }
-    }
 
-
-    if ($children.Count -eq 0) {
-        Write-Host "`n[Preview] Planned source (display only):" -ForegroundColor Cyan
+        # Inspect command syntax without evaluating source expressions.
+        $calls = $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true)
+        $children = @()
         foreach ($call in $calls) {
-            if ($call.GetCommandName() -notmatch '^(Write-|Show-|Measure-|Get-Function|Out-|Clear-Host|Pause|Start-Sleep)') {
-                Write-Host $call.Extent.Text
+            $name = $call.GetCommandName()
+            if (-not $name -or $name -eq $FunctionName -or $name -in $children) { continue }
+
+            $target = Get-Command -Name $name -CommandType Function -ErrorAction SilentlyContinue
+            if (-not $target -or $target.ModuleName -ne $command.ModuleName) { continue }
+
+            if ($name -eq 'Start-Kerberoasting') {
+                $children += $name
+                continue
+            }
+
+            if ($name -match '^(Invoke-|New-|Add-|Remove-|Set-|Restart-|Install-|Export-|Request-|Search-|Get-)') {
+                # Infrastructure and formatting helpers are not workflow steps.
+                if ($name -match '^(Get-(AS2GoSettings|Function|ASConfig|RunTime)|Set-(ASConfig|NewColor|NewBackground|BestDomain|AttackScope)|New-PrivilegeEscalationRecommendation)') { continue }
+                $targetHelp = $target.ScriptBlock.Ast.GetHelpContent()
+                if (($target.ScriptBlock.File -like '*Public*') -or ($targetHelp -and $targetHelp.Component -match 'Main Function')) {
+                    $children += $name
+                }
             }
         }
-        Write-Host '[Preview] Execution skipped.' -ForegroundColor Yellow
-        return
-    }
-    if ($UnAttended) {
-        foreach ($child in $children) {
-            Show-AS2GoPreview -FunctionName $child -UnAttended -Visited ($Visited + $FunctionName)
+
+        if ($children.Count -eq 0) {
+            Write-AS2GoOutput -Type NextCommand -Message 'Commands from source (display only)'
+            foreach ($call in $calls) {
+                if ($call.GetCommandName() -notmatch '^(Write-|Show-|Measure-|Get-(Function|Help$)|Out-|Clear-Host|Pause|Start-Sleep)') {
+                    Write-AS2GoOutput -Type Command -Message $call.Extent.Text -NoExtraLines
+                }
+            }
+            return
         }
-        return
-    }
-    do {
-        $options = @()
-        for ($i = 0; $i -lt $children.Count; $i++) {
-            $options += [pscustomobject]@{Label = $children[$i]; Help = 'Show description and planned steps without execution.'; Value = $children[$i] }
+
+        if ($UnAttended) {
+            foreach ($child in $children) {
+                Show-AS2GoPreview -FunctionName $child -UnAttended -Visited ($Visited + $FunctionName)
+            }
+            return
         }
-        $options += [pscustomobject]@{Label = 'Back / Exit'; Help = 'Return to the previous menu.'; Value = 'Back' }
-        $choice = Show-AS2GoPreviewChoice -Title "$FunctionName — Preview" -Options $options
-        if ($choice -ne 'Back') { Show-AS2GoPreview -FunctionName $choice -Visited ($Visited + $FunctionName) }
-    } until ($choice -eq 'Back')
+
+        $options = @(
+            foreach ($child in $children) {
+                [pscustomobject]@{ Label = $child; Help = 'Show the step description and commands.'; Value = $child }
+            }
+            [pscustomobject]@{ Label = 'Back / Exit'; Help = 'Return to the previous menu.'; Value = 'Back' }
+        )
+
+        do {
+            $choice = Show-AS2GoPreviewChoice -Title "$FunctionName - Preview" -Options $options
+            if ($choice -ne 'Back') {
+                Show-AS2GoPreview -FunctionName $choice -Visited ($Visited + $FunctionName)
+            }
+        } until ($choice -eq 'Back')
+    }
+    finally {
+        Measure-FunctionRuntime -End -Details $info
+    }
 }
 
+<#
+.SYNOPSIS
+Prompts for a numbered AS2Go preview option.
+
+.PARAMETER Title
+Menu title.
+
+.PARAMETER Options
+Menu entries with Label, Help, and Value properties. Enter selects the final entry.
+
+.COMPONENT
+Category: Sub Function
+
+.FUNCTIONALITY
+Displays a numbered preview menu and returns the selected option.
+#>
 function Show-AS2GoPreviewChoice {
-    param([string]$Title, [object[]]$Options)
-    # Do not use the live prompt helper: its runtime and logging hooks write files.
-    Write-Host "`n[>] $Title" -ForegroundColor Cyan
+
+    param(
+        [string]$Title,
+        [object[]]$Options
+    )
+
+    $info = Measure-FunctionRuntime -Begin
+
+    Write-AS2GoOutput -Type NextCommand -Message $Title -NoExtraLines
     for ($i = 0; $i -lt $Options.Count; $i++) {
-        Write-Host "  [$($i + 1)] $($Options[$i].Label -replace '&', '')"
+        Write-Host "  [$($i + 1)] $($Options[$i].Label)"
     }
+
+    $index = $Options.Count - 1
     do {
-        $answer = Read-Host 'Choose a preview step (Enter = Back / Skip)'
-        if ([string]::IsNullOrWhiteSpace($answer)) { return $Options[-1].Value }
+        $answer = Read-Host 'Choose a preview step (Enter = Back / Skip, ? = Help)'
+        if ([string]::IsNullOrWhiteSpace($answer)) { break }
         if ($answer -eq '?') {
-            $Options | ForEach-Object { Write-Host "$($_.Label -replace '&', ''): $($_.Help)" }
+            foreach ($option in $Options) {
+                Write-AS2GoOutput -Type Info -Message "$($option.Label): $($option.Help)" -NoExtraLines
+            }
         }
+
         $number = 0
         $valid = [int]::TryParse($answer, [ref]$number) -and $number -ge 1 -and $number -le $Options.Count
+        if ($valid) { $index = $number - 1 }
     } until ($valid)
-    return $Options[$number - 1].Value
+
+    Measure-FunctionRuntime -End -Details $info
+    return $Options[$index].Value
 }

@@ -27,8 +27,14 @@ foreach ($file in $publicFiles) {
 $module = New-Module -ArgumentList $root -ScriptBlock {
     param($root)
     Get-ChildItem "$root/Private/*.ps1", "$root/Public/*.ps1" | ForEach-Object { . $_.FullName }
+    $script:DateFormatLog = 'yyyy-MM-dd HH:mm:ss.fff'
+    $script:FGCH1 = 'Gray'
+    $script:FGCCommand = 'White'
+    $script:EnableLogging = $true
+    # Any accidental log write fails because this drive does not exist.
+    $script:ASModuleLog = 'PreviewLogMustStayDisabled:\AS2Go.log'
     $script:route = [System.Collections.Generic.Queue[string]]::new()
-    @('Invoke-ASPhase07PrivilegeEscalation', 'Invoke-KerberoastingAttack', 'Invoke-Kerberoasting', 'User', 'Back', 'Back', 'Back') | ForEach-Object { $script:route.Enqueue($_) }
+    @('Invoke-ASPhase07PrivilegeEscalation', 'Invoke-KerberoastingAttack', 'Start-Kerberoasting', 'User', 'Back', 'Back', 'Back') | ForEach-Object { $script:route.Enqueue($_) }
     function Show-AS2GoPreviewChoice {
         param($Title, $Options)
         if ($script:route.Count -eq 0) { throw "Unexpected menu: $Title" }

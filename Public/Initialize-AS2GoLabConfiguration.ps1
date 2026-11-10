@@ -159,10 +159,8 @@ function Initialize-AS2GoLabConfiguration {
     }
 
 
-    $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = [Security.Principal.WindowsPrincipal]::new($currentIdentity)
-
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    $result = Test-LocalAdministrator
+    if (-not $result.IsElevated) {
         Write-AS2GoOutput -Type Error -Message "This function must be run as Administrator."
         return
     }

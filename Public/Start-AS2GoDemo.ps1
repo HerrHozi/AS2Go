@@ -139,12 +139,14 @@ Function Start-AS2GoDemo {
         return
     }
     
-    $result = Get-ASConfig -Setting "LastConfig"
-    If ($null -eq $result) {
-        Write-AS2GoOutput -Type Warning -M "No previous configuration found. Run 'Initialize-AS2GoLabConfiguration' first."
-        return
+    if (-not $safeMode) {
+        $result = Get-ASConfig -Setting "LastConfig"
+        If ($null -eq $result) {
+            Write-AS2GoOutput -Type Warning -M "No previous configuration found. Run 'Initialize-AS2GoLabConfiguration' first."
+            return
+        }
     }
-    
+
     Clear-ExfiltrationFolder
 
     Write-AS2GoOutput -Type  Header -M "Attack Scenario to Go - along the kill-chain (AS2Go)"
@@ -154,7 +156,7 @@ Function Start-AS2GoDemo {
 
     Write-Host ""
 
-   # write-host "Checking required modules and tools..."
+    # write-host "Checking required modules and tools..."
     # check the correct directory and requirements
 
     $Script:ASTools = Get-ASConfig -Setting "Tools"
@@ -190,17 +192,15 @@ Function Start-AS2GoDemo {
     else {
         if ($Continue) { $StartValue = $Script:No } else { $StartValue = $Script:Yes }
         $question = "Starts the attack scenario from the beginning? Default "
-        $Begin = Get-Answer -question $question -defaultValue $StartValue
+       # $Begin = Get-Answer -question $question -defaultValue $StartValue
     }
 
-
+$Begin =  $Script:No
     If ($Begin -eq $Script:Yes) {
         Set-ASConfig -Setting "LastStage" -Value $Script:Phase50
         Set-NewColorSchema -NewStage $Script:InitialStart
 
-
         If (-not $SkipClearHost) { Clear-Host }
-
 
         $TimeStamp = (Get-Date).toString("yyyy-MM-dd HH:mm:ss")
         $lastVictim = Get-ASConfig -Setting "LastVictim"
@@ -220,19 +220,7 @@ Function Start-AS2GoDemo {
         Set-ASConfig -Setting "LastStart" -Value $TimeStamp
 
 
-
-
-        If ($DeveloperMode) {
-
-        }
-
         If ($UnAttended -eq $false) { pause }
-
-        ################################################################################
-        ######                                                                     #####
-        ######                Setting update                                       #####
-        ######                                                                     #####
-        ################################################################################
 
         If (-not $SkipClearHost) { Clear-Host }
         If ($UnAttended -eq $false) { Get-AS2GoSettings }
@@ -261,7 +249,6 @@ Function Start-AS2GoDemo {
     $null = Get-AS2GoSettings -ReadOnly
     
     $UseCase = Get-ASConfig -Setting "usecase"
-
 
     Show-ForestOverview 
     Get-ForestInfo
@@ -300,8 +287,6 @@ Function Start-AS2GoDemo {
         $Global:ASVictim = $env:UserName
     }
     #If (-not $SkipClearHost){Clear-Host}
-
-
 
     Write-Host ""
     Write-Host "  Compromised Account  --  " -NoNewline
@@ -350,24 +335,12 @@ Function Start-AS2GoDemo {
     Write-Host ""
     Set-ASConfig -Setting "LastVictim" -Value $Global:ASVictim
 
-
     If (($UnAttended -ne $true) -and ($SkipPopup -ne $true)) {
         Start-Sleep 2
     }
     else {
         Pause
     }
-
-
-    #endregion Attack Phase -  Brute Force Account 
-
-    ################################################################################
-    ######                                                                     #####
-    ######                Attack Phase - COMPROMISED User Account              #####
-    ######                                                                     #####
-    ################################################################################
-
-    #region Attack Phase - COMPROMISED User Account
 
 
 
@@ -452,7 +425,6 @@ Function Start-AS2GoDemo {
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode @domainPersistenceParameters
-   
     }
     elseif ($decision -eq 5) {
         Invoke-ASPhase05InitialAccess -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
@@ -462,7 +434,6 @@ Function Start-AS2GoDemo {
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode @domainPersistenceParameters
-
     }
     elseif ($decision -eq 6) {
         Invoke-ASPhase06Reconnaissance -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
@@ -471,7 +442,6 @@ Function Start-AS2GoDemo {
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode @domainPersistenceParameters
-
     }
     elseif ($decision -eq 7) {
         Invoke-ASPhase07PrivilegeEscalation -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode @privilegeEscalationParameters
@@ -479,7 +449,6 @@ Function Start-AS2GoDemo {
         Invoke-ASPhase10AccessSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode @domainPersistenceParameters
-
     }
     elseif ($decision -eq 9) {
         Invoke-ASPhase09ReconnaissancePrivileged -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
@@ -495,46 +464,12 @@ Function Start-AS2GoDemo {
     elseif ($decision -eq 11) {
         Invoke-ASPhase11ExfiltrateSensitiveData -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode
         Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode @domainPersistenceParameters
-
     }
     elseif ($decision -eq 12) {
         Invoke-ASPhase12DomainCompromisePersistence -EnableLogging:$EnableLogging -SkipImages:$SkipImages -SkipClearHost:$SkipClearHost -UnAttended:$UnAttended -AS2GODemo -Simulation:$Simulation -SafeMode:$SafeMode @domainPersistenceParameters
     }
 
     return
-
  
     Stop-AS2GoDemo
-
-
-    <# Ideen 
-
-
-enter-pssession -ComputerName Ch01-DSP-MGMT
-
-
-try
-{
-#https://www.hackingarticles.in/credential-dumping-wdigest/
-
-$UseLogonCredential = Get-ItemPropertyValue -Name UseLogonCredential -Path HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest
-Write-Host $UseLogonCredential
-}
-catch
-{
-Write-Host Get-ItemPropertyValue : Property UseLogonCredential does not exist at path -ForegroundColor yellow
-}
-
-try
-{
-$UseLogonCredential = Get-ItemPropertyValue -Name UseLogonCredential -Path HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest
-}
-catch
-{
-Write-Host Get-ItemPropertyValue : Property UseLogonCredential does not exist at path -ForegroundColor yellow
-}
-
-Get-ChildItem ??-*.* | Move-Item -Destination .\Clean-up -Force
-
-#>
 }

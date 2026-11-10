@@ -38,7 +38,7 @@ function Invoke-GroupManipulation {
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
-    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
+    Show-CurrentPhase -Phase  "https://attack.mitre.org/techniques/T1531/"   
 
     #$BGA = "S-1-5-21-18515944-1610616278-1029250612-500"
     #$BDA = "S-1-5-21-18515944-1610616278-1029250612-500"

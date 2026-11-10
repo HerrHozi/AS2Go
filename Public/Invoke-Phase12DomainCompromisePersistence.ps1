@@ -66,9 +66,9 @@ Part of: AS2Go attack phase orchestration
 Category: Main Function
 
 .FUNCTIONALITY
-Offers backdoor creation, GPO changes, privileged membership removal, and user disabling or password resets.
-Also offers staged file encryption, domain DPAPI backup-key export, and Golden Ticket creation and injection.
-Runs the selected workflow, requests restarts of configured Domain Controllers, or closes the demonstration.
+Demonstrates backdoor creation, GPO tampering, privileged membership removal, and account access disruption.
+Supports staged file encryption, domain DPAPI backup-key export, and Golden Ticket creation and injection.
+Executes the selected workflow, requests configured Domain Controller restarts, or exits the demonstration.
 #>
 function Invoke-ASPhase12DomainCompromisePersistence {
 
@@ -128,18 +128,23 @@ function Invoke-ASPhase12DomainCompromisePersistence {
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type Header -M "Attack Phase - $($Script:Phase12.toupper())"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
-    Write-AS2GoOutput -Type Bullet "Create a persistent backdoor domain account"
-    Write-AS2GoOutput -Type Bullet "Perform user account manipulation (disable accounts and/or reset passwords)"
-    Write-AS2GoOutput -Type Bullet "Perform Tier 0 group membership manipulation (remove all admins except backdoor and break-glass accounts)"
-    Write-AS2GoOutput -Type Bullet "Tamper with Group Policy Template (GPT) files to push malicious settings"
-    Write-AS2GoOutput -Type Bullet "Encrypt backup files stored on the domain controller"
-    Write-AS2GoOutput -Type Bullet "Export the DPAPI master key for offline decryption of secrets"
-    Write-AS2GoOutput -Type Bullet "Forge a Kerberos Golden Ticket for long-term domain persistence"
-    Write-AS2GoOutput -Type Bullet "Reboot all available machines in the domain"
+    Write-AS2GoOutput -Type Bullet "Establish persistent access by creating a backdoor domain account"
+    Write-AS2GoOutput -Type Bullet "Disrupt legitimate user access by disabling accounts and/or resetting passwords"
+    Write-AS2GoOutput -Type Bullet "Revoke legitimate administrators' Tier 0 access by removing group memberships"
+    Write-AS2GoOutput -Type Bullet "Modify Group Policy Template (GPT) files to distribute malicious policy settings"
+    Write-AS2GoOutput -Type Bullet "Encrypt backup files stored on the domain controller to impair recovery"
+    Write-AS2GoOutput -Type Bullet "Export the DPAPI backup key to enable offline decryption of protected secrets"
+    Write-AS2GoOutput -Type Bullet "Forge a Kerberos Golden Ticket to maintain persistent domain access"
+    Write-AS2GoOutput -Type Bullet "Initiate a domain-wide reboot of all reachable machines"
 
 
-    Write-AS2GoOutput -Type H1 -Message "`n`nThe configured break-glass account will be excluded, can be modified during this phase."
-    Write-AS2GoOutput -Type TextMaker -Message "Current Break Glass Account:" -Tm $result -NoExtraLines
+    Write-AS2GoOutput -Type H1 -Message "`n`nThe configured break-glass account (BGA) is excluded from privileged group membership removal and `ncan be modified during this phase."
+    Write-AS2GoOutput -Type TextMaker -Message "Current BGA:         " -Tm $result -NoExtraLines
+    
+    $SavedPath = Get-ASConfig -Setting 'ADPrivilegedGroupDirectMember'
+    Write-AS2GoOutput -Type H1 -Message "`n`nThe existing direct membership backup for privileged groups `ncan be updated during this phase."
+    Write-AS2GoOutput -Type TextMaker -Message "Current Backup File: " -Tm $SavedPath -NoExtraLines
+
 
 
     If ($UnAttended) {

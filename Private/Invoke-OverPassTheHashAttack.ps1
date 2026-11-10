@@ -189,7 +189,7 @@ Please confirm that the following prerequisites are met in the isolated test env
         $uniqueResults = @(ConvertFrom-CredentialDump -Unique -Path $CredentialDump)
     
         If ($uniqueResults.Count -eq 0) {
-            Write-AS2GoOutput -Type Error -Message "No Security Credentials found in LSASS-Dump."
+            Write-AS2GoOutput -Type Error -Message "No Security Credentials found in Credential Dump."
             return
         }
         else {
