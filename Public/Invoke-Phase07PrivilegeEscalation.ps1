@@ -100,6 +100,10 @@ function Invoke-ASPhase07PrivilegeEscalation {
         Set-NewColorSchema -NewStage $Script:InitialStart
         Get-AS2GoSettings
         $Script:BestDCs = Set-BestDomainController
+        $Forest = Get-ADForest
+        $Script:AllDomainsDetails = $Forest.Domains | ForEach-Object {
+            Get-DomainDetails -DomainName $_
+        }
     }
         
     If (-not $SkipClearHost) { Clear-Host }
@@ -155,8 +159,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
         Write-Host "  K " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Kerberoasting Attack"
         Write-Host "  1 " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Misconfigured Certificate Template Attack (ESC1)"
         Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)"
-        Write-Host "  M " -ForegroundColor Yellow -NoNewline; Write-Host "- for Credential Theft via Memory Access" -NoNewline; Write-Host " ** Coming Soon **" -ForegroundColor Yellow
-        Write-Host "  E " -ForegroundColor Yellow -NoNewline; Write-Host "- to enable the Memory Access" -NoNewline; Write-Host " ** Coming Soon **" -ForegroundColor Yellow
+        Write-Host "  M " -ForegroundColor Yellow -NoNewline; Write-Host "- for Credential Theft via Memory Access"
+        Write-Host "  E " -ForegroundColor Yellow -NoNewline; Write-Host "- to enable the Memory Access"
 
         Write-host "`n  S " -ForegroundColor Yellow -NoNewline; Write-Host "- to skip this step"
 
@@ -169,8 +173,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
             $message = "Select the attack technique to execute. Options with unmet requirements are hidden."
             
             #$Script:helpPassTheHash = $null 
-            $script:helpMemoryAccess = $null 
-            $Script:helpEnableMemoryAccess = $null 
+            #$script:helpMemoryAccess = $null 
+            #$Script:helpEnableMemoryAccess = $null 
             
             $Options = @(
                 [pscustomobject] @{
@@ -237,7 +241,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
         }
         elseif ($answer -eq "M") {
 
-            New-CredentialTheftThroughMemoryAccess
+            Invoke-PriviledgeEscalationViaMemoryAccess
         }
         elseif ($answer -eq "E") {
 
