@@ -13,7 +13,7 @@ function Set-AttackScope {
 
     $Info = Measure-FunctionRuntime -Begin
 
-    $lastSelection = Get-ASConfig -Setting "MySearchBase"
+    $lastSelection = Get-ASConfig -Setting "AS2GoSearchBase"
    
     If ($UnAttended) {
         $DomainSearchBase = (get-Addomain).DistinguishedName
@@ -91,7 +91,7 @@ function Set-AttackScope {
             }
         } Until ($prompt -eq $Script:Yes)
     }
-    Set-ASConfig -Setting "MySearchBase" -Value $DomainSearchBase
+    Set-ASConfig -Setting "AS2GoSearchBase" -Value $DomainSearchBase
     
     Measure-FunctionRuntime -End -Details $Info
 

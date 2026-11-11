@@ -443,6 +443,36 @@ If (-not (Test-Path -Path $Script:ConfigFile)) {
     copy-item "$ASModulePath\AS2GO.json" -Destination $Script:ConfigFile
 }
 
+$LegacySettingNames = @{
+    myDC         = 'AS2GoDC'
+    myViPC       = 'AS2GoViPC'
+    mySAW        = 'AS2GoSAW'
+    myAppServer  = 'AS2GoAppServer'
+    MySearchBase = 'AS2GoSearchBase'
+}
+$ConfigData = Get-Content -Path $Script:ConfigFile -Raw | ConvertFrom-Json
+$ConfigChanged = $false
+foreach ($LegacyName in $LegacySettingNames.Keys) {
+    $LegacyEntry = $ConfigData.DefaultParameter.Setting | Where-Object { $_.Name -eq $LegacyName } | Select-Object -First 1
+    $CurrentEntry = $ConfigData.DefaultParameter.Setting | Where-Object { $_.Name -eq $LegacySettingNames[$LegacyName] } | Select-Object -First 1
+    if ($LegacyEntry -and -not $CurrentEntry) {
+        $LegacyEntry.Name = $LegacySettingNames[$LegacyName]
+        $ConfigChanged = $true
+    }
+    elseif ($LegacyEntry -and $CurrentEntry) {
+        if (-not $CurrentEntry.Value -and $LegacyEntry.Value) {
+            $CurrentEntry.Value = $LegacyEntry.Value
+        }
+        foreach ($ParameterGroup in $ConfigData.DefaultParameter) {
+            $ParameterGroup.Setting = @($ParameterGroup.Setting | Where-Object { $_ -ne $LegacyEntry })
+        }
+        $ConfigChanged = $true
+    }
+}
+if ($ConfigChanged) {
+    $ConfigData | ConvertTo-Json -Depth 10 | Set-Content -Path $Script:ConfigFile -Force
+}
+
 
 <#
 $logo = @'

@@ -29,11 +29,11 @@
           "Value": "Attack Scenario to Go - along the kill-chain"
         },
         {
-          "Name": "mydc",
+          "Name": "AS2GoDC",
           "Value": ""
         },
         {
-          "Name": "myViPC",
+          "Name": "AS2GoViPC",
           "Value": ""
         },
         {
@@ -45,11 +45,11 @@
           "Value": ""
         },
         {
-          "Name": "mySAW",
+          "Name": "AS2GoSAW",
           "Value": ""
         },
         {
-          "Name": "myAppServer",
+          "Name": "AS2GoAppServer",
           "Value": ""
         },
         {
@@ -57,7 +57,7 @@
           "Value": ""
         },
         {
-          "Name": "MySearchBase",
+          "Name": "AS2GoSearchBase",
           "Value": ""
         },
         {

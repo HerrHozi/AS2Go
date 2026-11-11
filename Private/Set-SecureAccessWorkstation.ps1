@@ -18,7 +18,7 @@ function Set-SecureAccessWorkstation {
     Write-AS2GoOutput -Type Header -Message "Define a Secure Access Workstation"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-    $previousSAW = Get-ASConfig -Setting "mySAW"
+    $previousSAW = Get-ASConfig -Setting "AS2GoSAW"
 
     if (-not [string]::IsNullOrWhiteSpace([string]$previousSAW)) {
         $message = "Use the current Secure Access Workstation ($previousSAW) or select a new one:"
@@ -60,7 +60,7 @@ function Set-SecureAccessWorkstation {
                     throw "Could not read a host name for computer '$computerDN'."
                 }
 
-                Set-ASConfig -Setting "mySAW" -Value $computerName
+                Set-ASConfig -Setting "AS2GoSAW" -Value $computerName
                 $sawComputerName = $computerName
                 Write-AS2GoOutput -Type TextMaker -Message "New Secure Access Workstation:" -Tm $computerName
             }
@@ -77,7 +77,7 @@ function Set-SecureAccessWorkstation {
         }
         else {
             $computerName = $computerName.Trim()
-            Set-ASConfig -Setting "mySAW" -Value $computerName
+            Set-ASConfig -Setting "AS2GoSAW" -Value $computerName
             $sawComputerName = $computerName
             Write-AS2GoOutput -Type TextMaker -Message "New Secure Access Workstation:" -Tm $computerName
         }

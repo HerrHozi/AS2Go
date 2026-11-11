@@ -124,7 +124,7 @@ Function Invoke-GoldenTicket {
 
     If (-not $SkipClearHost) { Clear-Host }
     $Script:ASDomainSID = Get-ASConfig -Setting "DomainSID" 
-    $Script:ASSearchBase = Get-ASConfig -Setting "MySearchBase"
+    $Script:ASSearchBase = Get-ASConfig -Setting "AS2GoSearchBase"
     $Script:ASKrbtgtNtml = Get-ASConfig -Setting "krbtgtntml"
         
         

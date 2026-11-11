@@ -72,7 +72,7 @@ Describe 'Invoke-VerifyConfiguration' {
     It 'checks the configured paths, selected workstation, directory targets and scenario prefix' {
         $script:settings.Tools = (New-Item -Path (Join-Path $TestDrive 'Tools') -ItemType Directory).FullName
         $script:settings.BackupShare = (New-Item -Path (Join-Path $TestDrive 'Backup') -ItemType Directory).FullName
-        $script:settings.mySAW = 'paw.child.example.test'
+        $script:settings.AS2GoSAW = 'paw.child.example.test'
         $null = New-Item -Path (Join-Path $script:settings.Tools 'Rubeus.exe') -ItemType File
         $null = New-Item -Path (Join-Path $script:settings.BackupShare 'ntds.dit') -ItemType File
         $script:zones = @(
@@ -123,7 +123,7 @@ Describe 'Invoke-VerifyConfiguration' {
     }
 
     It 'distinguishes negative results from query failures' {
-        $script:settings.mySAW = 'offline.child.example.test'
+        $script:settings.AS2GoSAW = 'offline.child.example.test'
         $script:settings.Tools = Join-Path $TestDrive 'MissingTools'
         $script:settings.BackupShare = Join-Path $TestDrive 'MissingShare'
         $script:winRMReachable = $false

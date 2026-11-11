@@ -68,7 +68,7 @@ function Invoke-VerifyConfiguration {
             Get-BreakGlassAccount
         }
         'Secure Access Workstation' = {
-            $workstation = Get-ASConfig -Setting 'mySAW'
+            $workstation = Get-ASConfig -Setting 'AS2GoSAW'
             if ([string]::IsNullOrWhiteSpace($workstation)) {
                 Write-AS2GoOutput -Type Warning -Message 'No Secure Access Workstation is configured.'
             }
