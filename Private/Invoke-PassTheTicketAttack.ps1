@@ -35,7 +35,7 @@ function Invoke-PassTheTicketAttack {
     
     $Info = Measure-FunctionRuntime -Begin
 
-    $Script:ASSAW = Get-ASConfig -Setting "mySAW"
+    $Script:ASSAW = Get-ASConfig -Setting "AS2GoSAW"
     $Script:ASTicketsUNCPath = Get-ASConfig -Setting "ticketsPath"
 
     $TicketsSourcePath = "\\$Script:ASSAW\$Script:ASTicketsUNCPath"

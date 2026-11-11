@@ -258,7 +258,8 @@ function Initialize-AS2GoLabConfiguration {
     $Script:LogonServer = Get-LogonServerFQDN
 
     Show-ForestOverview 
-
+    $server = $Script:BestDCs[$FQDN]
+    
     $currentuser = whoami.exe
     $samaccountname = $currentuser.Split("\")[-1]
 
@@ -269,7 +270,7 @@ function Initialize-AS2GoLabConfiguration {
     Write-AS2GoOutput -Type Bullet -Message "Current Logon Server: " -TM $Script:LogonServer
     Write-AS2GoOutput -Type Bullet -Message "Current User:         " -TM $currentuser
 
-    $server = $Script:BestDCs[$FQDN]
+
     write-Log -Message "    >> Attempting to retrieve group membership for user '$samaccountname' from server '$server' for verification..."
     $membership = @(Get-ADPrincipalGroupMembership -Identity $samaccountname -Server $server) 
     $membership | Select-Object @{N = 'MemberOf'; E = { $_.samaccountname } }, @{N = 'SID'; E = { $_.sid } }  | Out-Host
@@ -391,10 +392,10 @@ function Initialize-AS2GoLabConfiguration {
                 Invoke-ADCSSetup -CTPreFix $Scenario
             }
             "Assets" {
-                Initialize-AS2GoAssets -AS2GoOU $AS2GoOU -Scenario $Scenario -UPNSuffix $UPNSuffix -Server $Script:LogonServer
+                Initialize-AS2GoAssets -AS2GoOU $AS2GoOU -Scenario $Scenario -UPNSuffix $UPNSuffix -Server $server
             }
             "DemoUsers" {
-                Invoke-DemoAccounts -AS2GoOU $AS2GoOU -Scenario $Scenario -UPNSuffix $UPNSuffix -Server $Script:LogonServer
+                Invoke-DemoAccounts -AS2GoOU $AS2GoOU -Scenario $Scenario -UPNSuffix $UPNSuffix -Server $server
             }
             "MDI" {
                 Invoke-MDITriggers

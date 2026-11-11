@@ -34,7 +34,7 @@ function New-PrivilegeEscalationRecommendation {
     $Info = Measure-FunctionRuntime -Begin
 
     If ($null -eq $Script:ASSAW) {
-        $Script:ASSAW = Get-ASConfig -Setting "mySAW" -ErrorAction SilentlyContinue
+        $Script:ASSAW = Get-ASConfig -Setting "AS2GoSAW" -ErrorAction SilentlyContinue
     }
 
     [bool]$condition1 = $false

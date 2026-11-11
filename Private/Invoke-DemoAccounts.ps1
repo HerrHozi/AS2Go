@@ -133,7 +133,7 @@ Function Invoke-DemoAccounts {
 
    }
 
-   Set-ASConfig -Setting "MySearchBase" -Value $OrganizationalUnit
+   Set-ASConfig -Setting "AS2GoSearchBase" -Value $OrganizationalUnit
    Set-ASConfig -Setting "PreviousBase" -Value $OrganizationalUnit
 
 

@@ -137,7 +137,7 @@ function Get-AS2GoSettings {
         if ($null -ne $newValue -and ($newValue.ToString().Trim()).Length -gt 0) {
             Set-ASConfig -Setting $Setting.Key -Value $newValue
             
-            #            if ($Setting.Key -eq 'mySAW') {
+            #            if ($Setting.Key -eq 'AS2GoSAW') {
             #                $path = "\\$newValue\$Script:ASTicketsUNCPath\`$c\temp\tickets"
             #                Set-ASConfig -Setting "ASTicketsUNCPath" -Value $path
             #            }
@@ -153,10 +153,10 @@ function Get-AS2GoSettings {
     # Keep the Index numbers stable (your UI references them)
     # -------------------------------
     $Settings = @(
-        (New-AS2GoSetting -Index 0  -Label "Logon Server / DC"          -Key "myDC"          -InputType Text    -ScriptVar "ASDC"),
-        (New-AS2GoSetting -Index 1  -Label "Victim PC"                  -Key "myViPC"        -InputType Text    -ScriptVar "ASVictimMaschine"),
-        (New-AS2GoSetting -Index 2  -Label "Admin PC"                   -Key "mySAW"         -InputType Text    -ScriptVar "ASSAW"),
-        (New-AS2GoSetting -Index 3  -Label "Application Server"         -Key "myAppServer"   -InputType Text    -ScriptVar "ASAppServer"),
+        (New-AS2GoSetting -Index 0  -Label "Logon Server / DC"          -Key "AS2GoDC"          -InputType Text    -ScriptVar "ASDC"),
+        (New-AS2GoSetting -Index 1  -Label "Victim PC"                  -Key "AS2GoViPC"        -InputType Text    -ScriptVar "ASVictimMaschine"),
+        (New-AS2GoSetting -Index 2  -Label "Admin PC"                   -Key "AS2GoSAW"         -InputType Text    -ScriptVar "ASSAW"),
+        (New-AS2GoSetting -Index 3  -Label "Application Server"         -Key "AS2GoAppServer"   -InputType Text    -ScriptVar "ASAppServer"),
         (New-AS2GoSetting -Index 4  -Label "Help Desk Group"            -Key "globalHelpDesk"-InputType Text    -ScriptVar "ASHelpDesk"),
         (New-AS2GoSetting -Index 5  -Label "MDI Honeytoken"             -Key "honeytoken"    -InputType ADObject -ScriptVar "ASHoneyToken"),
         (New-AS2GoSetting -Index 6  -Label "Domain Name"                -Key "fqdn"          -InputType Text    -ScriptVar "ASDomain"),
@@ -164,7 +164,7 @@ function Get-AS2GoSettings {
         (New-AS2GoSetting -Index 8  -Label "NTLM Hash Helpdesk"         -Key "pthntml"       -InputType Text    -ScriptVar "ASPtHntml"),
         (New-AS2GoSetting -Index 9  -Label "NTLM Hash krbtgt"           -Key "krbtgtntml"    -InputType Text    -ScriptVar "ASKrbtgtNtml"),
         (New-AS2GoSetting -Index 10 -Label "Seconds to reboot"          -Key "time2reboot"   -InputType Text    -ScriptVar "ASTime2Reboot"),
-        (New-AS2GoSetting -Index 11 -Label "AD Search Base"             -Key "MySearchBase"  -InputType ADObject -ScriptVar "ASSearchBase"),
+        (New-AS2GoSetting -Index 11 -Label "AD Search Base"             -Key "AS2GoSearchBase"  -InputType ADObject -ScriptVar "ASSearchBase"),
         (New-AS2GoSetting -Index 12 -Label "OU for BD User"             -Key "BDUsersOU"     -InputType ADObject -ScriptVar "ASOUofBackDoorUser"),
         (New-AS2GoSetting -Index 13 -Label "Tickets UNC Path (suffix)"  -Key "ticketsPath"   -InputType Text    -ScriptVar "ASTicketsUNCPath"),
         (New-AS2GoSetting -Index 14 -Label "Tickets Directory"          -Key "ticketsDir"    -InputType Text    -ScriptVar "ASTicketsDirectory"),
@@ -208,14 +208,14 @@ function Get-AS2GoSettings {
         # env defaults
         try { 
             $value = [System.Net.Dns]::GetHostEntry($env:COMPUTERNAME).HostName
-            Set-ASConfig -Setting "myViPC" -Value $value
+            Set-ASConfig -Setting "AS2GoViPC" -Value $value
         }
         catch {
-            Set-ASConfig -Setting "myViPC" -Value $env:COMPUTERNAME 
+            Set-ASConfig -Setting "AS2GoViPC" -Value $env:COMPUTERNAME 
         }
         try {
             $server = Get-LogonServerFQDN
-            Set-ASConfig -Setting "myDC" -Value $server
+            Set-ASConfig -Setting "AS2GoDC" -Value $server
         }
         catch { }
 

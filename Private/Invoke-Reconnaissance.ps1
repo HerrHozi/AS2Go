@@ -34,11 +34,11 @@ function Invoke-Reconnaissance {
     $Info = Measure-FunctionRuntime -Begin
 
     If ($null -eq $Script:ASSAW) {
-        $Script:ASSAW = Get-ASConfig -Setting "mySAW" -ErrorAction SilentlyContinue
+        $Script:ASSAW = Get-ASConfig -Setting "AS2GoSAW" -ErrorAction SilentlyContinue
     }
 
     If ($null -eq $Script:ASDC) {
-        $Script:ASDC = Get-ASConfig -Setting "myDC" -ErrorAction SilentlyContinue
+        $Script:ASDC = Get-ASConfig -Setting "AS2GoDC" -ErrorAction SilentlyContinue
     }
   
     Get-ForestInfo

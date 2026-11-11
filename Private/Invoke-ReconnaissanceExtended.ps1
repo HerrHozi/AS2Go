@@ -37,7 +37,7 @@ function Invoke-ReconnaissanceExtended {
     
 
     If ($null -eq $Script:ASDC) {
-        $Script:ASDC = Get-ASConfig -Setting "myDC" -ErrorAction SilentlyContinue
+        $Script:ASDC = Get-ASConfig -Setting "AS2GoDC" -ErrorAction SilentlyContinue
     }
 
     If ($null -eq $Script:ASFQDN) {
