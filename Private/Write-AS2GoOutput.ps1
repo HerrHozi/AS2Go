@@ -50,7 +50,7 @@ Write-AS2GoOutput {
     Param(
         [Parameter(Mandatory = $false, Position = 0)]
         [Alias('T')]
-        [ValidateSet("Info", "Input", "Success", "Warning", "Error", "CodeSnippet", "Command", "NextCommand", "TextMaker", "Header", "Bullet", "Quit", "H1", "OK", "BAD", "TOP" )]
+        [ValidateSet("Info", "Input", "Success", "Warning", "Error", "CodeSnippet", "Command", "NextCommand", "TextMaker", "Header", "Bullet", "Quit", "H1", "OK", "BAD", "TOP", "Important" )]
         [string] $Type = "Info",
         [Parameter(Mandatory = $false, Position = 1)]
         [Alias('M')]
@@ -58,6 +58,7 @@ Write-AS2GoOutput {
         [Parameter(Mandatory = $false, Position = 2)]
         [Alias('TM')]
         [string] $TextMaker = "",
+        [string] $Note = "",
         [switch] $NoExtraLines,
         [switch] $NoNewLine
     )
@@ -180,7 +181,6 @@ Write-AS2GoOutput {
             $level = "INFO"
         }
         "TextMaker" { 
-
             If ($NoExtraLines) {
                 Write-host "  [i] $Message " -ForegroundColor $Script:FGCSInfo -NoNewline
                 Write-host "$TextMaker" -ForegroundColor $Script:FGCTextMaker
@@ -189,7 +189,18 @@ Write-AS2GoOutput {
                 Write-host "`n  [i] $Message " -ForegroundColor $Script:FGCSInfo -NoNewline
                 Write-host "$TextMaker`n`n" -ForegroundColor $Script:FGCTextMaker
             } 
+            $level = "INFO"
+        }
+         "Important" { 
+            If ($NoExtraLines) {
+                Write-host "  [!] $Note " -ForegroundColor $Script:FGCTextMaker -NoNewline
+                Write-host "$Message " #-ForegroundColor $Script:FGCSInfo 
 
+            }
+            Else { 
+                Write-host "`n`n  [!] $Note " -ForegroundColor $Script:FGCTextMaker -NoNewline
+                Write-host "$Message`n" #-ForegroundColor $Script:FGCSInfo 
+            } 
             $level = "INFO"
         }
         "Top" { 

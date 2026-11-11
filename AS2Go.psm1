@@ -463,8 +463,25 @@ $logo | ForEach-Object {
 #>
 
 #Clear-Host
+$PiskelPath = Join-Path -Path $ASModulePath -ChildPath "AS2Go.piskel"
+$TemporaryPiskelPath = $null
+try {
+    if (-not (Test-Path -LiteralPath $PiskelPath)) {
+        $TemporaryPiskelPath = [System.IO.Path]::GetTempFileName()
+        Set-Content -LiteralPath $TemporaryPiskelPath -Encoding UTF8 -ErrorAction Stop -Value '{"modelVersion":2,"piskel":{"name":"AS2Go_7x5","description":"gelb orange","fps":12,"height":11,"width":32,"layers":["{\"name\":\"Layer 1\",\"opacity\":1,\"frameCount\":1,\"chunks\":[{\"layout\":[[0]],\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAALCAYAAAAeEY8BAAAAjElEQVQ4T2NkGGDAOMD2M6A44M8J1/8wB7FY7IbLIYuD5GFyxKhHNgebZ1EsQbcUxAdZgs0QdHEYH5c4rpAm2wHIBiJbisvBRDkAXRGhoAapx+djWBTBzPnfwwCOYsYSRNQTDAF0RxHyLS4HgSyHWYzMJtsBpKYNsh1ATA5Azzm4cgfeKBio8mDACyIA0aWqDKC3fwMAAAAASUVORK5CYII=\"}]}"]}}'
+        $PiskelPath = $TemporaryPiskelPath
+    }
+    Show-PiskelFile -PiskelPath $PiskelPath -addshadow
+}
+catch {
+    <#Do this if a terminating exception happens#>
+}
+finally {
+    if ($TemporaryPiskelPath) {
+        Remove-Item -LiteralPath $TemporaryPiskelPath -Force -ErrorAction SilentlyContinue
+    }
+}
 
-Show-PiskelFile -PiskelPath (Join-Path -Path $ASModulePath -ChildPath "AS2Go.piskel") -addshadow
 
 Initialize-ConsoleColors
 

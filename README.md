@@ -10,13 +10,13 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermannn.holger@live.de
-Current Version: 2026.11.10.786
-Last Update:     2026-11-10
+Current Version: 2026.11.11.839
+Last Update:     2026-11-11
 ```
 
 AS2Go (**Attack Scenario to Go**) is a PowerShell-based Active Directory attack simulation and training framework designed for demos, workshops, security awareness sessions, and purple team exercises.
 
-The project provides a controlled lab environment that demonstrates how attackers can move through an Active Directory infrastructure by following a realistic cyber kill chain â€” from initial access to full domain compromise.
+The project provides a controlled lab environment that demonstrates how attackers can move through an Active Directory infrastructure by following a realistic cyber kill chain from initial access to full domain compromise.
 
 AS2Go helps security professionals, consultants, and defenders better understand how common weaknesses in Active Directory can be abused in practice, while providing a safe and repeatable environment for learning and demonstrations.
 
@@ -24,7 +24,7 @@ It is designed for:
 
 - Security awareness and blue team training
 - Detection engineering and incident response exercises
-- Demonstrating Semperis Directory Services Protector (DSP), Microsoft Defender and Sentinel alert behavior
+- Demonstrating Semperis Directory Services Protector (DSP) or Lightning, Microsoft Defender and Sentinel alert behavior
 - Repeatable SOC tabletop and hands-on lab sessions
 
 ## Project Information
@@ -69,7 +69,7 @@ The goal is not stealth, but visibility and learning.
 ### Platform
 
 - Windows lab environment
-- PowerShell 7.1 or higher
+- PowerShell 7.4 or higher
 - Active Directory test domain (recommended for full scenario)
 
 ### PowerShell Modules

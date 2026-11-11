@@ -40,7 +40,7 @@ Function Invoke-GoldenTicket {
 
     $Info = Measure-FunctionRuntime -Begin
 
-    $dn = Select-ADObject -DomainSelectionOnly -Title "Select Domain to get a Domain Controller for DPAPI Master Key Export"
+    $dn = Select-ADObject -DomainSelectionOnly -Title "Select a domain for the Golden Ticket demonstration"
     $fqdn = Convert-FromDNToCN -DistinguishedName $dn
     $server = Get-BestDomainController -domain $dn
 

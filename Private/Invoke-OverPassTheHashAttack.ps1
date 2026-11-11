@@ -44,7 +44,7 @@ function Invoke-OverPassTheHashAttack {
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    Write-AS2GoOutput -Type Header -Message "Starting Pass-the-Hash (PtH) Attack on VictimPC"
+    Write-AS2GoOutput -Type Header -Message "Starting Overpass-the-Hash (OpTH) Attack on VictimPC"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
 

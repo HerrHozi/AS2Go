@@ -13,7 +13,7 @@ The phase demonstrates persistence and impact actions such as:
 - Tier 0 group membership manipulation
 - Group Policy Template tampering
 - Encrypting backup files on a domain controller
-- Exporting a DPAPI master key
+- Exporting domain DPAPI backup keys
 - Forging a Kerberos Golden Ticket
 - Rebooting available domain machines
 
@@ -133,7 +133,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
     Write-AS2GoOutput -Type Bullet "Revoke legitimate administrators' Tier 0 access by removing group memberships"
     Write-AS2GoOutput -Type Bullet "Modify Group Policy Template (GPT) files to distribute malicious policy settings"
     Write-AS2GoOutput -Type Bullet "Encrypt backup files stored on the domain controller to impair recovery"
-    Write-AS2GoOutput -Type Bullet "Export the DPAPI backup key to enable offline decryption of protected secrets"
+    Write-AS2GoOutput -Type Bullet "Export domain DPAPI backup keys that can help recover domain users' DPAPI-protected data"
     Write-AS2GoOutput -Type Bullet "Forge a Kerberos Golden Ticket to maintain persistent domain access"
     Write-AS2GoOutput -Type Bullet "Initiate a domain-wide reboot of all reachable machines"
 
@@ -197,7 +197,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         $topicPurge = "Purge all privileged group memberships to grant exclusive control to the backdoor account"
         $topicUserAccount = "Disable user accounts or enforce password resets (retain backdoor control)"
         $topicEncrypt = "Encrypt critical Domain Controller assets for strategic leverage"
-        $topicMasterKey = "Extract the DPAPI master key for credential and secret recovery"
+        $topicDPAPIBackupKeys = "Export domain DPAPI backup keys that can help recover users' DPAPI master keys"
         $topicGoldenTicket = "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
         $topicReboot = "Trigger coordinated reboot across accessible Domain Controllers"
         $topicExit = "Exit AS2Go."
@@ -241,9 +241,9 @@ function Invoke-ASPhase12DomainCompromisePersistence {
                     Value = "UserAccount"
                 },
                 [pscustomobject] @{
-                    Label = "Master &Key"
-                    Help  = $topicMasterKey
-                    Value = "MasterKey"
+                    Label = "DPAPI Backup &Keys"
+                    Help  = $topicDPAPIBackupKeys
+                    Value = "DPAPIBackupKeys"
                 },
                 [pscustomobject] @{
                     Label = "&Golden Ticket"
@@ -300,8 +300,8 @@ function Invoke-ASPhase12DomainCompromisePersistence {
                 Invoke-Encryption
                 $repeat = $Script:Yes
             }
-            "MasterKey" {
-                Invoke-DPAPIMasterKeyExport
+            "DPAPIBackupKeys" {
+                Invoke-DPAPIBackupKeyExport
                 $repeat = $Script:Yes
             }
             "Reboot" {

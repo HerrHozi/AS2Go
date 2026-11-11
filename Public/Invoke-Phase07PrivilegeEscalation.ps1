@@ -57,9 +57,9 @@ Runs Phase 07 without phase visuals and without clearing the host.
 Alias: P07, ESC
 Part of: AS2Go attack phase orchestration
 .FUNCTIONALITY
-Lets you select a privilege-escalation technique: Overpass-the-Hash, Pass-the-Ticket, Kerberoasting, or ESC1.
-Demonstrates how a stolen NTLM hash, tickets, or vulnerable certificate templates can grant admin access.
-Credential theft via memory access and PsExec as SYSTEM are listed as options reserved for future activation.
+Demonstrates credential reuse, Kerberos ticket abuse, Kerberoasting, and AD CS certificate template abuse.
+Supports privilege escalation through ESC1, remote code execution as Local System via PsExec, and credential theft from process memory.
+Shows how captured NTLM hashes, stolen Kerberos tickets, and vulnerable certificate templates can grant privileged domain access.
 #>
 function Invoke-ASPhase07PrivilegeEscalation {
 
@@ -117,21 +117,21 @@ function Invoke-ASPhase07PrivilegeEscalation {
     Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-    Write-AS2GoOutput -Type  Bullet "Reuse captured NTLM hashes to authenticate via Pass-the-Hash"
-    Write-AS2GoOutput -Type  Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
-    Write-AS2GoOutput -Type  Bullet "Roast Kerberos service tickets to recover weak (service) account passwords"
-    Write-AS2GoOutput -Type  Bullet "Abuse an ESC1-vulnerable certificate template to impersonate privileged users"
-    Write-AS2GoOutput -Type  Bullet "Gain remote code execution as Local System using PsExec"
-    Write-AS2GoOutput -Type  Bullet "Extract credentials from process memory"
+    Write-AS2GoOutput -Type Bullet "Convert captured NTLM hashes into Kerberos tickets via Overpass-the-Hash"
+    Write-AS2GoOutput -Type Bullet "Reuse stolen Kerberos tickets to authenticate via Pass-the-Ticket"
+    Write-AS2GoOutput -Type Bullet "Request Kerberos service tickets and crack them offline to recover service-account credentials"
+    Write-AS2GoOutput -Type Bullet "Abuse an ESC1-vulnerable AD CS certificate template to obtain a certificate for a privileged principal"
+    Write-AS2GoOutput -Type Bullet "Obtain remote code execution as Local System using PsExec"
+    Write-AS2GoOutput -Type Bullet "Extract credentials from process memory"
 
-    $Script:helpKerberoasting = "Run a Kerberoasting attack to request and crack service account TGS tickets."
-    $Script:helpESC1 = "Abuse Misconfigured Certificate Template Attack (ESC1)."
-    $Script:helpPsExec = "Abuse PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)."
-    $Script:helpPassTheTicket = "Abuse Pass-the-Ticket Attack."
-    $Script:helpPassTheHash = "Abuse Pass-the-Hash Attack."
-    $Script:helpSkip = "Skip Privilege Escalation."
-    $script:helpMemoryAccess = "Abuse Memory Access for Credential Theft."
+    $Script:helpKerberoasting = "Request Kerberos service tickets for SPN accounts and crack them offline to recover service-account credentials."
+    $Script:helpESC1 = "Abuse an ESC1-vulnerable AD CS certificate template to obtain a certificate for a privileged principal."
+    $Script:helpPsExec = "Execute a PsExec attack to obtain remote code execution as Local System (NT AUTHORITY\SYSTEM)."
+    $Script:helpPassTheHash = "Convert captured NTLM hashes into Kerberos tickets to authenticate via Overpass-the-Hash."
+    $Script:helpPassTheTicket = "Reuse captured Kerberos tickets to authenticate via Pass-the-Ticket."
+    $script:helpMemoryAccess = "Extract credentials from process memory."
     $Script:helpEnableMemoryAccess = "Enable Memory Access for Credential Theft."
+    $Script:helpSkip = "Skip Privilege Escalation."
 
     If (-not $unattended) {
         $answer = Show-DecisionPrompt
@@ -154,13 +154,13 @@ function Invoke-ASPhase07PrivilegeEscalation {
 
         Write-AS2GoOutput -Type Header -Message "Select an Attack Technique"
 
-        Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Hash Attack"
+        Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for an Overpass-the-Hash Attack"
         Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack"
         Write-Host "  K " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Kerberoasting Attack"
-        Write-Host "  1 " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Misconfigured Certificate Template Attack (ESC1)"
-        Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack running as Local System (NT AUTHORITY\SYSTEM)"
+        Write-Host "  1 " -ForegroundColor Yellow -NoNewline; Write-Host "- for an AD CS Certificate Template Abuse Attack (ESC1)"
+        Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack as Local System (NT AUTHORITY\SYSTEM)"
         Write-Host "  M " -ForegroundColor Yellow -NoNewline; Write-Host "- for Credential Theft via Memory Access"
-        Write-Host "  E " -ForegroundColor Yellow -NoNewline; Write-Host "- to enable the Memory Access"
+        Write-Host "  E " -ForegroundColor Yellow -NoNewline; Write-Host "- to Enable Memory Access for Credential Theft"
 
         Write-host "`n  S " -ForegroundColor Yellow -NoNewline; Write-Host "- to skip this step"
 
@@ -193,12 +193,12 @@ function Invoke-ASPhase07PrivilegeEscalation {
                     Value = "X"
                 },
                 [pscustomobject] @{
-                    Label = "Pt&T"
+                    Label = "PT&T"
                     Help  = $Script:helpPassTheTicket
                     Value = $Script:PtT
                 },
                 [pscustomobject] @{
-                    Label = "Pt&H"
+                    Label = "OpT&H"
                     Help  = $Script:helpPassTheHash
                     Value = $Script:PtH
                 },
