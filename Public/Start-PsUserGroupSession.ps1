@@ -71,6 +71,10 @@ function Start-PsUserGroupSession {
     #Write-host "get-command -Module 'AS2Go' | Where-Object {`$_.Name -like 'Start*'}"
     
  
+
+Write-AS2GoOutput -Type Important -Note "Note -" -Message "This implementation may not be the best, but it works best for me. 🙂"
+
+
     $title = "PoSH User Group | AS2Go | Presentation"
     $message = "Select the action to execute. Options with unmet requirements are hidden."
 

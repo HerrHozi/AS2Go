@@ -15,3 +15,5 @@
 /ChangeLog.md
 /Start-PsUserGroupSession.ps1
 /Start-Sandbox.ps1
+/Start-PsUserGroupSession.ps1
+/Get-AuthorInfo.ps1

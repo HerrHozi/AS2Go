@@ -111,12 +111,6 @@ Function Start-AS2GoDemo {
         return
     }
 
-
-
-    #[bool]$showStep = $true # show the steps in an image
-    #[bool]$skipstep = $false # show the steps in an image
-    
-    $SkipPopup = $true
     Write-Log -Message "."
     Write-Log -Message "."
     Write-Log -Message "<< -- UniversalTime [UTC]"
@@ -133,6 +127,7 @@ Function Start-AS2GoDemo {
 
 
     If (-not $SkipClearHost) { Clear-Host }
+   
     $answer = Show-Disclaimer
 
     if ($answer -eq $Script:No) {
@@ -403,7 +398,14 @@ $Begin =  $Script:No
     )
     $title = "Select an attack phase to start or continue your attack scenario."
     $message = ""
-    $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
+   
+    If ($unattended) {
+        $decision = 4
+    }
+    else {
+       $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
+    }
+
 
 
     $privilegeEscalationParameters = @{}

