@@ -7,7 +7,7 @@
 @{
     PrivateData       = @{
         PSData         = @{
-            LastUpdate   = '2026-11-11'
+            LastUpdate   = '2026-11-12'
             Tags         = @('ActiveDirectory', 'ADCS', 'Killchain', 'RedTeam', 'Offense', 'AttackSimulation', 'AdversaryEmulation', 'PurpleTeam', 'BlueTeam', 'DefensiveSecurity')
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
@@ -37,7 +37,7 @@ v2026.5.7.1034
     
 
     RootModule        = 'AS2Go.psm1'
-    ModuleVersion     = '2026.11.11.1410'
+    ModuleVersion     = '2026.11.12.68'
     GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
     Author            = 'Holger Zimmermann | zimmermann.holger@live.de'
