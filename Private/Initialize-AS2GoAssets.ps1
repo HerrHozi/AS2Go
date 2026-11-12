@@ -214,6 +214,22 @@ Function Initialize-AS2GoAssets {
             Switch ($ou) {
                 $ouAccounts { 
                     Set-ADOrganizationalUnit -Identity "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier $ouAccounts" -PostalCode "AS2GOTierung" -Server $Server 
+                    
+                    if ($newOU -eq "T0 Accounts") {
+                        Set-ASConfig -Setting "T0AccountsOU" -Value "OU=$newOU,$ShortDNPAth"
+                    }
+                    elseif ($newOU -eq "T1 Accounts") {
+                        Set-ASConfig -Setting "T1AccountsOU" -Value "OU=$newOU,$ShortDNPAth"
+                    }
+                    elseif ($newOU -eq "T2 Accounts") {
+                        Set-ASConfig -Setting "T2AccountsOU" -Value "OU=$newOU,$ShortDNPAth"
+                    }
+                                      
+                    
+                    
+                    
+                    
+                    
                     Write-Host ""
                 }
   
@@ -271,7 +287,11 @@ Function Initialize-AS2GoAssets {
                     $UPN = $newUser + $UPNSuffix
                     New-ADUser -Name $newUser -UserPrincipalName  $UPN -SamAccountName $newUser  -PasswordNeverExpires $false  -AccountPassword $SecurePass -PassThru -Path "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier Service Account" -Server $Server  | Enable-ADAccount           
                     Set-ADOrganizationalUnit -Identity "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier $ouSvcAccounts" -Server $Server 
-                    Write-Host ([string]" - including service account:").PadRight($space, ' ') -NoNewline; Write-Host $newUser -ForegroundColor Yellow 
+                    Write-Host ([string]" - including service account:").PadRight($space, ' ') -NoNewline; Write-Host $newUser -ForegroundColor Yellow
+                    
+                    if ($newOU -eq "T0 ServiceAccounts") {
+                        Set-ASConfig -Setting "T0ServiceAccountsOU" -Value "OU=$newOU,$ShortDNPAth"
+                    }
                 }
                 $ouServers {
                     # create dummy Server
@@ -425,7 +445,6 @@ Function Initialize-AS2GoAssets {
     $answer = Show-DecisionPrompt -Options $Options -Default 1
 
     If ($answer -eq $Script:Yes) {
-
 
 
         Get-ADGroup -LDAPFilter "(adminCount=1)" -Properties * -Server $Server -SearchBase $ADRoot.defaultNamingContext | Where-Object {

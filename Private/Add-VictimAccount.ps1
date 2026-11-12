@@ -3,7 +3,7 @@
 Creates one victim Active Directory user using time-based names.
 
 .DESCRIPTION
-Creates one VI- account with the attributes from New-AS2GoUsers.ps1.
+Creates one VI- account with time-based lab attributes.
 Adds the account to SG-AS2Go-Victims only if that group exists.
 
 .PARAMETER Shortname
