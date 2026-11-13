@@ -5,7 +5,7 @@
 ![PowerShell](https://img.shields.io/badge/PowerShell-7.4%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Maintenance](https://img.shields.io/badge/status-active-brightgreen)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HerrHozi/AS2Go)
+[![Ask DeepWiki](https://raw.githubusercontent.com/HerrHozi/GCCare/main/.github/assets/badge-deepwiki.svg)](https://deepwiki.com/HerrHozi/AS2Go)
 [![Blog](https://img.shields.io/badge/blog-herrhozi.com-blue)](https://herrhozi.com)
 
 ```Text
