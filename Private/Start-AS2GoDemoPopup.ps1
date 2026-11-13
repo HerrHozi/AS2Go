@@ -7,7 +7,6 @@ function Start-AS2GoDemoPopup {
         [Parameter(Mandatory)]
         [ValidateScript({ Test-Path $_ })]
         [string]$SourceFile,
-
         [string]$TargetFile = 'C:\Temp\your-files-have-been-encrypted.html'
     )
 

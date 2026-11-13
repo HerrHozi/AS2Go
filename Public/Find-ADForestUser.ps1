@@ -30,6 +30,11 @@ Find-ADForestUser -User 'As2go' -Password 'Hozi-Lab!42'
 Finds matching accounts and reports every enabled account that authenticates with the
 supplied password.
 
+.EXAMPLE
+Find-ADForestUser -User 'As2go' -Password 'Hozi-Lab!42' | Select-object NetBIOSName, SamAccountName, Enabled, MemberOfRid, PasswordMatched | ft
+
+Finds matching accounts and reports (incl. memberof) every enabled account that authenticates with the supplied password.
+
 .OUTPUTS
 System.Management.Automation.PSCustomObject
 Returns the DNS and NetBIOS domain names, sign-in names, enabled status, and distinguished name of each match.
@@ -75,7 +80,9 @@ function Find-ADForestUser {
 
         foreach ($Domain in $Forest.Domains) {
             try {
-                $Accounts = Get-ADUser -Server $Domain -LDAPFilter $LdapFilter -ErrorAction Stop
+                $Accounts = Get-ADUser -Server $Domain -LDAPFilter $LdapFilter -Properties memberOf -ErrorAction Stop
+
+                #   $Groups = Get-ADPrincipalGroupMembership -Server $Domain -Identity $Account.SamAccountName
             }
             catch {
                 Write-AS2GoOutput -Type Warning -Message "Could not search domain '$Domain'. $($_.Exception.Message)"
@@ -126,6 +133,11 @@ function Find-ADForestUser {
                     }
                 }
 
+                $membership = Get-ADGroup -LDAPFilter ("(member:1.2.840.113556.1.4.1941:=$($Account.DistinguishedName))") -Server $Domain | Select-Object *, @{N = 'RID'; E = { ($_.SID.value).split("-")[-1] } } | Sort-Object RID
+                $rids = $membership.rid -join ", "
+                $samaccountnames = $membership.samaccountname -join ", "
+
+
                 $Result = [PSCustomObject]@{
                     Domain            = $Domain
                     NetBIOSName       = $NetBIOSName
@@ -133,6 +145,8 @@ function Find-ADForestUser {
                     UserPrincipalName = $Account.UserPrincipalName
                     Enabled           = $Account.Enabled
                     DistinguishedName = $Account.DistinguishedName
+                    MemberOf          = $samaccountnames
+                    MemberOfRid       = $rids
                 }
 
                 if ($TestPassword) {

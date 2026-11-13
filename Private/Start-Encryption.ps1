@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 Demonstrates certificate-based file encryption in a specified directory or share.
 
@@ -13,7 +13,7 @@ using AES-256-CBC with an RSA-protected session key. Missing paths or certificat
 Directory or UNC share whose files are processed recursively. Supply an existing path accessible to the current user.
 
 .EXAMPLE
-Invoke-FileEncryption -share "\\DC01.example.com\AS2Go-EncryptionDemo"
+Start-Encryption -share "\\DC01.example.com\AS2Go-EncryptionDemo"
 Processes all files below the specified lab share using the matching machine certificate.
 
 .INPUTS
@@ -36,7 +36,7 @@ Category: Sub Function
 Recursively encrypts files in the selected path using AES and an existing machine certificate.
 Saves plain-text copies in the AS2Go temporary folder before overwriting the original files.
 #>
-Function Invoke-FileEncryption {
+Function Start-Encryption {
     param(
         [string] $share
     )

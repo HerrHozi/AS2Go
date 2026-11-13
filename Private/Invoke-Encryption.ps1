@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 Encrypts critical Domain Controller assets for strategic leverage.
 
@@ -68,8 +68,10 @@ function Invoke-Encryption {
     Copy-Item -Path "$TargetPath\$filePrefix.txt" -Destination $FolderToEncrypt -Recurse
 
     Write-AS2GoOutput -Type TextMaker -Message "Starting to encrypt all files in folder" -TextMaker $FolderToEncrypt
-
-    $answer = Show-DecisionPrompt -Default 1
+    
+    $Title = "For visual effect, log on to a few domain controllers using the Windows sign-in screen."
+    $Message = "Ready to proceed with this step?" #Options with unmet requirements are hidden.",
+    $answer = Show-DecisionPrompt -Default 1 -Title $Title -Message $Message
 
     If ($answer -eq $Script:Yes) {
         $affectedDC = $BackupShare.split("\")[2]
@@ -77,7 +79,7 @@ function Invoke-Encryption {
           
         Write-AS2GoOutput -Type Info -Message "Content of file '$FolderToEncrypt\$filePrefix.txt' before encryption:"
         Invoke-Item "$FolderToEncrypt\$filePrefix.txt"
-        Invoke-FileEncryption -share $FolderToEncrypt
+        Start-Encryption -share $FolderToEncrypt
         Write-AS2GoOutput -Type Textmaker -Message "The following file is one of the files that were encrypted: --> " -TM "$FolderToEncrypt\$filePrefix.txt" 
         Invoke-Item "$FolderToEncrypt\$filePrefix.txt"
 

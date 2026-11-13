@@ -5,6 +5,7 @@ function Get-LocalComputerInformation {
         $registryPath = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
         $registry = Get-ItemProperty -LiteralPath $registryPath -ErrorAction Stop
         $computerSystem = Get-CimInstance -ClassName Win32_ComputerSystem -Property TotalPhysicalMemory -ErrorAction Stop
+        $os = (Get-CimInstance -ClassName Win32_OperatingSystem).Caption
 
         $osBuild = $registry.CurrentBuildNumber
         if ([string]::IsNullOrWhiteSpace($osBuild)) {
@@ -21,10 +22,10 @@ function Get-LocalComputerInformation {
 
         $information = [pscustomobject]@{
             ComputerName = $env:COMPUTERNAME
-            OS      = [string]$registry.ProductName
-            OSBuild = [int]$osBuild
-            Version = [string]$version
-            Memory  = [math]::Round($computerSystem.TotalPhysicalMemory / 1GB, 2)
+            OS           = [string]$os
+            OSBuild      = [int]$osBuild
+            Version      = [string]$version
+            Memory       = [math]::Round($computerSystem.TotalPhysicalMemory / 1GB, 2)
         }
 
         Write-Log -Message "    >> Local computer: $($information.OS), version $($information.Version), build $($information.OSBuild), $($information.Memory) GB RAM"

@@ -12,8 +12,8 @@ Returns the loaded settings and configuration without displaying the interactive
 Category: Main Function
 
 .FUNCTIONALITY
-From a CMD demo to a PowerShell 7 module
-for Active Directory attack simulation
+How a lab-specific CMD script
+became a PowerShell 7 module
 #>
 function Start-PsUserGroupSession {
     
@@ -51,28 +51,29 @@ function Start-PsUserGroupSession {
     Write-AS2GoOutput -Type Bullet -Message "incl. Color-coded console display of code without executing it."
     Write-AS2GoOutput -Type Command -Message "  [>] get-command -Module AS2Go | Where-Object {`$_.Name -like 'Start*'}"
 
-    write-as2gooutput -Type Bullet -Message "vd"
+    if (-not $SafeMode) {
 
-    $results = Get-ChildItem -Path . -Filter *.html -Recurse | Get-Random -Count 5
+        $results = Get-ChildItem -Path . -Filter *.html -Recurse | Get-Random -Count 5
 
-    $title = "Example: Reusable interactive menus with keyboard shortcuts"
-    $message = "Select an HTML file."
+        $title = "Example: Reusable interactive menus with keyboard shortcuts"
+        $message = "Select an HTML file."
 
-    $options = New-HelpOptions -InputObject $results -Label "Name" -Help "LastWriteTime" -Value "Fullname"
-    $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
-    Invoke-Item $answer
+        $options = New-HelpOptions -InputObject $results -Label "Name" -Help "LastWriteTime" -Value "Fullname"
+        $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+        Invoke-Item $answer
 
-    $results = Get-ChildItem -Path . -Filter *.html -Recurse | Get-Random -Count 5
-    $options = New-HelpOptions -InputObject $results -Label "Name" -Help "LastWriteTime" -Value "IndexOf" -AddSkip
-    $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
-    $results[$answer]
+        $results = Get-ChildItem -Path . -Filter *.html -Recurse | Get-Random -Count 5
+        $options = New-HelpOptions -InputObject $results -Label "Name" -Help "LastWriteTime" -Value "IndexOf" -AddSkip
+        $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+        $results[$answer]
 
+    }
     #ctrl + shift + p --> Debug Restart
     #Write-host "get-command -Module 'AS2Go' | Where-Object {`$_.Name -like 'Start*'}"
     
  
 
-Write-AS2GoOutput -Type Important -Note "Note -" -Message "This implementation may not be the best, but it works best for me. 🙂"
+    Write-AS2GoOutput -Type Important -Note "Note -" -Message "This implementation may not be the best, but it works best for me. 🙂"
 
 
     $title = "PoSH User Group | AS2Go | Presentation"
@@ -100,7 +101,7 @@ Write-AS2GoOutput -Type Important -Note "Note -" -Message "This implementation m
             Value = 'Last'
         },
         [pscustomobject] @{
-            Label = "&Exit"
+            Label = "E&xit"
             Help  = '' #Exit the presentation'
             Value = 'Exit'
         }
@@ -111,7 +112,11 @@ Write-AS2GoOutput -Type Important -Note "Note -" -Message "This implementation m
     If ($answer -eq 'Exit') {
         return
     }
+    clear-host
+    Get-AuthorInfo
 
+
+    
     Measure-FunctionRuntime -End -Details $info
 
 }

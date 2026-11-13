@@ -25,9 +25,9 @@ SamAccountName for the Tier 2 victim user.
 .PARAMETER SrvAccount
 SamAccountName for the Tier 0 service account.
 
-.PARAMETER Shortname
-Optional suffix for legacy account names. Use 'y' for yyyyMMdd, 'n' for yyyyMMdd.HHmmss,
-or a custom suffix. Explicit account names take precedence.
+.PARAMETER ShortName
+Replaces the AS2go prefix while keeping the standard account suffixes.
+Explicit account names take precedence. Use up to six characters if creating the default service account name.
 
 .PARAMETER SkipDomainAdmin
 Skips the domain administrator.
@@ -46,7 +46,7 @@ Shared password for every created account. At least seven characters to satisfy
 the default Active Directory password complexity requirements.
 
 .EXAMPLE
-New-AS2GoUserSet -WhatIf
+New-AS2GoUserSet -ShortName Lab01 -WhatIf
 
 .EXAMPLE
 New-AS2GoUserSet -DAUser AS2go-T0-Adm -VIUser AS2go -SkipHelpDesk -MasterPassword 'P@ssw0rd!'
@@ -61,24 +61,43 @@ function New-AS2GoUserSet {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [ValidateNotNullOrEmpty()][string]$Shortname,
-        [AllowNull()][ValidateLength(7, 256)][string]$MasterPassword,
+        [ValidateNotNullOrEmpty()][string]$ShortName,
+        [System.Security.SecureString]$InititalPassword, 
         [switch]$SkipDomainAdmin,
         [switch]$SkipHelpDesk,
         [switch]$SkipVictim,
         [ValidateLength(1, 20)][string]$DAUser = 'AS2go-T0-Adm',
         [ValidateLength(1, 20)][string]$EAUser = 'AS2go-T0-Ent',
         [ValidateLength(1, 20)][string]$SAUser = 'AS2go-T1-Adm',
-        [ValidateLength(1, 20)][string]$HDUser = 'AS2go-T2-Admm',
+        [ValidateLength(1, 20)][string]$HDUser = 'AS2go-T2-Adm',
         [ValidateLength(1, 20)][string]$VIUser = 'AS2go',
         [ValidateLength(1, 20)][string]$SrvAccount = 'As2go-T0-SvcAccount',
-        [ValidateNotNullOrEmpty()][string]$Server
+        [ValidateNotNullOrEmpty()][string]$Server,
+        [Switch]$EnableLogging
         # 7 characters satisfies the default Active Directory password complexity policy.
         # AllowNull keeps 'New-AS2GoUserSet -WhatIf' working without a password.
-
     )
 
     $info = Measure-FunctionRuntime -Begin
+
+    if (-not $InititalPassword) {
+
+        $RandomPw = Get-RandomPassword
+        Write-Host "`n`n[~] Enter initial password or press Enter for random one $RandomPw    : " -NoNewline -ForegroundColor Cyan
+        #$newpw = Write-AS2GoOutput -Type Input -Message "Enter initial password or press Enter for random   $RandomPw   "
+
+        $newpw = Read-Host -AsSecureString
+        $plainText = [System.Net.NetworkCredential]::new('', $newpw).Password
+        Set-ASConfig -setting "LastPw" -value $plainText
+
+        if ($newpw.Length -eq 0) {
+            $InititalPassword = ConvertTo-SecureString $RandomPw -AsPlainText -Force
+        }
+        else {
+            $InititalPassword = $newpw
+        }
+    }  
+
 
     try {
         Write-AS2GoOutput -Type Header -Message 'Create AS2Go Lab Accounts'
@@ -88,23 +107,24 @@ function New-AS2GoUserSet {
             @{ Parameter = 'DAUser'; Name = $DAUser; Prefix = 'DA'; Title = 'Domain Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'DAGroup'; Skip = $SkipDomainAdmin }
             @{ Parameter = 'EAUser'; Name = $EAUser; Prefix = 'EA'; Title = 'Enterprise Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'EAGroup' }
             @{ Parameter = 'SAUser'; Name = $SAUser; Prefix = 'SA'; Title = 'Server Administrator'; Tier = 'Tier 1'; OU = 'T1AccountsOU'; Group = 'SAGroup' }
-            @{ Parameter = 'HDUser'; Name = $HDUser; Prefix = 'HD'; Title = 'Help Desk'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'HDGroup'; Skip = $SkipHelpDesk }
-            @{ Parameter = 'VIUser'; Name = $VIUser; Prefix = 'VI'; Title = 'Normal User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'VIGroup'; Skip = $SkipVictim }
+            @{ Parameter = 'HDUser'; Name = $HDUser; Prefix = 'HD'; Title = 'Help Desk User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'HDGroup'; Skip = $SkipHelpDesk }
+            @{ Parameter = 'VIUser'; Name = $VIUser; Prefix = 'VI'; Title = 'Normal / Compromised User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'VIGroup'; Skip = $SkipVictim }
             @{ Parameter = 'SrvAccount'; Name = $SrvAccount; Prefix = 'SVC'; Title = 'Service Account'; Tier = 'Tier 0'; OU = 'T0ServiceAccountsOU'; Skip = $SkipHelpDesk }
         ) | Where-Object { -not $_.Skip }
 
         $now = Get-Date
-        $suffix = switch ($Shortname) {
-            'y' { $now.ToString('yyyyMMdd') }
-            'n' { $now.ToString('yyyyMMdd.HHmmss') }
-            default { $Shortname }
-        }
 
         $settings = @{}
         $accountNames = @{}
         foreach ($account in $accounts) {
-            if ($suffix -and -not $PSBoundParameters.ContainsKey($account.Parameter)) {
-                $account.Name = "$($account.Prefix)-$suffix"
+            if ($PSBoundParameters.ContainsKey('ShortName') -and -not $PSBoundParameters.ContainsKey($account.Parameter)) {
+                $separator = $account.Name.IndexOf('-')
+                $account.Name = if ($separator -ge 0) {
+                    $ShortName + $account.Name.Substring($separator)
+                }
+                else {
+                    $ShortName
+                }
             }
             if ($account.Name.Length -gt 20 -or $account.Name -match '[\x00-\x1f"\[\]:;|=+,*?<>/\\@]' -or $account.Name -match '^\s|[.\s]$') {
                 throw "Invalid Active Directory account name '$($account.Name)'. Use a valid SamAccountName of at most 20 characters."
@@ -175,12 +195,12 @@ function New-AS2GoUserSet {
                 Enabled               = $false
             }
             if (-not $password) {
-                if ([string]::IsNullOrWhiteSpace($MasterPassword)) {
+                if ([string]::IsNullOrWhiteSpace($InititalPassword)) {
                     throw 'Parameter -MasterPassword must contain the shared password for the created lab accounts.'
                 }
-                $password = ConvertTo-SecureString -String $MasterPassword -AsPlainText -Force
+                #$password = ConvertTo-SecureString -String $InititalPassword -AsPlainText -Force
             }
-            $user = New-ADUser @userParameters @adParameters -AccountPassword $password -PassThru -Confirm:$false
+            $user = New-ADUser @userParameters @adParameters -AccountPassword $InititalPassword -PassThru -Confirm:$false
             if ($account.GroupDN) {
                 Add-ADGroupMember -Identity $account.GroupDN -Members $user @adParameters -Confirm:$false
             }

@@ -1,24 +1,18 @@
-<#
+﻿<#
 .SYNOPSIS
-Runs Phase 09 of the AS2Go attack simulation: Privileged Reconnaissance.
+Runs the AS2Go privileged reconnaissance demonstration.
 
 .DESCRIPTION
-Invoke-ASPhase09ReconnaissancePrivileged executes a reconnaissance phase focused on privileged
-infrastructure context. The function prepares the phase, optionally shows visuals, and performs
-interactive or unattended reconnaissance actions against the logon server.
-
-The phase includes tasks such as:
-- Listing services on the logon server
-- Listing processes on the logon server
-- Running extended reconnaissance tasks
-- Running the phase once per invocation
+Phase 09 demonstrates what an elevated account can see after privilege escalation.
+An interactive run offers to display services and processes on the logon server
+and separately prompts for extended reconnaissance.
 
 .PARAMETER Preview
 Browses descriptions and workflow steps offline without executing actions.
 Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
-Runs the phase without interactive confirmation prompts.
+Runs extended reconnaissance without the phase prompts and skips the logon server service and process listings.
 
 .PARAMETER Continue
 Reserved switch for workflow continuation handling.
@@ -33,7 +27,10 @@ Skips visual phase assets (for example, phase HTML images/pages).
 Prevents clearing the console during phase execution.
 
 .PARAMETER AS2GoDemo
-Runs the phase in AS2Go demo mode and skips selected setup interactions.
+Uses the settings and forest information already loaded by the AS2Go demo.
+
+.PARAMETER SafeMode
+Skips reconnaissance actions.
 
 .EXAMPLE
 Invoke-ASPhase09ReconnaissancePrivileged
@@ -43,7 +40,7 @@ Runs Phase 09 interactively.
 .EXAMPLE
 Invoke-ASPhase09ReconnaissancePrivileged -UnAttended -EnableLogging
 
-Runs Phase 09 without prompts and with logging enabled.
+Runs extended reconnaissance without phase prompts and with logging enabled.
 
 .EXAMPLE
 Invoke-ASPhase09ReconnaissancePrivileged -SkipImages -SkipClearHost
@@ -52,17 +49,14 @@ Runs Phase 09 without phase visuals and without clearing the host.
 
 .NOTES
 Part of: AS2Go attack phase orchestration
+
+.FUNCTIONALITY
+Shows how elevated privileges can expose services and running processes on the logon server.
+Includes an extended reconnaissance demonstration.
 #>
 function Invoke-ASPhase09ReconnaissancePrivileged {
 
-
-
-    ################################################################################
-    #####                                                                      #####
-    #####    Phase 09 - Reconnaissance - After Privileged Escalation           #####
-    #####                                                                      #####
-    ################################################################################
-
+    [Alias("ASP09")]
     Param (
         [switch]$Preview,
         [switch]$UnAttended,
@@ -80,31 +74,51 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
 
 
     $Info = Measure-FunctionRuntime -Begin
+      Update-WindowTitle -NewTitle $Script:Phase09
+    Show-CurrentPhase -Phase "phase_09.html"
 
-    If (-not $AS2GoDemo) {
-        Set-NewColorSchema -NewStage $Script:InitialStart
-        Get-AS2GoSettings
-        Get-forestinfo
+    If (-not $SafeMode) {
+        If (-not $AS2GoDemo) {
+            Set-NewColorSchema -NewStage $Script:InitialStart
+            Get-AS2GoSettings
+            Get-forestinfo
+        }
     }
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    Update-WindowTitle -NewTitle $Script:Phase09
-    #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
-    Show-CurrentPhase -Phase "phase_09.html"
+  
 
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type  Header -Message "Attack Phase - $($Script:Phase09)"
-    Write-AS2GoOutput -Type  H1 -Message "Use the newly gained privileges to collect reconnaissance `nand configuration data from the current logon server."
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Bullet -Message "View services on the logon server with elevated privileges"
+    Write-AS2GoOutput -Type Bullet -Message "View running processes on the logon server"
+    Write-AS2GoOutput -Type Bullet -Message "Collect additional directory and network information during extended reconnaissance"
 
-
-    If ($UnAttended) {
-        $answer = $Script:Yes
+    $promptParams = @{}
+    if ($safemode) {
+        $promptParams.Options = @(
+            [pscustomobject]@{
+                Label = '&Skip'
+                Help  = 'Skip this step in Safe Mode'
+                Value = $Script:No
+            }
+        )
+    }
+    
+    If (-not $UnAttended) {
+        $answer = Show-DecisionPrompt @promptParams
     }
     else {
-        $question = "Would you like to run this step - Y or N? Default "
-        $answer = Get-Answer -question $question -defaultValue $Script:Yes
+        if ($safemode) {
+            $answer = $Script:No
+        }
+        else {
+            $answer = $Script:Yes
+        }
+
     }
 
     If ($answer -eq $Script:Yes) {
