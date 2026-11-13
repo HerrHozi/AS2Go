@@ -12,9 +12,6 @@
     .COMPONENT
     Category: Sub Function
 
-    .FUNCTIONALITY
-    Browses forest objects in a GUI, supports OU creation, and highlights selected Tier 0 entries.
-
     .PARAMETER Title
         This text displayed in the dialog window title. Default is "Select AD Object".
 
@@ -24,6 +21,10 @@
 
     .PARAMETER DomainSelectionOnly
         If specified, only domain objects can be selected. The tree view is not expanded to show child objects.
+
+    .PARAMETER OnlyUserSelectionPossible
+        Includes users in the tree and allows only user objects to be selected.
+        Takes precedence over DomainSelectionOnly when both switches are specified.
 
     .PARAMETER AddOU
         Enables a context menu for creating an organizational unit under a selected domain, OU, or container.
@@ -82,6 +83,9 @@
         - This is a private function and requires a graphical environment (Windows Forms).
         - The function uses Active Directory modules to query the forest structure.
         - All logging is handled through Write-Log.
+
+    .FUNCTIONALITY
+    Browses AD objects in a graphical tree, with optional user-only selection, OU creation, and Tier 0 marking.
     #>
 
     [CmdletBinding()]
@@ -97,7 +101,8 @@
         [switch]$IncludeGPOs,
         [switch]$MarkTier0,
         [Switch]$ShowAdvanced,
-        [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)'
+        [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)',
+        [switch]$OnlyUserSelectionPossible
     )
 
     If ($Script:NotStandAlone) {
@@ -320,7 +325,7 @@
     #>
     function Get-ChildNodes($node) {
 
-        if ($DomainSelectionOnly) { return }
+        if ($DomainSelectionOnly -and -not $OnlyUserSelectionPossible) { return }
 
         if ($node.Nodes.Count -eq 1 -and $node.Nodes[0].Text -eq 'dummy') {
 
@@ -336,7 +341,8 @@
                 "(objectClass=builtinDomain)"
             )
 
-            if ($IncludeUsers) { $filters += "(objectCategory=user)" }
+            if ($OnlyUserSelectionPossible) { $filters += "(&(objectCategory=person)(objectClass=user))" }
+            elseif ($IncludeUsers) { $filters += "(objectCategory=user)" }
             if ($IncludeGroups) { $filters += "(objectCategory=group)" }
             if ($IncludeComputers) { $filters += "(objectCategory=computer)" }
             if ($IncludeGPOs) { $filters += "(objectCategory=groupPolicyContainer)" }
@@ -609,6 +615,11 @@
     $tree.add_AfterSelect({
             $node = $_.Node
             $statusLabel.Text = "Selected: $($node.Text)"
+
+            if ($OnlyUserSelectionPossible) {
+                $btnOK.Enabled = ($node.Tag -and $node.Tag.ObjectClass -eq 'user')
+                return
+            }
 
             if ($DomainSelectionOnly) {
                 $btnOK.Enabled = ($node.Parent -and -not $node.Parent.Parent)

@@ -5,7 +5,8 @@ Creates the AS2Go lab users and a Tier 0 service account.
 .DESCRIPTION
 Creates up to five lab users and one service account in the configured Active Directory OUs.
 Each user joins its configured security group. All accounts share the supplied master password,
-use the lab thumbnail, and expire after seven days.
+use the lab thumbnail, and expire after seven days. The service account additionally receives a
+random SPN that points to a newly created SPN target computer, making it Kerberoastable.
 
 .PARAMETER DAUser
 SamAccountName for the Tier 0 domain administrator.
@@ -23,7 +24,8 @@ SamAccountName for the Tier 2 help desk user.
 SamAccountName for the Tier 2 victim user.
 
 .PARAMETER SrvAccount
-SamAccountName for the Tier 0 service account.
+SamAccountName for the Tier 0 service account. Receives a random SPN that is hosted by a newly
+created computer named 'SRV-' plus the account name truncated to 15 characters.
 
 .PARAMETER ShortName
 Replaces the AS2go prefix while keeping the standard account suffixes.
@@ -46,41 +48,51 @@ Shared password for every created account. At least seven characters to satisfy
 the default Active Directory password complexity requirements.
 
 .EXAMPLE
-New-AS2GoUserSet -ShortName Lab01 -WhatIf
+New-As2GoDemoPrincipal -ShortName Lab01 -WhatIf
 
 .EXAMPLE
-New-AS2GoUserSet -DAUser AS2go-T0-Adm -VIUser AS2go -SkipHelpDesk -MasterPassword 'P@ssw0rd!'
+New-As2GoDemoPrincipal -DAUser AS2go-T0-Adm -VIUser AS2go -SkipHelpDesk -MasterPassword 'P@ssw0rd!'
 
 .COMPONENT
 Category: Lab Setup
 
 .FUNCTIONALITY
-Creates five lab users with configured group memberships and a separate Tier 0 service account.
+Creates six lab principals with configured group memberships and a Tier 0 service account that
+receives a Kerberoastable SPN on a dedicated SPN target computer.
 #>
-function New-AS2GoUserSet {
+function New-As2GoDemoPrincipal {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [ValidateNotNullOrEmpty()][string]$ShortName,
+        [ValidateNotNullOrEmpty()][ValidateLength(1, 13)][string]$ShortName,
         [System.Security.SecureString]$InititalPassword, 
         [switch]$SkipDomainAdmin,
         [switch]$SkipHelpDesk,
         [switch]$SkipVictim,
-        [ValidateLength(1, 20)][string]$DAUser = 'AS2go-T0-Adm',
+        [ValidateLength(1, 13)][string]$DAUser = 'AS2go-T0-Adm',
         [ValidateLength(1, 20)][string]$EAUser = 'AS2go-T0-Ent',
         [ValidateLength(1, 20)][string]$SAUser = 'AS2go-T1-Adm',
         [ValidateLength(1, 20)][string]$HDUser = 'AS2go-T2-Adm',
         [ValidateLength(1, 20)][string]$VIUser = 'AS2go',
-        [ValidateLength(1, 20)][string]$SrvAccount = 'As2go-T0-SvcAccount',
+        [ValidateLength(1, 20)][string]$SrvAccount = 'As2go-T0-SA',
         [ValidateNotNullOrEmpty()][string]$Server,
         [Switch]$EnableLogging
         # 7 characters satisfies the default Active Directory password complexity policy.
-        # AllowNull keeps 'New-AS2GoUserSet -WhatIf' working without a password.
+        # AllowNull keeps 'New-As2GoDemoPrincipal -WhatIf' working without a password.
     )
 
     $info = Measure-FunctionRuntime -Begin
 
     if (-not $InititalPassword) {
+
+        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+        Write-AS2GoOutput -Type Bullet -Message 'Tier 0 Domain Administrator Account'
+        Write-AS2GoOutput -Type Bullet -Message 'Tier 0 Enterprise Account'
+        Write-AS2GoOutput -Type Bullet -Message 'Tier 1 Server Operator'
+        Write-AS2GoOutput -Type Bullet -Message 'Tier 2 Help Desk Account'
+        Write-AS2GoOutput -Type Bullet -Message 'Tier 2 Victim Account'
+        Write-AS2GoOutput -Type Bullet -Message 'Tier 0 Service Account including an SPN'
+        
 
         $RandomPw = Get-RandomPassword
         Write-Host "`n`n[~] Enter initial password or press Enter for random one $RandomPw    : " -NoNewline -ForegroundColor Cyan
@@ -100,8 +112,7 @@ function New-AS2GoUserSet {
 
 
     try {
-        Write-AS2GoOutput -Type Header -Message 'Create AS2Go Lab Accounts'
-        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+
 
         $accounts = @(
             @{ Parameter = 'DAUser'; Name = $DAUser; Prefix = 'DA'; Title = 'Domain Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'DAGroup'; Skip = $SkipDomainAdmin }
@@ -109,7 +120,7 @@ function New-AS2GoUserSet {
             @{ Parameter = 'SAUser'; Name = $SAUser; Prefix = 'SA'; Title = 'Server Administrator'; Tier = 'Tier 1'; OU = 'T1AccountsOU'; Group = 'SAGroup' }
             @{ Parameter = 'HDUser'; Name = $HDUser; Prefix = 'HD'; Title = 'Help Desk User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'HDGroup'; Skip = $SkipHelpDesk }
             @{ Parameter = 'VIUser'; Name = $VIUser; Prefix = 'VI'; Title = 'Normal / Compromised User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'VIGroup'; Skip = $SkipVictim }
-            @{ Parameter = 'SrvAccount'; Name = $SrvAccount; Prefix = 'SVC'; Title = 'Service Account'; Tier = 'Tier 0'; OU = 'T0ServiceAccountsOU'; Skip = $SkipHelpDesk }
+            @{ Parameter = 'SrvAccount'; Name = $SrvAccount; Prefix = 'SVC'; Title = 'Service Account'; Tier = 'Tier 0'; OU = 'T0ServiceAccountsOU'; Group = 'DAGroup'; Skip = $SkipHelpDesk; SPN = $true }
         ) | Where-Object { -not $_.Skip }
 
         $now = Get-Date
@@ -208,6 +219,33 @@ function New-AS2GoUserSet {
             $CN = Convert-FromDNToCN -DistinguishedName $account.Path
             $CN += "/$($account.Name)"
             Write-AS2GoOutput -Type Success -Message ("Created {0,-26} '{1}'." -f $account.Title, $CN) -NoExtraLines
+
+            if ($account.SPN) {
+                # Give the service account at least one Kerberoastable SPN that is hosted by a dedicated lab computer.
+                $services = @('HTTPS', 'FTP', 'CIFS', 'kafka', 'MSSQL', 'POP3', 'HTTP')
+                $spnComputer = 'SRV-' + $account.Name
+                if ($spnComputer.Length -gt 15) {
+                    $spnComputer = $spnComputer.Substring(0, 15)
+                }
+                $spnComputerSam = '{0}$' -f $spnComputer
+                if (Get-ADComputer -Filter { SamAccountName -eq $spnComputerSam } -Server $Server -ErrorAction SilentlyContinue) {
+                    throw "Computer '$spnComputer' already exists on '$Server'."
+                }
+                $spnPath = "OU=T0 Servers," + ($account.Path -split '(?<!\\),', 2)[1]
+                $spnPathDN = (Get-ADOrganizationalUnit -Identity $spnPath -Server $Server -ErrorAction SilentlyContinue).DistinguishedName
+                if (-not $spnPathDN) {
+                    $spnPathDN = (Get-ADDomain -Server $Server).ComputersContainer
+                }
+                $spnService = $services | Get-Random
+                $spn = "$spnService/$spnComputer"
+                $spnAction = "Create computer '$spnComputer' in '$spnPathDN' and assign SPN '$spn'"
+                if ($PSCmdlet.ShouldProcess($account.Name, $spnAction)) {
+                    New-ADComputer -Name $spnComputer -Description 'AS2Go Lab Computer - needed for Kerberoasting Attack' `
+                        -OperatingSystem 'Windows Server 2019 Standard' -Path $spnPathDN @adParameters -Confirm:$false
+                    Set-ADUser -Identity $user -ServicePrincipalNames @{ Add = $spn } @adParameters -Confirm:$false
+                    Write-AS2GoOutput -Type Success -Message "Assigned SPN '$spn' to '$($account.Name)' (SPN target computer '$spnComputer')." -NoExtraLines
+                }
+            }
         }
     }
     finally {

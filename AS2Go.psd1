@@ -12,12 +12,14 @@
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
             ReleaseNotes = '            
-2026.11.12.68
+2026.11.13.802
         - Requires PowerShell 7.4 or later.
         - Added -SafeMode to restrict selected actions during guided lab demos.
         - Added timestamped JSON backups of direct privileged group memberships and additive restore. Phase 12 can refresh the backup before a purge.
         - Expanded lab readiness checks for domain controller access, external tools, DNS zone transfers, and AD CS.
         - Updated the Phase 07 privilege escalation walkthrough and added Pass-The-Ticket and Overpass-the-Hash techniques.
+        - Improved handling Golden Ticket attacks.
+        - Added option to create a set of demo principals
 
 2026.5.21.957
         - Added Golden Ticket Attack to Phase 12 Domain Persistence.
@@ -37,7 +39,7 @@ v2026.5.7.1034
     
 
     RootModule        = 'AS2Go.psm1'
-    ModuleVersion     = '2026.11.13.802'
+    ModuleVersion     = '2026.11.13.1258'
     GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
     Author            = 'Holger Zimmermann | zimmermann.holger@live.de'

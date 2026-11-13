@@ -42,7 +42,11 @@ function Set-BreakGlassAccount {
     $Decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $Title
 
     If ($Decision -eq "New") {
-        $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0
+        $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0 -OnlyUserSelectionPossible
+        if (-not $result) {
+            Write-AS2GoOutput -Type Error -Message "No account selected."
+            return
+        }
         Set-ASConfig -Setting "BreakGlassAccount" -Value $result
         $result = Convert-FromDNToCN -DistinguishedName $result
         Write-AS2GoOutput -Type TextMaker -Message "New Break Glass Account:" -Tm $result

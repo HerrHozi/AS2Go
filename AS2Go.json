@@ -8,11 +8,11 @@
         },
         {
           "Name": "Version",
-          "Value": "2026.10.29.1034"
+          "Value": "2026.11.13.802"
         },
         {
           "Name": "Author",
-          "Value": "me@mrhozi.com"
+          "Value": "as2go@mrhozi.com"
         }
       ]
     }
@@ -66,19 +66,11 @@
         },
         {
           "Name": "globalHelpDesk",
-          "Value": "SG-AS2Go-Helpdesk"
+          "Value": ""
         },
         {
           "Name": "Honeytoken",
           "Value": ""
-        },
-        {
-          "Name": "pthntml",
-          "Value": "[value can be set during the attack]"
-        },
-        {
-          "Name": "krbtgtntml",
-          "Value": "[value can be set during the attack]"
         },
         {
           "Name": "ticketsDir",
@@ -95,10 +87,6 @@
         {
           "Name": "BadCA",
           "Value": "Wifi"
-        },
-        {
-          "Name": "SP07",
-          "Value": "[Can be set during the attack]"
         },
         {
           "Name": "Tools",
@@ -138,7 +126,7 @@
         },
         {
           "Name": "LastPW",
-          "Value": "!AS2Go-2026-is-Very-cool!"
+          "Value": ""
         },
         {
           "Name": "LastNumofDemoUsers",
