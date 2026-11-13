@@ -99,7 +99,7 @@ Describe 'Invoke-VerifyConfiguration' {
         ($script:queries -contains 'CA:dc.example.test:True') | Should Be $true
         ($script:queries -contains 'WebEnrollment:dc.example.test') | Should Be $true
         ($script:queries -contains 'WinRM:paw.child.example.test:5985') | Should Be $true
-        ($script:queries -contains 'Templates:dc.example.test:(&(objectClass=pKICertificateTemplate)(name=Demo\28Lab\29\2a*))') | Should Be $true
+        ($script:queries -contains 'Templates:dc.example.test:(&(objectClass=pKICertificateTemplate)(name=Demo\28Lab\29\2a ESC1))') | Should Be $true
         $script:CTemplates | Should Be 'existing setup state'
         $script:ADCSASGoCTemplatesMissing | Should Be $false
     }

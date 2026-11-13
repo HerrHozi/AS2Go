@@ -93,7 +93,10 @@ function Set-SecureAccessWorkstation {
     }
 
     if (-not [string]::IsNullOrWhiteSpace([string]$sawComputerName)) {
-        $winRMReachable = Test-NetConnection -ComputerName $sawComputerName -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+        $winRMReachable = & {
+            $ProgressPreference = 'SilentlyContinue'
+            Test-NetConnection -ComputerName $sawComputerName -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue -ProgressAction SilentlyContinue -ErrorAction SilentlyContinue
+        }
 
         if ($winRMReachable) {
             Write-AS2GoOutput -Type Success -Message "WinRM is reachable on $sawComputerName (TCP 5985)."

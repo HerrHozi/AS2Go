@@ -16,7 +16,7 @@ Editing this guide or reviewing the source does not require a domain-joined comp
 | Domain-joined Windows member server or workstation | Victim machine and preferred execution point for initial configuration |
 | Additional workstation for SAW/PAW scenarios | Administrative activity used by selected scenarios |
 | AD Certificate Services | Required for certificate-based scenarios; configurable through setup |
-| Defender for Identity, Defender for Endpoint, or a SIEM | Optional monitoring for validating detections |
+| Semperis Lightning, Defender for Identity, Defender for Endpoint, or a SIEM | Optional monitoring for validating detections |
 
 Use an isolated network with restricted egress. Obtain installation packages before disconnecting the lab, or use controlled access during preparation. The member computer must resolve the lab domain and controllers through lab DNS. Remote setup requires the applicable management connections, including PowerShell remoting and SMB for backup-share setup.
 
@@ -35,7 +35,7 @@ nltest.exe /dsgetdc:contoso.com
 
 ## 2. Install PowerShell and Management Tools
 
-The module manifest declares PowerShell 7.1 as its minimum version. Install a supported PowerShell 7 release meeting this requirement on the execution computer and start `pwsh.exe` for AS2Go.
+The module manifest declares PowerShell 7.4 as its minimum version. Install a supported PowerShell 7 release meeting this requirement on the execution computer and start `pwsh.exe` for AS2Go.
 
 Install the Windows management tools providing `ActiveDirectory`, `GroupPolicy`, and `DnsServer`. These are Windows/RSAT components, not modules to install through `Install-Module ActiveDirectory` or `Install-Module GroupPolicy`.
 
@@ -44,6 +44,8 @@ On Windows Server, install the relevant features from elevated **Windows PowerSh
 ```powershell
 Install-WindowsFeature -Name RSAT-AD-PowerShell, GPMC, RSAT-DNS-Server
 ```
+
+`RSAT-DNS-Server` installs the `DnsServer` PowerShell module and DNS Manager on the Windows Server where you run AS2Go. In Server Manager, select **Manage > Add Roles and Features**, then under **Features** select **Remote Server Administration Tools > Role Administration Tools > DNS Server Tools**. On a server with Desktop Experience, open the DNS MMC snap-in from **Server Manager > Tools > DNS** or run `dnsmgmt.msc`. These steps install management tools only. [Microsoft RSAT documentation](https://learn.microsoft.com/en-us/troubleshoot/windows-server/system-management-components/remote-server-administration-tools)
 
 On a supported Windows client, use **Optional Features** to install:
 
@@ -87,10 +89,10 @@ Import creates runtime directories below `$env:PUBLIC\AS2Go` and copies the bund
 
 ## 4. Review the Workflow Offline (Optional)
 
-With a checkout supporting `-Preview`, browse setup and demo steps before using the lab:
+Use `-Preview` to review setup and demo steps offline:
 
 ```powershell
-Initialize-AS2GoLabConfiguration -Preview
+Initialize-AS2GoLab -Preview
 Start-AS2GoDemo -Preview
 
 # Print the demo workflow without interactive navigation.
@@ -104,19 +106,19 @@ Preview returns before live function initialization, AD queries, configuration w
 On the domain-joined victim machine, use the elevated administrative PowerShell 7 session:
 
 ```powershell
-Initialize-AS2GoLabConfiguration
+Initialize-AS2GoLab
 
 # Optional custom naming and logging:
-Initialize-AS2GoLabConfiguration -AS2GoOU 'SecurityLab' -Scenario 'SL' -EnableLogging
+Initialize-AS2GoLab -AS2GoOU 'SecurityLab' -Scenario 'SL' -EnableLogging
 ```
 
-The implemented setup parameters are `Preview`, `AS2GoOU`, `Scenario`, `EnableLogging`, and `DeveloperMode`. The UPN suffix comes from the saved `LastUPNSuffix` setting; `UPNSuffix` is not a parameter of this command. Developer mode enables logging and can use timestamp-based naming; it still performs live actions.
+The setup command also has the alias `Setup-AS2GoDemo`. Use `Get-Command Initialize-AS2GoLab -Syntax` to inspect its parameters. The UPN suffix comes from the saved `LastUPNSuffix` setting. `-DeveloperMode` enables logging and can use timestamp-based naming during live setup.
 
 Review the requirements confirmation and discovered forest, domain, controller, and account information. Work through the menu in its displayed order, revisiting **Verify Config** afterward:
 
 | Menu option | Action and considerations |
 | --- | --- |
-| Verify Config | Displays configured accounts, tiering assets, groups, demo users, and AD CS inventory. This is an informational review, not a comprehensive pass/fail test. |
+| Verify Config | Reviews the current lab configuration and reports individual results and query failures. See [Verify Readiness](#6-verify-readiness). |
 | Malicious Tools | Selects the tools folder, disables Defender real-time monitoring, adds a folder exclusion, attempts to copy archives, and guides manual extraction. These protection changes require explicit lab authorization and may be blocked by managed security policy. |
 | BGA | Stores the selected break-glass account for exclusion by scenario logic. This does not replace isolation or snapshots. |
 | SAW | Selects or records the Secure Access Workstation hostname; it does not provision or harden a workstation. |
@@ -133,7 +135,13 @@ Coordinate endpoint-protection settings with the lab owner and detection objecti
 
 ## 6. Verify Readiness
 
-Reopen **Verify Config** and compare its output with the intended lab. Its completion message alone does not establish that every component works. The current honeytoken display reads the break-glass setting, so verify honeytoken configuration independently.
+Reopen **Verify Config** from the setup menu. Review each result and warning individually.
+
+- **Local settings and files** — Checks for expected executables in the configured tools folder and sample files on the backup share. Displays the saved break-glass account and MDI honeytoken separately.
+- **Workstation and directory** — Checks TCP port 5985 on the configured Secure Access Workstation and inventories tiering OUs, groups, and demo accounts in the current domain.
+- **AD CS and DNS** — Lists enterprise CAs and checks for the ESC1 template by name, for example `AS2Go ESC1`. Checks the Web Enrollment feature on the selected forest-root domain controller and reports DNS zone transfer settings from the setup logon server.
+
+The final message indicates that the review finished. A failed query produces a warning and the next check group continues.
 
 Use read-only checks as appropriate:
 
@@ -166,7 +174,7 @@ Start-AS2GoDemo -Continue
 
 Individual phases are available, for example `Invoke-ASPhase04BruteForceAttack`. Commands perform live actions when `-Preview` is absent. Use `-UnAttended` only after reviewing and authorizing the workflow: it suppresses prompts where possible and does not make execution harmless.
 
-Record phases, timestamps, expected alerts, observed telemetry, and failures. Use only fake sensitive data for data-access demonstrations. The Phase 10 sample-file path is configured through `PrivateData.SensitiveInfos` in `AS2Go.psd1`.
+Record phases, timestamps, expected alerts, observed telemetry, and failures. Use only fake sensitive data for data-access demonstrations. Phase 10 uses the sample-file path defined by `$Script:SensitiveInfos` in `AS2Go.psm1`.
 
 ## Runtime Files and Reset
 
@@ -192,11 +200,13 @@ Deleting runtime files does not undo AD, DNS, AD CS, GPO, share, or endpoint-pro
 | --- | --- |
 | Computer is not part of a domain | Check `Win32_ComputerSystem.PartOfDomain`. Join the execution computer to the test domain for live initialization; use preview for offline review. |
 | Management module unavailable | Install the corresponding Windows/RSAT component and verify import in PowerShell 7. |
+| `ERROR: The 'DnsServer' PowerShell module is not installed.` | On the Windows Server running AS2Go, run `Install-WindowsFeature -Name RSAT-DNS-Server` in elevated Windows PowerShell. Open a new PowerShell 7 session and run `Get-Module -ListAvailable -Name DnsServer`. |
 | Access denied | Check local elevation, Domain Admins/Enterprise Admins membership, and target permissions. Reopen the session after changing group membership. |
 | Remote setup or share creation fails | Check lab DNS, selected controller, remoting/SMB connectivity, firewall rules, and target permissions. |
 | External tool or archive missing | Check configured tools path, filenames, manual extraction, and quarantine events. |
 | Unexpected lab names or stale paths | Review `$env:PUBLIC\AS2Go\Config\AS2Go.json`; importing preserves an existing file. |
-| Unsupported setup parameter | Inspect `Get-Command -Name Initialize-AS2GoLabConfiguration -Syntax` and installed version. Source help may contain legacy examples. |
+| Unsupported setup parameter | Inspect `Get-Command -Name Initialize-AS2GoLab -Syntax` and installed version. Source help may contain legacy examples. |
 | Verification completes but assets are missing | Inspect each inventory section and verify the service or object independently. |
+| PKINIT returns `KDC_ERR_PADATA_TYPE_NOSUPP` | See [Troubleshooting PKINIT and KDC_ERR_PADATA_TYPE_NOSUPP](https://herrhozi.com/2026/11/10/troubleshooting-pkinit-kdc-err-padata-type-nosupp/). |
 
 For more detail, use setup's `-EnableLogging` switch and review the runtime logs. Report issues through [AS2Go on GitHub](https://github.com/HerrHozi/AS2Go) with sanitized reproduction steps, module version, and relevant errors.

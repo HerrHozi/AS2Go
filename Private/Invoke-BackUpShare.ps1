@@ -57,16 +57,16 @@ function Invoke-BackUpShare {
 
     $server = Select-ADObject -Title "Select Domain Controller" -LocalDomainOnly -IncludeComputers
 
-    If ($null -eq $server){
+    If ($null -eq $server) {
         #$TargetServer = $Script:BestDCs[(Get-ADDomain).DNSRoot]
         Write-AS2GoOutput -Type Info -Message "Please select a computer"
         return
     }
     else {
-    $CN = Convert-FromDNToCN $server
-    $dnsdomain = $CN.split("/")[0]
-    $computer = Get-ADComputer -Identity $server -Server $dnsdomain
-    $TargetServer = $computer.DNSHostName
+        $CN = Convert-FromDNToCN $server
+        $dnsdomain = $CN.split("/")[0]
+        $computer = Get-ADComputer -Identity $server -Server $dnsdomain
+        $TargetServer = $computer.DNSHostName
     }
  
     
@@ -82,6 +82,7 @@ function Invoke-BackUpShare {
         Get-ChildItem -Path      "\\$TargetServer\AD-Backup" -ErrorAction Stop | Out-Host
         Write-AS2GoOutput -Type TextMaker -Message "Done - New Share is available" -TM  "\\$TargetServer\AD-Backup"
         Set-ASConfig -Setting "BackupShare" -Value "\\$TargetServer\AD-Backup" -ErrorAction Stop
+        Set-ASConfig -Setting "AS2GoAppServer" -Value $TargetServer
     }
     catch [System.UnauthorizedAccessException] {
         Write-AS2GoOutput -Type Error -Message "No permission to create or write backup share on $TargetServer. Use an account with local admin/share permissions."

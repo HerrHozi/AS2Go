@@ -1,1 +1,0 @@
-C:\BGInfo\bginfo64.exe C:\BGInfo\AS2GoDev.bgi /timer:0 /nolicprompt

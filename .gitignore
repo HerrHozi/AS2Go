@@ -7,13 +7,9 @@
 /Corefunctions/
 /Exfiltration/
 /Tests/
+/Tools/AS2Go-Attack-Compatibility-Reference_MASTER.html
 
 /AS2Go.code-workspace
 /launch.json
-/Claude.md
 /Agents.md
 /ChangeLog.md
-/Start-PsUserGroupSession.ps1
-/Start-Sandbox.ps1
-/Start-PsUserGroupSession.ps1
-/Get-AuthorInfo.ps1

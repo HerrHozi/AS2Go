@@ -5,7 +5,7 @@ function Invoke-VerifyConfiguration {
 
     .DESCRIPTION
     Checks the configured tools, accounts, Secure Access Workstation, and simulated AD backup share.
-    Inventories directory assets, enterprise CAs, and scenario templates. Checks the Web Enrollment
+    Inventories directory assets, enterprise CAs, and the scenario ESC1 template. Checks the Web Enrollment
     Windows feature on the forest-root DC and zone transfer settings on the setup DNS server.
     Reports missing settings and failed queries while continuing with the other checks.
 
@@ -16,11 +16,11 @@ function Invoke-VerifyConfiguration {
     Reserved string parameter.
 
     .PARAMETER CTPrefix
-    Certificate template prefix to look up. Defaults to AS2Go.
+    Scenario prefix of the ESC1 certificate template. Defaults to AS2Go.
 
     .EXAMPLE
     Invoke-VerifyConfiguration -CTPrefix AS2Go
-    Reviews the lab and displays certificate templates with the AS2Go prefix.
+    Reviews the lab and checks for the AS2Go ESC1 certificate template.
 
     .OUTPUTS
     Console messages and inventory output.
@@ -43,9 +43,9 @@ function Invoke-VerifyConfiguration {
     Write-AS2GoOutput -Type Header -Message 'Verify the AS2Go lab configuration'
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-    $templatePrefix = $CTPrefix
+    $esc1TemplateName = "$CTPrefix ESC1"
     $checks = [ordered]@{
-        'Lab tools' = {
+        'Lab tools'                                = {
             $toolsPath = Get-ASConfig -Setting 'Tools'
             if ([string]::IsNullOrWhiteSpace($toolsPath)) {
                 Write-AS2GoOutput -Type Warning -Message 'No tools folder is configured.'
@@ -64,35 +64,40 @@ function Invoke-VerifyConfiguration {
                 }
             }
         }
-        'Break-glass account' = {
+        'Break-glass account'                      = {
             Get-BreakGlassAccount
         }
-        'Secure Access Workstation' = {
+        'Secure Access Workstation'                = {
+            Write-AS2GoOutput -Type H1 -Message 'Secure Access Workstation'
+
             $workstation = Get-ASConfig -Setting 'AS2GoSAW'
             if ([string]::IsNullOrWhiteSpace($workstation)) {
                 Write-AS2GoOutput -Type Warning -Message 'No Secure Access Workstation is configured.'
             }
-            elseif (Test-NetConnection -ComputerName $workstation -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue) {
+            elseif (& {
+                $ProgressPreference = 'SilentlyContinue'
+                Test-NetConnection -ComputerName $workstation -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue -ProgressAction SilentlyContinue
+            }) {
                 Write-AS2GoOutput -Type Success -Message "WinRM is reachable on $workstation (TCP 5985)."
             }
             else {
                 Write-AS2GoOutput -Type Warning -Message "WinRM is not reachable on $workstation (TCP 5985)."
             }
         }
-        'Directory assets' = {
+        'Directory assets'                         = {
             $domainController = Get-BestDomainController -Domain (Get-ADDomain).DNSRoot
             if (-not $domainController) { throw 'No controller was found for the current domain.' }
             Get-TieringAssets -Server $domainController
             Get-AS2GoGroups -Server $domainController
             Get-DemoAccounts -Server $domainController
         }
-        'Enterprise CAs and certificate templates' = {
+        'Enterprise CAs and ESC1 certificate template' = {
             $rootController = Get-BestDomainController -Domain (Get-ADForest).RootDomain
             if (-not $rootController) { throw 'No controller was found for the forest root domain.' }
             Get-ADCSEnterpriseCA -Server $rootController -InventoryOnly
-            Get-ADCSCertificateTemplates -Server $rootController -CTPrefix $templatePrefix -InventoryOnly
+            Get-ADCSCertificateTemplates -Server $rootController -CTPrefix $esc1TemplateName -ExactMatch -InventoryOnly
         }
-        'AD CS Web Enrollment feature' = {
+        'AD CS Web Enrollment feature'             = {
             $rootController = Get-BestDomainController -Domain (Get-ADForest).RootDomain
             if (-not $rootController) { throw 'No controller was found for the forest root domain.' }
             $feature = Invoke-Command -ComputerName $rootController -ScriptBlock {
@@ -105,7 +110,7 @@ function Invoke-VerifyConfiguration {
                 Write-AS2GoOutput -Type Warning -Message "AD CS Web Enrollment feature is not installed on $rootController."
             }
         }
-        'AD backup share' = {
+        'AD backup share'                          = {
             $backupShare = Get-ASConfig -Setting 'BackupShare'
             if ([string]::IsNullOrWhiteSpace($backupShare)) {
                 Write-AS2GoOutput -Type Warning -Message 'No AD backup share is configured.'
@@ -124,13 +129,13 @@ function Invoke-VerifyConfiguration {
                 }
             }
         }
-        'DNS zone transfers' = {
+        'DNS zone transfers'                       = {
             $dnsServer = $Script:LogonServer
             if (-not $dnsServer) { throw 'No logon server is available for the DNS query.' }
             $rootDomain = (Get-ADForest).RootDomain
             $zones = @(Get-DnsServerZone -ComputerName $dnsServer | Where-Object {
-                $_.ZoneType -eq 'Primary' -and ($_.ZoneName -eq $rootDomain -or $_.ZoneName -like "*.$rootDomain")
-            })
+                    $_.ZoneType -eq 'Primary' -and ($_.ZoneName -eq $rootDomain -or $_.ZoneName -like "*.$rootDomain")
+                })
             if ($zones.Count -eq 0) {
                 Write-AS2GoOutput -Type Warning -Message "No primary DNS zones for $rootDomain were found on $dnsServer."
             }
@@ -143,7 +148,7 @@ function Invoke-VerifyConfiguration {
                 }
             }
         }
-        'MDI honeytoken' = {
+        'MDI honeytoken'                           = {
             Get-Honeytoken
         }
     }

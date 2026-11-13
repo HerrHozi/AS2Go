@@ -2,14 +2,14 @@
 
 ![Module Type](https://img.shields.io/badge/type-PowerShell%20Module-orange)
 ![PowerShellGallery](https://img.shields.io/powershellgallery/v/AS2Go)
-![PowerShell](https://img.shields.io/badge/PowerShell-7.1%2B-blue)
+![PowerShell](https://img.shields.io/badge/PowerShell-7.4%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Maintenance](https://img.shields.io/badge/status-active-brightgreen)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HerrHozi/AS2Go)
 [![Blog](https://img.shields.io/badge/blog-herrhozi.com-blue)](https://herrhozi.com)
 
 ```Text
-Author:          Holger Zimmermann | zimmermannn.holger@live.de
+Author:          Holger Zimmermann | as2go@mrhozi.com
 Current Version: 2026.11.13.1258
 Last Update:     2026-11-13
 ```

@@ -462,7 +462,7 @@ function Initialize-AS2GoLab {
     } Until ($repeat -eq $Script:No)
     Measure-FunctionRuntime -End -Details $Info
 
-    Write-AS2GoOutput -Type  Header -M "Any feedback is welcome - zimmermann.holger@live.de!"
+    Write-AS2GoOutput -Type  Header -M "Any feedback is welcome - as2go@mrhozi.com!"
 
     Write-Log -Message "  >> Force garbage collection"
     [GC]::Collect()

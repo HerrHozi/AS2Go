@@ -48,7 +48,7 @@ boundary; directly invoked functions may not display it.
 
 Send security reports privately to the project maintainer, Holger Zimmermann:
 
-**[zimmermannn.holger@live.de](mailto:zimmermannn.holger@live.de)**
+**[as2go@mrhozi.com](mailto:as2go@mrhozi.com)**
 
 Use the subject `AS2Go security report`. Include, where possible:
 
