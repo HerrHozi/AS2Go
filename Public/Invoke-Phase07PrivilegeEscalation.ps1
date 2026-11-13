@@ -9,12 +9,12 @@ can be run interactively or in unattended mode using an automatic recommendation
 
 Depending on the selected option, the phase can trigger attacks and actions such as:
 - Overpass-the-Hash with a captured NTLM hash (PtH)
-- Pass-the-Ticket (PtT) (coming soon)
+- Pass-the-Ticket (PtT)
 - Kerberoasting
 - Misconfigured Certificate Template attack (ESC1)
-- Credential theft through memory access (coming soon)
+- Credential theft through memory access
 - Enabling memory access settings
-- Privilege escalation to SYSTEM (for example via PsExec workflow) (coming soon)
+- Privilege escalation to SYSTEM (for example via PsExec workflow)
 
 .PARAMETER Preview
 Browses descriptions and workflow steps offline without executing actions.

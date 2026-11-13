@@ -76,7 +76,7 @@
         Description: Displays all users and OUs, highlighting Tier 0 objects with a red indicator.
 
     .NOTES
-        - Author:      zimmermann.holger@live.de
+        - Author:      as2go@mrhozi.com
         - Version:     1.0
         - Last Update: 2026-02-22
 
