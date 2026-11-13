@@ -6,7 +6,7 @@ function Get-AuthorInfo {
         return
     }
 
-
+    Write-AS2GoOutput -Type Header -Message "About me"
 
     $SandboxProfile = @(
         [pscustomobject]@{
@@ -20,10 +20,58 @@ function Get-AuthorInfo {
             AttackSimulation = 'AS2Go'
             'YearsInIT (AD)' = '25+'
             CurrentMission   = 'Make Active Directory Misconfiguration Visible'
-            seeAlso          = 'https://github.com/HerrHozi'
+            GitHub           = 'https://github.com/HerrHozi'
+            Community        = 'https://www.powershellgallery.com/profiles/HerrHozi'
             wWWHomePage      = 'https://HerrHozi.com'
         }
     )
 
-    return $SandboxProfile
+    write-host "`n`n`n`n"
+
+    $SandboxProfile | fl
+
+    write-host "`n`n"
+
+    $title = "PoSH User Group | AS2Go | Presentation"
+    $message = "Select the action to execute. Options with unmet requirements are hidden."
+
+    $Options = @(
+        [pscustomobject] @{
+            Label = "&First Slide"
+            Help  = 'Go to the first slide'
+            Value = 'First'
+        },
+        [pscustomobject] @{
+            Label = "&Previous Slide"
+            Help  = 'Go to the previous slide'
+            Value = 'Previous'
+        },
+        [pscustomobject] @{
+            Label = "&Next Slide"
+            Help  = 'Go to the next slide'
+            Value = 'Next'
+        },
+        [pscustomobject] @{
+            Label = "&Last Slide"
+            Help  = 'Go to the last slide'
+            Value = 'Last'
+        },
+        [pscustomobject] @{
+            Label = "E&xit"
+            Help  = 'Exit the presentation'
+            Value = 'Exit'
+        }
+    )
+
+    $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 2 -Title $title
+
+
+
+    If ($answer -eq 'Exit') {
+        return
+    }
+    clear-host
+    Start-PsUserGroupSession -SafeMode
+
 }
+

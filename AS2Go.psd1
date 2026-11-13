@@ -6,18 +6,18 @@
 
 @{
     PrivateData       = @{
-        PSData         = @{
-            LastUpdate   = '2026-11-12'
+        PSData = @{
+            LastUpdate   = '2026-11-13'
             Tags         = @('ActiveDirectory', 'ADCS', 'Killchain', 'RedTeam', 'Offense', 'AttackSimulation', 'AdversaryEmulation', 'PurpleTeam', 'BlueTeam', 'DefensiveSecurity')
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
             ReleaseNotes = '            
-2026.11.10.786
+2026.11.12.68
         - Requires PowerShell 7.4 or later.
-        - Added offline -Preview for exploring attack phases and -SafeMode to restrict selected actions during guided lab demos.
+        - Added -SafeMode to restrict selected actions during guided lab demos.
         - Added timestamped JSON backups of direct privileged group memberships and additive restore. Phase 12 can refresh the backup before a purge.
         - Expanded lab readiness checks for domain controller access, external tools, DNS zone transfers, and AD CS.
-        - Updated the Phase 07 privilege escalation walkthrough and clarified the Phase 12 DPAPI backup key demonstration.
+        - Updated the Phase 07 privilege escalation walkthrough and added Pass-The-Ticket and Overpass-the-Hash techniques.
 
 2026.5.21.957
         - Added Golden Ticket Attack to Phase 12 Domain Persistence.
@@ -37,7 +37,7 @@ v2026.5.7.1034
     
 
     RootModule        = 'AS2Go.psm1'
-    ModuleVersion     = '2026.11.12.68'
+    ModuleVersion     = '2026.11.13.802'
     GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
     Author            = 'Holger Zimmermann | zimmermann.holger@live.de'

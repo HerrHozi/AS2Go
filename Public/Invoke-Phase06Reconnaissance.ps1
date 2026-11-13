@@ -1,26 +1,18 @@
-<#
+﻿<#
 .SYNOPSIS
-Runs Phase 06 of the AS2Go attack simulation: Reconnaissance.
+Runs the AS2Go reconnaissance demonstration with a standard domain user.
 
 .DESCRIPTION
-Invoke-ASPhase06Reconnaissance executes the reconnaissance phase in the AS2Go workflow.
-It prepares phase context, optionally displays phase visuals, and runs baseline reconnaissance
-tasks with optional extended reconnaissance.
-
-In AS2Go demo mode, execution is interactive (or unattended) and runs once per invocation.
-Outside demo mode, the phase runs once with default confirmation behavior.
-
-The phase includes actions such as:
-- Collecting reconnaissance and configuration data
-- Running standard reconnaissance tasks
-- Optionally running extended reconnaissance tasks
+Phase 06 demonstrates what a standard domain user can learn from Active Directory.
+The baseline demonstration shows which directory information is visible to that account.
+In an interactive run, you can also choose to run extended reconnaissance.
 
 .PARAMETER Preview
 Browses descriptions and workflow steps offline without executing actions.
 Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
-Runs the phase without interactive confirmation prompts.
+Runs baseline reconnaissance without the phase prompts and skips extended reconnaissance.
 
 .PARAMETER Continue
 Reserved switch for workflow continuation handling.
@@ -35,7 +27,10 @@ Skips visual phase assets (for example, phase HTML images/pages).
 Prevents clearing the console during phase execution.
 
 .PARAMETER AS2GoDemo
-Runs the phase in AS2Go demo mode with interactive demo flow behavior.
+Uses the settings already loaded by the AS2Go demo.
+
+.PARAMETER SafeMode
+Skips reconnaissance actions.
 
 .EXAMPLE
 Invoke-ASPhase06Reconnaissance
@@ -45,7 +40,7 @@ Runs Phase 06 with default behavior.
 .EXAMPLE
 Invoke-ASPhase06Reconnaissance -UnAttended -EnableLogging
 
-Runs Phase 06 without prompts and with logging enabled.
+Runs baseline reconnaissance without phase prompts and with logging enabled.
 
 .EXAMPLE
 Invoke-ASPhase06Reconnaissance -AS2GoDemo -SkipImages -SkipClearHost
@@ -54,15 +49,15 @@ Runs Phase 06 in demo mode without phase visuals and without clearing the host.
 
 .NOTES
 Part of: AS2Go attack phase orchestration
+
+.FUNCTIONALITY
+Shows what a standard domain user can discover 
+about domain administrators, computers, and domain controllers.
 #>
 function Invoke-ASPhase06Reconnaissance {
 
-    ################################################################################
-    #####                                                                      #####
-    #####    Phase 06 - Reconnaissance with non privileged user                #####
-    #####                                                                      #####
-    ################################################################################
 
+    [Alias("ASP06")]
     Param (
         [switch]$Preview,
         [switch]$UnAttended,
@@ -89,29 +84,40 @@ function Invoke-ASPhase06Reconnaissance {
     If (-not $SkipClearHost) { Clear-Host }
 
 
-
     Update-WindowTitle -NewTitle $Script:Phase06
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
     Show-CurrentPhase -Phase "phase_06.html"
     If (-not $SkipClearHost) { Clear-Host }
 
-    Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase06.toupper())"
+    Write-AS2GoOutput -Type  Header -Message "Attack Phase - $($Script:Phase06.toupper())"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    Write-AS2GoOutput -Type Bullet -Message "List domain administrators visible to a standard domain user"
+    Write-AS2GoOutput -Type Bullet -Message "List computers registered in Active Directory"
+    Write-AS2GoOutput -Type Bullet -Message "Identify domain controllers visible to the same account"
 
-    Write-AS2GoOutput -Type H1 -Message $((get-help (Get-FunctionName)).Functionality)
-    #$Functionality = "This phase involves collecting reconnaissance and configuration data with a non-privileged user."
-    #Write-AS2GoOutput -Type H1 -Message $Functionality
 
-    If ($AS2GoDemo) {
-        If ($UnAttended) {
-            $answer = $Script:Yes
-        }
-        else {
-            $question = "Would you like to run this step - Y or N? Default "
-            $answer = Get-Answer -question $question -defaultValue $Script:Yes
-        }
+    $promptParams = @{}
+    if ($safemode) {
+        $promptParams.Options = @(
+            [pscustomobject]@{
+                Label = '&Skip'
+                Help  = 'Skip this step in Safe Mode'
+                Value = $Script:No
+            }
+        )
+    }
+    
+    If (-not $UnAttended) {
+        $answer = Show-DecisionPrompt @promptParams
     }
     else {
-        $answer = $Script:Yes
+        if ($safemode) {
+            $answer = $Script:No
+        }
+        else {
+            $answer = $Script:Yes
+        }
+
     }
 
     If ($answer -eq $Script:Yes) {

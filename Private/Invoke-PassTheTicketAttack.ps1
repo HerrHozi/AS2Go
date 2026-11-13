@@ -52,13 +52,9 @@ function Invoke-PassTheTicketAttack {
     Write-AS2GoOutput -Type H1 -Message "This attack simulates a Pass-the-Ticket (PtT) attack, where stolen Kerberos tickets are used to impersonate a user and access resources on the network. `nIn this case, we will attempt to use stolen tickets to access the Domain Controller's c$ share and list NetBIOS sessions.`n"
     Write-AS2GoOutput -Type Bullet -Message "Step #1 - stage mimikatz on Admin PC"
     Write-AS2GoOutput -Type Bullet -Message "Step #2 - harvest tickets on Admin PC"
-    Write-AS2GoOutput -Type Bullet -Message "Step #3 - run PtT to become Domain Admin"
+    Write-AS2GoOutput -Type Bullet -Message "Step #3 - run PtT to become a Tier 0 Admin"
+    Write-Host ""
 
-
-
-
-
-    #
     If ($UnAttended) { Start-Sleep 2 } else { 
     
 

@@ -39,9 +39,9 @@ Uses a separate preview menu; runtime selection and skip parameters are not eval
     Invoke-ASPhase05InitialAccess
 
 .FUNCTIONALITY
-    Displays the current user's Active Directory account, domain, password policy, and group membership
-    information using Get-CurrentADUserInfo, then reports local administrator membership and token
-    elevation status using Test-LocalAdministrator.
+Displays the current user's Active Directory account, domain, password policy, and group membership
+information using Get-CurrentADUserInfo, then reports local administrator membership and token
+elevation status using Test-LocalAdministrator.
 
 #>
 

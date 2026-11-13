@@ -87,7 +87,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         [switch]$SkipClearHost,
         [switch]$AS2GoDemo,
         [switch]$DeveloperMode,
-        [validateSet("Encrypt", "Reboot", "BackdoorUser", "GPT", "UserManipulation", "GroupManipulation")]
+        [validateSet("Encrypt", "Reboot", "BackdoorUser", "GPT", "UserManipulation", "GroupManipulation", "GoldenTicket")]
         [String]$DomainPersistence,
         [switch]$SafeMode
     )

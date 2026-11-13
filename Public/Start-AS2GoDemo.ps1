@@ -151,11 +151,7 @@ Function Start-AS2GoDemo {
 
     Write-Host ""
 
-    # write-host "Checking required modules and tools..."
-    # check the correct directory and requirements
-
     $Script:ASTools = Get-ASConfig -Setting "Tools"
-
     $Script:FileVersionM = Get-FileVersion -fullname "$($Script:ASTools)\mimikatz.exe"
     $Script:FileVersionP = Get-FileVersion -fullname "$($Script:ASTools)\PsExec.exe"
     $Script:FileVersionR = Get-FileVersion -fullname "$($Script:ASTools)\Rubeus.exe"
@@ -168,29 +164,18 @@ Function Start-AS2GoDemo {
     }
 
     If ($PreCheckFailed -eq $true) {
+        $null  = Write-AS2GoOutput -Type Input -M "Acknowledging warnings before proceeding..."
         Write-host "`n  [>] Please acknowledge the warning(s) by pressing ENTER ... " -ForegroundColor $Script:FGCWarning -NoNewline
-        $confirmed = Read-Host
-        Write-Log -Message "        >> Confirmed the warning with - $confirmed"
     }
  
     $demo = Get-ASConfig -Setting "DemoTitle"
     Update-WindowTitle -NewTitle $demo
 
-    # If (-not $SkipClearHost){Clear-Host}
     Set-NewColorSchema -NewStage $Script:PtT
 
     $laststage = Get-ASConfig -Setting "LastStage"
 
-    If ($UnAttended) {
-        if ($Continue) { $Begin = $Script:No } else { $Begin = $Script:Yes }
-    }
-    else {
-        if ($Continue) { $StartValue = $Script:No } else { $StartValue = $Script:Yes }
-        $question = "Starts the attack scenario from the beginning? Default "
-       # $Begin = Get-Answer -question $question -defaultValue $StartValue
-    }
-
-$Begin =  $Script:No
+    $Begin = $Script:No
     If ($Begin -eq $Script:Yes) {
         Set-ASConfig -Setting "LastStage" -Value $Script:Phase50
         Set-NewColorSchema -NewStage $Script:InitialStart
@@ -245,87 +230,23 @@ $Begin =  $Script:No
     
     $UseCase = Get-ASConfig -Setting "usecase"
 
-    Show-ForestOverview 
-    Get-ForestInfo
-
-    If (-not $SkipClearHost) { Clear-Host }
-
-    If ($Begin -eq $Script:Yes) {
-        $MyInfo = "This demo uses the following user & computer principals"
-        $MyFGC = $Script:FGCHighLight
-    }
-    else {
-        $MyInfo = "Still using the following user & computer principals"
-        $MyFGC = "Darkblue"
-    }
-
-    Update-WindowTitle -NewTitle "Used Accounts"
-
-    Write-AS2GoOutput -Type  Header -M $MyInfo
-
-    $Global:ASVictim = $env:UserName
-
-    if ($Global:ASVictim -match "^VI-|^HD-|^DA-") {
-
-        $suffix = $Global:ASVictim.Substring(3)
-
-        If (($UnAttended -ne $true) -and ($SkipPopup -ne $true)) {
-            $question = " -> Enter or confirm your account suffix! Default "
-            $suffix = Get-Answer -question $question -defaultValue $suffix
-        }
-
-        $Global:ASVictim = "VI-$suffix"
-        $Global:ASHelpDeskUser = "HD-$suffix"
-        $Global:ASDomainAdmin = "DA-$suffix"
-    }
-    else {
-        $Global:ASVictim = $env:UserName
-    }
-    #If (-not $SkipClearHost){Clear-Host}
-
-    Write-Host ""
-    Write-Host "  Compromised Account  --  " -NoNewline
-    Write-Host                                  $Global:ASVictim -ForegroundColor $fgcC -NoNewline
-    Write-Host " | Tier 2 Account"
+    If (-not $safeMode) {
+        Show-ForestOverview 
+        Get-ForestInfo
     
-    if ($Global:ASHelpDeskUser) {
-        Write-Host "  Helpdesk User        --  $Global:ASHelpDeskUser | Tier 1 Account"
-    }
-    if ($Global:ASDomainAdmin) {
-        Write-Host "  Domain Admin         --  $Global:ASDomainAdmin | Tier 0 Account"
-    }
-
-    If ($Begin -eq $Script:Yes) {
-               
         $infoV = Get-ComputerInformation -computer $Script:ASVictimMaschine
         $infoS = Get-ComputerInformation -computer $Script:ASSAW
         $infoD = Get-ComputerInformation -computer $Script:ASDC
-        
-        Write-Host ""
-        Write-Host "  Victim Maschine      --  $infoV  | Tier 2 Maschine"
-        Write-Host "  Admin Maschine       --  $infoS  | Tier 0 Maschine" 
-        Write-Host "  Domain Controller    --  $infoD  | Tier 0 Maschine" 
-   
-        try {
-            Write-Output $Global:ASHelpDeskUser | Set-Clipboard
-        }
-        catch {
-            Write-Output $Global:ASHelpDeskUser | clip
-        }
-        
-        If (($UnAttended -ne $true) -and ($SkipPopup -ne $true)) {
-            $wshell = New-Object -ComObject Wscript.Shell
-            $Output = $wshell.Popup("Do NOT forget to simulate helpdesk support by ""$Global:ASHelpDeskUser"" on your Victim PC!", 0, "Simulate helpdesk support on Victim PC - hd.cmd", 0 + 64)
-        }
-
+    
     }
-    else {
-        If (($UnAttended -ne $true) -and ($SkipPopup -ne $true)) {
-            $wshell = New-Object -ComObject Wscript.Shell
-            $Output = $wshell.Popup("Do NOT forget to simulate domain activities by ""$Global:ASDomainAdmin"" on your Admin PC!", 0, "Simulate domain activities on Admin PC", 0 + 64)           
-        }
 
-    }
+
+
+
+    If (-not $SkipClearHost) { Clear-Host }
+
+    $Global:ASVictim = $env:UserName
+ 
 
     Write-Host ""
     Set-ASConfig -Setting "LastVictim" -Value $Global:ASVictim
@@ -336,8 +257,6 @@ $Begin =  $Script:No
     else {
         Pause
     }
-
-
 
     Write-AS2GoOutput -Type HEADER -Message "ATTACK NAVIGATION"
     Write-AS2GoOutput -Type H1 -Message "Choose your starting point in the attack chain.`n"
@@ -403,7 +322,7 @@ $Begin =  $Script:No
         $decision = 4
     }
     else {
-       $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
+        $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 1 -Title $title
     }
 
 
