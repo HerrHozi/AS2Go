@@ -527,11 +527,12 @@ Write-Host "'AS2Go'`n`n" -ForegroundColor DarkCyan
 #Write-Host "  Version:         $($ASModuleManifest.Version) | Last Update: $ASModuleLastUpdate | Author: $($ASModuleManifest.Author) " -ForegroundColor Gray
 Write-Host "`n  [>] Quick-Start: " -NoNewline -ForegroundColor Gray 
 
-Write-AS2GoOutput -Type Command -NoExtraLines  -Message "Initialize-AS2GoLabConfiguration"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "Setup-AS2GoDemo"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   New-As2GoDemoPrincipal"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Start-As2GoDemo"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase04BruteForceAttack"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase07PrivilegeEscalation"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase12DomainCompromisePersistence"
-Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Start-AS2GoDemo"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   ASP07 -EnableLogging -SkipImages -UnAttended -Technique PtT"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   ASP12 -EnableLogging -SkipImages"
 

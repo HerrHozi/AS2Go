@@ -32,12 +32,6 @@ Tests DC administrative-share access and attempts to change the info attribute o
 #>
 Function Invoke-GoldenTicketAttack {
 
-    ################################################################################
-    #####                                                                      ##### 
-    #####    Start a Golden Ticket Attack                                     #####                                 
-    #####                                                                      #####
-    ################################################################################
-
     $Info = Measure-FunctionRuntime -Begin
 
     If (-not $SkipClearHost) { Clear-Host }
@@ -68,26 +62,35 @@ Function Invoke-GoldenTicketAttack {
 
     $title = "Select an (fake) account for the Golden Ticket attack."
     $message = "Enter your choice!"
-
     $Options = @(
-        [pscustomobject] @{ Label = "&Fake User"; Help = "Random Fake User account, $sFakeUser"; Value = "Fake" },
-        [pscustomobject] @{ Label = "&Select a real User"; Help = "Select a real user account from the domain/forest"; Value = "Real" }
+        [pscustomobject] @{ Label = "&User Account"; Help = "Select an existing AD user account from domain/forest"; Value = "Real" },
+        [pscustomobject] @{ Label = "&Fake User"; Help = "Random Fake User account, $sFakeUser"; Value = "Fake" }
     )
-
-    $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 1 -Title $title
+    $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
     
     If ($answer -eq "Fake") {
         $dn = Select-ADObject -DomainSelectionOnly -Title "Select a domain for the Golden Ticket demonstration"
-
+        If (-not $dn) {
+            Write-AS2GoOutput -Type Info -Message "No domain selected for the Golden Ticket demonstration."
+            return
+            $cn = Convert-FromDNToCN -DistinguishedName $dn
+            Write-AS2GoOutput -Type Textmaker -message "Selected Domain" -TM $cn
+        }
     }
     else {
-        $dn = Select-ADObject -Title "Select an user for the Golden Ticket demonstration" -IncludeUsers -MarkTier0
+        $dn = Select-ADObject -Title "Select an user for the Golden Ticket demonstration" -IncludeUsers -MarkTier0 -OnlyUserSelectionPossible
+        If (-not $dn) {
+            Write-AS2GoOutput -Type Info -Message "No user selected for the Golden Ticket demonstration."
+            return
+        }
+                $cn = Convert-FromDNToCN -DistinguishedName $dn
         $server = Get-BestDomainController -domain $dn
         $realUser = Get-ADUser -Server $server -identity $dn
         $sFakeUser = $realUser.SamAccountName
         $dn = if ($dn -match '(?i)(^|,)(DC=[^,]+(?:,DC=[^,]+)*)$') { $Matches[2] } else { $null }
-    }    
 
+        Write-AS2GoOutput -Type Textmaker -message "Selected Account - " -TM $cn
+    }    
 
     $fqdn = Convert-FromDNToCN -DistinguishedName $dn
     $server = Get-BestDomainController -domain $dn
@@ -100,7 +103,7 @@ Function Invoke-GoldenTicketAttack {
     $KrbtgtSID = $Script:ASDomainSID + "-502"
     $KrbtgtAccount = $temp.NetBIOSName + "\" + $KrbtgtName
  
-    Write-AS2GoOutput -Type Textmaker -message "Selected Account:" -TM $sFakeUser
+
     Set-ASConfig -Setting "LastGTUser" -Value $sFakeUser
 
     Pause

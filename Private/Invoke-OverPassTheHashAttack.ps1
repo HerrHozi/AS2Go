@@ -105,14 +105,22 @@ Please confirm that the following prerequisites are met in the isolated test env
 
         $ntlmHash = Get-ASConfig -Setting "pthntml"
 
-        if (($ntlmHash.split("|")).count -eq 3) {
-            Write-log -Message "Use a previously extracted NTLM hash data: $ntlmHash"
-            $helpPrevious = "Use a previously extracted NTLM hash data: $ntlmHash"
-        }
-        else {
+        If ([string]::IsNullOrEmpty($ntlmHash)) {
             Write-log -Message 'No valid NTLM hash data found. '
             $helpPrevious = ""
         }
+        else {
+            if (($ntlmHash.split("|")).count -eq 3) {
+                Write-log -Message "Use a previously extracted NTLM hash data: $ntlmHash"
+                $helpPrevious = "Use a previously extracted NTLM hash data: $ntlmHash"
+            }
+            else {
+                Write-log -Message 'No valid NTLM hash data found. '
+                $helpPrevious = ""
+            }
+        }
+
+
 
 
         # $helpPrevious = ""
@@ -184,7 +192,6 @@ Please confirm that the following prerequisites are met in the isolated test env
                 "privilege::debug" `
                 "sekurlsa::logonpasswords" `
                 "exit" }
-
 
         $uniqueResults = @(ConvertFrom-CredentialDump -Unique -Path $CredentialDump)
     

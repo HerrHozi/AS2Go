@@ -1,10 +1,10 @@
-function Initialize-AS2GoLabConfiguration {
+function Initialize-AS2GoLab {
     <#
     .SYNOPSIS
     Initializes AS2Go lab setup with tiering assets, demo users, DNS Zone, ADCS installation & creation of an smb share.
 
     .DESCRIPTION
-    The Initialize-AS2GoLabSetup function prepares the Actice Directory through a 
+    The Initialize-AS2GoLab function prepares the Actice Directory through a 
     menu-driven interface to configure and deploy AS2Go lab components. It enables the 
     creation of dedicated AS2Go Active Directory groups, organizational units, and 
     demo users aligned with a tiering model.
@@ -67,30 +67,30 @@ function Initialize-AS2GoLabConfiguration {
     Required: False
 
     .EXAMPLE
-    Initialize-AS2GoLabSetup
+    Initialize-AS2GoLab
 
     Description: Runs the function with default parameters, launching an interactive menu to select 
     the Active Directory setup scope.
 
     .EXAMPLE
-    Initialize-AS2GoLabSetup -AS2GoOU "SecurityTier" -Scenario "ST"
+    Initialize-AS2GoLab -AS2GoOU "SecurityTier" -Scenario "ST"
 
     Description: Initializes Active Directory setup using "SecurityTier" as the OU name and "ST" as 
     the acronym for naming objects.
 
     .EXAMPLE
-    Initialize-AS2GoLabSetup -EnableLogging
+    Initialize-AS2GoLab -EnableLogging
 
     Description: Runs the function with logging enabled for operational tracking and troubleshooting.
 
     .EXAMPLE
-    Initialize-AS2GoLabSetup -DeveloperMode
+    Initialize-AS2GoLab -DeveloperMode
 
     Description: Runs the function in developer mode with automatic logging enabled and timestamp-based 
     OU naming for testing purposes.
 
     .EXAMPLE
-    Initialize-AS2GoLabSetup -AS2GoOU "AS2Go" -UPNSuffix "@contoso.com" -EnableLogging
+    Initialize-AS2GoLab -AS2GoOU "AS2Go" -UPNSuffix "@contoso.com" -EnableLogging
 
     Description: Initializes Active Directory setup with a custom UPN suffix and logging enabled.
 
@@ -143,7 +143,7 @@ function Initialize-AS2GoLabConfiguration {
     .LINK
     https://learn.microsoft.com/en-us/powershell/scripting/developer/help/writing-help-for-powershell-functions
     #>
-    [Alias("Initialize-AS2GoDemo", "ASP00")]
+    [Alias("Setup-AS2GoDemo", "ASP00")]
     param(
         [switch]$Preview,
         [string] $AS2GoOU = "AS2Go", 
@@ -154,7 +154,7 @@ function Initialize-AS2GoLabConfiguration {
         [switch] $SafeMode
     )
     if ($Preview) {
-        Show-AS2GoPreview -FunctionName 'Initialize-AS2GoLabConfiguration' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
+        Show-AS2GoPreview -FunctionName 'Initialize-AS2GoLab' -UnAttended:([bool]$PSBoundParameters['UnAttended'])
         return
     }
 
@@ -272,13 +272,50 @@ function Initialize-AS2GoLabConfiguration {
 
 
     write-Log -Message "    >> Attempting to retrieve group membership for user '$samaccountname' from server '$server' for verification..."
-    $membership = @(Get-ADPrincipalGroupMembership -Identity $samaccountname -Server $server) 
-    $membership | Select-Object @{N = 'MemberOf'; E = { $_.samaccountname } }, @{N = 'SID'; E = { $_.sid } }  | Out-Host
+    $membership = @()
+    $membershipConfirmedByUser = $false
+    try {
+        $membership = @(Get-ADPrincipalGroupMembership -Identity $samaccountname -Server $server -ErrorAction Stop)
+    }
+    catch {
+        Write-Log -Message "    >> Failed to retrieve group membership from '$server': $_"
+        Write-Log -Message "    >> Falling back to an LDAP tokenGroups lookup..."
+        Write-AS2GoOutput -Type Warning -Message "The group membership of '$samaccountname' could not be verified on '$server' (ADWS failure)."
+        Write-AS2GoOutput -Type Info -M "Using the LDAP tokenGroups fallback instead ..."
+        $membership = @(Get-AS2GoTokenGroupMembership -SamAccountName $samaccountname -Server $server)
+    }
 
-    $test = $membership | where-object { $_.SID -like "*-512" -or $_.SID -like "*-519" }
-    if ($test.Count -eq 0) {
-        Write-AS2GoOutput -type Warning -Message "To run this configuration, ensure the user is a member of the Enterprise Admins group or the Domain Admins group."
-        return
+    if (-not $membership) {
+        Write-Log -Message "    >> LDAP tokenGroups lookup failed for '$samaccountname' on '$server'."
+        Write-AS2GoOutput -Type Warning -Message "The group membership of '$samaccountname' could not be verified on '$server'."
+        Write-AS2GoOutput -Type Warning -Message "Please confirm that the current user is a member of the Enterprise Admins or Domain Admins group."
+
+        $title = "Confirm privileged group membership"
+        $message = "The group membership of '$currentuser' could not be verified.`nDo you confirm that this user is a member of the Enterprise Admins or Domain Admins group?"
+        $Options = @(
+            [pscustomobject] @{ Label = "&Yes, confirm privileged user"; Help = "Continue the environment configuration with the confirmed privileged membership."; Value = $Script:Yes },
+            [pscustomobject] @{ Label = "&Quit"; Help = "Abort the AS2Go environment configuration."; Value = $Script:No }
+        )
+        $answer = Show-DecisionPrompt -Title $title -Message $message -Options $Options -Default 1
+
+        if ($answer -eq $Script:Yes) {
+            Write-Log -Message "    >> User confirmed privileged group membership for '$samaccountname'."
+            $membershipConfirmedByUser = $true
+        }
+        else {
+            Write-Log -Message "User did not confirm privileged group membership. Exiting..."
+            return
+        }
+    }
+
+    if (-not $membershipConfirmedByUser) {
+        $membership | Select-Object @{N = 'MemberOf'; E = { $_.samaccountname } }, @{N = 'SID'; E = { $_.sid } }  | Out-Host
+
+        $test = $membership | where-object { $_.SID -like "*-512" -or $_.SID -like "*-519" }
+        if ($test.Count -eq 0) {
+            Write-AS2GoOutput -type Warning -Message "To run this configuration, ensure the user is a member of the Enterprise Admins group or the Domain Admins group."
+            return
+        }
     }
 
     $Script:MoAD = Test-PoSHModuleAvailability -PSModule "ActiveDirectory"
