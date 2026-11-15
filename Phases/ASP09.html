@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Sensitive Data Access</title>
+  <title>AS2Go · Reconnaissance (Privileged)</title>
   <style>
     :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
     body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
@@ -36,33 +36,33 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Sensitive Data Access</span>
+    <span class="title"><span class="brand">AS2Go</span> · Reconnaissance (Privileged)</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: Sensitive Data Access">
-      <img src="./phase_10.png" alt="AS2Go attack scenario: Sensitive Data Access">
+    <figure class="diagram" aria-label="AS2Go attack scenario: Reconnaissance (Privileged)">
+      <img src="./ASP09.png" alt="AS2Go attack scenario: Reconnaissance (Privileged)">
     </figure>
-    <nav class="panel" aria-label="Sensitive Data Access references">
-      <a href="https://attack.mitre.org/techniques/T1039/" target="_blank" rel="noopener noreferrer">Data from Network Shares</a>
-      <a href="https://attack.mitre.org/techniques/T1552/001/" target="_blank" rel="noopener noreferrer">Credentials in Files</a>
-      <a href="https://attack.mitre.org/tactics/TA0009/" target="_blank" rel="noopener noreferrer">Collection</a>
-      <a href="https://www.cyber.gov.au/publication/detecting-and-mitigating-active-directory-compromises" target="_blank" rel="noopener noreferrer">AD Backup Protection</a>
+    <nav class="panel" aria-label="Reconnaissance (Privileged) references">
+      <a href="https://attack.mitre.org/techniques/T1007/" target="_blank" rel="noopener noreferrer">System Service Discovery</a>
+      <a href="https://attack.mitre.org/techniques/T1057/" target="_blank" rel="noopener noreferrer">Process Discovery</a>
+      <a href="https://www.microsoft.com/en-us/security/blog/2020/08/27/stopping-active-directory-attacks-and-other-post-exploitation-behavior-with-amsi-and-machine-learning/" target="_blank" rel="noopener noreferrer">AD Attack Detection</a>
+      <a href="https://learn.microsoft.com/en-us/security/privileged-access-workstations/overview" target="_blank" rel="noopener noreferrer">Securing Privileged Access</a>
     </nav>
     <section class="panel">
-      <span class="eyebrow">PHASE 10</span>
-      <h1>Sensitive Data Access</h1>
-      <p>This phase demonstrates how accessible network shares and an application-server console can expose sensitive information, using fake backup content and simulated password-file data.</p>
+      <span class="eyebrow">PHASE 09</span>
+      <h1>Reconnaissance (Privileged)</h1>
+      <p>After gaining additional privileges, the scenario revisits the environment to examine information and resources available in the new security context.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Enumerates the configured backup share and its contents, prepares simulated sample data, and opens an application-server console to inspect a sample plaintext password file. The samples contain no real credentials.</p>
+        <p>Offers remote service and process enumeration on the current logon server. Optional extended reconnaissance covers privileged group membership, a manual DNS zone-transfer workflow, domain-controller sessions, and honeytoken authentication activity.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>Passwords should never be stored in plaintext files. Apply least privilege to shares, administrative consoles, and backups, and monitor access to sensitive locations.</p>
+        <p>Administrative tools can also support attacker discovery. Correlate remote enumeration with account privileges and logon activity, and restrict administrative pathways to domain controllers.</p>
       </section>
     </div>
   </main>

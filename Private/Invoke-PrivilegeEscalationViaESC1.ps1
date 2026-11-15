@@ -38,7 +38,7 @@ function Invoke-PrivilegeEscalationViaESC1 {
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
-    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
+    Show-CurrentPhase -Phase "ASP07_ESC1.html"
 
     Update-WindowTitle -NewTitle $Script:Phase25
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase25

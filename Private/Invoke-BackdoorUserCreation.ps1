@@ -41,7 +41,7 @@ function Invoke-BackdoorUserCreation {
     
     Write-AS2GoOutput -Type Header -M "Create a backdoor account with elevated group memberships for persistence"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
-    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
+    Show-CurrentPhase -Phase "ASP12_BD.html"
     
     If ($UnAttended) {
         $answer = $Script:Yes

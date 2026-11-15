@@ -34,6 +34,7 @@ Function Invoke-GoldenTicketAttack {
 
     $Info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP12_GT.html"
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type Header -M "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Domain Compromise &amp; Persistence</title>
+  <title>AS2Go · Password Spray</title>
   <style>
     :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
     body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
@@ -36,34 +36,33 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Domain Compromise &amp; Persistence</span>
+    <span class="title"><span class="brand">AS2Go</span> · Password Spray</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: Domain Compromise &amp; Persistence">
-      <img src="./phase_12.png" alt="AS2Go attack scenario: Domain Compromise &amp; Persistence">
+    <figure class="diagram" aria-label="AS2Go attack scenario: Password Spray">
+      <img src="./ASP04.png" alt="AS2Go attack scenario: Password Spray">
     </figure>
-    <nav class="panel" aria-label="Domain Compromise &amp; Persistence references">
-      <a href="https://cymulate.com/cybersecurity-glossary/golden-ticket-attack/" target="_blank" rel="noopener noreferrer">Golden Ticket</a>
-      <a href="https://attack.mitre.org/techniques/T1484/001/" target="_blank" rel="noopener noreferrer">Group Policy Modification</a>
-      <a href="https://attack.mitre.org/techniques/T1136/002/" target="_blank" rel="noopener noreferrer">Domain Account Persistence</a>
-      <a href="https://learn.microsoft.com/en-us/windows/win32/seccng/cng-dpapi-backup-keys-on-ad-domain-controllers" target="_blank" rel="noopener noreferrer">DPAPI Backup Keys</a>
-      <a href="https://attack.mitre.org/techniques/T1531/" target="_blank" rel="noopener noreferrer">Account Access Removal</a>
+    <nav class="panel" aria-label="Password Spray references">
+      <a href="https://en.hackndo.com/password-spraying-lockout/" target="_blank" rel="noopener noreferrer">Spray passwords, avoid lockouts</a>
+      <a href="https://www.paloaltonetworks.com/cyberpedia/password-spraying" target="_blank" rel="noopener noreferrer">Password Spraying Explained</a>
+      <a href="https://attack.mitre.org/techniques/T1110/003/" target="_blank" rel="noopener noreferrer">MITRE T1110.003</a>
+      <a href="https://learn.microsoft.com/en-us/defender-xdr/alert-classification-suspicious-ip-password-spray" target="_blank" rel="noopener noreferrer">Detection and Investigation</a>
     </nav>
     <section class="panel">
-      <span class="eyebrow">PHASE 12</span>
-      <h1>Domain Compromise &amp; Persistence</h1>
-      <p>The final scenario stage demonstrates persistence and impact after privileged access has been obtained, including changes to domain accounts, policies, and authentication material.</p>
+      <span class="eyebrow">PHASE 04</span>
+      <h1>Password Spray</h1>
+      <p>This phase demonstrates password spraying against Active Directory accounts in the selected lab scope, showing how weak passwords can provide an initial foothold.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Offers backdoor accounts, Group Policy Template changes, user and privileged-group manipulation, staged file encryption, domain DPAPI backup-key export, Golden Ticket creation and injection, and configured domain-controller restart workflows.</p>
+        <p>Reviews forest password policies and account lockout thresholds, selects a domain or forest scope, and tests configured password candidates. Preview stays offline; Safe Mode allows the phase to be skipped only.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>A domain compromise can leave multiple persistence paths. Monitor privileged account and policy changes, protect domain-controller secrets, and include forged tickets and exposed backup keys in recovery planning.</p>
+        <p>Account lockout alone does not eliminate password spraying. Reduce weak passwords, monitor authentication failures across accounts, and investigate successful sign-ins that follow suspicious attempts.</p>
       </section>
     </div>
   </main>

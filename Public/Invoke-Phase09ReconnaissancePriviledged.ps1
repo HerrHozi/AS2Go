@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Runs the AS2Go privileged reconnaissance demonstration.
 
@@ -75,7 +75,7 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
 
     $Info = Measure-FunctionRuntime -Begin
       Update-WindowTitle -NewTitle $Script:Phase09
-    Show-CurrentPhase -Phase "phase_09.html"
+    Show-CurrentPhase -Phase "ASP09.html"
 
     If (-not $SafeMode) {
         If (-not $AS2GoDemo) {

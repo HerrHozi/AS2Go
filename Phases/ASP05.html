@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Reconnaissance (Compromised)</title>
+  <title>AS2Go · Initial Access</title>
   <style>
     :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
     body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
@@ -36,33 +36,33 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Reconnaissance (Compromised)</span>
+    <span class="title"><span class="brand">AS2Go</span> · Initial Access</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: Reconnaissance (Compromised)">
-      <img src="./phase_06.png" alt="AS2Go attack scenario: Reconnaissance (Compromised)">
+    <figure class="diagram" aria-label="AS2Go attack scenario with Initial Access highlighted">
+      <img src="./ASP05.png" alt="AS2Go attack flow: Password Spray, Initial Access (current phase), Reconnaissance (Compromised), Privilege Escalation, Reconnaissance (Privileged), Sensitive Data Access, Data Exfiltration, and Domain Compromise and Persistence.">
     </figure>
-    <nav class="panel" aria-label="Reconnaissance (Compromised) references">
-      <a href="https://www.microsoft.com/en-us/security/blog/2020/08/27/stopping-active-directory-attacks-and-other-post-exploitation-behavior-with-amsi-and-machine-learning/" target="_blank" rel="noopener noreferrer">AD Attack Detection</a>
-      <a href="https://attack.mitre.org/techniques/T1087/002/" target="_blank" rel="noopener noreferrer">Domain Account Discovery</a>
-      <a href="https://attack.mitre.org/techniques/T1069/002/" target="_blank" rel="noopener noreferrer">Domain Group Discovery</a>
-      <a href="https://www.cyber.gov.au/publication/detecting-and-mitigating-active-directory-compromises" target="_blank" rel="noopener noreferrer">AD Compromise Guide</a>
+    <nav class="panel" aria-label="Initial Access references">
+      <a href="https://attack.mitre.org/tactics/TA0001/" target="_blank" rel="noopener noreferrer">Initial Access</a>
+      <a href="https://attack.mitre.org/techniques/T1078/" target="_blank" rel="noopener noreferrer">Valid Accounts</a>
+      <a href="https://attack.mitre.org/techniques/T1078/002/" target="_blank" rel="noopener noreferrer">Domain Accounts</a>
+      <a href="https://learn.microsoft.com/en-us/microsoft-365/security/defender/alert-grading-password-spray?view=o365-worldwide" target="_blank" rel="noopener noreferrer">Password Spray Investigation</a>
     </nav>
     <section class="panel">
-      <span class="eyebrow">PHASE 06</span>
-      <h1>Reconnaissance (Compromised)</h1>
-      <p>With a compromised account, an attacker can investigate the directory and identify useful accounts, computers, groups, and accessible resources before attempting to gain additional privileges.</p>
+      <span class="eyebrow">PHASE 05</span>
+      <h1>Initial Access</h1>
+      <p>A compromised domain account provides an entry point into the environment. This phase reviews the current account context and local administrator status before the scenario continues with reconnaissance.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Surveys forest and domain information, privileged group memberships, computer accounts, and domain controllers, then attempts to list configured administrative shares. Optional extended tasks include DNS, session, and honeytoken activity.</p>
+        <p>Current Active Directory user information, including domain, password policy and group memberships, alongside local administrator membership and token elevation status. Safe Mode skips the Active Directory user-information lookup.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>A standard domain account can reveal valuable directory information. Detect unusual enumeration and honeytoken activity, and review permissions on administrative resources.</p>
+        <p>Valid credentials can give an attacker a foothold. Review the account's permissions and investigate unusual sign-ins; successful authentication alone does not imply administrative access.</p>
       </section>
     </div>
   </main>

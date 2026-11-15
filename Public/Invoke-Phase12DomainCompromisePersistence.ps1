@@ -98,7 +98,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
     }
 
     $info = Measure-FunctionRuntime -Begin
-    Show-CurrentPhase -Phase "phase_12.html"
+    Show-CurrentPhase -Phase "ASP12.html"
     
     $functionCallParameters = Get-FunctionCallParameters -FunctionName $MyInvocation.MyCommand.Name -BoundParameters $PSBoundParameters
     $4logfile = $functionCallParameters.Parameters | Out-String

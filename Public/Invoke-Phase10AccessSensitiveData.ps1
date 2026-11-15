@@ -85,7 +85,7 @@ function Invoke-ASPhase10AccessSensitiveData {
 
 
     $Info = Measure-FunctionRuntime -Begin
-    Show-CurrentPhase -Phase "phase_10.html"
+    Show-CurrentPhase -Phase "ASP10.html"
 
     If (-not $SkipClearHost) { Clear-Host }
     If (-not $AS2GoDemo) {

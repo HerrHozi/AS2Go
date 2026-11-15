@@ -30,6 +30,7 @@ function Invoke-PrivilegeGroupPurge {
 
     $info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP12_Revoke.html"
     try {
         if (-not $SkipClearHost) { Clear-Host }
         Write-AS2GoOutput -Type Header -Message 'Purge privileged group memberships'

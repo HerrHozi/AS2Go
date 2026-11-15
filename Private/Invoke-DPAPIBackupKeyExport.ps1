@@ -32,6 +32,7 @@ function Invoke-DPAPIBackupKeyExport {
 
     $info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP12_BackupKey.html"
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type Header -Message "Export Domain DPAPI Backup Keys"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)

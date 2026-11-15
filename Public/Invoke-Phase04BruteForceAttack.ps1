@@ -84,7 +84,7 @@ function Invoke-ASPhase04BruteForceAttack {
     If (-not $AS2GoDemo) { Set-NewColorSchema -NewStage $Script:InitialStart }
     If (-not $SkipClearHost) { Clear-Host }
     
-    Show-CurrentPhase -Phase "phase_04.html"
+    Show-CurrentPhase -Phase "ASP04.html"
     Update-WindowTitle -NewTitle $Script:Phase04
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase04
 

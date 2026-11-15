@@ -40,7 +40,7 @@ function Start-Kerberoasting {
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
-    Show-CurrentPhase -Phase  "https://cymulate.com/cybersecurity-glossary"   
+    Show-CurrentPhase -Phase "ASP07_Kerberosting.html"
 
     $dnsdomain = $env:USERDNSDOMAIN
     $bestdc = $Script:BestDCs[$dnsdomain]

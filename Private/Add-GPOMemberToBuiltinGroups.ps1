@@ -24,7 +24,7 @@ function Add-GPOMemberToBuiltinGroups {
 
     $Info = Measure-FunctionRuntime -Begin
 
-    Show-CurrentPhase -Phase "ASP012_GPT"
+    Show-CurrentPhase -Phase "ASP12_GPT.html"
 
     If (-not $SkipClearHost) { Clear-Host }
 

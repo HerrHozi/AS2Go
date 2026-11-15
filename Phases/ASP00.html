@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Password Spray</title>
+  <title>AS2Go · Attack Scenario Overview</title>
   <style>
     :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
     body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
@@ -36,33 +36,32 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Password Spray</span>
+    <span class="title"><span class="brand">AS2Go</span> · Attack Scenario Overview</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: Password Spray">
-      <img src="./phase_04.png" alt="AS2Go attack scenario: Password Spray">
+    <figure class="diagram" aria-label="AS2Go attack scenario overview">
+      <img src="./ASP00.png" alt="AS2Go attack scenario overview">
     </figure>
-    <nav class="panel" aria-label="Password Spray references">
-      <a href="https://en.hackndo.com/password-spraying-lockout/" target="_blank" rel="noopener noreferrer">Spray passwords, avoid lockouts</a>
-      <a href="https://www.paloaltonetworks.com/cyberpedia/password-spraying" target="_blank" rel="noopener noreferrer">Password Spraying Explained</a>
-      <a href="https://attack.mitre.org/techniques/T1110/003/" target="_blank" rel="noopener noreferrer">MITRE T1110.003</a>
-      <a href="https://learn.microsoft.com/en-us/defender-xdr/alert-classification-suspicious-ip-password-spray" target="_blank" rel="noopener noreferrer">Detection and Investigation</a>
+    <nav class="panel" aria-label="Attack Scenario Overview references">
+      <a href="https://www.cyber.gov.au/publication/detecting-and-mitigating-active-directory-compromises" target="_blank" rel="noopener noreferrer">AD Compromise Guide</a>
+      <a href="https://learn.microsoft.com/en-us/security/privileged-access-workstations/overview" target="_blank" rel="noopener noreferrer">Securing Privileged Access</a>
+      <a href="https://attack.mitre.org/techniques/T1078/002/" target="_blank" rel="noopener noreferrer">Valid Domain Accounts</a>
     </nav>
     <section class="panel">
-      <span class="eyebrow">PHASE 04</span>
-      <h1>Password Spray</h1>
-      <p>This phase demonstrates password spraying against Active Directory accounts in the selected lab scope, showing how weak passwords can provide an initial foothold.</p>
+      <span class="eyebrow">PHASE 00</span>
+      <h1>Attack Scenario Overview</h1>
+      <p>Follow the AS2Go Active Directory scenario from password spraying and initial access through reconnaissance, privilege escalation, data access, exfiltration, and domain compromise.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Reviews forest password policies and account lockout thresholds, selects a domain or forest scope, and tests configured password candidates. Preview stays offline; Safe Mode allows the phase to be skipped only.</p>
+        <p>An overview of the scenario and the relationships between its stages. Each phase page highlights its position in the attack flow and provides references for the demonstrated behavior.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>Account lockout alone does not eliminate password spraying. Reduce weak passwords, monitor authentication failures across accounts, and investigate successful sign-ins that follow suspicious attempts.</p>
+        <p>Several small weaknesses can combine into a domain-wide compromise. Protect identities, restrict privileged access, and correlate evidence across the entire scenario.</p>
       </section>
     </div>
   </main>

@@ -35,6 +35,7 @@ function Invoke-PassTheTicketAttack {
     
     $Info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP07_PtT.html"
     $Script:ASSAW = Get-ASConfig -Setting "AS2GoSAW"
     $Script:ASTicketsUNCPath = Get-ASConfig -Setting "ticketsPath"
 

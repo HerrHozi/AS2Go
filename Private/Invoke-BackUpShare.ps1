@@ -38,6 +38,7 @@ function Invoke-BackUpShare {
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
+    Show-CurrentPhase -Phase "ASP12_Encryption.html"
     $CurrentFunction = $Info.FunctionName
 
     If (-not $SkipClearHost) { Clear-Host }

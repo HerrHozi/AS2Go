@@ -50,7 +50,7 @@ function Stop-AS2GoDemo {
     }
         
     If (-not $SkipImages) { 
-        #Show-CurrentPhase -Phase "phase_020.html" 
+        #Show-CurrentPhase -Phase "ASP020.html" 
     }
 
     If ($NextStepReboot -ne $Script:Yes) {

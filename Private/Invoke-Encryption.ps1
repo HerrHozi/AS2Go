@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Encrypts critical Domain Controller assets for strategic leverage.
 
@@ -32,6 +32,7 @@ function Invoke-Encryption {
 
     $info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP12_Encryption.html"
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type Header -M "Encrypt critical Domain Controller assets for strategic leverage"

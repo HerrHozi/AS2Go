@@ -86,7 +86,7 @@ function Invoke-ASPhase05InitialAccess {
     Update-WindowTitle -NewTitle $Script:Phase05
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase05
 
-    Show-CurrentPhase -Phase "phase_05.html"
+    Show-CurrentPhase -Phase "ASP05.html"
 
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase05.toupper())"

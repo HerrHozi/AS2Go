@@ -39,6 +39,7 @@ function Invoke-OverPassTheHashAttack {
    
     $Info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP07_OpTH.html"
     Update-WindowTitle -NewTitle "Overpass-the-Hash (OpTH) Attack"
     Set-ASConfig -Setting "LastStage" -Value "Overpass-the-Hash (OpTH) Attack"
 

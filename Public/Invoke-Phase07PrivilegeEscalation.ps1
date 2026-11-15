@@ -111,7 +111,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
     Update-WindowTitle -NewTitle $Script:Phase07
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase07
 
-    Show-CurrentPhase -Phase "phase_07.html"
+    Show-CurrentPhase -Phase "ASP07.html"
     If (-not $SkipClearHost) { Clear-Host }
     
     Write-AS2GoOutput -Type  Header -M "Attack Phase - $($Script:Phase07.toupper())"
@@ -223,7 +223,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
         }
 
         If ($answer -eq $Script:PtH) {
-            Show-CurrentPhase -Phase "phase_07_PtH.html"  
+            Show-CurrentPhase -Phase "ASP07_PtH.html"  
             Invoke-OverPassTheHashAttack
         }
         elseif ($answer -eq $Script:PtT) {

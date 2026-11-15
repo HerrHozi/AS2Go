@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Privileged Account Compromised</title>
+  <title>AS2Go · Domain Compromise &amp; Persistence</title>
   <style>
     :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
     body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
@@ -36,33 +36,34 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Privileged Account Compromised</span>
+    <span class="title"><span class="brand">AS2Go</span> · Domain Compromise &amp; Persistence</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: Privileged Account Compromised">
-      <img src="./phase_08.png" alt="AS2Go attack scenario: Privileged Account Compromised">
+    <figure class="diagram" aria-label="AS2Go attack scenario: Domain Compromise &amp; Persistence">
+      <img src="./ASP12.png" alt="AS2Go attack scenario: Domain Compromise &amp; Persistence">
     </figure>
-    <nav class="panel" aria-label="Privileged Account Compromised references">
-      <a href="https://learn.microsoft.com/en-us/security/privileged-access-workstations/overview" target="_blank" rel="noopener noreferrer">Securing Privileged Access</a>
-      <a href="https://attack.mitre.org/tactics/TA0004/" target="_blank" rel="noopener noreferrer">Privilege Escalation</a>
-      <a href="https://attack.mitre.org/techniques/T1078/002/" target="_blank" rel="noopener noreferrer">Valid Domain Accounts</a>
-      <a href="https://www.cyber.gov.au/publication/detecting-and-mitigating-active-directory-compromises" target="_blank" rel="noopener noreferrer">AD Compromise Guide</a>
+    <nav class="panel" aria-label="Domain Compromise &amp; Persistence references">
+      <a href="https://cymulate.com/cybersecurity-glossary/golden-ticket-attack/" target="_blank" rel="noopener noreferrer">Golden Ticket</a>
+      <a href="https://attack.mitre.org/techniques/T1484/001/" target="_blank" rel="noopener noreferrer">Group Policy Modification</a>
+      <a href="https://attack.mitre.org/techniques/T1136/002/" target="_blank" rel="noopener noreferrer">Domain Account Persistence</a>
+      <a href="https://learn.microsoft.com/en-us/windows/win32/seccng/cng-dpapi-backup-keys-on-ad-domain-controllers" target="_blank" rel="noopener noreferrer">DPAPI Backup Keys</a>
+      <a href="https://attack.mitre.org/techniques/T1531/" target="_blank" rel="noopener noreferrer">Account Access Removal</a>
     </nav>
     <section class="panel">
-      <span class="eyebrow">PHASE 08</span>
-      <h1>Privileged Account Compromised</h1>
-      <p>This stage marks the transition from a compromised account to a context with additional privileges. The scope of that access determines which resources can be reached next.</p>
+      <span class="eyebrow">PHASE 12</span>
+      <h1>Domain Compromise &amp; Persistence</h1>
+      <p>The final scenario stage demonstrates persistence and impact after privileged access has been obtained, including changes to domain accounts, policies, and authentication material.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>A visual checkpoint following privilege escalation, before reconnaissance with privileged access. The highlighted graphic identifies the escalation stage; this page itself performs no authentication or privilege changes.</p>
+        <p>Offers backdoor accounts, Group Policy Template changes, user and privileged-group manipulation, staged file encryption, domain DPAPI backup-key export, Golden Ticket creation and injection, and configured domain-controller restart workflows.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>Local administrator, local SYSTEM, and domain administrator are different security contexts. Confirm the actual account, token, and resource permissions before interpreting the impact of elevated access.</p>
+        <p>A domain compromise can leave multiple persistence paths. Monitor privileged account and policy changes, protect domain-controller secrets, and include forged tickets and exposed backup keys in recovery planning.</p>
       </section>
     </div>
   </main>

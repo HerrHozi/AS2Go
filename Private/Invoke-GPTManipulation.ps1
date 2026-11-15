@@ -30,6 +30,7 @@ function Invoke-GPTManipulation {
 
     $info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP12_GPT.html"
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type Header -M "Manipulate Group Policy Templates (GPT) files"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)

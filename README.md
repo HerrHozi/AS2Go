@@ -10,7 +10,7 @@
 
 ```Text
 Author:          Holger Zimmermann | as2go@mrhozi.com
-Current Version: 2026.11.15.1040
+Current Version: 2026.11.15.1060
 Last Update:     2026-11-15
 ```
 
@@ -43,7 +43,7 @@ You are responsible for legal, policy, and compliance requirements in your organ
 
 ## What AS2Go Demonstrates
 
-<img width="853" alt="AS2Go Phase 00 overview" src="Phases/phase_00.png"/>
+<img width="853" alt="AS2Go Phase 00 overview" src="Phases/ASP00.png"/>
 
 AS2Go follows a realistic multi-phase attack chain to generate observable behavior for defenders.
 Depending on your setup and enabled phases, the simulation can include:

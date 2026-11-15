@@ -33,6 +33,7 @@ function Invoke-UserAccountDisruption {
 
     $info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP12_Disruption.html"
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type Header -M "Disable user accounts or enforce password resets"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)

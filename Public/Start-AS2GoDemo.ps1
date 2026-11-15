@@ -271,7 +271,7 @@ Function Start-AS2GoDemo {
     Write-AS2GoOutput -Type Bullet -Message "[X] $Script:Phase11"
     Write-AS2GoOutput -Type Bullet -Message "[D] $Script:Phase12"
 
-    Show-CurrentPhase -Phase "phase_00.html"
+    Show-CurrentPhase -Phase "ASP00.html"
 
     $Options = @(
         [pscustomobject]@{

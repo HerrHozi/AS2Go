@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Data Exfiltration</title>
+  <title>AS2Go · Reconnaissance (Compromised)</title>
   <style>
     :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
     body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
@@ -36,33 +36,33 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Data Exfiltration</span>
+    <span class="title"><span class="brand">AS2Go</span> · Reconnaissance (Compromised)</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: Data Exfiltration">
-      <img src="./phase_11.png" alt="AS2Go attack scenario: Data Exfiltration">
+    <figure class="diagram" aria-label="AS2Go attack scenario: Reconnaissance (Compromised)">
+      <img src="./ASP06.png" alt="AS2Go attack scenario: Reconnaissance (Compromised)">
     </figure>
-    <nav class="panel" aria-label="Data Exfiltration references">
-      <a href="https://www.crowdstrike.com/en-us/cybersecurity-101/cyberattacks/data-exfiltration/" target="_blank" rel="noopener noreferrer">Data Exfiltration Explained</a>
-      <a href="https://attack.mitre.org/tactics/TA0010/" target="_blank" rel="noopener noreferrer">Exfiltration</a>
-      <a href="https://attack.mitre.org/techniques/T1003/003/" target="_blank" rel="noopener noreferrer">NTDS Exposure Risks</a>
-      <a href="https://www.cyber.gov.au/publication/detecting-and-mitigating-active-directory-compromises" target="_blank" rel="noopener noreferrer">AD Backup Protection</a>
+    <nav class="panel" aria-label="Reconnaissance (Compromised) references">
+      <a href="https://www.microsoft.com/en-us/security/blog/2020/08/27/stopping-active-directory-attacks-and-other-post-exploitation-behavior-with-amsi-and-machine-learning/" target="_blank" rel="noopener noreferrer">AD Attack Detection</a>
+      <a href="https://attack.mitre.org/techniques/T1087/002/" target="_blank" rel="noopener noreferrer">Domain Account Discovery</a>
+      <a href="https://attack.mitre.org/techniques/T1069/002/" target="_blank" rel="noopener noreferrer">Domain Group Discovery</a>
+      <a href="https://www.cyber.gov.au/publication/detecting-and-mitigating-active-directory-compromises" target="_blank" rel="noopener noreferrer">AD Compromise Guide</a>
     </nav>
     <section class="panel">
-      <span class="eyebrow">PHASE 11</span>
-      <h1>Data Exfiltration</h1>
-      <p>This phase illustrates the risk of copying accessible Active Directory backups to another location, using simulated backup data transferred over SMB.</p>
+      <span class="eyebrow">PHASE 06</span>
+      <h1>Reconnaissance (Compromised)</h1>
+      <p>With a compromised account, an attacker can investigate the directory and identify useful accounts, computers, groups, and accessible resources before attempting to gain additional privileges.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Copies files from the configured backup share to a local destination folder and lists the copied .dit files. It demonstrates a file-transfer workflow; it does not extract credentials from a real Active Directory database or upload files to an external service.</p>
+        <p>Surveys forest and domain information, privileged group memberships, computer accounts, and domain controllers, then attempts to list configured administrative shares. Optional extended tasks include DNS, session, and honeytoken activity.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>Backup access can expose highly sensitive identity data. Restrict and monitor backup-share reads and file transfers, and protect backups separately from ordinary business shares.</p>
+        <p>A standard domain account can reveal valuable directory information. Detect unusual enumeration and honeytoken activity, and review permissions on administrative resources.</p>
       </section>
     </div>
   </main>

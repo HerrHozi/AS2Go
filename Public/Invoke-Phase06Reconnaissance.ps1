@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Runs the AS2Go reconnaissance demonstration with a standard domain user.
 
@@ -86,7 +86,7 @@ function Invoke-ASPhase06Reconnaissance {
 
     Update-WindowTitle -NewTitle $Script:Phase06
     #Set-ASConfig -Setting "LastStage" -Value $Script:Phase06
-    Show-CurrentPhase -Phase "phase_06.html"
+    Show-CurrentPhase -Phase "ASP06.html"
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type  Header -Message "Attack Phase - $($Script:Phase06.toupper())"

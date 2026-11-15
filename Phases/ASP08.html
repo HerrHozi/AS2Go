@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Initial Access</title>
+  <title>AS2Go · Privileged Account Compromised</title>
   <style>
     :root { color-scheme: dark; --bg:#0f172a; --raised:#1e293b; --border:#334155; --text:#e2e8f0; --dim:#94a3b8; --bright:#fff; --link:#38bdf8; }
     body[data-theme="light"] { color-scheme:light; --bg:#f8fafc; --raised:#fff; --border:#cbd5e1; --text:#0f172a; --dim:#475569; --bright:#020617; --link:#0369a1; }
@@ -36,33 +36,33 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Initial Access</span>
+    <span class="title"><span class="brand">AS2Go</span> · Privileged Account Compromised</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario with Initial Access highlighted">
-      <img src="./phase_05.png" alt="AS2Go attack flow: Password Spray, Initial Access (current phase), Reconnaissance (Compromised), Privilege Escalation, Reconnaissance (Privileged), Sensitive Data Access, Data Exfiltration, and Domain Compromise and Persistence.">
+    <figure class="diagram" aria-label="AS2Go attack scenario: Privileged Account Compromised">
+      <img src="./ASP08.png" alt="AS2Go attack scenario: Privileged Account Compromised">
     </figure>
-    <nav class="panel" aria-label="Initial Access references">
-      <a href="https://attack.mitre.org/tactics/TA0001/" target="_blank" rel="noopener noreferrer">Initial Access</a>
-      <a href="https://attack.mitre.org/techniques/T1078/" target="_blank" rel="noopener noreferrer">Valid Accounts</a>
-      <a href="https://attack.mitre.org/techniques/T1078/002/" target="_blank" rel="noopener noreferrer">Domain Accounts</a>
-      <a href="https://learn.microsoft.com/en-us/microsoft-365/security/defender/alert-grading-password-spray?view=o365-worldwide" target="_blank" rel="noopener noreferrer">Password Spray Investigation</a>
+    <nav class="panel" aria-label="Privileged Account Compromised references">
+      <a href="https://learn.microsoft.com/en-us/security/privileged-access-workstations/overview" target="_blank" rel="noopener noreferrer">Securing Privileged Access</a>
+      <a href="https://attack.mitre.org/tactics/TA0004/" target="_blank" rel="noopener noreferrer">Privilege Escalation</a>
+      <a href="https://attack.mitre.org/techniques/T1078/002/" target="_blank" rel="noopener noreferrer">Valid Domain Accounts</a>
+      <a href="https://www.cyber.gov.au/publication/detecting-and-mitigating-active-directory-compromises" target="_blank" rel="noopener noreferrer">AD Compromise Guide</a>
     </nav>
     <section class="panel">
-      <span class="eyebrow">PHASE 05</span>
-      <h1>Initial Access</h1>
-      <p>A compromised domain account provides an entry point into the environment. This phase reviews the current account context and local administrator status before the scenario continues with reconnaissance.</p>
+      <span class="eyebrow">PHASE 08</span>
+      <h1>Privileged Account Compromised</h1>
+      <p>This stage marks the transition from a compromised account to a context with additional privileges. The scope of that access determines which resources can be reached next.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Current Active Directory user information, including domain, password policy and group memberships, alongside local administrator membership and token elevation status. Safe Mode skips the Active Directory user-information lookup.</p>
+        <p>A visual checkpoint following privilege escalation, before reconnaissance with privileged access. The highlighted graphic identifies the escalation stage; this page itself performs no authentication or privilege changes.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>Valid credentials can give an attacker a foothold. Review the account's permissions and investigate unusual sign-ins; successful authentication alone does not imply administrative access.</p>
+        <p>Local administrator, local SYSTEM, and domain administrator are different security contexts. Confirm the actual account, token, and resource permissions before interpreting the impact of elevated access.</p>
       </section>
     </div>
   </main>

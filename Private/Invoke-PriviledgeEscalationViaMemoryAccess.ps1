@@ -48,6 +48,7 @@ function Invoke-PriviledgeEscalationViaMemoryAccess {
 
     $Info = Measure-FunctionRuntime -Begin
 
+    Show-CurrentPhase -Phase "ASP07_MemDump.html"
     $result = Test-LocalAdministrator
 
     If (-not $SkipClearHost) { Clear-Host }

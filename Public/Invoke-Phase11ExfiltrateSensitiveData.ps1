@@ -84,7 +84,7 @@ function Invoke-ASPhase11ExfiltrateSensitiveData {
 
 
     $Info = Measure-FunctionRuntime -Begin
-    Show-CurrentPhase -Phase "phase_11.html"
+    Show-CurrentPhase -Phase "ASP11.html"
 
     If (-not $SkipClearHost) { Clear-Host }
     If (-not $AS2GoDemo) {
