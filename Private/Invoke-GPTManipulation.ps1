@@ -74,12 +74,12 @@ function Invoke-GPTManipulation {
             
             $Options = @(
                 [pscustomobject] @{
-                    Label = "Add &Members"
-                    Help  = "Add members to the built-in Administrators & Remote Desktop Users Group."
+                    Label = "Add &Member"
+                    Help  = "Add a member to the built-in Administrators & Remote Desktop Users Group."
                     Value = "M"
                 },
                 [pscustomobject] @{
-                    Label = "Scheduled &Tasks"
+                    Label = "Scheduled &Task"
                     Help  = "Add a Scheduled Task."
                     Value = "S"
                 },

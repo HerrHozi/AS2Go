@@ -10,7 +10,7 @@
 
 ```Text
 Author:          Holger Zimmermann | as2go@mrhozi.com
-Current Version: 2026.11.15.874
+Current Version: 2026.11.15.1040
 Last Update:     2026-11-15
 ```
 

@@ -223,7 +223,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         else {
 
             If (-not $Script:MoGPO) {
-                $topicGPT = $null
+                #$topicGPT = $null
             }
 
             $result = Test-LocalAdministrator
