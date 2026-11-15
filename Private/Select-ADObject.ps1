@@ -6,14 +6,22 @@
     .DESCRIPTION
         Select-ADObject provides a graphical user interface (GUI) for browsing and selecting Active Directory 
         objects such as Organizational Units (OUs), users, groups, and computers. The function displays a 
-        tree view of the forest structure with custom icons for different object types. It supports browsing 
+        tree view of the forest structure with custom icons for different object types. It supports browsing
         across multiple domains and optionally highlights Tier 0 (high-security) objects.
+        Disabled user and computer accounts are shown with a small red cross in the bottom-right corner
+        of their icon. Tier 0 objects are marked with a red dot in the top-right corner.
+        Right-click a user to enable or disable the account.
+        Selection of OUs and containers can be blocked (-BlockOUSelection) so that only other object types
+        can be picked while OUs remain browsable.
 
     .COMPONENT
     Category: Sub Function
 
+    .FUNCTIONALITY
+    Browses forest objects in a GUI, supports OU creation, optionally blocks OU selection, and highlights Tier 0 entries and disabled accounts.
+
     .PARAMETER Title
-        This text displayed in the dialog window title. Default is "Select AD Object".
+        The text displayed in the dialog window title. Default is "Select AD Object".
 
     .PARAMETER LocalDomainOnly
         If specified, only the current domain and its contents are displayed. By default, all domains 
@@ -22,12 +30,19 @@
     .PARAMETER DomainSelectionOnly
         If specified, only domain objects can be selected. The tree view is not expanded to show child objects.
 
-    .PARAMETER OnlyUserSelectionPossible
-        Includes users in the tree and allows only user objects to be selected.
-        Takes precedence over DomainSelectionOnly when both switches are specified.
-
     .PARAMETER AddOU
         Enables a context menu for creating an organizational unit under a selected domain, OU, or container.
+
+    .PARAMETER BlockOUSelection
+        If specified, organizational units and containers can still be browsed (expanded) but cannot be
+        selected, so the OK button stays disabled for them. Intended for use with -IncludeUsers,
+        -IncludeGroups, -IncludeComputers or -IncludeGPOs, so that only those object types can be picked.
+
+    .PARAMETER IncludeGPOs
+        If specified, GPO objects (groupPolicyContainer) are included in the browsable tree view.
+
+    .PARAMETER ShowAdvanced
+        If specified, objects flagged with showInAdvancedViewOnly are shown as well.
 
     .PARAMETER IncludeLinkedGPOs
         Displays GPOs linked to each domain, OU, or container as selectable child entries.
@@ -42,8 +57,9 @@
         If specified, computer objects are included in the browsable tree view.
 
     .PARAMETER MarkTier0
-        If specified, Tier 0 (high-security) objects are marked with a red overlay on their icons. 
-        This helps identify highly sensitive AD objects.
+        If specified, Tier 0 (high-security) objects are marked with a red dot in the top-right corner
+        of their icons. This helps identify highly sensitive AD objects. Can be combined with the red
+        cross shown for disabled accounts.
 
     .PARAMETER Tier0Regex
         A regular expression pattern used to identify Tier 0 objects. Default pattern matches:
@@ -59,13 +75,18 @@
 
     .EXAMPLE
         PS> Select-ADObject -Title "Select Target OU"
-        Description: Displays the AD selection dialog with a custom title title. Only OUs and containers 
-        are available for selection.
+        Description: Displays the AD selection dialog with a custom title. Domains, OUs and containers
+        are shown; objects below the domain level can be selected.
 
     .EXAMPLE
         PS> Select-ADObject -LocalDomainOnly -IncludeUsers -IncludeGroups
-        Description: Shows only the current domain's contents, allowing selection of users and groups 
-        in addition to OUs.
+        Description: Shows only the current domain's contents, including users and groups in addition
+        to OUs. Disabled users are marked with a red cross.
+
+    .EXAMPLE
+        PS> Select-ADObject -IncludeUsers -BlockOUSelection
+        Description: Shows OUs for browsing, but only user objects can be selected. OUs and containers
+        cannot be confirmed with OK.
 
     .EXAMPLE
         PS> Select-ADObject -DomainSelectionOnly
@@ -73,19 +94,16 @@
 
     .EXAMPLE
         PS> Select-ADObject -MarkTier0 -IncludeUsers -Title "Select Tier 0 Target"
-        Description: Displays all users and OUs, highlighting Tier 0 objects with a red indicator.
+        Description: Displays all users and OUs, highlighting Tier 0 objects with a red dot.
 
     .NOTES
-        - Author:      as2go@mrhozi.com
-        - Version:     1.0
-        - Last Update: 2026-02-22
+        - Author:      zimmermann.holger@live.de
+        - Version:     1.1
+        - Last Update: 2026-11-15
 
         - This is a private function and requires a graphical environment (Windows Forms).
         - The function uses Active Directory modules to query the forest structure.
         - All logging is handled through Write-Log.
-
-    .FUNCTIONALITY
-    Browses AD objects in a graphical tree, with optional user-only selection, OU creation, and Tier 0 marking.
     #>
 
     [CmdletBinding()]
@@ -94,6 +112,7 @@
         [switch]$LocalDomainOnly,
         [switch]$DomainSelectionOnly,
         [switch]$AddOU,
+        [switch]$BlockOUSelection,
         [switch]$IncludeLinkedGPOs,
         [switch]$IncludeUsers,
         [switch]$IncludeGroups,
@@ -101,8 +120,7 @@
         [switch]$IncludeGPOs,
         [switch]$MarkTier0,
         [Switch]$ShowAdvanced,
-        [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)',
-        [switch]$OnlyUserSelectionPossible
+        [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)'
     )
 
     If ($Script:NotStandAlone) {
@@ -264,7 +282,26 @@
     function Add-TierOverlay($bmp) {
         $clone = $bmp.Clone()
         $g = [System.Drawing.Graphics]::FromImage($clone)
-        $g.FillEllipse([System.Drawing.Brushes]::Red, 10, 10, 5, 5)
+        $g.FillEllipse([System.Drawing.Brushes]::Red, 10, 1, 5, 5)
+        $g.Dispose()
+        $clone
+    }
+
+    <#
+    .SYNOPSIS
+    Marks an icon as belonging to a disabled account.
+
+    .FUNCTIONALITY
+    Adds a small red cross in the bottom-right corner to the supplied bitmap.
+    #>
+    function Add-DisabledOverlay($bmp) {
+        $clone = $bmp.Clone()
+        $g = [System.Drawing.Graphics]::FromImage($clone)
+        $g.SmoothingMode = 'AntiAlias'
+        $pen = New-Object System.Drawing.Pen([System.Drawing.Color]::Red, 2)
+        $g.DrawLine($pen, 10, 10, 14, 14)
+        $g.DrawLine($pen, 14, 10, 10, 14)
+        $pen.Dispose()
         $g.Dispose()
         $clone
     }
@@ -288,6 +325,14 @@
     if ($MarkTier0) {
         foreach ($k in @("User", "OU", "Container", "Computer", "Group", "GPO")) {
             $imageList.Images.Add("${k}_T0", (Add-TierOverlay $imageList.Images[$k])) | Out-Null
+        }
+    }
+
+    # Disabled variants (user and computer accounts), also combined with the Tier 0 marker
+    foreach ($k in @("User", "Computer")) {
+        $imageList.Images.Add("${k}_Disabled", (Add-DisabledOverlay $imageList.Images[$k])) | Out-Null
+        if ($MarkTier0) {
+            $imageList.Images.Add("${k}_T0_Disabled", (Add-DisabledOverlay $imageList.Images["${k}_T0"])) | Out-Null
         }
     }
 
@@ -325,7 +370,7 @@
     #>
     function Get-ChildNodes($node) {
 
-        if ($DomainSelectionOnly -and -not $OnlyUserSelectionPossible) { return }
+        if ($DomainSelectionOnly) { return }
 
         if ($node.Nodes.Count -eq 1 -and $node.Nodes[0].Text -eq 'dummy') {
 
@@ -337,12 +382,11 @@
             
             $filters = @(
                 "(objectClass=organizationalUnit)",
-                "(objectClass=container)"
+                "(objectClass=container)",
                 "(objectClass=builtinDomain)"
             )
 
-            if ($OnlyUserSelectionPossible) { $filters += "(&(objectCategory=person)(objectClass=user))" }
-            elseif ($IncludeUsers) { $filters += "(objectCategory=user)" }
+            if ($IncludeUsers) { $filters += "(objectCategory=user)" }
             if ($IncludeGroups) { $filters += "(objectCategory=group)" }
             if ($IncludeComputers) { $filters += "(objectCategory=computer)" }
             if ($IncludeGPOs) { $filters += "(objectCategory=groupPolicyContainer)" }
@@ -358,7 +402,7 @@
           
             write-verbose $orFilter
 		  
-            $null = $searcher.PropertiesToLoad.AddRange(@("name", "distinguishedName", "objectClass"))
+            $null = $searcher.PropertiesToLoad.AddRange(@("name", "distinguishedName", "objectClass", "userAccountControl"))
 
             foreach ($res in $searcher.FindAll()) {
 
@@ -382,10 +426,20 @@
                     $iconKey = "${iconKey}_T0"
                 }
 
+                # Disabled accounts: UF_ACCOUNTDISABLE = 0x2 in userAccountControl
+                $isDisabled = $false
+                if ($cls -in @('user', 'computer') -and $res.Properties['useraccountcontrol'].Count -gt 0) {
+                    $uac = [int]$res.Properties['useraccountcontrol'][0]
+                    $isDisabled = [bool]($uac -band 2)
+                    if ($isDisabled -and $imageList.Images.ContainsKey("${iconKey}_Disabled")) {
+                        $iconKey = "${iconKey}_Disabled"
+                    }
+                }
+
                 $child = New-Object System.Windows.Forms.TreeNode
                 $child.Text = $name
                 $child.Name = $dn
-                $child.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; ObjectClass = $cls }
+                $child.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; ObjectClass = $cls; IsDisabled = $isDisabled }
                 $child.ImageKey = $iconKey
                 $child.SelectedImageKey = $iconKey
                 $child.Nodes.Add("dummy") | Out-Null
@@ -558,20 +612,65 @@
 
     $tree.add_BeforeExpand({ Get-ChildNodes $_.Node })
 
+    $contextMenu = New-Object System.Windows.Forms.ContextMenuStrip
+    $newMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("New")
+    $addOuMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("Organizational Unit")
+    $accountMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("Disable Account")
     if ($AddOU) {
-        $contextMenu = New-Object System.Windows.Forms.ContextMenuStrip
-        $newMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("New")
-        $addOuMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("Organizational Unit")
         $newMenuItem.DropDownItems.Add($addOuMenuItem) | Out-Null
         $contextMenu.Items.Add($newMenuItem) | Out-Null
-        $tree.ContextMenuStrip = $contextMenu
+    }
+    $contextMenu.Items.Add($accountMenuItem) | Out-Null
+    $tree.ContextMenuStrip = $contextMenu
 
-        $tree.add_NodeMouseClick({
-                if ($_.Button -eq [System.Windows.Forms.MouseButtons]::Right) {
-                    $tree.SelectedNode = $_.Node
+    $tree.add_MouseDown({
+            if ($_.Button -eq [System.Windows.Forms.MouseButtons]::Right) {
+                $node = $tree.GetNodeAt($_.Location)
+                $tree.SelectedNode = $node
+            }
+        })
+
+    $contextMenu.add_Opening({
+            $node = $tree.SelectedNode
+            $objectClass = $node.Tag.ObjectClass
+            $newMenuItem.Visible = $AddOU -and $objectClass -in @('domain', 'organizationalUnit', 'container', 'builtinDomain')
+            $accountMenuItem.Visible = $objectClass -eq 'user'
+            $accountMenuItem.Text = if ($node.Tag.IsDisabled) { 'Enable Account' } else { 'Disable Account' }
+            $_.Cancel = -not ($newMenuItem.Available -or $accountMenuItem.Available)
+        })
+
+    $accountMenuItem.add_Click({
+            $node = $tree.SelectedNode
+            if ($node.Tag.ObjectClass -ne 'user') { return }
+
+            $enable = $node.Tag.IsDisabled
+            $action = if ($enable) { 'Enable' } else { 'Disable' }
+
+            try {
+                if ($enable) {
+                    Enable-ADAccount -Identity $node.Name -Server $node.Tag.Domain -Confirm:$false -ErrorAction Stop
                 }
-            })
+                else {
+                    Disable-ADAccount -Identity $node.Name -Server $node.Tag.Domain -Confirm:$false -ErrorAction Stop
+                }
+            }
+            catch {
+                [void][System.Windows.Forms.MessageBox]::Show(
+                    $form, $_.Exception.Message, "$action Account failed",
+                    [System.Windows.Forms.MessageBoxButtons]::OK,
+                    [System.Windows.Forms.MessageBoxIcon]::Error
+                )
+                return
+            }
 
+            $node.Tag.IsDisabled = -not $enable
+            $iconKey = $node.ImageKey -replace '_Disabled$', ''
+            if ($node.Tag.IsDisabled) { $iconKey = "${iconKey}_Disabled" }
+            $node.ImageKey = $iconKey
+            $node.SelectedImageKey = $iconKey
+        })
+
+    if ($AddOU) {
         $addOuMenuItem.add_Click({
                 $parentNode = $tree.SelectedNode
                 if (-not $parentNode -or -not $parentNode.Tag -or $parentNode.Tag.ObjectClass -notin @('domain', 'organizationalUnit', 'container', 'builtinDomain')) {
@@ -585,7 +684,9 @@
 
                 try {
                     $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain -PassThru -ErrorAction Stop
-                    Write-Log -Message "Created organizational unit '$($createdOU.DistinguishedName)'"
+                    if ($Script:NotStandAlone) {
+                        Write-Log -Message "Created organizational unit '$($createdOU.DistinguishedName)'"
+                    }
 
                     # Refresh the parent's child nodes so the new OU is shown immediately
                     $tree.BeginUpdate()
@@ -606,7 +707,9 @@
                     }
                 }
                 catch {
-                    Write-Log -Message "Failed to create organizational unit '$ouName' under '$($parentNode.Name)': $_"
+                    if ($Script:NotStandAlone) {
+                        Write-Log -Message "Failed to create organizational unit '$ouName' under '$($parentNode.Name)': $_"
+                    }
                     [void][System.Windows.Forms.MessageBox]::Show($form, $_.Exception.Message, "OU creation failed", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
                 }
             })
@@ -616,22 +719,21 @@
             $node = $_.Node
             $statusLabel.Text = "Selected: $($node.Text)"
 
-            if ($OnlyUserSelectionPossible) {
-                $btnOK.Enabled = ($node.Tag -and $node.Tag.ObjectClass -eq 'user')
-                return
-            }
-
             if ($DomainSelectionOnly) {
                 $btnOK.Enabled = ($node.Parent -and -not $node.Parent.Parent)
                 return
             }
 
-            if ($AllowDomainSwitch) {
-                $btnOK.Enabled = [bool]($node.Parent)
+            # Selectable only below the domain level (forest and domain nodes are never selectable here)
+            $selectable = [bool]($node.Parent -and $node.Parent.Parent)
+
+            # -BlockOUSelection: OUs and containers stay browsable but cannot be selected
+            if ($selectable -and $BlockOUSelection -and $node.Tag -and
+                $node.Tag.ObjectClass -in @('organizationalUnit', 'container', 'builtinDomain')) {
+                $selectable = $false
             }
-            else {
-                $btnOK.Enabled = [bool]($node.Parent -and $node.Parent.Parent)
-            }
+
+            $btnOK.Enabled = $selectable
         })
 
     $btnOK.add_Click({

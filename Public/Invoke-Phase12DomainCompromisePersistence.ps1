@@ -184,6 +184,21 @@ function Invoke-ASPhase12DomainCompromisePersistence {
     Update-WindowTitle -NewTitle $Script:Phase12
     Set-ASConfig -Setting "LastStage" -Value $Script:Phase12
 
+
+
+    Write-AS2GoOutput -Type H1 -Message "`nChoose an action for Domain Dominance & Persistence"
+    Write-AS2GoOutput -Type Bullet -Message "[C] Define a Break Glass Account" 
+    Write-AS2GoOutput -Type Bullet -Message "[B] Creating a backdoor domain account"
+    Write-AS2GoOutput -Type Bullet -Message "[W] Removing group memberships"
+    Write-AS2GoOutput -Type Bullet -Message "[L] Disabling accounts and/or resetting passwords"
+    Write-AS2GoOutput -Type Bullet -Message "[T] Modify Group Policy Template (GPT) files"
+    Write-AS2GoOutput -Type Bullet -Message "[G] Dump Kerberos Ticket"   
+    Write-AS2GoOutput -Type Bullet -Message "[D] Export domain DPAPI backup keys"
+    Write-AS2GoOutput -Type Bullet -Message "[E] Encrypt backup files"
+    Write-AS2GoOutput -Type Bullet -Message "[R] Reboot of all reachable Domain Controller"
+    Write-AS2GoOutput -Type Bullet -Message "[S] Skip the remaining actions and end the demonstration"
+
+
     Do {
 
 
@@ -200,7 +215,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
         $topicDPAPIBackupKeys = "Export domain DPAPI backup keys that can help recover users' DPAPI master keys"
         $topicGoldenTicket = "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
         $topicReboot = "Trigger coordinated reboot across accessible Domain Controllers"
-        $topicExit = "Exit AS2Go."
+        $topicSkip = "Skip the remaining actions and end the demonstration"
 
         If ($UnAttended) {
             $answer = $DomainPersistence
@@ -211,8 +226,17 @@ function Invoke-ASPhase12DomainCompromisePersistence {
                 $topicGPT = $null
             }
 
-            $title = "Domain Dominance & Persistence"
-            $message = "Select the action to execute. Options with unmet requirements are hidden."
+            $result = Test-LocalAdministrator
+            if (-not $result.IsElevated) {
+                $topicDPAPIBackupKeys = ""
+                $topicGoldenTicket = ""
+            }
+
+
+
+
+            $title = "Select an action"
+            $message = "Only actions with all prerequisites met are shown."
             $Options = @(
                 [pscustomobject] @{
                     Label = "&Change BGA"
@@ -224,24 +248,23 @@ function Invoke-ASPhase12DomainCompromisePersistence {
                     Help  = $topicBackdoor
                     Value = "Backdoor"
                 },
-
                 [pscustomobject] @{
-                    Label = "GP&T"
+                    Label = "&Tamper GPT"
                     Help  = $topicGPT
                     Value = "GPT"
                 },
                 [pscustomobject] @{
-                    Label = "&Purge"
+                    Label = "&Wipe Access"
                     Help  = $topicPurge
                     Value = "Purge"
                 },
                 [pscustomobject] @{
-                    Label = "&User Account"
+                    Label = "&Lock Out"
                     Help  = $topicUserAccount
                     Value = "UserAccount"
                 },
                 [pscustomobject] @{
-                    Label = "DPAPI Backup &Keys"
+                    Label = "&Dump DPAPI Keys"
                     Help  = $topicDPAPIBackupKeys
                     Value = "DPAPIBackupKeys"
                 },
@@ -261,8 +284,8 @@ function Invoke-ASPhase12DomainCompromisePersistence {
                     Value = "Reboot"
                 },
                 [pscustomobject] @{
-                    Label = "E&xit"
-                    Help  = $topicExit
+                    Label = "&Skip"
+                    Help  = $topicSkip
                     Value = "Exit"
                 }
             )

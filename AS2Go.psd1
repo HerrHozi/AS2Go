@@ -7,7 +7,7 @@
 @{
     PrivateData       = @{
         PSData = @{
-            LastUpdate   = '2026-11-14'
+            LastUpdate   = '2026-11-15'
             Tags         = @('ActiveDirectory', 'ADCS', 'Killchain', 'RedTeam', 'Offense', 'AttackSimulation', 'AdversaryEmulation', 'PurpleTeam', 'BlueTeam', 'DefensiveSecurity')
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
@@ -39,7 +39,7 @@ v2026.5.7.1034
     
 
     RootModule        = 'AS2Go.psm1'
-    ModuleVersion     = '2026.11.14.595'
+    ModuleVersion     = '2026.11.15.874'
     GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
     Author            = 'Holger Zimmermann | as2go@mrhozi.com'
@@ -49,11 +49,6 @@ v2026.5.7.1034
     Description       = 'AS2Go is an acronym for Attack Scenario to Go.'
 
     PowerShellVersion = '7.4'
-
-    NestedModules     = @(
-        '.\Modules\ADCSGoat\ADCSGoat.psd1',
-        '.\Modules\PSCertutil\PSCertutil.psd1'
-    )
 
     FunctionsToExport = '*'
     AliasesToExport   = '*'

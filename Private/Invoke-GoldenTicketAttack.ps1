@@ -78,7 +78,7 @@ Function Invoke-GoldenTicketAttack {
         }
     }
     else {
-        $dn = Select-ADObject -Title "Select an user for the Golden Ticket demonstration" -IncludeUsers -MarkTier0 -OnlyUserSelectionPossible
+        $dn = Select-ADObject -Title "Select an user for the Golden Ticket demonstration" -IncludeUsers -MarkTier0 -BlockOUSelection
         If (-not $dn) {
             Write-AS2GoOutput -Type Info -Message "No user selected for the Golden Ticket demonstration."
             return

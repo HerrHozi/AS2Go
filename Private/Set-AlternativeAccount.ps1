@@ -48,7 +48,7 @@ function Set-AlternativeAccount {
     $Decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $Title
 
     If ($Decision -eq "New") {
-        $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0
+        $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0 -BlockOUSelection
         Set-ASConfig -Setting "LastAltUser" -Value $result
         $CN = Convert-FromDNToCN -DistinguishedName $result
         Write-AS2GoOutput -Type TextMaker -Message "New SAN Target Account:" -Tm $CN

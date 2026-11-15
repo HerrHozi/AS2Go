@@ -1,15 +1,16 @@
-<#
+﻿<#
 .SYNOPSIS
 Configures AD CS roles and vulnerable certificate templates for the AS2Go lab.
 
 .DESCRIPTION
 Inventories enterprise certification authorities and Web Enrollment services using a preferred root-domain DC.
 Offers installation of missing CA and Web Enrollment roles or creation of AS2Go certificate templates.
-The template workflow accepts a custom prefix, checks for existing templates, and invokes ADCSGoat to create
-and publish vulnerable templates and adjust CA settings. The menu remains available until the user skips it.
+The template workflow offers an optional internal-name suffix, reports existing AS2Go templates, and invokes
+New-ESCxCertficateTemplate to create and publish a new ESC1 and ESC4 template pair. The menu remains available
+until the user skips it.
 
 .PARAMETER CTPreFix
-Initial prefix used to find and create AS2Go certificate templates. The menu can replace it with a custom prefix.
+Template name prefix passed to New-ESCxCertficateTemplate. The menu can replace it with a custom prefix.
 
 .EXAMPLE
 Invoke-ADCSSetup -CTPreFix "AS2Go"
@@ -23,14 +24,14 @@ Console messages and output from invoked commands; no dedicated result object is
 
 .NOTES
 Private AS2Go function. Run from an initialized AS2Go module session.
-Requires initialized AS2Go controller mappings and the ADCSGoat tools for template creation.
+Requires initialized AS2Go controller mappings for template creation and publication.
 
 .COMPONENT
 Category: Main Function
 
 .FUNCTIONALITY
 Reviews certification authorities and enrollment services, then offers installation of missing AD CS roles.
-Creates and publishes vulnerable certificate templates with a selected prefix and adjusts CA settings.
+Creates and publishes a new ESC1 and ESC4 certificate template pair on a selected Enterprise CA.
 #>
 function Invoke-ADCSSetup {
 
@@ -47,19 +48,17 @@ function Invoke-ADCSSetup {
     
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type Header -Message "Setup Active Directory Certificate Services (ADCS) for AS2Go"
-    
-    
+        
     $Functionality = (Get-Help $CurrentFunction).Functionality
     Write-AS2GoOutput -Type H1 -Message ($Functionality + "`n")
-    
-    
+        
     $bestDC = Get-BestDomainController -Domain (Get-ADForest).RootDomain
     Get-ADCSEnterpriseCA -Server $bestDC
     Get-ADCSEnrollmentServices -Server $bestDC
 
     do {
 
-        If ($Script:ADCSEnrollmentServiceMissing -eq $false) {
+        If ($Script:ADCSEnrollmentServiceMissing -eq $true) {
             $default = 0
         }
         else {
@@ -90,51 +89,60 @@ function Invoke-ADCSSetup {
             Write-AS2GoOutput -Type Bullet -Message "    Select: Update certificates that use certificate templates"
         }
         elseif ($answer -eq 'Templates') {
-            
+
             $TargetServer = $Script:BestDCs[(Get-ADForest).RootDomain]
 
 
-            $Title = "Certificate Templates - Define Prefix for misconfigured Templates"
+            $Title = "Certificate Templates - Define Suffix for the new Template Pair"
 
             $Options = @(
-                [pscustomobject] @{ Label = "&Use default prefix ($CTPreFix)"; Help = "Use the default prefix for certificate templates." ; Value = "Previous" },
-                [pscustomobject] @{ Label = "&Define new prefix"; Help = "Define a dedicated prefix for certificate templates."; Value = "New" }
+                [pscustomobject] @{ Label = "&Use timestamp suffix"; Help = "Name the new templates with a shared timestamp suffix." ; Value = "Previous" },
+                [pscustomobject] @{ Label = "&Define new suffix"; Help = "Define a dedicated suffix for the internal template names."; Value = "New" }
             )
             $Decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $Title
 
             If ($Decision -eq "New") {
                 do {
-                    $result = Read-Host "Enter new template prefix"
+                    $result = Read-Host "Enter new template name suffix"
                     if ([string]::IsNullOrWhiteSpace($result)) {
                         Write-AS2GoOutput -Type Warning -Message "Input is required. Empty, whitespace-only or null values are not allowed."
                     }
                 } until (-not [string]::IsNullOrWhiteSpace($result))
 
-                $CTPreFix = $result.Trim()
-                Write-AS2GoOutput -Type TextMaker -Message "New template prefix:" -Tm $CTPreFix
+                $CTSuffix = $result.Trim()
+                Write-AS2GoOutput -Type TextMaker -Message "New template name suffix:" -Tm $CTSuffix
             }
             else {
-                Write-AS2GoOutput -Type Info -message "Keep default prefix ($CTPreFix) for Certificate Templates!"
-            } 
+                $CTSuffix = $null
+                Write-AS2GoOutput -Type Info -message "Keep timestamp suffix for the new Certificate Templates!"
+            }
 
 
             Get-ADCSCertificateTemplates -CTPrefix $CTPreFix -Server $TargetServer
-            
-            If ($Script:ADCSASGoCTemplatesMissing) {
-                Write-AS2GoOutput -Type TextMaker -Message "Installation will be performed on server" -TM $TargetServer
-                If ($EnableLogging) {
-                    Install-ADCSGoat -TemplatePreFix "$CTPreFix " -verbose -Server $TargetServer
-                }
-                else {
-                    Install-ADCSGoat -TemplatePreFix "$CTPreFix " -Server $TargetServer
-                }
-                
-                Write-AS2GoOutput -Type Success "Templates with prefix $CTPreFix PUBLISHED successfully."
-                Get-ADCSCertificateTemplates -CTPrefix $CTPreFix -Server $TargetServer
 
+            If ($Script:ADCSASGoCTemplatesMissing) {
+                Write-AS2GoOutput -Type Info -Message "No AS2Go certificate templates were found; a new ESC1 and ESC4 pair will be created."
             }
             else {
-                Write-AS2GoOutput -Type Quit -Message "All AS2Go-specific Certificate Templates are available in the Template container already."
+                Write-AS2GoOutput -Type Info -Message "Existing AS2Go templates stay unchanged; another ESC1 and ESC4 pair will be created."
+            }
+
+            Write-AS2GoOutput -Type TextMaker -Message "Installation will be performed on server" -TM $TargetServer
+
+            If ($EnableLogging) {
+                $TemplatePairCreated = New-ESCxCertficateTemplate -CTPrefix $CTPreFix -Suffix $CTSuffix -Server $TargetServer -verbose
+            }
+            else {
+                $TemplatePairCreated = New-ESCxCertficateTemplate -CTPrefix $CTPreFix -Suffix $CTSuffix -Server $TargetServer
+            }
+
+            Get-ADCSCertificateTemplates -CTPrefix $CTPreFix -Server $TargetServer
+
+            If ($TemplatePairCreated) {
+                Write-AS2GoOutput -Type Success "New ESC1 and ESC4 templates with prefix $CTPreFix PUBLISHED successfully."
+            }
+            else {
+                Write-AS2GoOutput -Type Error -Message "Creating or publishing the new ESC1 and ESC4 templates failed. Review the messages above."
             }
         }
         else {

@@ -45,7 +45,7 @@ function Invoke-VerifyConfiguration {
 
     $esc1TemplateName = "$CTPrefix ESC1"
     $checks = [ordered]@{
-        'Lab tools'                                = {
+        'Lab tools'                                    = {
             $toolsPath = Get-ASConfig -Setting 'Tools'
             if ([string]::IsNullOrWhiteSpace($toolsPath)) {
                 Write-AS2GoOutput -Type Warning -Message 'No tools folder is configured.'
@@ -64,10 +64,10 @@ function Invoke-VerifyConfiguration {
                 }
             }
         }
-        'Break-glass account'                      = {
+        'Break-glass account'                          = {
             Get-BreakGlassAccount
         }
-        'Secure Access Workstation'                = {
+        'Secure Access Workstation'                    = {
             Write-AS2GoOutput -Type H1 -Message 'Secure Access Workstation'
 
             $workstation = Get-ASConfig -Setting 'AS2GoSAW'
@@ -75,16 +75,16 @@ function Invoke-VerifyConfiguration {
                 Write-AS2GoOutput -Type Warning -Message 'No Secure Access Workstation is configured.'
             }
             elseif (& {
-                $ProgressPreference = 'SilentlyContinue'
-                Test-NetConnection -ComputerName $workstation -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue -ProgressAction SilentlyContinue
-            }) {
+                    $ProgressPreference = 'SilentlyContinue'
+                    Test-NetConnection -ComputerName $workstation -Port 5985 -InformationLevel Quiet -WarningAction SilentlyContinue -ProgressAction SilentlyContinue
+                }) {
                 Write-AS2GoOutput -Type Success -Message "WinRM is reachable on $workstation (TCP 5985)."
             }
             else {
                 Write-AS2GoOutput -Type Warning -Message "WinRM is not reachable on $workstation (TCP 5985)."
             }
         }
-        'Directory assets'                         = {
+        'Directory assets'                             = {
             $domainController = Get-BestDomainController -Domain (Get-ADDomain).DNSRoot
             if (-not $domainController) { throw 'No controller was found for the current domain.' }
             Get-TieringAssets -Server $domainController
@@ -97,20 +97,15 @@ function Invoke-VerifyConfiguration {
             Get-ADCSEnterpriseCA -Server $rootController -InventoryOnly
             Get-ADCSCertificateTemplates -Server $rootController -CTPrefix $esc1TemplateName -ExactMatch -InventoryOnly
         }
-        'AD CS Web Enrollment feature'             = {
+        'AD CS Web Enrollment feature'                 = {
             $rootController = Get-BestDomainController -Domain (Get-ADForest).RootDomain
             if (-not $rootController) { throw 'No controller was found for the forest root domain.' }
-            $feature = Invoke-Command -ComputerName $rootController -ScriptBlock {
-                Get-WindowsFeature -Name 'ADCS-Web-Enrollment' -ErrorAction Stop
-            }
-            if ($feature.Installed) {
-                Write-AS2GoOutput -Type Success -Message "AD CS Web Enrollment feature is installed on $rootController."
-            }
-            else {
-                Write-AS2GoOutput -Type Warning -Message "AD CS Web Enrollment feature is not installed on $rootController."
-            }
+            
+            Get-ADCSEnrollmentServices -Server $rootController 
+
         }
-        'AD backup share'                          = {
+        'AD backup share'                              = {
+
             $backupShare = Get-ASConfig -Setting 'BackupShare'
             if ([string]::IsNullOrWhiteSpace($backupShare)) {
                 Write-AS2GoOutput -Type Warning -Message 'No AD backup share is configured.'
@@ -119,6 +114,7 @@ function Invoke-VerifyConfiguration {
                 Write-AS2GoOutput -Type Warning -Message "AD backup share is unavailable: $backupShare"
             }
             else {
+                Write-AS2GoOutput -Type H1 -Message 'AD backup share is configured.'
                 foreach ($file in 'ntds.dit', 'daily-work.txt') {
                     if (Test-Path -LiteralPath (Join-Path $backupShare $file) -PathType Leaf) {
                         Write-AS2GoOutput -Type Bullet -Message "Found $file in $backupShare"
@@ -162,6 +158,7 @@ function Invoke-VerifyConfiguration {
             Write-AS2GoOutput -Type Warning -Message "$($check.Key) could not be verified: $($_.Exception.Message)"
         }
     }
+
 
     Write-AS2GoOutput -Type Info -Message 'Lab configuration review finished. See the results above.'
     Measure-FunctionRuntime -End -Details $info

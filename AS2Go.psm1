@@ -69,9 +69,6 @@ $Script:ASPhases = Join-Path -Path $ASModulePath -ChildPath "Phases"
 $Script:ASSetup = Join-Path -Path $ASModulePath -ChildPath "LabSetup"
 $Script:ASConfig = Join-Path -Path $ASModulePath -ChildPath "Config"
 
-$Global:PathPSCertutil = Join-Path -Path $ASModulePath -ChildPath "Modules\PSCertutil\PSCertutil.psd1"
-$Global:PathADCSGoat = Join-Path -Path $ASModulePath -ChildPath "Modules\ADCSGoat\ADCSGoat.psd1"
-
 $Script:AllDomainsDetails = @()
 $Script:DoaminTypes = @{}
 $Script:ADCS = @{}

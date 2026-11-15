@@ -198,7 +198,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
                     Value = $Script:PtT
                 },
                 [pscustomobject] @{
-                    Label = "OpT&H"
+                    Label = "&OpTH"
                     Help  = $Script:helpPassTheHash
                     Value = $Script:PtH
                 },

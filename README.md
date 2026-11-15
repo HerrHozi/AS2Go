@@ -10,8 +10,8 @@
 
 ```Text
 Author:          Holger Zimmermann | as2go@mrhozi.com
-Current Version: 2026.11.14.595
-Last Update:     2026-11-14
+Current Version: 2026.11.15.874
+Last Update:     2026-11-15
 ```
 
 AS2Go (**Attack Scenario to Go**) is a PowerShell-based Active Directory attack simulation and training framework designed for demos, workshops, security awareness sessions, and purple team exercises.

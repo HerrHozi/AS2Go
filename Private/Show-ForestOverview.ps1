@@ -34,7 +34,7 @@ function Show-ForestOverview {
         Get-DomainPWDetails -DomainName $_
     }
 
-    Write-AS2GoOutput -Type Header -Message "Identified the following domains"
+    Write-AS2GoOutput -Type Header -Message "Discovered Domains"
 
     $overview = $AllDomainsDetails |
     Select-Object `

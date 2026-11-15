@@ -42,7 +42,7 @@ function Set-BreakGlassAccount {
     $Decision = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $Title
 
     If ($Decision -eq "New") {
-        $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0 -OnlyUserSelectionPossible
+        $result = Select-ADObject -Title $Title -IncludeUsers -MarkTier0 -BlockOUSelection
         if (-not $result) {
             Write-AS2GoOutput -Type Error -Message "No account selected."
             return

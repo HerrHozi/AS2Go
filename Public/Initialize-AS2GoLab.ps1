@@ -323,23 +323,6 @@ function Initialize-AS2GoLab {
     $Script:MoDNS = Test-PoSHModuleAvailability -PSModule "DnsServer"
 
 
-
-    try {
-        Import-Module $Global:PathADCSGoat -NoClobber -ErrorAction Stop
-        Write-AS2GoOutput -Type  Bullet -M "Imported PowerShell module: " -TM "ADCSGoat"
-    } 
-    catch {
-        Write-AS2GoOutput -Type  Error -M "Unable to import PowerShell module $Global:PathADCSGoat"
-    }
-
-    try {
-        Import-Module $Global:PathPSCertutil -NoClobber -ErrorAction Stop
-        Write-AS2GoOutput -Type  Bullet -M "Imported PowerShell module: " -TM "PSCertutil"
-    } 
-    catch {
-        Write-AS2GoOutput -Type  Error -M "Unable to import PowerShell module $Global:PathPSCertutil"
-    }
-
     if ($Script:MoAD -eq $false -or $Script:MoGPO -eq $false -or $Script:MoDNS -eq $false) {
         [bool]$PreCheckFailed = $true
     }
