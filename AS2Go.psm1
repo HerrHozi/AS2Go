@@ -525,8 +525,8 @@ Write-Host "'AS2Go'`n`n" -ForegroundColor DarkCyan
 Write-Host "`n  [>] Quick-Start: " -NoNewline -ForegroundColor Gray 
 
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "Setup-AS2GoDemo"
-Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   New-As2GoDemoPrincipal"
-Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Start-As2GoDemo"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   New-AS2GoDemoPrincipalSet"
+Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Start-AS2GoDemo"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase04BruteForceAttack"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase07PrivilegeEscalation"
 Write-AS2GoOutput -Type Command -NoExtraLines  -Message "                   Invoke-ASPhase12DomainCompromisePersistence"

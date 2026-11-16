@@ -131,6 +131,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
     $Script:helpPassTheTicket = "Reuse captured Kerberos tickets to authenticate via Pass-the-Ticket."
     $script:helpMemoryAccess = "Extract credentials from process memory."
     $Script:helpEnableMemoryAccess = "Enable Memory Access for Credential Theft."
+    $Script:helpLoadHash = "Reuse a previously stored KRBTGT or NTLM hash for the matching ticket command."
     $Script:helpSkip = "Skip Privilege Escalation."
 
     If (-not $unattended) {
@@ -161,6 +162,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
         Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack as Local System (NT AUTHORITY\SYSTEM)"
         Write-Host "  M " -ForegroundColor Yellow -NoNewline; Write-Host "- for Credential Theft via Memory Access"
         Write-Host "  E " -ForegroundColor Yellow -NoNewline; Write-Host "- to Enable Memory Access for Credential Theft"
+        Write-Host "  L " -ForegroundColor Yellow -NoNewline; Write-Host "- to Load a previously stored Hash"
 
         Write-host "`n  S " -ForegroundColor Yellow -NoNewline; Write-Host "- to skip this step"
 
@@ -213,6 +215,11 @@ function Invoke-ASPhase07PrivilegeEscalation {
                     Value = "E"
                 },
                 [pscustomobject] @{
+                    Label = "&Load Hash"
+                    Help  = $Script:helpLoadHash
+                    Value = "L"
+                },
+                [pscustomobject] @{
                     Label = "&Skip"
                     Help  = $Script:helpSkip
                     Value = $Script:No
@@ -250,6 +257,10 @@ function Invoke-ASPhase07PrivilegeEscalation {
         elseif ($answer -eq "X") {
 
             Invoke-PrivilegeEscalationViaLocalSystem
+        }
+        elseif ($answer -eq "L") {
+
+            Invoke-LoadHash
         }
         else {
             Write-AS2GoOutput -Type Info -Message "Privilege Escalation was skipped."

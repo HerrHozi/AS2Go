@@ -160,9 +160,9 @@ function Get-AS2GoSettings {
         (New-AS2GoSetting -Index 4  -Label "Help Desk Group"            -Key "globalHelpDesk"-InputType Text    -ScriptVar "ASHelpDesk"),
         (New-AS2GoSetting -Index 5  -Label "MDI Honeytoken"             -Key "honeytoken"    -InputType ADObject -ScriptVar "ASHoneyToken"),
         (New-AS2GoSetting -Index 6  -Label "Domain Name"                -Key "fqdn"          -InputType Text    -ScriptVar "ASDomain"),
-        (New-AS2GoSetting -Index 7  -Label "Domain SID"                 -Key "DomainSID"     -InputType Text    -ScriptVar "ASDomainSID"),
-        (New-AS2GoSetting -Index 8  -Label "NTLM Hash Helpdesk"         -Key "pthntml"       -InputType Text    -ScriptVar "ASPtHntml"),
-        (New-AS2GoSetting -Index 9  -Label "NTLM Hash krbtgt"           -Key "krbtgtntml"    -InputType Text    -ScriptVar "ASKrbtgtNtml"),
+        #(New-AS2GoSetting -Index 7  -Label "Domain SID"                 -Key "DomainSID"     -InputType Text    -ScriptVar "ASDomainSID"),
+        #(New-AS2GoSetting -Index 8  -Label "NTLM Hash Helpdesk"         -Key "ASP07NT"       -InputType Text    -ScriptVar "ASPtHntml"),
+        #(New-AS2GoSetting -Index 9  -Label "NTLM Hash krbtgt"           -Key "ASP07KR"    -InputType Text    -ScriptVar "ASKrbtgtNtml"),
         (New-AS2GoSetting -Index 10 -Label "Seconds to reboot"          -Key "time2reboot"   -InputType Text    -ScriptVar "ASTime2Reboot"),
         (New-AS2GoSetting -Index 11 -Label "AD Search Base"             -Key "AS2GoSearchBase"  -InputType ADObject -ScriptVar "ASSearchBase"),
         (New-AS2GoSetting -Index 12 -Label "OU for BD User"             -Key "BDUsersOU"     -InputType ADObject -ScriptVar "ASOUofBackDoorUser"),
@@ -269,10 +269,9 @@ function Get-AS2GoSettings {
         Show-AS2GoSettingsTable -Settings $Settings
 
         If (-not $unattended) {
-        $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+            $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
         }
-        else
-        {
+        else {
             $decision = "Yes"
         }
 

@@ -143,7 +143,7 @@ function Invoke-UserAccountDisruption {
                     }
                 }
                 while ([string]::IsNullOrWhiteSpace($NewRandomPW))
-                Set-ASConfig -Setting "LastPW" -Value $NewRandomPW
+                Set-ASConfig -Setting "LastPW" -Value $NewRandomPW -DPAPI
             }
         }
     }

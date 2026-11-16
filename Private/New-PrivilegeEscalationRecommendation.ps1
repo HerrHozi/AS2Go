@@ -111,16 +111,20 @@ function New-PrivilegeEscalationRecommendation {
         [bool]$bAdminPC = $false
     }
 
+    if (-not $safeMode) {
+
+        [bool]$hdUser = Search-ProcessForAS2GoUsers -user  $Global:ASHelpDeskUser
+        [bool]$daUser = Search-ProcessForAS2GoUsers -user  $Global:ASDomainAdmin 
+        [bool]$bMemberofDA = Search-ADGroupMemberShip -name "$env:COMPUTERNAME$" -rID "-512"
+        [bool]$bMemberofAO = Search-ADGroupMemberShip -name "$env:COMPUTERNAME$" -rID "-548"
+        [bool]$bHDMemberofPUG = Search-ADGroupMemberShip -name $Global:ASHelpDeskUser -rID "-525"
+        [bool]$bDAMemberofPUG = Search-ADGroupMemberShip -name $Global:ASDomainAdmin -rID "-525"
+        [bool]$AdminWithSPN = Get-AdminWithSPN
+        $RiskyCAtemplate = Get-RiskyEnrolledTemplates -SuppressOutPut
+    }
 
 
-    [bool]$hdUser = Search-ProcessForAS2GoUsers -user  $Global:ASHelpDeskUser
-    [bool]$daUser = Search-ProcessForAS2GoUsers -user  $Global:ASDomainAdmin 
-    [bool]$bMemberofDA = Search-ADGroupMemberShip -name "$env:COMPUTERNAME$" -rID "-512"
-    [bool]$bMemberofAO = Search-ADGroupMemberShip -name "$env:COMPUTERNAME$" -rID "-548"
-    [bool]$bHDMemberofPUG = Search-ADGroupMemberShip -name $Global:ASHelpDeskUser -rID "-525"
-    [bool]$bDAMemberofPUG = Search-ADGroupMemberShip -name $Global:ASDomainAdmin -rID "-525"
-    [bool]$AdminWithSPN = Get-AdminWithSPN
-    $RiskyCAtemplate = Get-RiskyEnrolledTemplates -SuppressOutPut
+
 
     $client = Get-CachedKerberosTicketsClient
 
@@ -167,144 +171,144 @@ function New-PrivilegeEscalationRecommendation {
 
     $currentUser = Test-LocalAdministrator
 
-If ($currentUser.IsLocalAdmin) {
-    Write-AS2GoOutput -Type TOP -Message "Current user '$Global:ASVictim' has local administrator privileges."
-}
-else {
-    Write-AS2GoOutput -Type BAD -Message "Current user '$Global:ASVictim' does not have local administrator privileges."
-}
-
-if ($lsassStatus.IsElevated) {
-    Write-AS2GoOutput -Type TOP -Message 'The current PowerShell process is running with an elevated administrator token.'
-}
-else {
-    Write-AS2GoOutput -Type BAD -Message 'The current PowerShell process is not running with an elevated administrator token.'
-}
-
-If ($bMemberofDA) {
-    Write-AS2GoOutput -Type TOP -Message "Victim PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Domain Admins group.'
-}
-
-If ($bMemberofAO) {
-    Write-AS2GoOutput -Type TOP -Message "Victim PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Account Operators group.'
-}
-
-if ($lsassStatus.PplRuntimeConfirmed) {
-    Write-AS2GoOutput -Type BAD -Message 'Evidence of LSASS starting as a protected process (PPL) was found for the current boot.'
-}
-else {
-    Write-AS2GoOutput -Type TOP -Message 'No evidence of LSASS starting as a protected process (PPL) was found for the current boot.'
-}
-
-if ($lsassStatus.CredentialGuardRunning) {
-    Write-AS2GoOutput -Type BAD -Message 'Credential Guard is running.'
-}
-else {
-    Write-AS2GoOutput -Type TOP -Message 'Credential Guard is not running.'
-}
-
-if ($lsassStatus.VbsRunning) {
-    Write-AS2GoOutput -Type BAD -Message 'Virtualization-Based Security (VBS) is running.'
-}
-else {
-    Write-AS2GoOutput -Type TOP -Message 'Virtualization-Based Security (VBS) is not running.'
-}
-
-if ($lsassStatus.DefenderRealTimeProtection) {
-    Write-AS2GoOutput -Type BAD -Message 'Microsoft Defender real-time protection is enabled.'
-}
-else {
-    Write-AS2GoOutput -Type TOP -Message 'Microsoft Defender real-time protection is disabled.'
-}
-
-if ($lsassStatus.DefenderBehaviorMonitoring) {
-    Write-AS2GoOutput -Type BAD -Message 'Microsoft Defender behavior monitoring is enabled.'
-}
-else {
-    Write-AS2GoOutput -Type TOP -Message 'Microsoft Defender behavior monitoring is disabled.'
-}
-
-if ($lsassStatus.DefenderEdrRunning) {
-    Write-AS2GoOutput -Type BAD -Message 'Microsoft Defender for Endpoint is running.'
-}
-else {
-    Write-AS2GoOutput -Type TOP -Message 'Microsoft Defender for Endpoint is not running.'
-}
-
-If ($client.ToUpper().Contains('VI-')) {
-    Write-AS2GoOutput -Type BAD -Message 'User for currently cached Kerberos tickets is' -TextMaker "$($client.ToUpper())"
-}
-elseif ($client.ToUpper().Contains('(0)')) {
-    Write-AS2GoOutput -Type BAD -Message 'Currently no cached Kerberos tickets are available for' -TextMaker "$($client.ToUpper())"
-}
-else {
-    Write-AS2GoOutput -Type TOP -Message 'Client for currently cached Kerberos tickets is' -TextMaker "$($client.ToUpper())"
-}
-
-If ($bAdminPC) {
-    Write-AS2GoOutput -Type TOP -Message 'The compromised user has access to the admin share on' -TextMaker "\\$Script:ASSAW\c$!"
-}
-else {
-    Write-AS2GoOutput -Type BAD -Message 'The current user does not have access to the share' -TextMaker "\\$Script:ASSAW\c$!"
-}
-
-[bool]$condition1 = $false
-
-If ($value -eq 1) {
-    [bool]$condition1 = $true
-    Write-AS2GoOutput -Type TOP -Message 'WDigest will store credentials in memory. The UseLogonCredential registry value is set to' -TextMaker "$value"
-}
-elseif ($value -eq 0) {
-    Write-AS2GoOutput -Type OK -Message 'WDigest will not store credentials in memory. The UseLogonCredential registry value is set to' -TextMaker "$value"
-}
-elseif ($value -eq -1) {
-    Write-AS2GoOutput -Type OK -Message 'The UseLogonCredential registry value does not exist.'
-}
-else {
-    Write-AS2GoOutput -Type BAD -Message 'Credential caching in the Windows authentication protocol WDigest is not supported on this OS build.'
-}
-
-If ($bHDMemberofPUG) {
-    Write-AS2GoOutput -Type BAD -Message "HD user $Global:ASHelpDeskUser is a member of the Protected Users security group." -TextMaker "$Global:ASHelpDeskUser"
-}
-else {
-    If ($Global:ASHelpDeskUser) {
-        Write-AS2GoOutput -Type TOP -Message "HD user $Global:ASHelpDeskUser is not a member of the Protected Users security group." -TextMaker "$Global:ASHelpDeskUser"
+    If ($currentUser.IsLocalAdmin) {
+        Write-AS2GoOutput -Type TOP -Message "Current user '$Global:ASVictim' has local administrator privileges."
+    }
+    else {
+        Write-AS2GoOutput -Type BAD -Message "Current user '$Global:ASVictim' does not have local administrator privileges."
     }
 
-    If ($hdUser -and $condition1) {
-        Write-AS2GoOutput -Type TOP -Message "Credential theft through memory access is possible for user" -TextMaker "$Global:ASHelpDeskUser"
+    if ($lsassStatus.IsElevated) {
+        Write-AS2GoOutput -Type TOP -Message 'The current PowerShell process is running with an elevated administrator token.'
     }
-}
-
-If ($bDAMemberofPUG) {
-    Write-AS2GoOutput -Type BAD -Message "DA user $Global:ASDomainAdmin is a member of the Protected Users security group." -TextMaker "$Global:ASDomainAdmin"
-}
-else {
-    If ($Global:ASDomainAdmin) {
-        Write-AS2GoOutput -Type TOP -Message "DA user $Global:ASDomainAdmin is not a member of the Protected Users security group." -TextMaker "$Global:ASDomainAdmin"
+    else {
+        Write-AS2GoOutput -Type BAD -Message 'The current PowerShell process is not running with an elevated administrator token.'
     }
 
-    If ($daUser -and $condition1) {
-        Write-AS2GoOutput -Type TOP -Message 'Credential theft through memory access is possible for user' -TextMaker "$Global:ASDomainAdmin"
+    If ($bMemberofDA) {
+        Write-AS2GoOutput -Type TOP -Message "Victim PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Domain Admins group.'
     }
-}
 
-If ($RiskyCAtemplate) {
-    Write-AS2GoOutput -Type TOP -Message 'At least one risky CA template was found, for example:' -TextMaker "$RiskyCAtemplate"
-}
+    If ($bMemberofAO) {
+        Write-AS2GoOutput -Type TOP -Message "Victim PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Account Operators group.'
+    }
 
-If ($OSBuild -le 17134) {
-    Write-AS2GoOutput -Type BAD -Message 'PtC is not supported on this machine.'
-}
+    if ($lsassStatus.PplRuntimeConfirmed) {
+        Write-AS2GoOutput -Type BAD -Message 'Evidence of LSASS starting as a protected process (PPL) was found for the current boot.'
+    }
+    else {
+        Write-AS2GoOutput -Type TOP -Message 'No evidence of LSASS starting as a protected process (PPL) was found for the current boot.'
+    }
 
-If ($OSBuild -ge 22621) {
-    Write-AS2GoOutput -Type BAD -Message 'PtH is not supported on this machine.'
-}
+    if ($lsassStatus.CredentialGuardRunning) {
+        Write-AS2GoOutput -Type BAD -Message 'Credential Guard is running.'
+    }
+    else {
+        Write-AS2GoOutput -Type TOP -Message 'Credential Guard is not running.'
+    }
 
-If ($AdminWithSPN) {
-    Write-AS2GoOutput -Type TOP -Message 'At least one Tier 0 account has a' -TextMaker 'Service Principal Name (SPN).'
-}
+    if ($lsassStatus.VbsRunning) {
+        Write-AS2GoOutput -Type BAD -Message 'Virtualization-Based Security (VBS) is running.'
+    }
+    else {
+        Write-AS2GoOutput -Type TOP -Message 'Virtualization-Based Security (VBS) is not running.'
+    }
+
+    if ($lsassStatus.DefenderRealTimeProtection) {
+        Write-AS2GoOutput -Type BAD -Message 'Microsoft Defender real-time protection is enabled.'
+    }
+    else {
+        Write-AS2GoOutput -Type TOP -Message 'Microsoft Defender real-time protection is disabled.'
+    }
+
+    if ($lsassStatus.DefenderBehaviorMonitoring) {
+        Write-AS2GoOutput -Type BAD -Message 'Microsoft Defender behavior monitoring is enabled.'
+    }
+    else {
+        Write-AS2GoOutput -Type TOP -Message 'Microsoft Defender behavior monitoring is disabled.'
+    }
+
+    if ($lsassStatus.DefenderEdrRunning) {
+        Write-AS2GoOutput -Type BAD -Message 'Microsoft Defender for Endpoint is running.'
+    }
+    else {
+        Write-AS2GoOutput -Type TOP -Message 'Microsoft Defender for Endpoint is not running.'
+    }
+
+    If ($client.ToUpper().Contains('VI-')) {
+        Write-AS2GoOutput -Type BAD -Message 'User for currently cached Kerberos tickets is' -TextMaker "$($client.ToUpper())"
+    }
+    elseif ($client.ToUpper().Contains('(0)')) {
+        Write-AS2GoOutput -Type BAD -Message 'Currently no cached Kerberos tickets are available for' -TextMaker "$($client.ToUpper())"
+    }
+    else {
+        Write-AS2GoOutput -Type TOP -Message 'Client for currently cached Kerberos tickets is' -TextMaker "$($client.ToUpper())"
+    }
+
+    If ($bAdminPC) {
+        Write-AS2GoOutput -Type TOP -Message 'The compromised user has access to the admin share on' -TextMaker "\\$Script:ASSAW\c$!"
+    }
+    else {
+        Write-AS2GoOutput -Type BAD -Message 'The current user does not have access to the share' -TextMaker "\\$Script:ASSAW\c$!"
+    }
+
+    [bool]$condition1 = $false
+
+    If ($value -eq 1) {
+        [bool]$condition1 = $true
+        Write-AS2GoOutput -Type TOP -Message 'WDigest will store credentials in memory. The UseLogonCredential registry value is set to' -TextMaker "$value"
+    }
+    elseif ($value -eq 0) {
+        Write-AS2GoOutput -Type OK -Message 'WDigest will not store credentials in memory. The UseLogonCredential registry value is set to' -TextMaker "$value"
+    }
+    elseif ($value -eq -1) {
+        Write-AS2GoOutput -Type OK -Message 'The UseLogonCredential registry value does not exist.'
+    }
+    else {
+        Write-AS2GoOutput -Type BAD -Message 'Credential caching in the Windows authentication protocol WDigest is not supported on this OS build.'
+    }
+
+    If ($bHDMemberofPUG) {
+        Write-AS2GoOutput -Type BAD -Message "HD user $Global:ASHelpDeskUser is a member of the Protected Users security group." -TextMaker "$Global:ASHelpDeskUser"
+    }
+    else {
+        If ($Global:ASHelpDeskUser) {
+            Write-AS2GoOutput -Type TOP -Message "HD user $Global:ASHelpDeskUser is not a member of the Protected Users security group." -TextMaker "$Global:ASHelpDeskUser"
+        }
+
+        If ($hdUser -and $condition1) {
+            Write-AS2GoOutput -Type TOP -Message "Credential theft through memory access is possible for user" -TextMaker "$Global:ASHelpDeskUser"
+        }
+    }
+
+    If ($bDAMemberofPUG) {
+        Write-AS2GoOutput -Type BAD -Message "DA user $Global:ASDomainAdmin is a member of the Protected Users security group." -TextMaker "$Global:ASDomainAdmin"
+    }
+    else {
+        If ($Global:ASDomainAdmin) {
+            Write-AS2GoOutput -Type TOP -Message "DA user $Global:ASDomainAdmin is not a member of the Protected Users security group." -TextMaker "$Global:ASDomainAdmin"
+        }
+
+        If ($daUser -and $condition1) {
+            Write-AS2GoOutput -Type TOP -Message 'Credential theft through memory access is possible for user' -TextMaker "$Global:ASDomainAdmin"
+        }
+    }
+
+    If ($RiskyCAtemplate) {
+        Write-AS2GoOutput -Type TOP -Message 'At least one risky CA template was found, for example:' -TextMaker "$RiskyCAtemplate"
+    }
+
+    If ($OSBuild -le 17134) {
+        Write-AS2GoOutput -Type BAD -Message 'PtC is not supported on this machine.'
+    }
+
+    If ($OSBuild -ge 22621) {
+        Write-AS2GoOutput -Type BAD -Message 'PtH is not supported on this machine.'
+    }
+
+    If ($AdminWithSPN) {
+        Write-AS2GoOutput -Type TOP -Message 'At least one Tier 0 account has a' -TextMaker 'Service Principal Name (SPN).'
+    }
 
     
     Write-Log -Message "    >> Your Victim PC settings -  $overview - $version"

@@ -32,7 +32,12 @@ function Add-RandomUsersToAccountOperators {
     #Import-Module ActiveDirectory
 
     [int]$UserCount = Get-ASConfig -Setting "RandomAccountOperators"
-    $PasswordPlain = Get-ASConfig -Setting "LastPW"
+    $PasswordPlain = Get-ASConfig -Setting "LastPW" -DPAPI
+
+    If ([string]::IsNullOrEmpty($PasswordPlain)) {
+        $PasswordPlain = Get-RandomPassword
+        Set-ASConfig -Setting "LastPW" -Value $PasswordPlain -DPAPI
+    }
 
     #Set-ASConfig -Setting "LastPW" -Value $PasswordPlain
 

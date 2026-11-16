@@ -42,7 +42,8 @@ Function Get-ASConfig {
                 $value = [System.Text.Encoding]::UTF8.GetString($decrypted)
             }
             catch {
-                throw "Unable to decrypt configuration setting '$Setting' with machine-scoped DPAPI."
+                Write-Log -Message "    >> Unable to decrypt configuration setting '$Setting' with machine-scoped DPAPI: $($_.Exception.Message)"
+                $value = $null
             }
         }
         Write-Log -Message "    >> using protected setting '$Setting'"

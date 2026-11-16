@@ -108,7 +108,7 @@ function New-PasswordSprayAttack {
     $DomainSearchBase = Set-AttackScope -Action "Password Spray"
     If ($DomainSearchBase -eq "SKIP") { return }
 
-    $PasswordToTest = Get-ASConfig -Setting "LastPW"
+    $PasswordToTest = Get-ASConfig -Setting "LastPW" -DPAPI
 
     If (-not $UnAttended) {
         $title = "Confirm or change the password for the first password spray"

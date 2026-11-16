@@ -40,7 +40,7 @@ function Invoke-PrivilegeEscalationViaLocalSystem {
 
     $Info = Measure-FunctionRuntime -Begin
 
-    Show-CurrentPhase -Phase "ASP07.html"
+    Show-CurrentPhase -Phase "ASP07_PsExec.html"
     Update-WindowTitle -NewTitle "PsExec Attack"
     Set-ASConfig -Setting "LastStage" -Value "PsExec Attack"
 

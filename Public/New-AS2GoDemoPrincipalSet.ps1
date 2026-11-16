@@ -5,7 +5,8 @@ Creates the AS2Go lab users and a Tier 0 service account.
 .DESCRIPTION
 Creates up to five lab users and one service account in the configured Active Directory OUs.
 Each user joins its configured security group. All accounts share the supplied master password,
-use the lab thumbnail, and expire after seven days. The service account additionally receives a
+use the lab thumbnail, and expire after seven days. Created accounts keep the initial password, so
+users are not prompted to change it at first logon. The service account additionally receives a
 random SPN that points to a newly created SPN target computer, making it Kerberoastable.
 
 .PARAMETER DAUser
@@ -48,10 +49,10 @@ Shared password for every created account. At least seven characters to satisfy
 the default Active Directory password complexity requirements.
 
 .EXAMPLE
-New-As2GoDemoPrincipal -ShortName Lab01 -WhatIf
+New-AS2GoDemoPrincipalSet -ShortName Lab01 -WhatIf
 
 .EXAMPLE
-New-As2GoDemoPrincipal -DAUser AS2go-T0-Adm -VIUser AS2go -SkipHelpDesk -MasterPassword 'P@ssw0rd!'
+New-AS2GoDemoPrincipalSet -DAUser AS2go-T0-Adm -VIUser AS2go -SkipHelpDesk -MasterPassword 'P@ssw0rd!'
 
 .COMPONENT
 Category: Lab Setup
@@ -60,7 +61,7 @@ Category: Lab Setup
 Creates six lab principals with configured group memberships and a Tier 0 service account that
 receives a Kerberoastable SPN on a dedicated SPN target computer.
 #>
-function New-As2GoDemoPrincipal {
+function New-AS2GoDemoPrincipalSet {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -78,7 +79,7 @@ function New-As2GoDemoPrincipal {
         [ValidateNotNullOrEmpty()][string]$Server,
         [Switch]$EnableLogging
         # 7 characters satisfies the default Active Directory password complexity policy.
-        # AllowNull keeps 'New-As2GoDemoPrincipal -WhatIf' working without a password.
+        # AllowNull keeps 'New-AS2GoDemoPrincipalSet -WhatIf' working without a password.
     )
 
     $info = Measure-FunctionRuntime -Begin
@@ -100,7 +101,7 @@ function New-As2GoDemoPrincipal {
 
         $newpw = Read-Host -AsSecureString
         $plainText = [System.Net.NetworkCredential]::new('', $newpw).Password
-        Set-ASConfig -setting "LastPw" -value $plainText
+        Set-ASConfig -setting "LastPw" -value $plainText -DPAPI
 
         if ($newpw.Length -eq 0) {
             $InititalPassword = ConvertTo-SecureString $RandomPw -AsPlainText -Force
@@ -212,6 +213,8 @@ function New-As2GoDemoPrincipal {
                 #$password = ConvertTo-SecureString -String $InititalPassword -AsPlainText -Force
             }
             $user = New-ADUser @userParameters @adParameters -AccountPassword $InititalPassword -PassThru -Confirm:$false
+            # Keep the initial master password valid without a required change at first logon.
+            Set-ADUser -Identity $user -Replace @{ pwdLastSet = -1 } @adParameters -Confirm:$false
             if ($account.GroupDN) {
                 Add-ADGroupMember -Identity $account.GroupDN -Members $user @adParameters -Confirm:$false
             }

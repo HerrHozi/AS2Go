@@ -113,7 +113,7 @@ Please confirm that the following prerequisites are met in the isolated test env
         $helpSkip = "Skip the Overpass-the-Hash (OpTH) simulation."
 
 
-        $ntlmHash = Get-ASConfig -Setting "pthntml"
+        $ntlmHash = Get-ASConfig -Setting "ASP07NT"
 
         If ([string]::IsNullOrEmpty($ntlmHash)) {
             Write-log -Message 'No valid NTLM hash data found. '
@@ -286,7 +286,7 @@ Please confirm that the following prerequisites are met in the isolated test env
         $Script:ASPtHntml = $BestResults[$SelectedIndex].NTLM
 
 
-        Set-ASConfig -Setting "pthntml" -Value "$($Script:ASFQDN)|$($Global:ASHelpDeskUser)|$($Script:ASPtHntml)"
+        Set-ASConfig -Setting "ASP07NT" -Value "$($Script:ASFQDN)|$($Global:ASHelpDeskUser)|$($Script:ASPtHntml)" -DPAPI
 
     
         Write-AS2GoOutput -Type Info -Message "Finished extracting logon sessions from $CredentialDump."

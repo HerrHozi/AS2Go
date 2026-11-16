@@ -146,6 +146,8 @@ Function Start-AS2GoDemo {
 
     Write-AS2GoOutput -Type  Header -M "Attack Scenario to Go - along the kill-chain (AS2Go)"
     
+    #Show-CurrentPhase -Phase "ASP00.html"
+
     $Script:MoAD = Test-PoSHModuleAvailability -PSModule "ActiveDirectory"
     $Script:MoGPO = Test-PoSHModuleAvailability -PSModule "GroupPolicy"
 
@@ -164,7 +166,7 @@ Function Start-AS2GoDemo {
     }
 
     If ($PreCheckFailed -eq $true) {
-        $null  = Write-AS2GoOutput -Type Input -M "Acknowledging warnings before proceeding..."
+        $null = Write-AS2GoOutput -Type Input -M "Acknowledging warnings before proceeding..."
         Write-host "`n  [>] Please acknowledge the warning(s) by pressing ENTER ... " -ForegroundColor $Script:FGCWarning -NoNewline
     }
  
@@ -244,7 +246,6 @@ Function Start-AS2GoDemo {
 
 
     If (-not $SkipClearHost) { Clear-Host }
-
     $Global:ASVictim = $env:UserName
  
 
@@ -258,8 +259,12 @@ Function Start-AS2GoDemo {
         Pause
     }
 
+
+    Show-CurrentPhase -Phase "ASP00.html"
     Write-AS2GoOutput -Type HEADER -Message "ATTACK NAVIGATION"
     Write-AS2GoOutput -Type H1 -Message "Choose your starting point in the attack chain.`n"
+
+
 
     Write-AS2GoOutput -Type Bullet -Message "[P] $Script:Phase04" 
     Write-AS2GoOutput -Type Bullet -Message "[I] $Script:Phase05"
@@ -271,7 +276,7 @@ Function Start-AS2GoDemo {
     Write-AS2GoOutput -Type Bullet -Message "[X] $Script:Phase11"
     Write-AS2GoOutput -Type Bullet -Message "[D] $Script:Phase12"
 
-    Show-CurrentPhase -Phase "ASP00.html"
+
 
     $Options = @(
         [pscustomobject]@{
@@ -295,7 +300,7 @@ Function Start-AS2GoDemo {
             Value = 7
         },
         [pscustomobject]@{
-            Label = "&Privileged"
+            Label = "Pri&vileged"
             Help  = "Perform reconnaissance using a privileged account"
             Value = 9
         },

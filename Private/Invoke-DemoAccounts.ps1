@@ -141,7 +141,7 @@ Function Invoke-DemoAccounts {
    New-DemoAccount -TargetOU $OrganizationalUnit -path $FileWithDemoUsers -NumberOfUsers $recommendAmount -UPNSuffix $UPNSuffix -Scenario $Scenario -Server $Script:LogonServer
    Add-RandomUsersToAccountOperators -TargetOU $OrganizationalUnit -Server $Script:LogonServer
 
-   $pw = Get-ASConfig -Setting "LastPW"
+   $pw = Get-ASConfig -Setting "LastPW" -DPAPI
    $VISecurePass = ConvertTo-SecureString -String $pw -AsPlainText -Force
    Add-VictimAccount -TargetOU $OrganizationalUnit -UPNSuffix $UPNSuffix -Server $Script:LogonServer -AccountPassword $VISecurePass
 

@@ -138,17 +138,18 @@ function Add-GPOMemberToBuiltinGroups {
                 Measure-FunctionRuntime -End -Details $Info
                 return
             }
-            $selectedFQDN = (($selectedDN -split ', ') | Where-Object { $_ -like 'DC=*' } | ForEach-Object { ($_ -split '=', 2)[1] }) -join '.'
+            $selectedServer = Get-BestDomainController -domain $selectedDN
             try {
-                $selectedObject = Get-ADObject -Identity $selectedDN -Properties objectSid, sAMAccountName, name -Server $selectedFQDN -ErrorAction Stop
+                $selectedObject = Get-ADObject -Identity $selectedDN -Properties objectSid, sAMAccountName, name -Server $selectedServer -ErrorAction Stop
             }
             catch {
                 Write-AS2GoOutput -Type Warning -Message "Selected principal '$selectedDN' could not be resolved."
                 Measure-FunctionRuntime -End -Details $Info
                 return
             }
-            $temp = $Script:AllDomainsDetails | Where-Object { $_.DomainFQDN -eq $selectedFQDN } | Select-Object NetBIOSName
-            $principalDomain = If ($temp) { $temp.NetBIOSName } else { $selectedFQDN }
+            $domainDN = if ($selectedDN -match '(?i)(^|,)(DC=[^,]+(?:,DC=[^,]+)*)$') { $Matches[2] } else { $null }
+            $temp = $Script:AllDomainsDetails | Where-Object { $_.DomainDN -match "^$domainDN" } | Select-Object DomainFQDN, NetBIOSName
+            $principalDomain = If ($temp) { $temp.NetBIOSName } else { ($domainDN -replace 'DC=', '') -replace ',', '.' }
             $principalName = If ($selectedObject.sAMAccountName) { $selectedObject.sAMAccountName } else { $selectedObject.Name }
             $newtrustee = $principalDomain + "\" + $principalName
             $trusteeSID = $selectedObject.objectSid.Value
@@ -188,14 +189,12 @@ function Add-GPOMemberToBuiltinGroups {
         $xml.AppendChild($groupsElement) | Out-Host
         $xml.Save($xmlFilePath)
 
+        Start-Sleep 1
         Add-GroupElementToFileGroupsXml -xmlFilePath $xmlFilePath -GroupName $GroupLocalAdmin -GroupSID "S-1-5-32-544"
     }
     else {
         Write-Log -Message "    >> found file: $xmlFilePath"
     }
-
-    Set-GPCMachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDLocalUaG -TOOLGUID $Script:ToolGUIDLocalUaG -Server $domainDNS
-    Start-Sleep 1
 
     # Groups.xml can be removed after creation (e.g. by security controls on the domain controller).
     If (!(Test-Path $xmlFilePath)) {
@@ -230,10 +229,23 @@ function Add-GPOMemberToBuiltinGroups {
     # Groups.xml can be removed between the two calls (e.g. by security controls on the domain controller).
     If (Test-Path $xmlFilePath) {
         Add-TrusteeToFileGroupsXml -xmlFilePath $xmlFilePath -LocalGroup $GroupRemoteDesktopUser -Trustee $newtrustee -SID $trusteeSID
+
+        # Groups.xml can also vanish after the last write; the calling menu clears the console, so this must be logged.
+        If (Test-Path $xmlFilePath) {
+            Write-Log -Message "    >> Groups.xml still present after both trustee writes."
+        }
+        else {
+            Write-AS2GoOutput -Type Warning -Message "Groups.xml disappeared after modifying $GroupRemoteDesktopUser. Check for security controls on the DC (e.g. Defender quarantine) and rerun this step."
+        }
     }
     else {
         Write-AS2GoOutput -Type Warning -Message "Groups.xml disappeared after modifying $GroupLocalAdmin - $GroupRemoteDesktopUser was not updated. Check for security controls on the DC and rerun this step."
     }
+
+    # Register the GPT extension only after all SYSVOL writes finished, mirroring Add-GPOScheduleTask:
+    # an early AD write (gPCMachineExtensionNames) can trigger DC-side policy processing while this step
+    # is still writing Groups.xml, which previously coincided with the file disappearing mid-flow.
+    Set-GPCMachineExtensionNames -GPOGUID $ID -CSEGUID $Script:CSEGUIDLocalUaG -TOOLGUID $Script:ToolGUIDLocalUaG -Server $domainDNS
 
     if (-not $UnAttended) { Pause }
 
