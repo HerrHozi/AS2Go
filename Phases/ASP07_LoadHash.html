@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Privilege Escalation · WDigest (example)</title>
+  <title>AS2Go · Privilege Escalation · Load & Reuse stolen Hash (example)</title>
   <style>
     :root {
       color-scheme: dark;
@@ -211,38 +211,44 @@
 
 <body data-theme="dark">
   <header class="top">
-    <img class="brand-mark" src="./AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Privilege Escalation · WDigest (example)</span>
+    <img class="brand-mark" src="../Assets/Images/AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
+    <span class="title"><span class="brand">AS2Go</span> · Privilege Escalation · Load & Reuse stolen Hash (example)</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: WDigest Plaintext Credential Storage">
-      <img src="./ASP07_LoadHash.png" alt="AS2Go attack scenario: WDigest Plaintext Credential Storage">
+    <figure class="diagram" aria-label="AS2Go attack scenario: Load & Reuse Stolen Hash - NTLM or Golden Ticket">
+      <img src="../Assets/Images/ASP07_LoadHash.png" alt="AS2Go attack scenario: Load & Reuse Stolen Hash - NTLM or Golden Ticket">
     </figure>
-    <nav class="panel" aria-label="WDigest references">
+    <nav class="panel" aria-label="Load & Reuse stolen Hash references">
       <a href="./ASP07_Attack-Compatibility-Reference.html" target="_blank" rel="noopener noreferrer">Attack Matrix</a>
-      <a href="https://attack.mitre.org/techniques/T1212/" target="_blank" rel="noopener noreferrer">Credentials in Registry (T1212)</a>
-      <a href="https://attack.mitre.org/techniques/T1003/" target="_blank" rel="noopener noreferrer">UseLogonCredential Overview</a>
+      <a href="https://attack.mitre.org/techniques/T1550/002/" target="_blank" rel="noopener noreferrer">Pass the Hash (T1550.002)</a>
+      <a href="https://attack.mitre.org/techniques/T1558/001/" target="_blank" rel="noopener noreferrer">Golden Ticket (T1558.001)</a>
+      <a href="https://github.com/darkoperator/mimikatz-missing-manual/blob/main/docs/28-Kerberos-Tickets-Over-Pass-the-Hash.md" target="_blank" rel="noopener noreferrer">Mimikatz Manual: Tickets over Pass the Hash</a>
+      <a href="https://github.com/darkoperator/mimikatz-missing-manual/blob/main/docs/30-Kerberos-Tickets-Golden-Ticket.md" target="_blank" rel="noopener noreferrer">Mimikatz Manual: Golden Ticket</a>
     </nav>
     <section class="panel">
       <span class="eyebrow">PHASE 07</span>
-      <h1>WDigest</h1>
-      <p>This phase demonstrates how an attacker re-enables WDigest credential caching through a Group
-        Policy change, stores the plaintext password of a privileged user in LSASS, and dumps it in the
-        authorized lab.</p>
+      <h1>Load & Reuse Stolen Hash</h1>
+      <p>This phase demonstrates how an attacker replays previously saved credential material in the
+        authorized lab: a stored KRBTGT hash is forged into a Golden Ticket and injected with
+        Pass-the-Ticket, or a stored NTLM hash is reused with Pass-the-Hash to impersonate a
+        privileged user without knowing the plaintext password.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Covers enabling the WDigest credential cache via registry and policy settings, forcing the
-          LSASS process to store plaintext credentials, waiting for the privileged user to authenticate,
-          and extracting the WDigest entry with the plaintext password from LSASS memory.</p>
+        <p>Covers loading the stored KRBTGT (Golden Ticket) or NTLM (Pass-the-Hash) data from the AS2Go
+          configuration, displaying the matching Mimikatz command, forging the Golden Ticket from the
+          KRBTGT hash and passing it into memory, checking the freshly cached tickets with klist, or
+          opening a new command window as the impersonated account with sekurlsa::pth.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>Keep WDigest disabled, restrict Group Policy modification rights, and alert on registry
-          changes to WDigest settings together with unexpected LSASS access.</p>
+        <p>Stolen hashes stay valid long after the original logon: an NTLM hash is enough to act as its
+          user, and the KRBTGT key authenticates every Golden Ticket in the domain. Rotate compromised
+          credentials, reset the KRBTGT password twice after domain compromise, protect LSASS with
+          Credential Guard, and alert on anomalous Kerberos requests and NTLM logon patterns.</p>
       </section>
     </div>
   </main>

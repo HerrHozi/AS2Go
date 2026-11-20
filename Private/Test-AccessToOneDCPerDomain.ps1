@@ -23,5 +23,4 @@ function Test-AccessToOneDCPerDomain {
     }
 
     Measure-FunctionRuntime -End -Details $info
-
 }

@@ -7,11 +7,17 @@
 @{
     PrivateData       = @{
         PSData = @{
-            LastUpdate   = '2026-11-16'
+            LastUpdate   = '2026-11-20'
             Tags         = @('ActiveDirectory', 'ADCS', 'Killchain', 'RedTeam', 'Offense', 'AttackSimulation', 'AdversaryEmulation', 'PurpleTeam', 'BlueTeam', 'DefensiveSecurity')
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
             ReleaseNotes = '            
+2026.11.16.1272
+        - Protects sensitive configuration values, including saved password hashes, with Windows DPAPI. Protected values can be decrypted only on the Windows computer that saved them and are omitted from logs.
+        - Provides illustrated scenario guides with security lessons and references, so workshop participants can review each scenario before or after the demo.
+        - Provisions fresh ESC1 and ESC4 certificate templates for authorized labs without requiring a separate AD CS module. Verify Config shows the ESC1 template used by the scenario.
+        - Makes Domain Persistence actions easier to find with clearer menu labels and distinct keyboard shortcuts, including a shortcut to skip the phase.
+
 2026.11.13.1258
         - Requires PowerShell 7.4 or later.
         - Added -SafeMode to restrict selected actions during guided lab demos.
@@ -39,7 +45,7 @@ v2026.5.7.1034
     
 
     RootModule        = 'AS2Go.psm1'
-    ModuleVersion     = '2026.11.16.1272'
+    ModuleVersion     = '2026.11.20.715'
     GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
     Author            = 'Holger Zimmermann | as2go@mrhozi.com'

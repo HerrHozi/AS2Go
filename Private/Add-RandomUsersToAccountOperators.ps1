@@ -39,8 +39,6 @@ function Add-RandomUsersToAccountOperators {
         Set-ASConfig -Setting "LastPW" -Value $PasswordPlain -DPAPI
     }
 
-    #Set-ASConfig -Setting "LastPW" -Value $PasswordPlain
-
     # --- Resolve Account Operators (RID 548) ---
     $AOGroupSID = "S-1-5-32-548"
     $AOGroup = Get-ADGroup -Identity $AOGroupSID -Server $Server

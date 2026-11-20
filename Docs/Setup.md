@@ -129,7 +129,7 @@ Review the requirements confirmation and discovered forest, domain, controller, 
 | MDI Triggers | Configures lab DNS zone transfers and honeytoken-related settings for detection exercises. |
 | Quit | Returns from setup. |
 
-Selected phases use `Certify.exe`, `Mimikatz.exe`, `Rubeus.exe`, `NetSess.exe`, and `PsExec.exe`. Archives may be absent from your checkout. See [Tools/README.md](Tools/README.md) for sources and tested versions. Place required executables in the configured tools folder. Setup offers `$env:PUBLIC\AS2Go\MaliciousTools` as its default destination, separate from the repository's `Tools` folder.
+Selected phases use `Certify.exe`, `Mimikatz.exe`, `Rubeus.exe`, `NetSess.exe`, and `PsExec.exe`. Archives may be absent from your checkout. See [Tools/README.md](../Tools/README.md) for sources and tested versions. Place required executables in the configured tools folder. Setup offers `$env:PUBLIC\AS2Go\MaliciousTools` as its default destination, separate from the repository's `Tools` folder.
 
 Coordinate endpoint-protection settings with the lab owner and detection objectives. The tools menu changes Defender settings after confirmation; setup also displays protection-related prerequisites. Record approved changes and restore them after the exercise. Do not weaken protections on production systems.
 

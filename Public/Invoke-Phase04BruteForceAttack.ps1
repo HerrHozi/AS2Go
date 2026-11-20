@@ -222,7 +222,7 @@ function Invoke-ASPhase04BruteForceAttack {
                 }
             }
             while ([string]::IsNullOrWhiteSpace($PasswordToTest) -or $PasswordToTest.Length -lt [int]$MaxPwLenght)
-            Set-ASConfig -Setting "LastPW" -Value $PasswordToTest
+            Set-ASConfig -Setting "LastPW" -Value $PasswordToTest -DPAPI
         }
     }
 

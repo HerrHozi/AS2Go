@@ -6,7 +6,7 @@ AS2Go began as a Windows batch demonstration for Microsoft Defender for Identity
 
 | Date | Milestone | Functions | Lines | Files |
 | --- | --- | ---: | ---: | ---: |
-| May 2021 | Microsoft Defender for Identity demo (`mdi-demo.cmd`) | — | — | 1 |
+| May 2021 | Microsoft Defender for Identity demo (`mdi-demo.cmd`) | — | 749 | 1 |
 | Aug 2021 | AS2Go v1.0 | 32 | 2,139 | 1 |
 | Dec 2021 | AS2Go v2.5 | 46 | 3,483 | 1 |
 | Apr 2023 | AS2Go v2.8 | 62 | 5,077 | 1 |
@@ -20,9 +20,22 @@ The August 2021 through November 2026 figures come from the project timeline and
 
 ### November 2026 · AS2Go PowerShell module
 
-- Added native support for provisioning ESC1 and ESC4 certificate templates in the lab and for checking the configured scenario templates during verification.
-- Updated the setup guide for PowerShell 7.4 and expanded configuration verification and troubleshooting guidance.
-- Added optional machine-scoped DPAPI protection for configuration values.
+2026.11.16.1272
+- Protects sensitive configuration values, including saved password hashes, with Windows DPAPI. Protected values can be decrypted only on the Windows computer that saved them and are omitted from logs.
+- Provides illustrated scenario guides with security lessons and references, so workshop participants can review each scenario before or after the demo.
+- Provisions fresh ESC1 and ESC4 certificate templates for authorized labs without requiring a separate AD CS module. Verify Config shows the ESC1 template used by the scenario.
+- Makes Domain Persistence actions easier to find with clearer menu labels and distinct keyboard shortcuts, including a shortcut to skip the phase.
+
+
+2026.11.13.1258
+- Follow the updated setup guide to configure AS2Go, verify your lab settings, and troubleshoot common setup issues.
+- Run AS2Go with PowerShell 7.4 or later.
+- Use `-SafeMode` to skip selected actions while walking participants through a guided lab demo.
+- Save direct memberships in privileged groups to a timestamped JSON file and restore those memberships alongside current members. Domain Persistence can refresh the backup before the group membership removal exercise.
+- Check domain controller access, required tools, DNS zone transfers, and Active Directory Certificate Services before starting a demo.
+- Use the updated Privilege Escalation walkthrough to explore Pass-the-Ticket and Overpass-the-Hash and discuss the activity defenders can look for in the lab.
+- Use the Golden Ticket demonstration to explore how forged Kerberos tickets affect domain security.
+- New function to create a set of Active Directory demo principals in one step to spend less time preparing the lab.
 
 ### February 2026 · Transition to a PowerShell 7 module
 

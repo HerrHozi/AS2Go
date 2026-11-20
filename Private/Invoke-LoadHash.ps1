@@ -28,6 +28,7 @@ Category: Main Function
 .FUNCTIONALITY
 Loads the stored KRBTGT or NTLM hash data and reruns the matching Golden Ticket or Pass-the-Hash command.
 Shows the injection outcome so users can see how previously saved credential material is reused.
+Request a Kerberos TGT using an NT hash (Overpass-the-Hash)
 #>
 function Invoke-LoadHash {
 
@@ -44,7 +45,7 @@ function Invoke-LoadHash {
     Set-ASConfig -Setting "LastStage" -Value "Load Hash Attack"
 
     $gtData = Get-ASConfig -Setting "ASP07KR" -DPAPI
-    $ntData = Get-ASConfig -Setting "ASP07NT" -DPAPI
+    $ntData = Get-ASConfig -Setting "ASP07NT"
 
     $gtParts = If ($gtData) { $gtData.split("|") } else { @() }
     $ntParts = If ($ntData) { $ntData.split("|") } else { @() }

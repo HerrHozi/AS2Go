@@ -175,7 +175,9 @@ Please confirm that the following prerequisites are met in the isolated test env
 
 
         # Default index must stay valid for both cases: last option ("Proceed" if present, otherwise "Skip").
-        $decision = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+        #$decision = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+
+        $decision = "ExtractNew"
 
         if ($decision -eq $Script:No) {
             Measure-FunctionRuntime -End -Details $Info
@@ -207,6 +209,7 @@ Please confirm that the following prerequisites are met in the isolated test env
     
         If ($uniqueResults.Count -eq 0) {
             Write-AS2GoOutput -Type Error -Message "No Security Credentials found in Credential Dump."
+            if(-not $unattended) {pause}
             return
         }
         else {
@@ -217,7 +220,7 @@ Please confirm that the following prerequisites are met in the isolated test env
         $BestResults = $uniqueResults |
         ForEach-Object {
             $samAccountName = $_.Username
-            $server = $_.LogonServer
+            $server = $_.FQDN
 
             $membership = @(
                 Get-ADPrincipalGroupMembership `
@@ -286,7 +289,7 @@ Please confirm that the following prerequisites are met in the isolated test env
         $Script:ASPtHntml = $BestResults[$SelectedIndex].NTLM
 
 
-        Set-ASConfig -Setting "ASP07NT" -Value "$($Script:ASFQDN)|$($Global:ASHelpDeskUser)|$($Script:ASPtHntml)" -DPAPI
+
 
     
         Write-AS2GoOutput -Type Info -Message "Finished extracting logon sessions from $CredentialDump."
@@ -325,6 +328,9 @@ Please confirm that the following prerequisites are met in the isolated test env
     Write-AS2GoOutput -Type NextCommand -Message "Please run the following command from the new terminal window" -NoExtraLines
     Write-AS2GoOutput -Type Command -NoExtraLines -Message "00.cmd"
 
+    if (-not $UnAttended ) { pause }
+
+    Set-ASConfig -Setting "ASP07NT" -Value "$($Script:ASFQDN)|$($Global:ASHelpDeskUser)|$($Script:ASPtHntml)"
    
     Measure-FunctionRuntime -End -Details $Info
 }
