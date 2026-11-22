@@ -259,12 +259,10 @@ function Invoke-ASPhase07PrivilegeEscalation {
             $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
 
             If ($answer -eq 'remote') {
-                Show-CurrentPhase -Phase "ESC_PtT.html" 
-                Invoke-PassTheTicketAttackRemoteMachine
+                Invoke-PassTheTicketAttack
 
             }
             elseif ($answer -eq 'local') {
-                Show-CurrentPhase -Phase "ESC_PtT.html" 
                 Invoke-PassTheTicketAttackLocalMachine 
             }
             else {
@@ -273,8 +271,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
             
 
             Show-CurrentPhase -Phase "ESC_PtT.html" 
-            Invoke-PassTheTicketAttackLocalMachine 
-            Invoke-PassTheTicketAttack
+
+
         }
         elseif ($answer -eq $Script:PtC  ) {
 

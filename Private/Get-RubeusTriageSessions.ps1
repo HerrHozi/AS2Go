@@ -46,13 +46,16 @@ function Get-RubeusTriageSessions {
         # Rubeus table row: "| LUID | UserName | Service | EndTime |"
         If ($line -match '^\s*\|\s*(0x[0-9a-fA-F]+)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*[^|]*?\s*\|\s*$') {
             $luid = $Matches[1]
-            $userName = ($Matches[2] -split '\s+@\s+')[0].Trim()
+            $userParts = $Matches[2] -split '\s+@\s+'
+            $userName = $userParts[0].Trim()
+            $domain = If ($userParts.Count -gt 1) { $userParts[1].Trim() } else { '' }
             $spn = $Matches[3].Trim()
 
             If (-not $found.Contains($luid)) {
                 $found[$luid] = [pscustomobject]@{
                     LUID       = $luid
                     UserName   = $userName
+                    Domain     = $domain
                     TGTSpn     = ''
                     ServiceSpn = ''
                 }
@@ -74,6 +77,7 @@ function Get-RubeusTriageSessions {
                 $found[$curLuid] = [pscustomobject]@{
                     LUID       = $curLuid
                     UserName   = $Matches[2]
+                    Domain     = ''
                     TGTSpn     = ''
                     ServiceSpn = ''
                 }

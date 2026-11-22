@@ -33,11 +33,14 @@ function Get-TieringAssets {
     Measure-Object | 
     Select-Object -ExpandProperty Count
 
-    Write-AS2GoOutput -Type Bullet -Message "Identified AS2Go Assests in the domain $((Get-ADDomain).DNSRoot)" -TM $results 
+    Write-AS2GoOutput -Type Bullet -Message "Identified AS2Go Assests in the domain $((Get-ADDomain).DNSRoot)" -TM $results
 
     If ($results -gt 0) {
         Write-AS2GoOutput -Type Bullet -Message "Here is an example:"
         Get-ADOrganizationalUnit -Filter 'postalCode -like "AS2GoTierung"' -Server $server -Properties * | Select-Object CanonicalName, Description | Sort-Object  CanonicalName | Format-Table -AutoSize | Out-Host
+    }
+    Else {
+        Write-AS2GoOutput -Type Warning -Message "No AS2Go tiering OUs were found in the domain $((Get-ADDomain).DNSRoot)."
     }
 
     Write-Log -Message "    >> Found $results Demo Account "

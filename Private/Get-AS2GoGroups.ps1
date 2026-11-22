@@ -39,6 +39,9 @@ function Get-AS2GoGroups {
         Write-AS2GoOutput -Type Bullet -Message "Here is an example:"
         Get-ADGroup -Filter 'adminDescription -like "AS2GoAdmins*" -or adminDescription -like "AS2GoHelpDesk*" -or adminDescription -like "AS2GoVictims*"' -Server $server -Properties * | Select-Object Name, Description | Sort-Object  Name | Format-Table -AutoSize | Out-Host
     }
+    Else {
+        Write-AS2GoOutput -Type Warning -Message "No AS2Go security groups were found in the domain $((Get-ADDomain).DNSRoot)."
+    }
 
     Write-Log -Message "    >> Found $results AS2Go Groups "
     Measure-FunctionRuntime -End -Details $Info

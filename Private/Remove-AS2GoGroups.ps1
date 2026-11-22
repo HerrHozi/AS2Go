@@ -6,9 +6,10 @@ Reverts the AS2Go group nesting and removes the AS2Go security groups.
 Undoes what Initialize-AS2GoAssets did to existing Active Directory objects, in reverse order:
 removes the AS2Go help desk/victim groups from the local Administrators group on the configured
 target machine, removes the AS2Go admin groups from Domain Admins/Server Operators/Enterprise
-Admins, moves the built-in Domain Admins (-512) and Enterprise Admins (-519) groups back from the
-Tier 0 Groups OU to their default CN=Users container, lifts the deny ACE/disabled inheritance on
-the Tier 0 Assets OU, and finally deletes the five AS2Go security groups themselves.
+Admins, moves every built-in sensitive group (adminCount=1, SID ending in -512 Domain Admins,
+-518 Schema Admins, -519 Enterprise Admins, or -520 Group Policy Creator Owners) found under the
+Tier 0 Groups OU back to its default CN=Users container, lifts the deny ACE/disabled inheritance
+on the Tier 0 Assets OU, and finally deletes the five AS2Go security groups themselves.
 
 .PARAMETER Scenario
 Scenario label used to resolve the AS2Go OU path. Defaults to AS2Go.
@@ -154,24 +155,27 @@ function Remove-AS2GoGroups {
     if (-not [string]::IsNullOrWhiteSpace($BDUsersOU)) {
         $Tier0GroupsOU = "OU=T0 Groups,OU=Tier 0 Assets,$BDUsersOU"
 
-        $MoveBacks = @(
-            [pscustomobject]@{ Sid = $DomainAdminsSID; Server = $Server; TargetDN = "CN=Users,$((Get-ADDomain -Server $Server).DistinguishedName)" }
-            [pscustomobject]@{ Sid = $EnterpriseAdminsSID; Server = $RootDC; TargetDN = "CN=Users,$((Get-ADDomain -Server $RootDC).DistinguishedName)" }
-        )
+        # Mirrors Initialize-AS2GoAssets' own discovery of sensitive groups to move: every adminCount=1
+        # group whose SID ends in -512 (Domain Admins), -518 (Schema Admins), -519 (Enterprise Admins),
+        # or -520 (Group Policy Creator Owners). Searching within the Tier 0 Groups OU itself finds only
+        # the ones actually moved there, regardless of which of these four groups exist in this domain.
+        $TargetDN = "CN=Users,$((Get-ADDomain -Server $Server).DistinguishedName)"
+        $PrivilegedGroups = @(Get-ADGroup -LDAPFilter "(adminCount=1)" -SearchBase $Tier0GroupsOU -Server $Server -ErrorAction SilentlyContinue | Where-Object {
+                $_.SID -like "*-512" -or $_.SID -like "*-518" -or $_.SID -like "*-519" -or $_.SID -like "*-520"
+            })
 
-        foreach ($MoveBack in $MoveBacks) {
-            try {
-                $group = Get-ADGroup -Identity $MoveBack.Sid -Server $MoveBack.Server -ErrorAction Stop
-                if ($group.DistinguishedName -like "*$Tier0GroupsOU") {
-                    Move-ADObject -Identity $group.DistinguishedName -TargetPath $MoveBack.TargetDN -Server $MoveBack.Server -Confirm:$false -ErrorAction Stop
-                    Write-AS2GoOutput -Type Success -Message "Moved '$($group.Name)' back to '$($MoveBack.TargetDN)'." -NoExtraLines
+        if ($PrivilegedGroups.Count -eq 0) {
+            Write-AS2GoOutput -Type Info -Message "No built-in privileged groups were found under the Tier 0 Groups OU."
+        }
+        else {
+            foreach ($group in $PrivilegedGroups) {
+                try {
+                    Move-ADObject -Identity $group.DistinguishedName -TargetPath $TargetDN -Server $Server -Confirm:$false -ErrorAction Stop
+                    Write-AS2GoOutput -Type Success -Message "Moved '$($group.Name)' back to '$TargetDN'." -NoExtraLines
                 }
-                else {
-                    Write-AS2GoOutput -Type Info -Message "'$($group.Name)' is not located under the Tier 0 Groups OU; leaving it in place."
+                catch {
+                    Write-AS2GoOutput -Type Warning -Message "Failed to move '$($group.Name)' back: $_"
                 }
-            }
-            catch {
-                Write-AS2GoOutput -Type Warning -Message "Failed to move group with SID '$($MoveBack.Sid)' back: $_"
             }
         }
 
