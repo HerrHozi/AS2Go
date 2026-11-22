@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Creates one victim Active Directory user using time-based names.
+Creates one compromised Active Directory account using time-based names.
 
 .DESCRIPTION
-Creates one VI- account with time-based lab attributes.
+Creates one CA- account with time-based lab attributes.
 Adds the account to SG-AS2Go-Victims only if that group exists.
 
 .PARAMETER Shortname
@@ -16,9 +16,9 @@ Password for the new account. Prompts securely when omitted.
 Category: Sub Function
 
 .FUNCTIONALITY
-Creates one victim account with time-based attributes and optional victim group membership.
+Creates one compromised account with time-based attributes and optional compromised account group membership.
 #>
-function Add-VictimAccount {
+function Add-CompromisedAccount {
 
     [CmdletBinding()]
     param(
@@ -40,7 +40,7 @@ function Add-VictimAccount {
             $UPNSuffix
         }
         if ([string]::IsNullOrWhiteSpace($UPNSuffix)) {
-            throw "A UPN suffix is required to create the victim account."
+            throw "A UPN suffix is required to create the compromised account."
         }
         if (-not $UPNSuffix.StartsWith("@")) {
             $UPNSuffix = "@$UPNSuffix"
@@ -53,9 +53,9 @@ function Add-VictimAccount {
             "n" { "$sLastname.$sFirstName" }
             default { $Shortname }
         }
-        $samAccountName = "VI-$sNewName"
+        $samAccountName = "CA-$sNewName"
         if ($samAccountName.Length -gt 20) {
-            throw "The generated victim SamAccountName '$samAccountName' exceeds the 20-character Active Directory limit."
+            throw "The generated compromised account SamAccountName '$samAccountName' exceeds the 20-character Active Directory limit."
         }
 
         $sDisplayName = "Compromised Credentials ($samAccountName)"
@@ -76,19 +76,19 @@ function Add-VictimAccount {
             "physicalDeliveryOfficeName" = "AS2Go Lab"
         }
 
-        $VIGroup = Get-ADGroup -Filter 'SamAccountName -eq "SG-AS2Go-Victims"' -Server $Server -ErrorAction Stop
+        $CAGroup = Get-ADGroup -Filter 'SamAccountName -eq "SG-AS2Go-Victims"' -Server $Server -ErrorAction Stop
         
         if ($null -eq $AccountPassword) {
-            $AccountPassword = Read-Host -Prompt "Password for victim user '$samAccountName'" -AsSecureString
+            $AccountPassword = Read-Host -Prompt "Password for compromised account '$samAccountName'" -AsSecureString
         }
 
         New-ADUser `
-            -Name "$sNewName-VI" `
+            -Name "$sNewName-CA" `
             -SamAccountName $samAccountName `
             -UserPrincipalName ($samAccountName + $UPNSuffix) `
             -Department "Tier 2" `
-            -Title "Normal User" `
-            -Initials "VI" `
+            -Title "Compromised Account" `
+            -Initials "CA" `
             -AccountPassword $AccountPassword `
             -Enabled $true `
             -PasswordNeverExpires $true `
@@ -102,18 +102,18 @@ function Add-VictimAccount {
             -Server $Server `
             -ErrorAction Stop
 
-        if ($null -ne $VIGroup) {
+        if ($null -ne $CAGroup) {
             Add-ADGroupMember `
-                -Identity $VIGroup `
+                -Identity $CAGroup `
                 -Members $samAccountName `
                 -Server $Server `
                 -ErrorAction Stop
         }
         else {
-            Write-AS2GoOutput -Type Warning -Message "Group 'SG-AS2Go-Victims' does not exist. Victim user '$samAccountName' was created without this membership."
+            Write-AS2GoOutput -Type Warning -Message "Group 'SG-AS2Go-Victims' does not exist. Compromised account '$samAccountName' was created without this membership."
         }
 
-        Write-AS2GoOutput -Type Success -Message "Created victim user '$samAccountName'."
+        Write-AS2GoOutput -Type Success -Message "Created compromised account '$samAccountName'."
     }
     finally {
         if ($Info) {

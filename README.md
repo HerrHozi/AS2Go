@@ -10,8 +10,8 @@
 
 ```Text
 Author:          Holger Zimmermann | as2go@mrhozi.com
-Current Version: 2026.11.20.715
-Last Update:     2026-11-20
+Current Version: 2026.11.22.989
+Last Update:     2026-11-22
 ```
 
 AS2Go (**Attack Scenario to Go**) is a PowerShell-based Active Directory attack simulation and training framework designed for demos, workshops, security awareness sessions, and purple team exercises.
@@ -99,8 +99,8 @@ Note: Tool availability and security controls in your lab influence which action
 
 - Single-domain Active Directory environment
 - At least one Domain Controller (DC)
-- At least one domain-joined victim machine, such as a server or workstation
-- Initial configuration should preferably be executed on the victim machine
+- At least one domain-joined lab computer, such as a server or workstation
+- Initial configuration should preferably be executed on the lab computer
 - Administrative privileges are required
 - Enterprise Admin privileges are recommended for full configuration
 

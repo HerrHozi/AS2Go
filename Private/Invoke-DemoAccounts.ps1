@@ -2,13 +2,13 @@
 
 <#
 .SYNOPSIS
-Creates AS2Go demo and victim accounts in a selected Active Directory OU.
+Creates AS2Go demo and compromised accounts in a selected Active Directory OU.
 
 .DESCRIPTION
 Reads AS2GO-DemoUsers.csv and offers the saved account count or a custom count within the available CSV rows.
 Prompts for the default Demo Accounts OU or another OU and saves the selected search base in module settings.
 Creates randomly selected CSV users with scenario attributes and optional nested OUs through New-DemoAccount.
-Then adds random users to Account Operators and creates a victim account, optionally joining the victim group.
+Then adds random users to Account Operators and creates a compromised account, optionally joining the compromised account group.
 Either selection step can be skipped. Directory operations use the configured logon server.
 
 .PARAMETER AS2GoOU
@@ -42,7 +42,7 @@ Category: Main Function
 
 .FUNCTIONALITY
 Selects a user count and target OU, then creates demo accounts from the configured CSV data.
-Adds random users to Account Operators and creates a victim account with optional victim-group membership.
+Adds random users to Account Operators and creates a compromised account with optional compromised account group membership.
 #>
 Function Invoke-DemoAccounts {
 
@@ -142,8 +142,8 @@ Function Invoke-DemoAccounts {
    Add-RandomUsersToAccountOperators -TargetOU $OrganizationalUnit -Server $Script:LogonServer
 
    $pw = Get-ASConfig -Setting "LastPW" -DPAPI
-   $VISecurePass = ConvertTo-SecureString -String $pw -AsPlainText -Force
-   Add-VictimAccount -TargetOU $OrganizationalUnit -UPNSuffix $UPNSuffix -Server $Script:LogonServer -AccountPassword $VISecurePass
+   $CASecurePass = ConvertTo-SecureString -String $pw -AsPlainText -Force
+   Add-CompromisedAccount -TargetOU $OrganizationalUnit -UPNSuffix $UPNSuffix -Server $Script:LogonServer -AccountPassword $CASecurePass
 
    Write-AS2GoOutput -Type TextMaker -Message "Done - New Users available under" -TM $cname
    Measure-FunctionRuntime -End -Details $Info

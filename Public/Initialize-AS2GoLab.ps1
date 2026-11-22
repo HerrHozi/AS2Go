@@ -209,8 +209,8 @@ function Initialize-AS2GoLab {
     Write-AS2GoOutput -Type H1 -Message "Requirements for the initial AS2Go lab configuration:`n"
     Write-AS2GoOutput -Type Bullet -Message "At least a single-domain Active Directory environment."
     Write-AS2GoOutput -Type Bullet -Message "At least one Domain Controller (DC)."
-    Write-AS2GoOutput -Type Bullet -Message "At least one domain-joined victim machine, such as a server or workstation."
-    Write-AS2GoOutput -Type Bullet -Message "Initial configuration should preferably be executed on the victim machine."
+    Write-AS2GoOutput -Type Bullet -Message "At least one domain-joined lab computer, such as a server or workstation."
+    Write-AS2GoOutput -Type Bullet -Message "Initial configuration should preferably be executed on the lab computer."
     Write-AS2GoOutput -Type Bullet -Message "Administrative privileges are required."
     Write-AS2GoOutput -Type Bullet -Message "Enterprise Admin privileges are recommended for full configuration."
     Write-AS2GoOutput -Type Bullet -Message "AS2Go stores malicious tools, configuration files, logs, and related data under: " -Tm $script:AS2GoPublicDir

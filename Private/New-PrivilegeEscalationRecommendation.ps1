@@ -135,7 +135,7 @@ function New-PrivilegeEscalationRecommendation {
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     write-host ""
     
-    Write-AS2GoOutput -Type Header -Message "Local (Victim) Computer Information"
+    Write-AS2GoOutput -Type Header -Message "Local Lab Computer Information"
     $localComputerInformation | Format-List | out-host
 
     Write-AS2GoOutput -Type Header -Message "Attack Compatibility Matrix"
@@ -167,15 +167,15 @@ function New-PrivilegeEscalationRecommendation {
 
     Write-AS2GoOutput -Type Header -Message "CURRENT SITUATION FROM AN ATTACKER'S PERSPECTIVE"
     
-    $Global:ASVictim = whoami 
+    $Global:ASCompromisedAccount = whoami
 
     $currentUser = Test-LocalAdministrator
 
     If ($currentUser.IsLocalAdmin) {
-        Write-AS2GoOutput -Type TOP -Message "Current user '$Global:ASVictim' has local administrator privileges."
+        Write-AS2GoOutput -Type TOP -Message "Current user '$Global:ASCompromisedAccount' has local administrator privileges."
     }
     else {
-        Write-AS2GoOutput -Type BAD -Message "Current user '$Global:ASVictim' does not have local administrator privileges."
+        Write-AS2GoOutput -Type BAD -Message "Current user '$Global:ASCompromisedAccount' does not have local administrator privileges."
     }
 
     if ($lsassStatus.IsElevated) {
@@ -186,11 +186,11 @@ function New-PrivilegeEscalationRecommendation {
     }
 
     If ($bMemberofDA) {
-        Write-AS2GoOutput -Type TOP -Message "Victim PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Domain Admins group.'
+        Write-AS2GoOutput -Type TOP -Message "Lab PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Domain Admins group.'
     }
 
     If ($bMemberofAO) {
-        Write-AS2GoOutput -Type TOP -Message "Victim PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Account Operators group.'
+        Write-AS2GoOutput -Type TOP -Message "Lab PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Account Operators group.'
     }
 
     if ($lsassStatus.PplRuntimeConfirmed) {
@@ -235,7 +235,7 @@ function New-PrivilegeEscalationRecommendation {
         Write-AS2GoOutput -Type TOP -Message 'Microsoft Defender for Endpoint is not running.'
     }
 
-    If ($client.ToUpper().Contains('VI-')) {
+    If ($client.ToUpper().Contains('CA-')) {
         Write-AS2GoOutput -Type BAD -Message 'User for currently cached Kerberos tickets is' -TextMaker "$($client.ToUpper())"
     }
     elseif ($client.ToUpper().Contains('(0)')) {
@@ -311,7 +311,7 @@ function New-PrivilegeEscalationRecommendation {
     }
 
     
-    Write-Log -Message "    >> Your Victim PC settings -  $overview - $version"
+    Write-Log -Message "    >> Your Lab PC settings -  $overview - $version"
     Measure-FunctionRuntime -End -Details $Info
 
     return "C"

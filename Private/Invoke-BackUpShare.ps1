@@ -46,7 +46,6 @@ function Invoke-BackUpShare {
     $Functionality = (Get-Help $CurrentFunction).Functionality
     Write-AS2GoOutput -Type H1 -Message $Functionality
 
-
     $value = Get-ASConfig -Setting "BackupShare"
     Write-AS2GoOutput -Type TextMaker -Message "Current Backup Share:" -Tm $value
 
@@ -55,11 +54,9 @@ function Invoke-BackUpShare {
         return
     }
 
-
     $server = Select-ADObject -Title "Select Domain Controller" -LocalDomainOnly -IncludeComputers
 
     If ($null -eq $server) {
-        #$TargetServer = $Script:BestDCs[(Get-ADDomain).DNSRoot]
         Write-AS2GoOutput -Type Info -Message "Please select a computer"
         return
     }
@@ -69,7 +66,6 @@ function Invoke-BackUpShare {
         $computer = Get-ADComputer -Identity $server -Server $dnsdomain
         $TargetServer = $computer.DNSHostName
     }
- 
     
     
     Write-Host

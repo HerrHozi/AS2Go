@@ -123,7 +123,7 @@ Function Start-AS2GoDemo {
     Write-Log -Message " "
     Write-Log -Message "    >> Using PowerShell version $($PSVersionTable.PSVersion.tostring())"
     Write-Log -Message " "
-    Write-Log -Message "Victim PC run on Windows $Script:WinVersion"
+    Write-Log -Message "Lab PC run on Windows $Script:WinVersion"
 
 
     If (-not $SkipClearHost) { Clear-Host }
@@ -185,7 +185,7 @@ Function Start-AS2GoDemo {
         If (-not $SkipClearHost) { Clear-Host }
 
         $TimeStamp = (Get-Date).toString("yyyy-MM-dd HH:mm:ss")
-        $lastVictim = Get-ASConfig -Setting "LastVictim"
+        $lastCompromisedAccount = Get-ASConfig -Setting "LastCompromisedAccount"
         $lastRun = Get-ASConfig -Setting "LastStart" 
         $lastDuration = Get-ASConfig -Setting "LastDuration" 
 
@@ -195,8 +195,8 @@ Function Start-AS2GoDemo {
         Write-Host $lastRun                -NoNewline -ForegroundColor $Script:FGCHighLight
         Write-Host " | "                   -NoNewline
         Write-Host $lastDuration           -NoNewline -ForegroundColor $Script:FGCHighLight
-        Write-Host " | Last Victim: "      -NoNewline  
-        Write-Host "[$lastVictim]"         -ForegroundColor $Script:FGCHighLight
+        Write-Host " | Last Compromised Account: "      -NoNewline
+        Write-Host "[$lastCompromisedAccount]"         -ForegroundColor $Script:FGCHighLight
         Write-Host "`n"
         #Update AS2Go.json config file
         Set-ASConfig -Setting "LastStart" -Value $TimeStamp
@@ -213,6 +213,11 @@ Function Start-AS2GoDemo {
         ######                                                                     #####
         ################################################################################
 
+
+
+
+
+        
         If ($SkipPasswordSpray ) {
             Write-Log -Message "Skipped Attack Phase - Brute Force Account"
         }
@@ -236,7 +241,7 @@ Function Start-AS2GoDemo {
         Show-ForestOverview 
         Get-ForestInfo
     
-        $infoV = Get-ComputerInformation -computer $Script:ASVictimMaschine
+        $infoV = Get-ComputerInformation -computer $Script:ASLabComputer
         $infoS = Get-ComputerInformation -computer $Script:ASSAW
         $infoD = Get-ComputerInformation -computer $Script:ASDC
     
@@ -246,11 +251,11 @@ Function Start-AS2GoDemo {
 
 
     If (-not $SkipClearHost) { Clear-Host }
-    $Global:ASVictim = $env:UserName
+    $Global:ASCompromisedAccount = $env:UserName
  
 
     Write-Host ""
-    Set-ASConfig -Setting "LastVictim" -Value $Global:ASVictim
+    Set-ASConfig -Setting "LastCompromisedAccount" -Value $Global:ASCompromisedAccount
 
     If (($UnAttended -ne $true) -and ($SkipPopup -ne $true)) {
         Start-Sleep 2

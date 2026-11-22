@@ -34,7 +34,7 @@ function Invoke-PrivilegeEscalationViaLocalSystem {
 
     ################################################################################
     #####                                                                      ##### 
-    #####    Start a process as a different user on the victim machine         #####                                
+    #####    Start a process as a different user on the lab computer         #####
     #####                                                                      #####
     ################################################################################
 

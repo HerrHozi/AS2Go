@@ -440,9 +440,12 @@ If (-not (Test-Path -Path $Script:ConfigFile)) {
     copy-item "$ASModulePath\AS2GO.json" -Destination $Script:ConfigFile
 }
 
-$LegacySettingNames = @{
+$LegacySettingNames = [ordered]@{
     myDC         = 'AS2GoDC'
-    myViPC       = 'AS2GoViPC'
+    AS2GoViPC    = 'AS2GoLabPC'
+    myViPC       = 'AS2GoLabPC'
+    LastVictim   = 'LastCompromisedAccount'
+    VIGroup      = 'CAGroup'
     mySAW        = 'AS2GoSAW'
     myAppServer  = 'AS2GoAppServer'
     MySearchBase = 'AS2GoSearchBase'

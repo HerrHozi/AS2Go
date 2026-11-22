@@ -21,8 +21,8 @@ SamAccountName for the Tier 1 server administrator.
 .PARAMETER HDUser
 SamAccountName for the Tier 2 help desk user.
 
-.PARAMETER VIUser
-SamAccountName for the Tier 2 victim user.
+.PARAMETER CAAccount
+SamAccountName for the Tier 2 compromised account. The generated default uses CA-.
 
 .PARAMETER SrvAccount
 SamAccountName for the Tier 0 service account. Receives a random SPN that is hosted by a newly
@@ -38,8 +38,8 @@ Skips the domain administrator.
 .PARAMETER SkipHelpDesk
 Skips the help desk user and service account.
 
-.PARAMETER SkipVictim
-Skips the victim user.
+.PARAMETER SkipCompromisedAccount
+Skips the compromised account.
 
 .PARAMETER Server
 Writable domain controller or domain to use for Active Directory operations. Defaults to the current domain.
@@ -52,7 +52,7 @@ the default Active Directory password complexity requirements.
 New-AS2GoDemoPrincipalSet -ShortName Lab01 -WhatIf
 
 .EXAMPLE
-New-AS2GoDemoPrincipalSet -DAUser AS2go-T0-Adm -VIUser AS2go -SkipHelpDesk -MasterPassword 'P@ssw0rd!'
+New-AS2GoDemoPrincipalSet -DAUser AS2go-T0-Adm -CAAccount CA-AS2go -SkipHelpDesk -MasterPassword 'P@ssw0rd!'
 
 .COMPONENT
 Category: Lab Setup
@@ -69,12 +69,12 @@ function New-AS2GoDemoPrincipalSet {
         [System.Security.SecureString]$InititalPassword, 
         [switch]$SkipDomainAdmin,
         [switch]$SkipHelpDesk,
-        [switch]$SkipVictim,
+        [Alias('SkipVictim')][switch]$SkipCompromisedAccount,
         [ValidateLength(1, 13)][string]$DAUser = 'AS2go-T0-Adm',
         [ValidateLength(1, 20)][string]$EAUser = 'AS2go-T0-Ent',
         [ValidateLength(1, 20)][string]$SAUser = 'AS2go-T1-Adm',
         [ValidateLength(1, 20)][string]$HDUser = 'AS2go-T2-Adm',
-        [ValidateLength(1, 20)][string]$VIUser = 'AS2go',
+        [Alias('VIUser')][ValidateLength(1, 20)][string]$CAAccount = 'AS2go',
         [ValidateLength(1, 20)][string]$SrvAccount = 'As2go-T0-SA',
         [ValidateNotNullOrEmpty()][string]$Server,
         [Switch]$EnableLogging
@@ -91,7 +91,7 @@ function New-AS2GoDemoPrincipalSet {
         Write-AS2GoOutput -Type Bullet -Message 'Tier 0 Enterprise Account'
         Write-AS2GoOutput -Type Bullet -Message 'Tier 1 Server Operator'
         Write-AS2GoOutput -Type Bullet -Message 'Tier 2 Help Desk Account'
-        Write-AS2GoOutput -Type Bullet -Message 'Tier 2 Victim Account'
+        Write-AS2GoOutput -Type Bullet -Message 'Tier 2 Compromised Account'
         Write-AS2GoOutput -Type Bullet -Message 'Tier 0 Service Account including an SPN'
         
 
@@ -120,7 +120,7 @@ function New-AS2GoDemoPrincipalSet {
             @{ Parameter = 'EAUser'; Name = $EAUser; Prefix = 'EA'; Title = 'Enterprise Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'EAGroup' }
             @{ Parameter = 'SAUser'; Name = $SAUser; Prefix = 'SA'; Title = 'Server Administrator'; Tier = 'Tier 1'; OU = 'T1AccountsOU'; Group = 'SAGroup' }
             @{ Parameter = 'HDUser'; Name = $HDUser; Prefix = 'HD'; Title = 'Help Desk User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'HDGroup'; Skip = $SkipHelpDesk }
-            @{ Parameter = 'VIUser'; Name = $VIUser; Prefix = 'VI'; Title = 'Normal / Compromised User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'VIGroup'; Skip = $SkipVictim }
+            @{ Parameter = 'CAAccount'; Name = $CAAccount; Prefix = 'CA'; Title = 'Compromised Account'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'CAGroup'; Skip = $SkipCompromisedAccount }
             @{ Parameter = 'SrvAccount'; Name = $SrvAccount; Prefix = 'SVC'; Title = 'Service Account'; Tier = 'Tier 0'; OU = 'T0ServiceAccountsOU'; Group = 'DAGroup'; Skip = $SkipHelpDesk; SPN = $true }
         ) | Where-Object { -not $_.Skip }
 
@@ -137,6 +137,9 @@ function New-AS2GoDemoPrincipalSet {
                 else {
                     $ShortName
                 }
+            }
+            if ($account.Parameter -eq 'CAAccount' -and -not $PSBoundParameters.ContainsKey('CAAccount')) {
+                $account.Name = 'CA-' + $account.Name
             }
             if ($account.Name.Length -gt 20 -or $account.Name -match '[\x00-\x1f"\[\]:;|=+,*?<>/\\@]' -or $account.Name -match '^\s|[.\s]$') {
                 throw "Invalid Active Directory account name '$($account.Name)'. Use a valid SamAccountName of at most 20 characters."

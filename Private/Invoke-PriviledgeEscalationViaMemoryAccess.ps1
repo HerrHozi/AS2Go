@@ -23,7 +23,7 @@ Console messages and output from invoked commands; no dedicated result object is
 .NOTES
 Private AS2Go function. Run from an initialized AS2Go module session and from an elevated session.
 Requires Mimikatz in the module tools folder, WDigest plaintext logons, and writable module configuration.
-Run on the victim PC after Set-UseLogonCredential enabled WDigest plaintext credential storage.
+Run on the Lab PC after Set-UseLogonCredential enabled WDigest plaintext credential storage.
 Intended for demonstration, because WDigest plaintext storage is disabled by default on modern Windows.
 
 Tested with Get-FileHash -Path $mimikatzPath -Algorithm SHA256 to verify the integrity of the Mimikatz binary.

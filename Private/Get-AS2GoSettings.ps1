@@ -154,7 +154,7 @@ function Get-AS2GoSettings {
     # -------------------------------
     $Settings = @(
         (New-AS2GoSetting -Index 0  -Label "Logon Server / DC"          -Key "AS2GoDC"          -InputType Text    -ScriptVar "ASDC"),
-        (New-AS2GoSetting -Index 1  -Label "Victim PC"                  -Key "AS2GoViPC"        -InputType Text    -ScriptVar "ASVictimMaschine"),
+        (New-AS2GoSetting -Index 1  -Label "Lab PC"                     -Key "AS2GoLabPC"       -InputType Text    -ScriptVar "ASLabComputer"),
         (New-AS2GoSetting -Index 2  -Label "Admin PC"                   -Key "AS2GoSAW"         -InputType Text    -ScriptVar "ASSAW"),
         (New-AS2GoSetting -Index 3  -Label "Application Server"         -Key "AS2GoAppServer"   -InputType Text    -ScriptVar "ASAppServer"),
         (New-AS2GoSetting -Index 4  -Label "Help Desk Group"            -Key "globalHelpDesk"-InputType Text    -ScriptVar "ASHelpDesk"),
@@ -208,10 +208,10 @@ function Get-AS2GoSettings {
         # env defaults
         try { 
             $value = [System.Net.Dns]::GetHostEntry($env:COMPUTERNAME).HostName
-            Set-ASConfig -Setting "AS2GoViPC" -Value $value
+            Set-ASConfig -Setting "AS2GoLabPC" -Value $value
         }
         catch {
-            Set-ASConfig -Setting "AS2GoViPC" -Value $env:COMPUTERNAME 
+            Set-ASConfig -Setting "AS2GoLabPC" -Value $env:COMPUTERNAME
         }
         try {
             $server = Get-LogonServerFQDN

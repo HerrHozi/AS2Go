@@ -13,7 +13,7 @@ Editing this guide or reviewing the source does not require a domain-joined comp
 | Component | Purpose |
 | --- | --- |
 | Active Directory test domain with at least one DC and working DNS | Directory services and lab targets |
-| Domain-joined Windows member server or workstation | Victim machine and preferred execution point for initial configuration |
+| Domain-joined Windows member server or workstation | lab computer and preferred execution point for initial configuration |
 | Additional workstation for SAW/PAW scenarios | Administrative activity used by selected scenarios |
 | AD Certificate Services | Required for certificate-based scenarios; configurable through setup |
 | Semperis Lightning, Defender for Identity, Defender for Endpoint, or a SIEM | Optional monitoring for validating detections |
@@ -103,7 +103,7 @@ Preview returns before live function initialization, AD queries, configuration w
 
 ## 5. Initialize the Lab
 
-On the domain-joined victim machine, use the elevated administrative PowerShell 7 session:
+On the domain-joined lab computer, use the elevated administrative PowerShell 7 session:
 
 ```powershell
 Initialize-AS2GoLab

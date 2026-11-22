@@ -33,7 +33,7 @@
           "Value": ""
         },
         {
-          "Name": "AS2GoViPC",
+          "Name": "AS2GoLabPC",
           "Value": ""
         },
         {
@@ -105,7 +105,7 @@
           "Value": ""
         },
         {
-          "Name": "LastVictim",
+          "Name": "LastCompromisedAccount",
           "Value": ""
         },
         {

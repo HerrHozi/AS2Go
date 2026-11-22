@@ -53,18 +53,18 @@ Function Initialize-AS2GoAssets {
     #     PSCustomObject AS2GoGroups
     # =========================================
 
-    #$VIGroup = "SG-$Scenario-Victims"            # member of local admins on VICTIM PC
-    #$HDGroup = "SG-$Scenario-HelpDesk"           # member of local admins on ADMIN PC & VICTIM PC
+    #$CAGroup = "SG-$Scenario-Victims"            # member of local admins on Lab PC
+    #$HDGroup = "SG-$Scenario-HelpDesk"           # member of local admins on ADMIN PC & Lab PC
     #$DAGroup = "SG-$Scenario-Admins"             # member of local admins on ADMIN PC
 
-    $VIGroup = "SG-$Scenario-Users"            # member of local admins on VICTIM PC
-    $HDGroup = "SG-$Scenario-T2-Admins"        # member of local admins on ADMIN PC & VICTIM PC
+    $CAGroup = "SG-$Scenario-Users"            # member of local admins on Lab PC
+    $HDGroup = "SG-$Scenario-T2-Admins"        # member of local admins on ADMIN PC & Lab PC
     $SAGroup = "SG-$Scenario-T1-Admins"
     $DAGroup = "SG-$Scenario-T0-Admins"        # member of local admins on ADMIN PC
     $EAGroup = "UG-$Scenario-T0-Enterprise"
 
-    $VIGroupDscpt = "needed for $Scenario | must be a member of local admins on VICTIM PC"
-    $HDGroupDscpt = "needed for $Scenario | must be a member of local admins on ADMIN PC & VICTIM PC"
+    $CAGroupDscpt = "needed for $Scenario | must be a member of local admins on Lab PC"
+    $HDGroupDscpt = "needed for $Scenario | must be a member of local admins on ADMIN PC & Lab PC"
     $DAGroupDscpt = "needed for $Scenario | must be a member of local admins on ADMIN PC"
 
     $AS2GoGroups = @(
@@ -72,9 +72,9 @@ Function Initialize-AS2GoAssets {
         [pscustomobject]@{ Name = $EAGroup; Tier = "0"; Scope = "Universal"; Description = "Tier 0 enterprise role for $Scenario"; Type = "AS2GoAdmins" }
         [pscustomobject]@{ Name = $SAGroup; Tier = "1"; Scope = "Global"; Description = "Tier 1 server administration role for $Scenario"; Type = "AS2GoAdmins" }
         [pscustomobject]@{ Name = $HDGroup; Tier = "2"; Scope = "Global"; Description = $HDGroupDscpt; Type = "AS2GoHelpDesk" }
-        [pscustomobject]@{ Name = $VIGroup; Tier = "2"; Scope = "Global"; Description = $VIGroupDscpt; Type = "AS2GoVictims" }
+        [pscustomobject]@{ Name = $CAGroup; Tier = "2"; Scope = "Global"; Description = $CAGroupDscpt; Type = "AS2GoVictims" }
     )
-    $DeviceManagerByTier = @{ "0" = $DAGroup; "1" = $SAGroup; "2" = $VIGroup }
+    $DeviceManagerByTier = @{ "0" = $DAGroup; "1" = $SAGroup; "2" = $CAGroup }
 
     # =========================================
     #       PSCustomObject $TieringOUName
@@ -253,7 +253,7 @@ Function Initialize-AS2GoAssets {
                                 Set-ASConfig -Setting "HDGroup" -Value $GroupName
                             }
                             else {
-                                Set-ASConfig -Setting "VIGroup" -Value $GroupName
+                                Set-ASConfig -Setting "CAGroup" -Value $GroupName
                             }
 
                             continue
@@ -328,7 +328,7 @@ Function Initialize-AS2GoAssets {
 
     $DomainNetBIOS = $Domain.NetBIOSName
 
-    foreach ($group in @($HDGroup, $VIGroup)) {
+    foreach ($group in @($HDGroup, $CAGroup)) {
         try {
             Add-LocalGroupMember -Group "Administrators" -Member "$DomainNetBIOS\$group" -ErrorAction Stop
             Write-AS2GoOutput -Type  Success -M "Added '$group' to local Administrators on $env:COMPUTERNAME" -noExtraLines
@@ -408,7 +408,7 @@ Function Initialize-AS2GoAssets {
     ################################################################################
 
     Disable-ADOUInheritance -TargetDN ("OU=" + $TieringOUName[0].Name + ",OU=$AS2GoOU,$RootOU") -LogonServer $Server
-    Set-DenyPermission -TargetDN "OU=T0 Groups,OU=$($TieringOUName[0].Name),OU=$AS2GoOU,$RootOU" -Trustee $VIGroup -LogonServer $Server
+    Set-DenyPermission -TargetDN "OU=T0 Groups,OU=$($TieringOUName[0].Name),OU=$AS2GoOU,$RootOU" -Trustee $CAGroup -LogonServer $Server
 
     Write-AS2GoOutput -Type  Success -Message "Finished creating Tiering OUs & Groups!"
     Measure-FunctionRuntime -End -Details $Info

@@ -236,6 +236,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
         elseif ($answer -eq $Script:PtT) {
 
             Show-CurrentPhase -Phase "ESC_PtT.html" 
+            Invoke-PassTheTicketAttackLocalMachine 
             Invoke-PassTheTicketAttack
         }
         elseif ($answer -eq $Script:PtC  ) {
