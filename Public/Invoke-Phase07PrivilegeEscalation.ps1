@@ -155,8 +155,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
 
         Write-AS2GoOutput -Type Header -Message "Select an Attack Technique"
 
-        Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for an Overpass-the-Hash Attack"
-        Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack"
+        Write-Host "  H " -ForegroundColor Yellow -NoNewline; Write-Host "- for an Overpass-the-Hash Attack (with Mimikatz or Rubeus)"
+        Write-Host "  T " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Pass-the-Ticket Attack (on local or remote machine)"
         Write-Host "  K " -ForegroundColor Yellow -NoNewline; Write-Host "- for a Kerberoasting Attack"
         Write-Host "  1 " -ForegroundColor Yellow -NoNewline; Write-Host "- for an AD CS Certificate Template Abuse Attack (ESC1)"
         Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack as Local System (NT AUTHORITY\SYSTEM)"
@@ -234,6 +234,43 @@ function Invoke-ASPhase07PrivilegeEscalation {
             Invoke-OverPassTheHashAttack
         }
         elseif ($answer -eq $Script:PtT) {
+
+
+            $Options = @(
+                [pscustomobject] @{
+                    Label = "&Local Machine"
+                    Help  = "YES to proceed"
+                    Value = 'local'
+                },
+                [pscustomobject] @{
+                    Label = "&Remote Machine"
+                    Help  = "NO to cancel"
+                    Value = 'remote'
+                },
+                [pscustomobject] @{
+                    Label = "&Skip"
+                    Help  = "SKIP to bypass this operation"
+                    Value = $Script:Skip
+                }
+            )
+            
+            $Title = "Decision Required"
+            $message = "Please make a decision:"
+            $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+
+            If ($answer -eq 'remote') {
+                Show-CurrentPhase -Phase "ESC_PtT.html" 
+                Invoke-PassTheTicketAttackRemoteMachine
+
+            }
+            elseif ($answer -eq 'local') {
+                Show-CurrentPhase -Phase "ESC_PtT.html" 
+                Invoke-PassTheTicketAttackLocalMachine 
+            }
+            else {
+                return
+            }
+            
 
             Show-CurrentPhase -Phase "ESC_PtT.html" 
             Invoke-PassTheTicketAttackLocalMachine 

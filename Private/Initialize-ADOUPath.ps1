@@ -2,8 +2,12 @@
 .SYNOPSIS
 Ensures every OU in a distinguished-name path exists.
 
+.PARAMETER Scenario
+Scenario label written into the adminDescription tag of any OU this function creates. Defaults to AS2Go.
+
 .FUNCTIONALITY
-Creates missing parent and child OUs, then returns the requested Active Directory OU.
+Creates missing parent and child OUs, tagging each new OU with the adminDescription creation tag,
+then returns the requested Active Directory OU.
 #>
 function Initialize-ADOUPath {
 
@@ -19,7 +23,8 @@ function Initialize-ADOUPath {
         [string]$DistinguishedName,
         [Parameter(Mandatory)]
         [string]$Server,
-        [bool]$ProtectedFromAccidentalDeletion = $false
+        [bool]$ProtectedFromAccidentalDeletion = $false,
+        [string]$Scenario = "AS2Go"
     )
 
     $Info = Measure-FunctionRuntime -Begin
@@ -61,6 +66,7 @@ function Initialize-ADOUPath {
                 -Path $pathDN `
                 -PostalCode "AS2GoDemoAccounts" `
                 -Description "Created by AS2Go PowerShell Module" `
+                -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } `
                 -ProtectedFromAccidentalDeletion $ProtectedFromAccidentalDeletion `
                 -Server $Server `
                 -ErrorAction Stop

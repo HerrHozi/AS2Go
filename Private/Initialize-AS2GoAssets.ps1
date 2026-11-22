@@ -141,22 +141,22 @@ Function Initialize-AS2GoAssets {
     Else {
         
         try {
-            New-ADOrganizationalUnit -Name $AS2GoOU  -Path "$RootOU" -Description "AS2Go Assets" -PostalCode "AS2GoDemoAccounts" -ProtectedFromAccidentalDeletion:$false -Server $Server    
+            New-ADOrganizationalUnit -Name $AS2GoOU  -Path "$RootOU" -Description "AS2Go Assets" -PostalCode "AS2GoDemoAccounts" -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -ProtectedFromAccidentalDeletion:$false -Server $Server
         }
         catch {
             $principal = "$env:USERDOMAIN\$env:USERNAME"
             Write-AS2GoOutput -type Error -Message "$_ | Affecting '$principal' on '$RootOU'"
             return
         }
-        
+
 
         $Cname = Convert-FromDNToCN -DistinguishedName "OU=$AS2GoOU,$RootOU"
         Write-Host ""
-        Write-AS2GoOutput -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname -NoExtraLines
-    
-        New-ADOrganizationalUnit -Name "Demo Accounts" -Path "OU=$AS2GoOU,$RootOU" -Description "AS2Go Demo Accounts" -PostalCode "AS2GoDemoAccounts" -Server $Server
+        Write-AS2GoOutput -Type  Textmaker -M "Created AS2Go OU:" -Tm $Cname -NoExtraLines
+
+        New-ADOrganizationalUnit -Name "Demo Accounts" -Path "OU=$AS2GoOU,$RootOU" -Description "AS2Go Demo Accounts" -PostalCode "AS2GoDemoAccounts" -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -Server $Server
         $Cname = Convert-FromDNToCN -DistinguishedName "OU=Demo Accounts,OU=$AS2GoOU,$RootOU"
-        Write-AS2GoOutput -Type  Textmaker -M "Created AS2GO OU:" -Tm $Cname -NoExtraLines
+        Write-AS2GoOutput -Type  Textmaker -M "Created AS2Go OU:" -Tm $Cname -NoExtraLines
     }
 
     $ExistingTierFound = $false
@@ -177,7 +177,7 @@ Function Initialize-AS2GoAssets {
             $TierSubOUs = @($ouGroups)
         }
         else {
-            New-ADOrganizationalUnit -Name $name -Path "OU=$AS2GoOU,$RootOU" -Description $TieringOUName[$i].Description -PostalCode "AS2GOTierung" -Server $Server -ErrorAction Stop
+            New-ADOrganizationalUnit -Name $name -Path "OU=$AS2GoOU,$RootOU" -Description $TieringOUName[$i].Description -PostalCode "AS2GoTierung" -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -Server $Server -ErrorAction Stop
             Write-AS2GoOutput -Type Info -Message "Created Tier $Tier Assets."
         }
         $ShortDNPAth = "OU=" + $TieringOUName[$i].Name + ",OU=$AS2GoOU,$RootOU"
@@ -204,7 +204,7 @@ Function Initialize-AS2GoAssets {
                 $ExistingSubOU = Get-ADOrganizationalUnit -Filter { Name -eq $newOU } -SearchBase $ShortDNPAth -SearchScope OneLevel -Server $Server -ErrorAction Stop
             }
             if ($null -eq $ExistingSubOU) {
-                New-ADOrganizationalUnit -Name $newOU -Path $ShortDNPAth -PostalCode "AS2GOTierung" -Server $Server -ErrorAction Stop
+                New-ADOrganizationalUnit -Name $newOU -Path $ShortDNPAth -PostalCode "AS2GoTierung" -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -Server $Server -ErrorAction Stop
                 Write-Host "      Created Sub OU " -NoNewline; Write-Host ([string]$newOU).PadRight(20, ' ') -ForegroundColor Yellow -NoNewline
             }
             else {
@@ -213,7 +213,7 @@ Function Initialize-AS2GoAssets {
 
             Switch ($ou) {
                 $ouAccounts { 
-                    Set-ADOrganizationalUnit -Identity "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier $ouAccounts" -PostalCode "AS2GOTierung" -Server $Server 
+                    Set-ADOrganizationalUnit -Identity "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier $ouAccounts" -PostalCode "AS2GoTierung" -Server $Server 
                     
                     if ($newOU -eq "T0 Accounts") {
                         Set-ASConfig -Setting "T0AccountsOU" -Value "OU=$newOU,$ShortDNPAth"
@@ -239,7 +239,7 @@ Function Initialize-AS2GoAssets {
                         $GroupName = $GroupDefinition.Name
                         $ExistingGroup = Get-ADGroup -Filter { SamAccountName -eq $GroupName } -Properties adminDescription -Server $Server -ErrorAction Stop
                         if ($null -eq $ExistingGroup) {
-                            New-ADGroup -Name $GroupName -SamAccountName $GroupName -GroupScope $GroupDefinition.Scope -GroupCategory Security -Description $GroupDefinition.Description -Path $GroupOU -OtherAttributes @{ 'adminDescription' = $GroupDefinition.Type } -Server $Server -ErrorAction Stop
+                            New-ADGroup -Name $GroupName -SamAccountName $GroupName -GroupScope $GroupDefinition.Scope -GroupCategory Security -Description $GroupDefinition.Description -Path $GroupOU -OtherAttributes @{ 'adminDescription' = "$($GroupDefinition.Type)|$Scenario|ASP00|Create" } -Server $Server -ErrorAction Stop
                             if ($GroupName.EndsWith("-T0-Enterprise")) {
                                 Set-ASConfig -Setting "EAGroup" -Value $GroupName
                             }
@@ -258,7 +258,7 @@ Function Initialize-AS2GoAssets {
 
                             continue
                         }
-                        if ($ExistingGroup.Name -ne $GroupName -or $ExistingGroup.adminDescription -ne $GroupDefinition.Type -or
+                        if ($ExistingGroup.Name -ne $GroupName -or -not ($ExistingGroup.adminDescription -like "$($GroupDefinition.Type)*") -or
                             $ExistingGroup.GroupScope -ne $GroupDefinition.Scope -or $ExistingGroup.GroupCategory -ne "Security") {
                             throw "Existing group '$GroupName' does not match the expected AS2Go name, role, scope, or category."
                         }
@@ -276,7 +276,7 @@ Function Initialize-AS2GoAssets {
                 $ouDevices {
                     # create device e.g. ch10-MyT0Device
                     $NewComputer = "DEV-T" + $Tier + "-" + (Get-Date -Format HHmmssff)
-                    New-ADComputer -Name $NewComputer -Description "Tier $Tier Device" -Path "OU=$newOU,$ShortDNPAth" -ManagedBy $DeviceManager -Server $Server
+                    New-ADComputer -Name $NewComputer -Description "Tier $Tier Device" -Path "OU=$newOU,$ShortDNPAth" -ManagedBy $DeviceManager -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -Server $Server
                     Set-ADOrganizationalUnit -Identity "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier $ouDevices" -Server $Server 
                     Write-Host ([string]" - including computer object:").PadRight($space, ' ') -NoNewline; Write-Host $NewComputer -ForegroundColor Yellow 
                 }
@@ -285,7 +285,7 @@ Function Initialize-AS2GoAssets {
                     $SecurePass = ConvertTo-SecureString -String New-RandomPassword -AsPlainText -Force
                     $newUser = "SVC-T" + $Tier + "-" + (Get-Date -Format HHmmssff)
                     $UPN = $newUser + $UPNSuffix
-                    New-ADUser -Name $newUser -UserPrincipalName  $UPN -SamAccountName $newUser  -PasswordNeverExpires $false  -AccountPassword $SecurePass -PassThru -Path "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier Service Account" -Server $Server  | Enable-ADAccount           
+                    New-ADUser -Name $newUser -UserPrincipalName  $UPN -SamAccountName $newUser  -PasswordNeverExpires $false  -AccountPassword $SecurePass -PassThru -Path "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier Service Account" -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -Server $Server  | Enable-ADAccount
                     Set-ADOrganizationalUnit -Identity "OU=$newOU,$ShortDNPAth" -Description "Tier $Tier $ouSvcAccounts" -Server $Server 
                     Write-Host ([string]" - including service account:").PadRight($space, ' ') -NoNewline; Write-Host $newUser -ForegroundColor Yellow
                     
@@ -296,7 +296,7 @@ Function Initialize-AS2GoAssets {
                 $ouServers {
                     # create dummy Server
                     $NewComputer = "$SrvPrefix-T" + $Tier + "-" + (Get-Date -Format HHmmssff)
-                    New-ADComputer -Name $NewComputer -Description "Tier $Tier Device" -Path "OU=$newOU,$ShortDNPAth" -ManagedBy $DeviceManager -Server $Server
+                    New-ADComputer -Name $NewComputer -Description "Tier $Tier Device" -Path "OU=$newOU,$ShortDNPAth" -ManagedBy $DeviceManager -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -Server $Server
                     Set-ADOrganizationalUnit -Identity "OU=$newOU,$ShortDNPAth" -Description $newOU -Server $Server 
                     Write-Host ([string]" - including computer object:").PadRight($space, ' ') -NoNewline; Write-Host $NewComputer -ForegroundColor Yellow 
                 }

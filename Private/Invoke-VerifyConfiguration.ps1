@@ -7,7 +7,8 @@ function Invoke-VerifyConfiguration {
     Checks the configured tools, accounts, Secure Access Workstation, and simulated AD backup share.
     Inventories directory assets, enterprise CAs, and the scenario ESC1 template. Checks the Web Enrollment
     Windows feature on the forest-root DC and zone transfer settings on the setup DNS server.
-    Reports missing settings and failed queries while continuing with the other checks.
+    Reports missing settings and failed queries while continuing with the other checks, then prints a
+    final summary marking each check as Existing, Missing, or (if it could not be verified) Error.
 
     .PARAMETER Param1
     Reserved string parameter.
@@ -30,6 +31,7 @@ function Invoke-VerifyConfiguration {
 
     .FUNCTIONALITY
     Checks tools, accounts, workstation access, directory assets, AD CS, the backup share, and DNS zone transfers.
+    Finishes with a summary reporting each check as Existing, Missing, or Error.
     #>
     param(
         [string]$Param1,
@@ -149,16 +151,33 @@ function Invoke-VerifyConfiguration {
         }
     }
 
+    $Summary = [ordered]@{}
     $ErrorActionPreference = 'Stop'
     foreach ($check in $checks.GetEnumerator()) {
+        $checkWarnings = [System.Collections.Generic.List[object]]::new()
         try {
-            & $check.Value
+            # Stream 3 (Warning) is merged into the output stream and forwarded unchanged, so the
+            # original console output is unaffected; only a copy is kept to derive the summary below.
+            & $check.Value 3>&1 | ForEach-Object {
+                if ($_ -is [System.Management.Automation.WarningRecord]) { $checkWarnings.Add($_) }
+                $_
+            }
+            $Summary[$check.Key] = if ($checkWarnings.Count -gt 0) { 'Missing' } else { 'Existing' }
         }
         catch {
             Write-AS2GoOutput -Type Warning -Message "$($check.Key) could not be verified: $($_.Exception.Message)"
+            $Summary[$check.Key] = 'Error'
         }
     }
 
+    Write-AS2GoOutput -Type Header -Message 'Verification Summary'
+    foreach ($entry in $Summary.GetEnumerator()) {
+        switch ($entry.Value) {
+            'Existing' { Write-AS2GoOutput -Type Success -Message "$($entry.Key): Existing" -NoExtraLines }
+            'Missing' { Write-AS2GoOutput -Type Warning -Message "$($entry.Key): Missing" -NoExtraLines }
+            'Error' { Write-AS2GoOutput -Type Error -Message "$($entry.Key): Could not be verified" }
+        }
+    }
 
     Write-AS2GoOutput -Type Info -Message 'Lab configuration review finished. See the results above.'
     Measure-FunctionRuntime -End -Details $info

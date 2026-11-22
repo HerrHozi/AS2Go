@@ -69,11 +69,11 @@ function Invoke-ADCSSetup {
         $Options = @(
             [pscustomobject] @{ Label = "Install AD&CS"; Help = "Install one Certification Authority & Web Enrollment services."; Value = "ADCS" },
             [pscustomobject] @{ Label = "Add (and publish) Certificate &Templates"; Help = "Create and publish vulnerable certificate templates, e.g. ESC1"; Value = "Templates" },
-            [pscustomobject] @{ Label = "&Skip"; Help = "Skip configuring ADCS for AS2GO."; Value = $Script:Skip }
+            [pscustomobject] @{ Label = "&Skip"; Help = "Skip configuring ADCS for AS2Go."; Value = $Script:Skip }
         )
 
-        $title = "AS2Go - Configure ADCS for AS2GO"
-        $message = "Select an option to configure ADCS for AS2GO."
+        $title = "AS2Go - Configure ADCS for AS2Go"
+        $message = "Select an option to configure ADCS for AS2Go."
         $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default $default -Title $title
 
         If ($answer -eq 'ADCS') {
@@ -146,7 +146,7 @@ function Invoke-ADCSSetup {
             }
         }
         else {
-            Write-log -Message "    >> Skipping ADCS setup for AS2GO."
+            Write-log -Message "    >> Skipping ADCS setup for AS2Go."
             $repeat = $Script:No
         }
 

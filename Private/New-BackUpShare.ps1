@@ -20,13 +20,14 @@ function New-BackUpShare {
     #####                                                                      #####
     ################################################################################
 
-    Param([string] $Server)
+    Param([string] $Server, [string] $Scenario = "AS2Go")
 
     $Info = Measure-FunctionRuntime -Begin
 
     try {
-        Invoke-Command -ComputerName $Server -ErrorAction Stop -ScriptBlock {
-            
+        Invoke-Command -ComputerName $Server -ErrorAction Stop -ArgumentList $Scenario -ScriptBlock {
+            Param([string] $Scenario)
+
             $sharePath = "C:\temp\as2go"
 
             if (-not (Test-Path $sharePath)) {
@@ -43,7 +44,7 @@ function New-BackUpShare {
             if (-not (Get-SmbShare -Name "AD-Backup" -ErrorAction SilentlyContinue)) {
                 New-SmbShare -Name "AD-Backup" -Path $sharePath `
                     -ChangeAccess "Domain Admins" `
-                    -Description "Needed for AS2Go"
+                    -Description "AS2Go|$Scenario|ASP00|Create"
             }
         }
         
@@ -56,7 +57,7 @@ function New-BackUpShare {
     catch {
         $errMsg = $_.Exception.Message
         if ($errMsg -match '(?i)access is denied|cannot connect to cim server|connecting to remote server .* failed') {
-            throw "AS2GO_ACCESS_DENIED: Missing permissions for WinRM/CIM or share management on $Server. Use an account with local admin rights on the target DC."
+            throw "AS2Go_ACCESS_DENIED: Missing permissions for WinRM/CIM or share management on $Server. Use an account with local admin rights on the target DC."
         }
 
         throw

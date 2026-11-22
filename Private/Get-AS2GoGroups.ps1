@@ -26,18 +26,18 @@ function Get-AS2GoGroups {
 
     Write-AS2GoOutput -Type H1 -Message "`nOverview AS2Go Groups"
 
-    $results = Get-ADGroup -Filter 'adminDescription -like "AS2GoAdmins" -or adminDescription -like "AS2GoHelpDesk" -or adminDescription -like "AS2GoVictims"' `
+    $results = Get-ADGroup -Filter 'adminDescription -like "AS2GoAdmins*" -or adminDescription -like "AS2GoHelpDesk*" -or adminDescription -like "AS2GoVictims*"' `
         -Server $server `
         -SearchBase (Get-ADDomain).DistinguishedName `
         -ResultSetSize $null |
-    Measure-Object | 
+    Measure-Object |
     Select-Object -ExpandProperty Count
 
-    Write-AS2GoOutput -Type Bullet -Message "Identified AS2Go Groups in the domain $((Get-ADDomain).DNSRoot)" -TM $results 
+    Write-AS2GoOutput -Type Bullet -Message "Identified AS2Go Groups in the domain $((Get-ADDomain).DNSRoot)" -TM $results
 
     If ($results -gt 0) {
         Write-AS2GoOutput -Type Bullet -Message "Here is an example:"
-        Get-ADGroup -Filter 'adminDescription -like "AS2GoAdmins" -or adminDescription -like "AS2GoHelpDesk" -or adminDescription -like "AS2GoVictims"' -Server $server -Properties * | Select-Object Name, Description | Sort-Object  Name | Format-Table -AutoSize | Out-Host
+        Get-ADGroup -Filter 'adminDescription -like "AS2GoAdmins*" -or adminDescription -like "AS2GoHelpDesk*" -or adminDescription -like "AS2GoVictims*"' -Server $server -Properties * | Select-Object Name, Description | Sort-Object  Name | Format-Table -AutoSize | Out-Host
     }
 
     Write-Log -Message "    >> Found $results AS2Go Groups "

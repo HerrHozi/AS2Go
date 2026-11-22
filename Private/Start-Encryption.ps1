@@ -6,7 +6,7 @@ Demonstrates certificate-based file encryption in a specified directory or share
 Checks that the supplied path exists and selects the first certificate under Cert:\LocalMachine with a
 private key and a subject matching CN=<computer name>. followed by further subject-name text.
 Enumerates all files recursively, including hidden files, and calls Start-FileEncryption for each file.
-The helper reads the file into memory, saves a plain-text copy in Script:AS2GOTempDir, and overwrites the original
+The helper reads the file into memory, saves a plain-text copy in Script:AS2GoTempDir, and overwrites the original
 using AES-256-CBC with an RSA-protected session key. Missing paths or certificates stop the workflow.
 
 .PARAMETER share
@@ -83,7 +83,7 @@ Function Start-FileEncryption {
     .Synopsis
         Encrypts a single file using AES-256-CBC with an RSA-encrypted session key.
         The file content is read into memory first, then the original is overwritten directly.
-        A plain-text safety copy is saved to $Script:AS2GOTempDir before overwriting.
+        A plain-text safety copy is saved to $Script:AS2GoTempDir before overwriting.
         The original can be restored using the private key of the provided certificate.
     #>
     Param(
@@ -95,7 +95,7 @@ Function Start-FileEncryption {
     $plainBytes = [System.IO.File]::ReadAllBytes($FileToEncrypt.FullName)
 
     # Safety copy of the original to temp before overwriting
-    $tempPath = [System.IO.Path]::Combine($Script:AS2GOTempDir, $FileToEncrypt.Name)
+    $tempPath = [System.IO.Path]::Combine($Script:AS2GoTempDir, $FileToEncrypt.Name)
     [System.IO.File]::WriteAllBytes($tempPath, $plainBytes)
 
     # Set up AES-256-CBC and wrap the session key with the certificate's public RSA key

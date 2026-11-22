@@ -14,7 +14,7 @@ backup when run without a path.
 
 .PARAMETER Path
 Specifies the destination JSON file. The destination must not already exist.
-If omitted, saves to $Script:AS2GOConfigDir\AS2Go-<root-domain>MemberShipBackup-yyyyMMdd-HHmmss.json.
+If omitted, saves to $Script:AS2GoConfigDir\AS2Go-<root-domain>MemberShipBackup-yyyyMMdd-HHmmss.json.
 The name uses the forest root domain's DNS name and the local date and time.
 
 .PARAMETER Forest
@@ -121,7 +121,7 @@ function Export-ADPrivilegedGroupDirectMember {
         if (-not $Path) {
             $Timestamp = Get-Date -Format 'yyyy-MM-dd_HHmmss'
             $BackupName = "AS2Go-$($ForestInfo.RootDomain)-PrivilegedGroupDirectMembers-$Timestamp.json"
-            $Path = Join-Path -Path $Script:AS2GOConfigDir -ChildPath $BackupName
+            $Path = Join-Path -Path $Script:AS2GoConfigDir -ChildPath $BackupName
         }
 
         $Domains = @(

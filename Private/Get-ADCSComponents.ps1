@@ -21,7 +21,7 @@ function Get-ADCSComponents {
 
     $script:EnrollmentServices = Get-ADObject -SearchBase $enrollDN -LDAPFilter "(objectClass=pKIEnrollmentService)" -Properties Name, dNSHostName, CanonicalName 
     $script:RootCA = Get-ADObject -SearchBase $RootCADN -LDAPFilter "(objectClass=certificationAuthority)" -Properties Name, dNSHostName, CanonicalName 
-    $script:CTemplates = Get-ADObject -SearchBase $CTemplateDN -LDAPFilter "(&(objectClass=pKICertificateTemplate)(Name=AS2GO*))" -Properties Name, whenChanged, CanonicalName 
+    $script:CTemplates = Get-ADObject -SearchBase $CTemplateDN -LDAPFilter "(&(objectClass=pKICertificateTemplate)(Name=AS2Go*))" -Properties Name, whenChanged, CanonicalName 
 
     "Enrollment Services: $($script:EnrollmentServices.Count)"
     $script:EnrollmentServices | Select-Object Name, @{N = 'Host'; E = { $_.dNSHostName } }, @{N = 'CanonicalName'; E = { $_.CanonicalName } }

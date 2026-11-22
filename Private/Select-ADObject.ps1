@@ -33,6 +33,14 @@
     .PARAMETER AddOU
         Enables a context menu for creating an organizational unit under a selected domain, OU, or container.
 
+    .PARAMETER TagNewOU
+        Tags any organizational unit created through -AddOU with the AS2Go adminDescription creation tag
+        and leaves it unprotected from accidental deletion, so Remove-AS2GoLab can discover and remove it.
+        Has no effect on an existing OU that is only selected, never created.
+
+    .PARAMETER Scenario
+        Scenario label written into the adminDescription tag when -TagNewOU is used. Defaults to AS2Go.
+
     .PARAMETER BlockOUSelection
         If specified, organizational units and containers can still be browsed (expanded) but cannot be
         selected, so the OK button stays disabled for them. Intended for use with -IncludeUsers,
@@ -112,6 +120,8 @@
         [switch]$LocalDomainOnly,
         [switch]$DomainSelectionOnly,
         [switch]$AddOU,
+        [switch]$TagNewOU,
+        [string]$Scenario = "AS2Go",
         [switch]$BlockOUSelection,
         [switch]$IncludeLinkedGPOs,
         [switch]$IncludeUsers,
@@ -683,7 +693,13 @@
                 }
 
                 try {
-                    $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain -PassThru -ErrorAction Stop
+                    if ($TagNewOU) {
+                        $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain `
+                            -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -ProtectedFromAccidentalDeletion:$false -PassThru -ErrorAction Stop
+                    }
+                    else {
+                        $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain -PassThru -ErrorAction Stop
+                    }
                     if ($Script:NotStandAlone) {
                         Write-Log -Message "Created organizational unit '$($createdOU.DistinguishedName)'"
                     }

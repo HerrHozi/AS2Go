@@ -36,7 +36,7 @@ function Get-AS2GoSettings {
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
     Write-Host ""
 
-    Set-ASConfig -Setting "ticketsDir" -Value $Script:AS2GOTicketsDir
+    Set-ASConfig -Setting "ticketsDir" -Value $Script:AS2GoTicketsDir
 
     # -------------------------------
     # Helper: build settings definition

@@ -40,7 +40,7 @@ function Invoke-PassTheTicketAttackSingleBox {
     Show-CurrentPhase -Phase "ASP07_PtT.html"
     $Script:ASSAW = Get-ASConfig -Setting "AS2GoSAW"
 
-    $TicketsToAbusePath = $Script:AS2GOTicketsDir
+    $TicketsToAbusePath = $Script:AS2GoTicketsDir
     # The single box mirrors the local AS2Go public folder layout, resolved remotely via $env:PUBLIC.
     $BoxTicketsPath = Join-Path -Path $Script:AS2GoPublicDir -ChildPath 'Temp\tickets'
     $RubeusExe = Join-Path -Path $Script:AS2GoPublicDir -ChildPath 'MaliciousTools\Rubeus.exe'

@@ -36,7 +36,7 @@ if (-not $isAdmin) {
 }
 #>
 
-If ($env:AS2GO_EXPORT_PRIVATE -ne 1) {
+If ($env:AS2Go_EXPORT_PRIVATE -ne 1) {
     ##Requires -RunAsAdministrator
 }
 
@@ -51,18 +51,20 @@ $ASModuleName = $MyInvocation.MyCommand.ScriptBlock.Module.Name
 
 $ASModuleManifest = (Test-ModuleManifest -Path $(join-path $ASModulePath -ChildPath "\$ASModuleName.psd1"))
 $ASModuleLastUpdate = $ASModuleManifest.PrivateData.PSData.LastUpdate
-$Script:SensitiveInfos = "c:\temp\as2go\daily-work.txt"
 
+$env:AS2Go = $ASModulePath
+
+$Script:SensitiveInfos = "c:\temp\as2go\daily-work.txt"
 $script:AS2GoPublicDir = Join-Path -Path $env:PUBLIC -ChildPath "AS2Go"
 $Script:AS2GoLogDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Logs"
-$Script:AS2GOTempDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Temp"
-$Script:AS2GOConfigDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Config"
+$Script:AS2GoTempDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Temp"
+$Script:AS2GoConfigDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Config"
 $Script:DefautCleanUpFolder = Join-Path -Path $script:AS2GoPublicDir -ChildPath "CleanUp"
 $Script:DefautExfiltrationFolder = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Exfiltration"
-$Script:AS2GOTicketsDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Tickets"
+$Script:AS2GoTicketsDir = Join-Path -Path $script:AS2GoPublicDir -ChildPath "Tickets"
 
 $Script:ASModuleLog = Join-Path -Path $Script:AS2GoLogDir -ChildPath "AS2Go.log"
-$Script:ConfigFile = Join-Path -Path $Script:AS2GOConfigDir -ChildPath "AS2Go.json"
+$Script:ConfigFile = Join-Path -Path $Script:AS2GoConfigDir -ChildPath "AS2Go.json"
 
 $Script:ASTools = Join-Path -Path $ASModulePath -ChildPath "Tools"
 $Script:ASPhases = Join-Path -Path $ASModulePath -ChildPath "Phases"
@@ -377,7 +379,7 @@ $PublicScriptBlock = [ScriptBlock]::Create((Get-ChildItem -Path $PublicPath | Ge
 $PublicFunctionAsts = $PublicScriptBlock.Ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $SearchRootOnly)
 $PublicFunctions = $PublicFunctionAsts.Name
 
-If ($env:AS2GO_EXPORT_PRIVATE -eq 1) {
+If ($env:AS2Go_EXPORT_PRIVATE -eq 1) {
     $ExportPrivateFunctions = $true
     $Script:EnableLogging = $true
 }
@@ -434,10 +436,10 @@ Initialize-AS2GoDirectory -Directory $Script:AS2GoConfigDir
 Initialize-AS2GoDirectory -Directory (Join-Path -Path $script:AS2GoPublicDir -ChildPath "MaliciousTools")
 Initialize-AS2GoDirectory -Directory $Script:DefautCleanUpFolder
 Initialize-AS2GoDirectory -Directory $Script:DefautExfiltrationFolder
-Initialize-AS2GoDirectory -Directory $Script:AS2GOTicketsDir
+Initialize-AS2GoDirectory -Directory $Script:AS2GoTicketsDir
 
 If (-not (Test-Path -Path $Script:ConfigFile)) {
-    copy-item "$ASModulePath\AS2GO.json" -Destination $Script:ConfigFile
+    copy-item "$ASModulePath\AS2Go.json" -Destination $Script:ConfigFile
 }
 
 $LegacySettingNames = [ordered]@{

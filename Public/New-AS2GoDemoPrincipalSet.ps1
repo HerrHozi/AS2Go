@@ -44,6 +44,10 @@ Skips the compromised account.
 .PARAMETER Server
 Writable domain controller or domain to use for Active Directory operations. Defaults to the current domain.
 
+.PARAMETER Scenario
+Scenario label written into adminDescription (AS2Go|Scenario|ASP00|Create) so Remove-AS2GoLab and
+Update-AS2GoLabAttribute can discover these accounts later. Defaults to AS2Go.
+
 .PARAMETER MasterPassword
 Shared password for every created account. At least seven characters to satisfy
 the default Active Directory password complexity requirements.
@@ -77,6 +81,7 @@ function New-AS2GoDemoPrincipalSet {
         [Alias('VIUser')][ValidateLength(1, 20)][string]$CAAccount = 'AS2go',
         [ValidateLength(1, 20)][string]$SrvAccount = 'As2go-T0-SA',
         [ValidateNotNullOrEmpty()][string]$Server,
+        [string]$Scenario = "AS2Go",
         [Switch]$EnableLogging
         # 7 characters satisfies the default Active Directory password complexity policy.
         # AllowNull keeps 'New-AS2GoDemoPrincipalSet -WhatIf' working without a password.
@@ -206,7 +211,7 @@ function New-AS2GoDemoPrincipalSet {
                 Description           = 'AS2Go Lab Account'
                 Path                  = $account.Path
                 AccountExpirationDate = $now.AddDays(7)
-                OtherAttributes       = @{ thumbnailPhoto = $thumbnailPhoto }
+                OtherAttributes       = @{ thumbnailPhoto = $thumbnailPhoto; adminDescription = "AS2Go|$Scenario|ASP00|Create" }
                 Enabled               = $false
             }
             if (-not $password) {
@@ -247,7 +252,7 @@ function New-AS2GoDemoPrincipalSet {
                 $spnAction = "Create computer '$spnComputer' in '$spnPathDN' and assign SPN '$spn'"
                 if ($PSCmdlet.ShouldProcess($account.Name, $spnAction)) {
                     New-ADComputer -Name $spnComputer -Description 'AS2Go Lab Computer - needed for Kerberoasting Attack' `
-                        -OperatingSystem 'Windows Server 2019 Standard' -Path $spnPathDN @adParameters -Confirm:$false
+                        -OperatingSystem 'Windows Server 2019 Standard' -Path $spnPathDN -OtherAttributes @{ adminDescription = "AS2Go|$Scenario|ASP00|Create" } @adParameters -Confirm:$false
                     Set-ADUser -Identity $user -ServicePrincipalNames @{ Add = $spn } @adParameters -Confirm:$false
                     Write-AS2GoOutput -Type Success -Message "Assigned SPN '$spn' to '$($account.Name)' (SPN target computer '$spnComputer')." -NoExtraLines
                 }

@@ -38,7 +38,7 @@ function New-DemoAccount {
         return
     }
 
-    $ou = Initialize-ADOUPath -DistinguishedName $TargetOU -Server $Server
+    $ou = Initialize-ADOUPath -DistinguishedName $TargetOU -Server $Server -Scenario $Scenario
     $cname = Convert-FromDNToCN -DistinguishedName $ou.DistinguishedName
 
 
@@ -53,7 +53,7 @@ function New-DemoAccount {
         [pscustomobject] @{ Label = "Nested by location &and department"; Help = "Create two additional OU levels and provision accounts: $cname/<country>/<department>"; Value = "TwoLevel" }
     )
 
-    $title = "AS2GO - Select target OU structure for new AS2GO demo accounts"
+    $title = "AS2Go - Select target OU structure for new AS2Go demo accounts"
     $message = "Press Enter to use the default structure '$cname' or choose an option below."
     $OUStructure = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
 
@@ -66,14 +66,14 @@ function New-DemoAccount {
         If ($OUStructure -eq "Country") {
             $UniqueCountryCodes | ForEach-Object {
                 $newOU = "OU=$_,$TargetOU"
-                $ou = Initialize-ADOUPath -DistinguishedName $newOU -Server $Server
+                $ou = Initialize-ADOUPath -DistinguishedName $newOU -Server $Server -Scenario $Scenario
                 $i++
             }
         }
         elseIf ($OUStructure -eq "Department") {
             $Script:Departments.Name | ForEach-Object {
                 $newOU = "OU=$_,$TargetOU"
-                $ou = Initialize-ADOUPath -DistinguishedName $newOU -Server $Server
+                $ou = Initialize-ADOUPath -DistinguishedName $newOU -Server $Server -Scenario $Scenario
                 $i++
             }
         }
@@ -82,7 +82,7 @@ function New-DemoAccount {
                 $newOU = "OU=$_,$TargetOU"
                 $Script:Departments.Name | ForEach-Object {
                     $newOUL2 = "OU=$_,$newOU"
-                    $ou = Initialize-ADOUPath -DistinguishedName $newOUL2 -Server $Server
+                    $ou = Initialize-ADOUPath -DistinguishedName $newOUL2 -Server $Server -Scenario $Scenario
                     $i++
                 }
             }
@@ -140,6 +140,7 @@ function New-DemoAccount {
                 -employeeID ($_.Country + $id.ToString('D6')) `
                 -OtherAttributes @{ 'employeeType' = 'AS2GoDemoUser'
                 'telephoneNumber'                  = $_.TelephoneNumber
+                'adminDescription'                 = "AS2Go|$($using:Scenario)|ASP00|Create"
             } `
                 -Department $localDepartments[$deptIndex].Name  `
                 -Title $localDepartments[$deptIndex].Positions[(Get-Random -Minimum 0 -Maximum $localDepartments[$deptIndex].Positions.Count)]  `

@@ -35,11 +35,11 @@ function Invoke-PassTheTicketAttackLocalMachine {
 
     $Info = Measure-FunctionRuntime -Begin
 
-    Show-CurrentPhase -Phase "ASP07_PtT.html"
+    Show-CurrentPhase -Phase "ASP07_PtTLocal.html"
 
     $tool1 = Join-Path -Path $Script:ASTools -ChildPath "Rubeus.exe"
     
-    $TicketsToAbusePath = $Script:AS2GOTicketsDir
+    $TicketsToAbusePath = $Script:AS2GoTicketsDir
 
     If (-not $SkipClearHost) { Clear-Host }
 

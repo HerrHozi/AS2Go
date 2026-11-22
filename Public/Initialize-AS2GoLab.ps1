@@ -403,7 +403,7 @@ function Initialize-AS2GoLab {
         
         switch ($decision) {
             "Share" {
-                Invoke-BackUpShare
+                Invoke-BackUpShare -Scenario $Scenario
             }
             "MaliciousTools" {
                 Initialize-AS2GoTools

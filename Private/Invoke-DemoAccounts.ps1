@@ -5,7 +5,7 @@
 Creates AS2Go demo and compromised accounts in a selected Active Directory OU.
 
 .DESCRIPTION
-Reads AS2GO-DemoUsers.csv and offers the saved account count or a custom count within the available CSV rows.
+Reads AS2Go-DemoUsers.csv and offers the saved account count or a custom count within the available CSV rows.
 Prompts for the default Demo Accounts OU or another OU and saves the selected search base in module settings.
 Creates randomly selected CSV users with scenario attributes and optional nested OUs through New-DemoAccount.
 Then adds random users to Account Operators and creates a compromised account, optionally joining the compromised account group.
@@ -70,7 +70,7 @@ Function Invoke-DemoAccounts {
 
 
    [int]$recommendAmount = Get-ASConfig -Setting "LastNumofDemoUsers"
-   $FileWithDemoUsers = Join-Path -Path $Script:ASSetup -ChildPath "AS2GO-DemoUsers.csv"
+   $FileWithDemoUsers = Join-Path -Path $Script:ASSetup -ChildPath "AS2Go-DemoUsers.csv"
 
    if (Test-path $FileWithDemoUsers) {
       [int]$NoDemoUsers = Import-Csv $FileWithDemoUsers | Measure-Object | Select-Object -ExpandProperty Count
@@ -92,7 +92,7 @@ Function Invoke-DemoAccounts {
       [pscustomobject] @{ Label = "&Skip"; Help = "Skip creating demo users."; Value = "S" }
    )
 
-   $title = "AS2Go - Specify the number of new AS2GO Demo Users"
+   $title = "AS2Go - Specify the number of new AS2Go Demo Users"
    $message = "Press Enter to confirm the default value ($recommendAmount) or select an option below."
    $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
 
@@ -115,12 +115,12 @@ Function Invoke-DemoAccounts {
       [pscustomobject] @{ Label = "&Skip"; Help = "Skip creating demo users."; Value = "S" }
    )
 
-   $title = "AS2Go - Select target OU for new AS2GO demo accounts."
+   $title = "AS2Go - Select target OU for new AS2Go demo accounts."
    $message = "Press Enter to confirm the default OU '$cname' or choose an option below."
    $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
 
    If ($answer -eq "O") {
-      $OrganizationalUnit = Select-ADObject -Title "Select Target OU - Domain switching is NOT supported (YET)!" -LocalDomainOnly -AddOU
+      $OrganizationalUnit = Select-ADObject -Title "Select Target OU - Domain switching is NOT supported (YET)!" -LocalDomainOnly -AddOU -TagNewOU -Scenario $Scenario
       if ($OrganizationalUnit -eq $null) {
          Write-AS2GoOutput -Type Warning -Message "No organizational unit was selected. Using the default OU."
          $OrganizationalUnit = "OU=Demo Accounts,OU=$AS2GoOU,$((Get-ADDomain).DistinguishedName)"
@@ -143,7 +143,7 @@ Function Invoke-DemoAccounts {
 
    $pw = Get-ASConfig -Setting "LastPW" -DPAPI
    $CASecurePass = ConvertTo-SecureString -String $pw -AsPlainText -Force
-   Add-CompromisedAccount -TargetOU $OrganizationalUnit -UPNSuffix $UPNSuffix -Server $Script:LogonServer -AccountPassword $CASecurePass
+   Add-CompromisedAccount -TargetOU $OrganizationalUnit -UPNSuffix $UPNSuffix -Server $Script:LogonServer -AccountPassword $CASecurePass -Scenario $Scenario
 
    Write-AS2GoOutput -Type TextMaker -Message "Done - New Users available under" -TM $cname
    Measure-FunctionRuntime -End -Details $Info

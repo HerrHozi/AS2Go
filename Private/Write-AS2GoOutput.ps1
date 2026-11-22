@@ -151,9 +151,10 @@ Write-AS2GoOutput {
             }
             Else {
                 Write-host "`n  [!] " -NoNewline -ForegroundColor $Script:FGCWarning
-                Write-Warning "$Message`n`n"
-            }   
-            $level = "WARN" 
+                Write-Warning $Message
+                Write-Host ""
+            }
+            $level = "WARN"
         }
         "Bullet" { 
             Write-host "  • $Message " -ForegroundColor $Script:FGCBullet -NoNewline

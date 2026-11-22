@@ -26,7 +26,7 @@ function Get-TieringAssets {
 
     Write-AS2GoOutput -Type H1 -Message "`nOverview AS2Go Assets"
 
-    $results = Get-ADOrganizationalUnit -Filter 'postalCode -like "AS2GOTierung"' `
+    $results = Get-ADOrganizationalUnit -Filter 'postalCode -like "AS2GoTierung"' `
         -Server $server `
         -SearchBase (Get-ADDomain).DistinguishedName `
         -ResultSetSize $null |
@@ -37,7 +37,7 @@ function Get-TieringAssets {
 
     If ($results -gt 0) {
         Write-AS2GoOutput -Type Bullet -Message "Here is an example:"
-        Get-ADOrganizationalUnit -Filter 'postalCode -like "AS2GOTierung"' -Server $server -Properties * | Select-Object CanonicalName, Description | Sort-Object  CanonicalName | Format-Table -AutoSize | Out-Host
+        Get-ADOrganizationalUnit -Filter 'postalCode -like "AS2GoTierung"' -Server $server -Properties * | Select-Object CanonicalName, Description | Sort-Object  CanonicalName | Format-Table -AutoSize | Out-Host
     }
 
     Write-Log -Message "    >> Found $results Demo Account "

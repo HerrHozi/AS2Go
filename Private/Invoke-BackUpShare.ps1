@@ -32,10 +32,12 @@ Copies and lists sample backup files, then saves the share path for later data-a
 function Invoke-BackUpShare {
 
     ################################################################################
-    #####                                                                      ##### 
-    #####    Start Process to create and fill Share on Domain Controller       #####                              
+    #####                                                                      #####
+    #####    Start Process to create and fill Share on Domain Controller       #####
     #####                                                                      #####
     ################################################################################
+
+    Param([string] $Scenario = "AS2Go")
 
     $Info = Measure-FunctionRuntime -Begin
     Show-CurrentPhase -Phase "ASP12_Encryption.html"
@@ -72,7 +74,7 @@ function Invoke-BackUpShare {
     Write-AS2GoOutput -Type Bullet -Message "Target Domain Controller:" -TM $TargetServer
     
     try {
-        New-BackUpShare -Server $TargetServer -ErrorAction Stop
+        New-BackUpShare -Server $TargetServer -Scenario $Scenario -ErrorAction Stop
 
         get-childitem -Recurse | Add-Content "\\$TargetServer\AD-Backup\ntds.dit"
         Copy-Item "$Script:ASSetup\ShareContent\*.*" -Destination "\\$TargetServer\AD-Backup" -Force -ErrorAction Stop
@@ -88,7 +90,7 @@ function Invoke-BackUpShare {
         $errMsg = $_.Exception.Message
         if (
             $_.CategoryInfo.Category -eq [System.Management.Automation.ErrorCategory]::PermissionDenied -or
-            $errMsg -match '(?i)AS2GO_ACCESS_DENIED|access is denied|cannot connect to cim server|connecting to remote server .* failed'
+            $errMsg -match '(?i)AS2Go_ACCESS_DENIED|access is denied|cannot connect to cim server|connecting to remote server .* failed'
         ) {
             Write-AS2GoOutput -Type Error -Message "No permission to create or write backup share on $TargetServer. Use an account with local admin/share permissions."
         }

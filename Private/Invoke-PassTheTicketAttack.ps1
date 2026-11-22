@@ -40,8 +40,8 @@ function Invoke-PassTheTicketAttack {
     $Script:ASTicketsUNCPath = Get-ASConfig -Setting "ticketsPath"
 
     $TicketsSourcePath = "\\$Script:ASSAW\$Script:ASTicketsUNCPath"
-    $TicketsTargetPath = $Script:AS2GOTempDir
-    $TicketsToAbusePath = $Script:AS2GOTicketsDir
+    $TicketsTargetPath = $Script:AS2GoTempDir
+    $TicketsToAbusePath = $Script:AS2GoTicketsDir
 
     $path = Get-ASConfig -Setting "Tools"
     $tool1 = join-path -path $path -childpath "mimikatz.exe"

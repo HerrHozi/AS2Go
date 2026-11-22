@@ -26,7 +26,7 @@ function Get-ADCSCertificateTemplates {
 
     ################################################################################
     #####                                                                      ##### 
-    #####    Get all AS2GO specific certificate Templates                      #####                      
+    #####    Get all AS2Go specific certificate Templates                      #####                      
     #####                                                                      #####
     ################################################################################
 
@@ -44,15 +44,16 @@ function Get-ADCSCertificateTemplates {
 
     $ConfigNC = (Get-ADRootDSE -Server $Server).ConfigurationNamingContext
     $escapedPrefix = $CTPrefix.Replace('\', '\5c').Replace('*', '\2a').Replace('(', '\28').Replace(')', '\29').Replace([string][char]0, '\00')
-    $adminDescriptionFilter = $escapedPrefix
     $matchDescription = "with adminDescription prefix '$CTPrefix'"
     if ($ExactMatch) {
+        # Matches the legacy exact value and the current tagged value (Name|Scenario|ASP00|Create).
+        $adminDescriptionClause = "(|(adminDescription=$escapedPrefix)(adminDescription=$escapedPrefix|*))"
         $matchDescription = "with adminDescription '$CTPrefix'"
     }
     else {
-        $adminDescriptionFilter += '*'
+        $adminDescriptionClause = "(adminDescription=$escapedPrefix*)"
     }
-    $templates = @(Get-ADObject -LDAPFilter "(&(objectClass=pKICertificateTemplate)(adminDescription=$adminDescriptionFilter))" `
+    $templates = @(Get-ADObject -LDAPFilter "(&(objectClass=pKICertificateTemplate)$adminDescriptionClause)" `
         -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,$ConfigNC"  `
         -Properties Name, adminDescription, whenChanged, CanonicalName   `
         -Server $Server)
@@ -72,7 +73,7 @@ function Get-ADCSCertificateTemplates {
     }
     
     $4logfile = $templates | Select-Object Name, adminDescription, whenChanged, CanonicalName | Format-Table | Out-String
-    Write-Log -Message "    >> Identified the following AS2GO specific certificate Template withing Forest '$ConfigNC': $4logfile"
+    Write-Log -Message "    >> Identified the following AS2Go specific certificate Template withing Forest '$ConfigNC': $4logfile"
   
     Measure-FunctionRuntime -End -Details $Info
 }

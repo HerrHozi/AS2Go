@@ -26,13 +26,14 @@ function Add-CompromisedAccount {
         [string]$UPNSuffix,
         [Parameter(Mandatory)][string]$Server,
         [ValidateNotNullOrEmpty()][string]$Shortname = "n",
-        [System.Security.SecureString]$AccountPassword
+        [System.Security.SecureString]$AccountPassword,
+        [string]$Scenario = "AS2Go"
     )
 
     $Info = Measure-FunctionRuntime -Begin
 
     try {
-        $ou = Initialize-ADOUPath -DistinguishedName $TargetOU -Server $Server
+        $ou = Initialize-ADOUPath -DistinguishedName $TargetOU -Server $Server -Scenario $Scenario
         $UPNSuffix = if ([string]::IsNullOrWhiteSpace($UPNSuffix)) {
             Set-UPNSuffix
         }
@@ -74,6 +75,7 @@ function Add-CompromisedAccount {
             "l"                          = "somewhere in Germany"
             "wWWHomePage"                = "https://HerrHozi.com"
             "physicalDeliveryOfficeName" = "AS2Go Lab"
+            "adminDescription"           = "AS2Go|$Scenario|ASP00|Create"
         }
 
         $CAGroup = Get-ADGroup -Filter 'SamAccountName -eq "SG-AS2Go-Victims"' -Server $Server -ErrorAction Stop

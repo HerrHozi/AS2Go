@@ -126,15 +126,14 @@ $Tools = @(
     ## AS2Go-Tools_v3.zip and AS2Go-Tools_v3.7z (PW: HerrHozi!)
     Write-Host
     Write-AS2GoOutput -Type H1 -Message "The password-protected ZIP archive contains the following tools:"
-    Write-Host
 
     $Tools | Format-Table Tool, Release, LastBuild, SHA256 -AutoSize | out-host
 
-    Write-AS2GoOutput -Type Bullet -Message "NetSess.exe    Release: 2.0.0.46 (last build 20220105)"
-    Write-AS2GoOutput -Type Bullet -Message "Mimikatz.exe   Release: 2.2.0.0  (last build 20220809)"
-    Write-AS2GoOutput -Type Bullet -Message "Rubeus.exe     Release: 2.3.3.0  (last build 20251009)"
-    Write-AS2GoOutput -Type Bullet -Message "Certify.exe    Release: 2.0.0.0  (last build 20251009)"
-    Write-AS2GoOutput -Type Bullet -Message "PsExec.exe     Release: 2.4      (last build 20220719)"
+#    Write-AS2GoOutput -Type Bullet -Message "NetSess.exe    Release: 2.0.0.46 (last build 20220105)"
+#    Write-AS2GoOutput -Type Bullet -Message "Mimikatz.exe   Release: 2.2.0.0  (last build 20220809)"
+#    Write-AS2GoOutput -Type Bullet -Message "Rubeus.exe     Release: 2.3.3.0  (last build 20251009)"
+#    Write-AS2GoOutput -Type Bullet -Message "Certify.exe    Release: 2.0.0.0  (last build 20251009)"
+#    Write-AS2GoOutput -Type Bullet -Message "PsExec.exe     Release: 2.4      (last build 20220719)"
 
     Write-AS2GoOutput -Type TextMaker -Message "Please extract manually the tools from the ZIP archive to the folder '$defaultFolder'.`n      The archive password is: " -TM "HerrHozi!"
     Invoke-Item $defaultFolder
