@@ -7,14 +7,18 @@ Reads Rubeus triage output and extracts one record per logon session (LUID).
 Supports the pipe-separated triage table ("| LUID | UserName | Service | EndTime |") with
 "SamAccountName @ FQDN" in the user column, and the legacy block format with
 "LUID: 0x...; UserName: ..." header lines followed by indented ticket lines.
-Computer accounts (trailing dollar sign) and sessions without any TGT or service
-ticket are excluded.
+Only a "krbtgt/<realm>" entry whose realm matches the session's own domain is treated as
+the usable TGT; a "krbtgt/<other realm>" entry is a cross-realm referral ticket (seen when
+only a trust-path ticket is cached, not the account's own domain TGT) and cannot be used to
+request arbitrary new service tickets in the account's own domain, so it is kept separately
+as CrossRealmTGTSpn instead. Computer accounts (trailing dollar sign) and sessions without
+any TGT, referral ticket, or service ticket are excluded.
 
 .PARAMETER TriageOutput
 Complete text output of a Rubeus triage run.
 
 .OUTPUTS
-Custom objects with LUID, UserName, TGTSpn, and ServiceSpn.
+Custom objects with LUID, UserName, Domain, TGTSpn, TGTEndTime, CrossRealmTGTSpn, and ServiceSpn.
 
 .EXAMPLE
 Get-RubeusTriageSessions -TriageOutput (.\Rubeus.exe triage | Out-String)
@@ -44,26 +48,45 @@ function Get-RubeusTriageSessions {
     foreach ($line in ($TriageOutput -split "`r?`n")) {
 
         # Rubeus table row: "| LUID | UserName | Service | EndTime |"
-        If ($line -match '^\s*\|\s*(0x[0-9a-fA-F]+)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*[^|]*?\s*\|\s*$') {
+        If ($line -match '^\s*\|\s*(0x[0-9a-fA-F]+)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*$') {
             $luid = $Matches[1]
             $userParts = $Matches[2] -split '\s+@\s+'
             $userName = $userParts[0].Trim()
             $domain = If ($userParts.Count -gt 1) { $userParts[1].Trim() } else { '' }
             $spn = $Matches[3].Trim()
+            $endTimeText = $Matches[4].Trim()
 
             If (-not $found.Contains($luid)) {
                 $found[$luid] = [pscustomobject]@{
-                    LUID       = $luid
-                    UserName   = $userName
-                    Domain     = $domain
-                    TGTSpn     = ''
-                    ServiceSpn = ''
+                    LUID             = $luid
+                    UserName         = $userName
+                    Domain           = $domain
+                    TGTSpn           = ''
+                    TGTEndTime       = $null
+                    CrossRealmTGTSpn = ''
+                    ServiceSpn       = ''
                 }
             }
 
             If ($spn) {
-                If ($spn -match '^krbtgt/') {
-                    If (-not $found[$luid].TGTSpn) { $found[$luid].TGTSpn = $spn }
+                If ($spn -match '^krbtgt/(.+)$') {
+                    # A "krbtgt/<realm>" entry is only a usable TGT when <realm> is the session's own
+                    # domain. A different realm is a cross-realm referral/trust-path ticket - it lets
+                    # Windows follow one specific trust, not request arbitrary new tickets in the
+                    # account's own domain, so it must not be treated as "the TGT" for candidate selection.
+                    If ($Matches[1].Trim() -eq $domain) {
+                        If (-not $found[$luid].TGTSpn) {
+                            $found[$luid].TGTSpn = $spn
+                            # Used to prefer the longest-still-valid TGT when several sessions qualify.
+                            $parsedEndTime = [datetime]::MinValue
+                            If ([datetime]::TryParse($endTimeText, [ref]$parsedEndTime)) {
+                                $found[$luid].TGTEndTime = $parsedEndTime
+                            }
+                        }
+                    }
+                    elseif (-not $found[$luid].CrossRealmTGTSpn) {
+                        $found[$luid].CrossRealmTGTSpn = $spn
+                    }
                 }
                 elseif (-not $found[$luid].ServiceSpn) {
                     $found[$luid].ServiceSpn = $spn
@@ -75,20 +98,28 @@ function Get-RubeusTriageSessions {
             $curLuid = $Matches[1]
             If (-not $found.Contains($curLuid)) {
                 $found[$curLuid] = [pscustomobject]@{
-                    LUID       = $curLuid
-                    UserName   = $Matches[2]
-                    Domain     = ''
-                    TGTSpn     = ''
-                    ServiceSpn = ''
+                    LUID             = $curLuid
+                    UserName         = $Matches[2]
+                    Domain           = ''
+                    TGTSpn           = ''
+                    TGTEndTime       = $null
+                    CrossRealmTGTSpn = ''
+                    ServiceSpn       = ''
                 }
             }
         }
         # Legacy ticket line: "   krbtgt   krbtgt/DOMAIN   <date>"
-        elseif ($curLuid -and $line -match '^\s*(\S+)\s+([^\s]+/[^\s]+)\s+\d{1,2}/\d{1,2}/\d{4}') {
+        elseif ($curLuid -and $line -match '^\s*(\S+)\s+([^\s]+/[^\s]+)\s+(\d{1,2}/\d{1,2}/\d{4}.*)$') {
             $spn = $Matches[2]
             If ($found.Contains($curLuid)) {
                 If ($spn -match '^krbtgt/') {
-                    If (-not $found[$curLuid].TGTSpn) { $found[$curLuid].TGTSpn = $spn }
+                    If (-not $found[$curLuid].TGTSpn) {
+                        $found[$curLuid].TGTSpn = $spn
+                        $parsedEndTime = [datetime]::MinValue
+                        If ([datetime]::TryParse($Matches[3].Trim(), [ref]$parsedEndTime)) {
+                            $found[$curLuid].TGTEndTime = $parsedEndTime
+                        }
+                    }
                 }
                 elseif (-not $found[$curLuid].ServiceSpn) {
                     $found[$curLuid].ServiceSpn = $spn

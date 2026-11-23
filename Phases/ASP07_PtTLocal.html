@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AS2Go · Privilege Escalation · Pass-the-Ticket (PtT) (example)</title>
+  <title>AS2Go · Privilege Escalation · Pass-the-Ticket (PtT) - Local Machine with Rubeus (example)</title>
   <style>
     :root {
       color-scheme: dark;
@@ -212,15 +212,15 @@
 <body data-theme="dark">
   <header class="top">
     <img class="brand-mark" src="../Assets/Images/AS2Go-Icon-Cyan-Red.png" alt="AS2Go logo" width="36" height="36">
-    <span class="title"><span class="brand">AS2Go</span> · Privilege Escalation · Pass-the-Ticket (PtT) (example)</span>
+    <span class="title"><span class="brand">AS2Go</span> · Privilege Escalation · Pass-the-Ticket (PtT) - Local Machine with Rubeus (example)</span>
     <span class="host">Cyber Kill Chain</span>
     <button type="button" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false">Light / dark</button>
   </header>
   <main>
-    <figure class="diagram" aria-label="AS2Go attack scenario: Pass-the-Ticket">
-      <img src="../Assets/Images/ASP07_PtTLm.png" alt="AS2Go attack scenario: Pass-the-Ticket">
+    <figure class="diagram" aria-label="AS2Go attack scenario: Pass-the-Ticket on the local machine with Rubeus">
+      <img src="../Assets/Images/ASP07_PtTLm.png" alt="AS2Go attack scenario: Pass-the-Ticket on the local machine with Rubeus">
     </figure>
-    <nav class="panel" aria-label="Pass-the-Ticket (PtT) references">
+    <nav class="panel" aria-label="Local Pass-the-Ticket (PtT) references">
       <a href="./ASP07_Attack-Compatibility-Reference.html" target="_blank" rel="noopener noreferrer">Attack Matrix</a>
       <a href="https://cymulate.com/cybersecurity-glossary/pass-the-ticket-attack/" target="_blank"
         rel="noopener noreferrer">Pass-the-Ticket 101</a>
@@ -229,23 +229,25 @@
     </nav>
     <section class="panel">
       <span class="eyebrow">PHASE 07</span>
-      <h1>Pass-the-Ticket (PtT)</h1>
-      <p>This phase demonstrates how an attacker extracts Kerberos tickets from a privileged access
-        workstation, copies the stolen .kirbi files to a compromised workstation, and imports them to act as
-        the privileged identity.</p>
+      <h1>Pass-the-Ticket (PtT) - Local Machine with Rubeus</h1>
+      <p>This phase demonstrates how an attacker uses Rubeus to harvest, select, dump, and reuse
+        cached Kerberos tickets on the same Windows machine, then attempts to access domain controller
+        administrative shares using the resulting Kerberos context.</p>
     </section>
     <div class="grid">
       <section class="panel">
         <h2>What this phase shows</h2>
-        <p>Covers staging Mimikatz on the PAW, extracting Kerberos tickets, copying the .kirbi files to a
-          compromised user workstation, injecting and reusing the stolen tickets there, and accessing
-          domain resources up to domain controller Tier 0 resources as a Domain Admin.</p>
+        <p>Covers inspecting local tickets and logon sessions with Rubeus triage, selecting a candidate
+          with a TGT and service ticket, and saving the selected session's TGT and available CIFS tickets as
+          local .kirbi files. Rubeus ptt imports these tickets into the current logon session; klist shows
+          the cached tickets before access to a domain controller's C$ share is tested in each forest domain.</p>
       </section>
       <section class="panel">
         <h2>Security lesson</h2>
-        <p>Restrict tooling and logons on privileged access workstations, monitor Kerberos ticket reuse
-          across hosts for the same account, and alert on unusual Local Security Authority process access
-          and ticket import activity.</p>
+        <p>Privileged Kerberos tickets cached on a compromised machine can be reused without knowing
+          the account password. Keep privileged logons off lower-trust machines, protect cached credentials,
+          and monitor ticket extraction, ticket injection, and unexpected access to domain controller
+          administrative shares. Access depends on the reused identity's permissions.</p>
       </section>
     </div>
   </main>

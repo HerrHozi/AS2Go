@@ -124,7 +124,10 @@ function New-PrivilegeEscalationRecommendation {
     }
 
 
-
+    $locallogons = get-LocalLogonSession  | 
+    Where-Object { $_.HasProcesses -eq $true } | 
+    Select-Object -Unique -Property Domain, UserName  | 
+    Sort-Object Domain, UserName 
 
     $client = Get-CachedKerberosTicketsClient
 
@@ -184,6 +187,16 @@ function New-PrivilegeEscalationRecommendation {
     else {
         Write-AS2GoOutput -Type BAD -Message 'The current PowerShell process is not running with an elevated administrator token.'
     }
+
+    if ($locallogons.Count -gt 1) {
+        Write-AS2GoOutput -Type TOP -Message "Identified additional active local logon session(s):" -TextMaker "$($locallogons.Count - 1)"
+    }
+    else {
+        Write-AS2GoOutput -Type BAD -Message 'No ADDITIONAL active local logon session identified.'
+    }
+
+
+
 
     If ($bMemberofDA) {
         Write-AS2GoOutput -Type TOP -Message "Lab PC '$env:COMPUTERNAME' is a member of the" -TextMaker 'Domain Admins group.'

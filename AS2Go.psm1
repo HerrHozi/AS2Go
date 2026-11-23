@@ -52,7 +52,7 @@ $ASModuleName = $MyInvocation.MyCommand.ScriptBlock.Module.Name
 $ASModuleManifest = (Test-ModuleManifest -Path $(join-path $ASModulePath -ChildPath "\$ASModuleName.psd1"))
 $ASModuleLastUpdate = $ASModuleManifest.PrivateData.PSData.LastUpdate
 
-$env:AS2Go = $ASModulePath
+$env:AS2Go = $ASModuleTopPath
 
 $Script:SensitiveInfos = "c:\temp\as2go\daily-work.txt"
 $script:AS2GoPublicDir = Join-Path -Path $env:PUBLIC -ChildPath "AS2Go"

