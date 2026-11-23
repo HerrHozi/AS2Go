@@ -4,11 +4,11 @@ Converts an LSASS logon-session text dump into session objects.
 
 .DESCRIPTION
 Parses the supplied text file and returns one object per Authentication Id block. Reads
-session metadata, the NTLM value from the msv section, and the username and domain from
-the kerberos section. Domain contains the NetBIOS domain from the session header; FQDN
-contains the domain from the kerberos section. Missing fields and literal (null) values
-are returned as $null. LogonTime remains a string. Reads the file only; it does not
-access LSASS, collect credentials, or authenticate.
+session metadata, and the username and NTLM value from the msv section (so both values
+describe the same credential). Domain contains the NetBIOS domain from the session
+header; FQDN contains the domain from the kerberos section. Missing fields and literal
+(null) values are returned as $null. LogonTime remains a string. Reads the file only; it
+does not access LSASS, collect credentials, or authenticate.
 
 .PARAMETER Path
 Path to the text dump file. Defaults to C:\Users\Public\AS2Go\Exfiltration\test.log.
@@ -78,8 +78,8 @@ function ConvertFrom-CredentialDump {
             elseif ($Line -match '^\s*\*\s*(Username|Domain|NTLM)\s*:\s*(.*?)\s*$') {
                 $Property = $Matches[1]
                 $Value = $Matches[2]
-                if (($Section -eq 'msv' -and $Property -eq 'NTLM') -or
-                    ($Section -eq 'kerberos' -and $Property -in 'Username', 'Domain')) {
+                if (($Section -eq 'msv' -and $Property -in 'Username', 'NTLM') -or
+                    ($Section -eq 'kerberos' -and $Property -eq 'Domain')) {
                     if ($Section -eq 'kerberos' -and $Property -eq 'Domain') {
                         $Property = 'FQDN'
                     }

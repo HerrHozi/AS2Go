@@ -117,11 +117,10 @@ function Invoke-Reconnaissance {
         }
     } | Format-Table HostName, IPv4Address, IsReadOnly, IsGlobalCatalog, Site, CanonicalName
 
-    Write-AS2GoOutput -Type  Header -M "... and connect to one c$ share"
 
-    Get-DirContent -Path "\\$Script:ASDC\c$"
-    Write-Host ""
-    Write-Host ""
+    Test-AccessToOneDCPerDomain
+
+
     If ($UnAttended) { Start-Sleep 2 } else { Pause }
     
     Measure-FunctionRuntime -End -Details $Info

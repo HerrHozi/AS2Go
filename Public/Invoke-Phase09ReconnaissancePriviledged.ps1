@@ -72,9 +72,8 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
         return
     }
 
-
     $Info = Measure-FunctionRuntime -Begin
-      Update-WindowTitle -NewTitle $Script:Phase09
+    Update-WindowTitle -NewTitle $Script:Phase09
     Show-CurrentPhase -Phase "ASP09.html"
 
     If (-not $SafeMode) {
@@ -84,10 +83,6 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
             Get-forestinfo
         }
     }
-
-    If (-not $SkipClearHost) { Clear-Host }
-
-  
 
     If (-not $SkipClearHost) { Clear-Host }
 
@@ -125,28 +120,22 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
 
         If (-not $SkipClearHost) { Clear-Host }
 
+        Test-AccessToOneDCPerDomain
+
         Write-AS2GoOutput -Type Header -Message "Show Services and Processes on Logon Server"
         $Functionality = "Displays services and processes from the current logon server for reconnaissance. `n"
         Write-AS2GoOutput -Type H1 -Message $Functionality
 
         $server = $env:LOGONSERVER.replace("\", "")
 
-        Write-Host      -NoNewline "  Commands: "
-        Write-Highlight -Text " Get-Service ", "-ComputerName ", "$server ", "| " , "Out-GridView ", "-Title " , "Services  on $server"`
-            -Color $fgcC, $fgcS, $fgcV, $fgcF, $fgcC, $fgcS, $fgcV
-
-        Write-Host      -NoNewline "            "
-        Write-Highlight -Text " Get-Process ", "-ComputerName ", "$server ", "| " , "Out-GridView ", "-Title " , "Processes on $server"`
-            -Color $fgcC, $fgcS, $fgcV, $fgcF, $fgcC, $fgcS, $fgcV
-        Write-Host ""
-
+        Write-AS2GoOutput -Type Command -Message "Get-Service -ComputerName $server | Out-GridView -Title 'Services  on $server'" -NoExtraLines
+        Write-AS2GoOutput -Type Command -Message "Get-Process -ComputerName $server | Out-GridView -Title 'Processes on $server'" -NoExtraLines
 
         If ($UnAttended) {
             $answer = $Script:No
         }
         else {
-            $question = "Do you want to run these steps - Y or N? Default "
-            $answer = Get-Answer -question $question -defaultValue $Script:Yes
+            $answer = Show-DecisionPrompt 
         }
 
         If ($answer -eq $Script:Yes) {
@@ -158,18 +147,12 @@ function Invoke-ASPhase09ReconnaissancePrivileged {
             $answer = $Script:Yes
         }
         else {
-            $question = "Further reconnaissance tasks - Y or N? Default "
-            $answer = Get-Answer -question $question -defaultValue $Script:Yes
+            $answer = Show-DecisionPrompt -Title "Run additional reconnaissance tasks?"
         }
 
         If ($answer -eq $Script:Yes) {
             Invoke-ReconnaissanceExtended
         }
-    }
-    elseIf ($answer -eq $Script:Exit) {
-        Stop-AS2GoDemo
-    }
-    else {
     }
 
     Measure-FunctionRuntime -End -Details $Info

