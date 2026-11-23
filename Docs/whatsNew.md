@@ -20,6 +20,10 @@ The August 2021 through November 2026 figures come from the project timeline and
 
 ### November 2026 · AS2Go PowerShell module
 
+2026.11.23.980
+- Golden Ticket workflow forges PAC_REQUESTOR-compliant tickets with Rubeus, validates them against the hardened Domain Controller before injection, and makes KDC rejection of older Mimikatz-forged tickets observable for defender discussions.
+
+
 2026.11.16.1272
 - Protects sensitive configuration values, including saved password hashes, with Windows DPAPI. Protected values can be decrypted only on the Windows computer that saved them and are omitted from logs.
 - Provides illustrated scenario guides with security lessons and references, so workshop participants can review each scenario before or after the demo.

