@@ -35,15 +35,15 @@ The phase menu can start these workflows. Use the linked page for the individual
 
 | Menu option | Separate guide |
 |---|---|
-| Overpass-the-Hash | [ASP07 Overpass-the-Hash](../Phases/ASP07_OpTH.html) |
-| Pass-the-Ticket on a local machine | [ASP07 Pass-the-Ticket, local](../Phases/ASP07_PtTLocal.html) |
-| Pass-the-Ticket on a remote machine | [ASP07 Pass-the-Ticket](../Phases/ASP07_PtT.html) |
-| Kerberoasting | [ASP07 Kerberoasting](../Phases/ASP07_Kerberosting.html) |
-| AD CS certificate template abuse (ESC1) | [ASP07 ESC1](../Phases/ASP07_ESC1.html) |
-| PsExec as Local System | [ASP07 PsExec](../Phases/ASP07_PsExec.html) |
-| Credential theft via memory access | [ASP07 Memory Access](../Phases/ASP07_MemDump.html) |
-| Enable memory access for credential theft | [ASP07 Memory Access](../Phases/ASP07_MemDump.html) |
-| Replay a stored credential | [ASP07 Stored Credential](../Phases/ASP07_LoadHash.html) |
+| Overpass-the-Hash | [ASP07 Overpass-the-Hash](ASP07_OverPassTheHash.md) |
+| Pass-the-Ticket on a local machine | [ASP07 Pass-the-Ticket, local](ASP07_PassTheTicketLocalMachine.md) |
+| Pass-the-Ticket on a remote machine | [ASP07 Pass-the-Ticket](ASP07_PassTheTicket.md) |
+| Kerberoasting | [ASP07 Kerberoasting](ASP07_Kerberoasting.md) |
+| AD CS certificate template abuse (ESC1) | [ASP07 ESC1](ASP07_ESC1.md) |
+| PsExec as Local System | [ASP07 Run-as Different Privileges](ASP07_LocalSystem.md) |
+| Credential theft via memory access | [ASP07 Memory Access](ASP07_MemoryDump.md) |
+| Enable memory access for credential theft | [ASP07 Memory Access](ASP07_MemoryDump.md) |
+| Replay a stored credential | [ASP07 Stored Credential](ASP07_StoredCredential.md) |
 
 The [ASP07 attack compatibility reference](../Phases/ASP07_Attack-Compatibility-Reference.html) provides a cross-technique view of requirements and compatibility.
 
