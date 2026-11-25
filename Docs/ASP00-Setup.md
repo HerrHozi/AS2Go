@@ -38,7 +38,7 @@ From this session, choose the appropriate workflow in the AS2Go menu. Review the
 - [ASP00 MDI Triggers](ASP00_MDITriggers.md)
 - [ASP00 Verify Config](ASP00_VerifyConfig.md)
 - [ASP00 AD CS](ASP00_ADCS.md)
-- [ASP00 Remove AS2Go Lab](ASP00-Remove-AS2GoLab.md)
+- [ASP00 Remove AS2Go Lab](ASP00_Remove-AS2GoLab.md)
 
 ## Shared command switches
 
@@ -273,7 +273,7 @@ Default runtime locations below `$env:PUBLIC\AS2Go`:
 
 Configured paths may differ. Archive required evidence securely before resetting. Logs and artifacts can contain sensitive lab information; sanitize them before sharing.
 
-Deleting runtime files does not undo AD, DNS, AD CS, GPO, share, or endpoint-protection changes. For AS2Go-tagged lab cleanup, see [ASP00 Remove AS2Go Lab](ASP00-Remove-AS2GoLab.md). Restore coordinated lab snapshots, or review and reverse each change manually. Confirm protection settings and exclusions are restored as intended. Include the execution computer's persisted configuration in the reset plan.
+Deleting runtime files does not undo AD, DNS, AD CS, GPO, share, or endpoint-protection changes. For AS2Go-tagged lab cleanup, see [ASP00 Remove AS2Go Lab](ASP00_Remove-AS2GoLab.md). Restore coordinated lab snapshots, or review and reverse each change manually. Confirm protection settings and exclusions are restored as intended. Include the execution computer's persisted configuration in the reset plan.
 
 ## Troubleshooting
 

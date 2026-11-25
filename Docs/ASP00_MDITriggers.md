@@ -41,13 +41,13 @@ This step only stores the selected account in AS2Go. Configure or register the a
 
 ## Configuration and permissions
 
-The honeytoken distinguished name is stored in `%PUBLIC%\AS2Go\Config\AS2Go.json`. It is written as an ordinary setting, not with the `-DPAPI` option. AS2Go configuration may contain other individually protected settings; DPAPI does not encrypt the entire JSON file. See [ASP00 Installation and Setup](ASP00__Setup.md) for the common configuration details.
+The honeytoken distinguished name is stored in `%PUBLIC%\AS2Go\Config\AS2Go.json`. It is written as an ordinary setting, not with the `-DPAPI` option. AS2Go configuration may contain other individually protected settings; DPAPI does not encrypt the entire JSON file. See [ASP00 Installation and Setup](ASP00-Setup.md) for the common configuration details.
 
 Applying the DNS change requires the DNS Server PowerShell module, connectivity to the configured DNS server, and permissions to change zone settings. Selecting the honeytoken requires directory read access to browse and select a user; it does not change the user's AD attributes.
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [Security Policy and authorized use](../SECURITY.md)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)
 - [Internal workflow: `Invoke-MDITriggers`](../Private/ASP00/Invoke-MDITriggers.ps1)

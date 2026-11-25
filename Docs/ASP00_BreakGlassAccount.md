@@ -26,7 +26,7 @@ The picker is opened with `-IncludeUsers`, `-MarkTier0`, and `-BlockOUSelection`
 
 The picker also has a user context menu for enabling or disabling an account and resetting its password. Those actions change Active Directory and are separate from selecting the break-glass account; use them only when intended and authorized.
 
-The shared setup switches and prerequisites are documented in [ASP00 Installation and Setup](ASP00__Setup.md).
+The shared setup switches and prerequisites are documented in [ASP00 Installation and Setup](ASP00-Setup.md).
 
 ## Configuration storage
 
@@ -50,7 +50,7 @@ The DN identifies the selected directory object; this workflow does not save the
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)
 - [Internal workflow: `Set-BreakGlassAccount`](../Private/Shared/Set-BreakGlassAccount.ps1)
 - [AD Object Picker](../Private/Shared/Select-ADObject.ps1)

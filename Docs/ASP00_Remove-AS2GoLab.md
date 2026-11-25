@@ -90,7 +90,7 @@ The function prints progress and warnings for missing objects; it does not produ
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 Demo Accounts](ASP00_DemoAccounts.md)
 - [ASP00 Backup Share](ASP00_BackupShare.md)
 - [ASP00 AD CS](ASP00_ADCS.md)

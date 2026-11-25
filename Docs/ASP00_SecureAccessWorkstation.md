@@ -65,11 +65,11 @@ The remote PtT workflow clears prior ticket staging files before it collects new
 
 ## Configuration storage
 
-The host name is saved as `AS2GoSAW` in `%PUBLIC%\AS2Go\Config\AS2Go.json`. This setting is written without the `-DPAPI` option and is stored as readable text. The local JSON file can contain a mixture of ordinary and individually DPAPI-protected settings; DPAPI protection is not applied to the entire file. See [ASP00 Installation and Setup](ASP00__Setup.md) for the shared configuration details.
+The host name is saved as `AS2GoSAW` in `%PUBLIC%\AS2Go\Config\AS2Go.json`. This setting is written without the `-DPAPI` option and is stored as readable text. The local JSON file can contain a mixture of ordinary and individually DPAPI-protected settings; DPAPI protection is not applied to the entire file. See [ASP00 Installation and Setup](ASP00-Setup.md) for the shared configuration details.
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [Public Phase 07 workflow](../Public/Invoke-Phase07PrivilegeEscalation.ps1)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)
 - [Internal workflow: `Set-SecureAccessWorkstation`](../Private/ASP00/Set-SecureAccessWorkstation.ps1)

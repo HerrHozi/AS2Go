@@ -32,7 +32,7 @@ The default path is constructed under the current domain root from `-AS2GoOU`; i
 
 ## Before you begin
 
-Complete the shared installation, authorization, and setup guidance in [ASP00 Installation and Setup](ASP00__Setup.md). Run the menu from the elevated Enterprise Admin setup session on the prepared, domain-joined Windows Server. The public initializer checks elevation and Domain Admins or Enterprise Admins membership; the setup screen recommends Enterprise Admin privileges for full configuration.
+Complete the shared installation, authorization, and setup guidance in [ASP00 Installation and Setup](ASP00-Setup.md). Run the menu from the elevated Enterprise Admin setup session on the prepared, domain-joined Windows Server. The public initializer checks elevation and Domain Admins or Enterprise Admins membership; the setup screen recommends Enterprise Admin privileges for full configuration.
 
 The workflow requires the Active Directory management tools, access to the current domain, and rights to create users and OUs and update group membership and account passwords. It uses the configured `AS2Go-DemoUsers.csv` file under the module's `LabSetup` directory. The bundled file contains **50,000 data rows**, which sets the current maximum selectable number of bulk demo users.
 
@@ -42,7 +42,7 @@ The workflow requires the Active Directory management tools, access to the curre
 Initialize-AS2GoLab
 ```
 
-After the prerequisite checks, select **Demo Users** in the setup menu. `Setup-AS2GoDemo` and `ASP00` are aliases of `Initialize-AS2GoLab`. The setup command's shared switches are documented in [ASP00 Installation and Setup](ASP00__Setup.md#shared-command-switches).
+After the prerequisite checks, select **Demo Users** in the setup menu. `Setup-AS2GoDemo` and `ASP00` are aliases of `Initialize-AS2GoLab`. The setup command's shared switches are documented in [ASP00 Installation and Setup](ASP00-Setup.md#shared-command-switches).
 
 ## Parameters
 
@@ -92,7 +92,7 @@ Objects created by the workflow are tagged with the selected scenario and the AS
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 AS2Go Assets](ASP00_AS2GoAssets.md)
 - [Security Policy and authorized use](../SECURITY.md)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)

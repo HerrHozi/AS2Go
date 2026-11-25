@@ -4,7 +4,7 @@
 
 ASP06 demonstrates what the current compromised domain account can discover and access during reconnaissance. The baseline reviews forest and domain information, privileged group memberships, computer accounts, and domain controllers. It also attempts to list the configured admin workstation's `C$` share and one domain controller's `C$` share in each forest domain.
 
-Complete the shared preparation in [ASP00 Installation and Setup](ASP00__Setup.md) first. Run this phase in the Windows session signed in as the compromised or scenario account, not the Enterprise Admin session used for setup.
+Complete the shared preparation in [ASP00 Installation and Setup](ASP00-Setup.md) first. Run this phase in the Windows session signed in as the compromised or scenario account, not the Enterprise Admin session used for setup.
 
 ## **Menu option**
 
@@ -45,6 +45,6 @@ With `-SafeMode`, the phase offers only the option to skip the reconnaissance ch
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 MDI Triggers](ASP00_MDITriggers.md)
 - [ASP06 phase walkthrough](../Phases/ASP06.html)

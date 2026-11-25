@@ -40,7 +40,7 @@ The workflow also adds the Tier 2 admin and user groups to the local **Administr
 
 ## Before you begin
 
-Follow the shared installation, authorization, and Quick Start guidance in [ASP00 Installation and Setup](ASP00__Setup.md). Run lab preparation in the Enterprise Admin sign-in on the domain-joined Windows Server. Do not run this setup against production Active Directory.
+Follow the shared installation, authorization, and Quick Start guidance in [ASP00 Installation and Setup](ASP00-Setup.md). Run lab preparation in the Enterprise Admin sign-in on the domain-joined Windows Server. Do not run this setup against production Active Directory.
 
 The public initializer checks that PowerShell is elevated and that the current account is a member of Domain Admins or Enterprise Admins. The full assets workflow also changes privileged group membership across the current domain and forest root. Use an Enterprise Admin account with rights to create and update OUs, groups, users, and computers, change OU permissions, and update the local Administrators group on the execution server. The module requires PowerShell 7.4 and the Active Directory management tools. The setup initializer also checks for Group Policy and DNS Server modules; see the parent setup guide for installation details.
 
@@ -56,7 +56,7 @@ Initialize-AS2GoLab
 
 ## Parameters
 
-There are no parameters specific to the **AS2Go Assets** menu choice. The public initializer accepts general setup parameters; their shared behavior is documented in [ASP00 Installation and Setup](ASP00__Setup.md#shared-command-switches).
+There are no parameters specific to the **AS2Go Assets** menu choice. The public initializer accepts general setup parameters; their shared behavior is documented in [ASP00 Installation and Setup](ASP00-Setup.md#shared-command-switches).
 
 | Public setup parameter | Default | Effect on AS2Go Assets |
 |---|---|---|
@@ -95,7 +95,7 @@ The public setup initializer verifies Domain Admins or Enterprise Admins members
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 Backup Share](ASP00_BackupShare.md)
 - [Security Policy and authorized use](../SECURITY.md)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)

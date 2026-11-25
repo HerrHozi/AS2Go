@@ -4,7 +4,7 @@
 
 ASP07 is the entry point for the privilege escalation phase. It presents the available techniques and starts the selected workflow. Each technique is documented separately; this page is an overview only.
 
-Complete the shared preparation in [ASP00 Installation and Setup](ASP00__Setup.md) first. Run the phase in the Windows session signed in as the compromised or scenario account, not the Enterprise Admin session used for setup.
+Complete the shared preparation in [ASP00 Installation and Setup](ASP00-Setup.md) first. Run the phase in the Windows session signed in as the compromised or scenario account, not the Enterprise Admin session used for setup.
 
 ## **Menu option**
 
@@ -49,13 +49,13 @@ The [ASP07 attack compatibility reference](../Phases/ASP07_Attack-Compatibility-
 
 ## Requirements and operational impact
 
-Use the prepared, explicitly authorized lab described in [ASP00 Installation and Setup](ASP00__Setup.md). Run the phase from the scenario account's session. The exact directory permissions, tools, host configuration, network access, and side effects depend on the selected technique; check its guide before running it. ASP07 can launch actions that change security state or generate authentication, process, network, and monitoring events. It is not a read-only phase.
+Use the prepared, explicitly authorized lab described in [ASP00 Installation and Setup](ASP00-Setup.md). Run the phase from the scenario account's session. The exact directory permissions, tools, host configuration, network access, and side effects depend on the selected technique; check its guide before running it. ASP07 can launch actions that change security state or generate authentication, process, network, and monitoring events. It is not a read-only phase.
 
 `-Preview` displays the preview workflow and returns before the phase's live actions. It does not validate lab readiness or permissions. Skipping images or clearing the console does not change the selected technique's behavior.
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP05 Initial Access](ASP05_Initial-Access.md)
 - [ASP06 Reconnaissance](ASP06_Reconnaissance.md)
 - [ASP09 Privileged Reconnaissance](ASP09_Reconnaissance-Privileged.md)

@@ -12,7 +12,7 @@
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
             ReleaseNotes = '
-2026.11.25.711
+2026.11.25.1166
         - Forges Golden Tickets that a hardened, modern Domain Controller accepts (Rubeus `golden` with PAC_REQUESTOR), validates them against the KDC before injection, and makes KDC rejection of older-style tickets observable for defender discussions.
         - Adds a configurable Golden Ticket lifetime (7-day default; custom 8-365 days).
         - Fixes ConvertFrom-CredentialDump returning the wrong username for an NTLM hash when a session''s msv and kerberos identities differ.
@@ -52,7 +52,7 @@ v2026.5.7.1034
     
 
     RootModule        = 'AS2Go.psm1'
-    ModuleVersion     = '2026.11.25.1166'
+    ModuleVersion     = '2026.11.25.1178'
     GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
     Author            = 'Holger Zimmermann | as2go@mrhozi.com'

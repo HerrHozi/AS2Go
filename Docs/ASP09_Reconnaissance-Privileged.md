@@ -4,7 +4,7 @@
 
 ASP09 demonstrates what an elevated account can access during reconnaissance. It attempts to list the `C$` share of one domain controller in each forest domain. In an interactive run, it can also list services and processes on the current logon server and offer additional reconnaissance tasks.
 
-Complete the shared preparation in [ASP00 Installation and Setup](ASP00__Setup.md) first. Run ASP09 in the Windows session signed in as the privileged account used for the scenario. This phase is available from the **Privileged** option in the `Start-AS2GoDemo` menu and can be started directly with `Invoke-ASPhase09ReconnaissancePrivileged` (alias: `ASP09`).
+Complete the shared preparation in [ASP00 Installation and Setup](ASP00-Setup.md) first. Run ASP09 in the Windows session signed in as the privileged account used for the scenario. This phase is available from the **Privileged** option in the `Start-AS2GoDemo` menu and can be started directly with `Invoke-ASPhase09ReconnaissancePrivileged` (alias: `ASP09`).
 
 ## Baseline checks
 
@@ -41,6 +41,6 @@ With `-SafeMode`, ASP09 offers only the option to skip its reconnaissance action
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 MDI Triggers](ASP00_MDITriggers.md)
 - [ASP09 phase walkthrough](../Phases/ASP09.html)

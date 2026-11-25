@@ -49,7 +49,7 @@ The summary is a quick status view, not a remediation action. It does not distin
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 MDI Triggers](ASP00_MDITriggers.md)
 - [ASP00 Malicious Tools](ASP00_MaliciousTools.md)
 - [ASP00 Backup Share](ASP00_BackupShare.md)

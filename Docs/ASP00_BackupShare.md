@@ -17,7 +17,7 @@ The workflow is:
 
 ## Before you begin
 
-Complete the shared setup and authorization guidance in [ASP00 Installation and Setup](ASP00__Setup.md) and [the security policy](../SECURITY.md). Run the setup on the prepared, domain-joined Windows Server in the administrative sign-in used for lab setup.
+Complete the shared setup and authorization guidance in [ASP00 Installation and Setup](ASP00-Setup.md) and [the security policy](../SECURITY.md). Run the setup on the prepared, domain-joined Windows Server in the administrative sign-in used for lab setup.
 
 `Initialize-AS2GoLab` checks for an elevated process and verifies membership in Domain Admins or Enterprise Admins. The setup screen recommends Enterprise Admin privileges for full configuration. The function checks availability of the Active Directory, Group Policy, and DNS Server modules; Active Directory tools are needed for the domain and controller selection used by the Share workflow. The share workflow also needs PowerShell remoting, SMB/CIM connectivity, and local administrative/share-management rights on the selected domain controller.
 
@@ -31,7 +31,7 @@ Initialize-AS2GoLab
 
 The command opens the AS2Go environment configuration menu after its prerequisite checks. `Setup-AS2GoDemo` is an alias. Select **Share** in the menu to run the backup-share workflow.
 
-The command's switches are documented once in [ASP00 Installation and Setup - Shared command switches](ASP00__Setup.md#shared-command-switches). There is no public command or share-specific parameter that directly invokes `New-BackUpShare`.
+The command's switches are documented once in [ASP00 Installation and Setup - Shared command switches](ASP00-Setup.md#shared-command-switches). There is no public command or share-specific parameter that directly invokes `New-BackUpShare`.
 
 ## Parameters
 
@@ -70,7 +70,7 @@ The workflow grants `Domain Admins` NTFS Modify access and SMB Change access to 
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [Security Policy and authorized use](../SECURITY.md)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)
 - [Public cleanup function: `Remove-AS2GoLab`](../Public/Remove-AS2GoLab.ps1)

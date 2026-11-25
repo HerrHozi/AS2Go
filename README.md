@@ -10,7 +10,7 @@
 
 ```Text
 Author:          Holger Zimmermann | as2go@mrhozi.com
-Current Version: 2026.11.25.1166
+Current Version: 2026.11.25.1178
 Last Update:     2026-11-25
 ```
 
@@ -36,7 +36,7 @@ It is designed for:
 
 ## Documentation
 
-- [ASP00 Installation and Setup](Docs/ASP00__Setup.md)
+- [ASP00 Installation and Setup](Docs/ASP00-Setup.md)
 - [What's New](Docs/whatsNew.md)
 
 ## Important Notice

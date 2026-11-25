@@ -4,7 +4,7 @@
 
 ASP12 is the entry point for the final phase of the AS2Go demonstration. It presents actions that demonstrate persistence and impact after privileged access has been obtained. This page is an overview only; each action has its own guide where available.
 
-Complete the shared preparation in [ASP00 Installation and Setup](ASP00__Setup.md) first. Run ASP12 only in the authorized lab and in a Windows session with the privileges required by the selected action. Requirements differ between actions.
+Complete the shared preparation in [ASP00 Installation and Setup](ASP00-Setup.md) first. Run ASP12 only in the authorized lab and in a Windows session with the privileges required by the selected action. Requirements differ between actions.
 
 ## **Menu option**
 
@@ -22,7 +22,7 @@ In interactive mode, ASP12 asks whether to start the phase and then presents the
 
 ## Phase flow
 
-- Prepare the lab using [ASP00 Installation and Setup](ASP00__Setup.md), then sign in with an account authorized for the action you intend to demonstrate.
+- Prepare the lab using [ASP00 Installation and Setup](ASP00-Setup.md), then sign in with an account authorized for the action you intend to demonstrate.
 - Start ASP12 from the attack navigation or invoke the phase directly.
 - Review the actions shown and select one, or skip the remaining actions.
 - Follow the linked action guide for its prerequisites, steps, and effects.
@@ -45,13 +45,13 @@ ASP12 is the final stage in the `Start-AS2GoDemo` workflow. Starting it directly
 
 ## Requirements and operational impact
 
-Use the prepared, explicitly authorized lab described in [ASP00 Installation and Setup](ASP00__Setup.md). The required rights, tools, target objects, and side effects depend on the selected action. ASP12 is not a read-only phase: actions can alter accounts and group membership, modify Group Policy files, export sensitive DPAPI backup material, encrypt files, forge and inject Kerberos tickets, or restart Domain Controllers. Review the corresponding guide and ensure you have a recovery plan for the lab before running an action.
+Use the prepared, explicitly authorized lab described in [ASP00 Installation and Setup](ASP00-Setup.md). The required rights, tools, target objects, and side effects depend on the selected action. ASP12 is not a read-only phase: actions can alter accounts and group membership, modify Group Policy files, export sensitive DPAPI backup material, encrypt files, forge and inject Kerberos tickets, or restart Domain Controllers. Review the corresponding guide and ensure you have a recovery plan for the lab before running an action.
 
 `-Preview` displays the preview workflow and returns before the phase's live actions. It does not validate lab readiness or permissions. Skipping images or clearing the console does not change the selected action's behavior.
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md)
 - [ASP12 phase overview](../Phases/ASP12.html)
 - [ASP12 Golden Ticket guide](ASP12_GoldenTicket.md)

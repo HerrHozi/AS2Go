@@ -17,7 +17,7 @@ This setup action does not create or modify Active Directory objects.
 
 ## Before you begin
 
-Complete the shared installation, authorization, and setup guidance in [ASP00 Installation and Setup](ASP00__Setup.md). Run the menu on the prepared lab server from the elevated setup session. The setup requires local administrative rights for Defender configuration. Defender settings may also be controlled by organizational policy.
+Complete the shared installation, authorization, and setup guidance in [ASP00 Installation and Setup](ASP00-Setup.md). Run the menu on the prepared lab server from the elevated setup session. The setup requires local administrative rights for Defender configuration. Defender settings may also be controlled by organizational policy.
 
 The selected folder will contain credential-access and other security assessment utilities. Use this workflow only on an isolated, explicitly authorized lab system. Coordinate the Defender changes with the lab owner and monitoring objectives before proceeding.
 
@@ -27,7 +27,7 @@ The selected folder will contain credential-access and other security assessment
 Initialize-AS2GoLab
 ```
 
-Complete the setup prompts and select **Malicious Tools**. Confirm the displayed destination or choose another folder. AS2Go copies `AS2Go-Tools_v3.zip` into that confirmed folder. You must extract the ZIP there manually, then confirm in the console that extraction is complete. The default destination is `$env:PUBLIC\AS2Go\MaliciousTools`. The shared setup switches are documented in [ASP00 Installation and Setup](ASP00__Setup.md#shared-command-switches).
+Complete the setup prompts and select **Malicious Tools**. Confirm the displayed destination or choose another folder. AS2Go copies `AS2Go-Tools_v3.zip` into that confirmed folder. You must extract the ZIP there manually, then confirm in the console that extraction is complete. The default destination is `$env:PUBLIC\AS2Go\MaliciousTools`. The shared setup switches are documented in [ASP00 Installation and Setup](ASP00-Setup.md#shared-command-switches).
 
 ## What the workflow prepares
 
@@ -73,7 +73,7 @@ After the lab exercise, restore Defender real-time monitoring and remove the fol
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [External tool sources and tested versions](../Tools/README.md)
 - [Security Policy and authorized use](../SECURITY.md)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)

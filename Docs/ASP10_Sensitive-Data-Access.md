@@ -91,6 +91,6 @@ The workflow itself requires no manual commands — run `Invoke-ASPhase10AccessS
 ## 7. Related
 
 - Phase diagram: [ASP10.html](../Phases/ASP10.html)
-- Share setup and tools preparation: [ASP00__Setup.md](ASP00__Setup.md), [ASP00_BackupShare.md](ASP00_BackupShare.md), [ASP00_MaliciousTools.md](ASP00_MaliciousTools.md)
+- Share setup and tools preparation: [ASP00-Setup.md](ASP00-Setup.md), [ASP00_BackupShare.md](ASP00_BackupShare.md), [ASP00_MaliciousTools.md](ASP00_MaliciousTools.md)
 - The next step in the kill chain (moving staged data out): Phase 11 — Exfiltrate Sensitive Data
 - MITRE ATT&CK: Network Share Discovery [T1135](https://attack.mitre.org/techniques/T1135/), Remote Services [T1021](https://attack.mitre.org/techniques/T1021/), Unsecured Credentials [T1552](https://attack.mitre.org/techniques/T1552/)

@@ -51,7 +51,7 @@ If a generated template name already exists, AS2Go leaves it unchanged and repor
 
 ## Requirements and operational impact
 
-- Run setup from the elevated Enterprise Admin session described in [ASP00 Installation and Setup](ASP00__Setup.md). The operation needs rights to install Windows roles remotely and create or update certificate-template objects and CA publication entries in the forest.
+- Run setup from the elevated Enterprise Admin session described in [ASP00 Installation and Setup](ASP00-Setup.md). The operation needs rights to install Windows roles remotely and create or update certificate-template objects and CA publication entries in the forest.
 - The setup computer needs the Active Directory and AD CS management components required by the workflow, access to the forest-root domain, and PowerShell remoting to the selected domain controller.
 - Installing AD CS adds a CA and Web Enrollment service to the forest-root domain controller. Creating templates adds objects and permissions to the forest configuration partition and publishes the templates to an Enterprise CA.
 - The ESC1 template permits broad enrollment with a supplied subject; the ESC4 template grants broad write access. Treat both as deliberately vulnerable lab objects and do not create them in production.
@@ -60,7 +60,7 @@ If a generated template name already exists, AS2Go leaves it unchanged and repor
 
 ## Related documentation
 
-- [ASP00 Installation and Setup](ASP00__Setup.md)
+- [ASP00 Installation and Setup](ASP00-Setup.md)
 - [ASP00 Verify Config](ASP00_VerifyConfig.md)
 - [Public cleanup function: `Remove-AS2GoLab`](../Public/Remove-AS2GoLab.ps1)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)
