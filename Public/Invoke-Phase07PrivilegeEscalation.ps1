@@ -54,7 +54,7 @@ Invoke-ASPhase07PrivilegeEscalation -SkipImages -SkipClearHost
 Runs Phase 07 without phase visuals and without clearing the host.
 
 .NOTES
-Alias: P07, ESC
+Alias: ASP07
 Part of: AS2Go attack phase orchestration
 .FUNCTIONALITY
 Demonstrates credential reuse, Kerberos ticket abuse, Kerberoasting, and AD CS certificate template abuse.
@@ -71,7 +71,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
 
     #https://www.beyondtrust.com/blog/entry/privilege-escalation-attack-defense-explained
     #https://www.microsoft.com/en-us/security/blog/2019/05/09/detecting-credential-theft-through-memory-access-modelling-with-microsoft-defender-atp/
-    [Alias("ASP07", "ESC")]
+    [Alias("ASP07")]
     Param (  
         [switch]$Preview,
         [switch]$UnAttended,
@@ -162,7 +162,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
         Write-Host "  X " -ForegroundColor Yellow -NoNewline; Write-Host "- for a PsExec Attack as Local System (NT AUTHORITY\SYSTEM)"
         Write-Host "  M " -ForegroundColor Yellow -NoNewline; Write-Host "- for Credential Theft via Memory Access"
         Write-Host "  E " -ForegroundColor Yellow -NoNewline; Write-Host "- to Enable Memory Access for Credential Theft"
-        Write-Host "  L " -ForegroundColor Yellow -NoNewline; Write-Host "- to Replay a previously stored Credential"
+        Write-Host "  C " -ForegroundColor Yellow -NoNewline; Write-Host "- to Replay a previously stored Credential"
 
         Write-host "`n  S " -ForegroundColor Yellow -NoNewline; Write-Host "- to skip this step"
 
@@ -215,7 +215,7 @@ function Invoke-ASPhase07PrivilegeEscalation {
                     Value = "E"
                 },
                 [pscustomobject] @{
-                    Label = "&Stored Credential"
+                    Label = "Stored &Credential"
                     Help  = $Script:helpStoredCredential
                     Value = "L"
                 },

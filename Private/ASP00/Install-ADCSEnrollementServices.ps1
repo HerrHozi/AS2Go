@@ -36,5 +36,6 @@ function Install-ADCSEnrollmentServices {
 
     $Script:ADCSEnrollmentServiceMissing = $false
 
+
     Measure-FunctionRuntime -End -Details $Info
 }

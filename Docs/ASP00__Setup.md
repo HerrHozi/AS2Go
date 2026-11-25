@@ -1,4 +1,85 @@
-# AS2Go Lab Setup Guide
+# ASP00 | Installation and Setup Guide
+
+This is the parent document for AS2Go installation, lab preparation, and launch. Complete the shared setup guidance here once, then use the linked page for the specific setup action or assessment phase.
+
+## Quick Start
+
+Run the installation and lab preparation from the Windows Server used for the demonstration. Keep two Windows sign-ins available on that server: use the Enterprise Admin session for setup, and use a separate session for the selected compromised account when running the phase.
+
+### 1. Prepare the lab as Enterprise Admin
+
+After completing the installation and prerequisites below, open PowerShell 7.4 in the Enterprise Admin session and run:
+
+```powershell
+Setup-AS2GoDemo
+New-AS2GoDemoPrincipalSet
+```
+
+Follow the setup prompts and confirm the intended lab scope. The **Share** setup option creates the simulated backup share; see [ASP00 Backup Share](ASP00_BackupShare.md) for its behavior and requirements.
+
+### 2. Start the demonstration as the selected compromised account
+
+Sign in to the same Windows Server in the second session using the account appropriate to the scenario (standard user, Tier 2, or Tier 1), then start the guided workflow:
+
+```powershell
+Start-AS2GoDemo
+```
+
+From this session, choose the appropriate workflow in the AS2Go menu. Review the documentation for that workflow before starting it.
+
+## ASP00 documentation map
+
+- [ASP00 Backup Share](ASP00_BackupShare.md)
+- [ASP00 AS2Go Assets](ASP00_AS2GoAssets.md)
+- [ASP00 Demo Accounts](ASP00_DemoAccounts.md)
+- [ASP00 Malicious Tools](ASP00_MaliciousTools.md)
+- [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md)
+- [ASP00 Secure Access Workstation](ASP00_SecureAccessWorkstation.md)
+- [ASP00 MDI Triggers](ASP00_MDITriggers.md)
+- [ASP00 Verify Config](ASP00_VerifyConfig.md)
+- [ASP00 AD CS](ASP00_ADCS.md)
+- [ASP00 Remove AS2Go Lab](ASP00-Remove-AS2GoLab.md)
+
+## Shared command switches
+
+These switch descriptions are maintained here so individual guides can link back instead of repeating shared setup and launch guidance.
+
+### `Initialize-AS2GoLab` / `Setup-AS2GoDemo`
+
+| Switch | Effect |
+|---|---|
+| `-Preview` | Displays the setup workflow without performing the live setup. |
+| `-EnableLogging` | Enables setup logging. |
+| `-DeveloperMode` | Enables developer behavior and logging as implemented by the setup command. |
+| `-SafeMode` | Accepted by the command; no behavior is currently implemented for this switch in `Initialize-AS2GoLab`. |
+
+### `New-AS2GoDemoPrincipalSet`
+
+| Switch | Effect |
+|---|---|
+| `-SkipDomainAdmin` | Omits the demo domain administrator. |
+| `-SkipHelpDesk` | Omits the help desk account and the service account. |
+| `-SkipCompromisedAccount` | Omits the configured compromised account. |
+| `-EnableLogging` | Accepted by the command; the principal-set function does not currently read this switch. |
+| `-WhatIf` | Previews the account creation actions supported by `ShouldProcess`. |
+
+### `Start-AS2GoDemo`
+
+| Switch | Effect |
+|---|---|
+| `-Preview` | Displays the guided workflow without executing it. |
+| `-UnAttended` | Runs the workflow without interactive prompts. Review phase behavior and scope first. |
+| `-Continue` | Continues from the saved stage. |
+| `-EnableLogging` | Enables scenario logging. |
+| `-SkipImages`, `-SkipClearHost`, `-SkipPopup` | Suppress images, console clearing, or popup messages. |
+| `-SkipPasswordSpray`, `-SkipCompromisedAccount`, `-SkipPwSpayWithRubeus` | Skip the corresponding workflow actions. |
+| `-SkipReconnaissance`, `-SkipPrivilegeEscalation`, `-SkipDataExfiltration`, `-SkipForgeAuthCertificates`, `-SkipKerberoastingAttack` | Skip the corresponding workflow actions. |
+| `-DeveloperMode` | Enables developer/demo output. |
+| `-Simulation` | The workflow forwards this setting to phase logic. Do not assume every phase implements simulation behavior. |
+| `-PrivilegeEscalation` | Selects one of `PtH`, `PtT`, `Kerberoasting`, `ESC1`, `WDigest`, or `PsExec`. |
+| `-DomainPersistence` | Selects one of `Encrypt`, `Reboot`, `BackdoorUser`, `GPT`, `UserManipulation`, or `GroupManipulation`. |
+| `-SafeMode` | Enables the workflow's safe-mode behavior. |
+
 
 ## Scope and Safety
 
@@ -85,7 +166,7 @@ Import-Module -Name AS2Go -Force
 
 The published package may differ from this checkout. Inspect its commands and parameters with `Get-Command` and `Get-Help`.
 
-Import creates runtime directories below `$env:PUBLIC\AS2Go` and copies the bundled configuration to `Config\AS2Go.json` if that file does not already exist. Reimporting preserves an existing runtime configuration. Review saved hostnames, domains, accounts, UPN suffixes, and paths for your lab; bundled values may refer to the author's environment.
+Import creates runtime directories below `$env:PUBLIC\AS2Go` and copies the bundled configuration to `Config\AS2Go.json` if that file does not already exist. Reimporting preserves an existing runtime configuration. The configuration can contain both ordinary values and values protected with machine-scoped Windows DPAPI; protection is applied per setting, not to the whole JSON file. Review saved hostnames, domains, accounts, UPN suffixes, and paths for your lab; bundled values may refer to the author's environment.
 
 ## 4. Review the Workflow Offline (Optional)
 
@@ -118,15 +199,15 @@ Review the requirements confirmation and discovered forest, domain, controller, 
 
 | Menu option | Action and considerations |
 | --- | --- |
-| Verify Config | Reviews the current lab configuration and reports individual results and query failures. See [Verify Readiness](#6-verify-readiness). |
-| Malicious Tools | Selects the tools folder, disables Defender real-time monitoring, adds a folder exclusion, attempts to copy archives, and guides manual extraction. These protection changes require explicit lab authorization and may be blocked by managed security policy. |
-| BGA | Stores the selected break-glass account for exclusion by scenario logic. This does not replace isolation or snapshots. |
-| SAW | Selects or records the Secure Access Workstation hostname; it does not provision or harden a workstation. |
-| AS2Go Assets | Creates dedicated tiering OUs and AD groups. Review the naming and scope. |
-| Demo Users | Creates demonstration accounts. Review the selected OU and account details. |
-| ADCS | Offers CA/Web Enrollment setup and intentionally vulnerable certificate templates, including ESC1 demonstrations. |
-| Share | Creates `AD-Backup` on the configured DC, copies sample backup files, and saves its UNC path as `BackupShare`. Requires remote administration and share access. |
-| MDI Triggers | Configures lab DNS zone transfers and honeytoken-related settings for detection exercises. |
+| [Verify Config](ASP00_VerifyConfig.md) | Reviews configured files, accounts, directory assets, AD CS, the backup share, and DNS settings. At the end, its summary marks each check as Existing, Missing, or Could not be verified. |
+| [Malicious Tools](ASP00_MaliciousTools.md) | Selects the tools folder, disables Defender real-time monitoring, adds a folder exclusion, copies the bundled archive and README, and guides manual extraction. These endpoint-protection changes require explicit lab authorization and may be blocked by managed security policy. |
+| [BGA](ASP00_BreakGlassAccount.md) | Opens the AD Object Picker to select or retain a break-glass user account. Saves the account DN in the local configuration for scenario exclusions. |
+| [SAW](ASP00_SecureAccessWorkstation.md) | Selects or records the Admin PC hostname used by the remote Pass-the-Ticket workflow. It checks WinRM and can offer to enable PowerShell Remoting on the selected computer. |
+| [AS2Go Assets](ASP00_AS2GoAssets.md) | Creates dedicated tiering OUs and AD groups. Review the naming and scope. |
+| [Demo Users](ASP00_DemoAccounts.md) | Creates bulk fake users from the bundled CSV, assigns them to the selected OU layout, and creates a compromised account. |
+| [ADCS](ASP00_ADCS.md) | Reviews or installs AD CS roles and can create and publish the AS2Go ESC1 and ESC4 certificate-template pair. |
+| [Share](ASP00_BackupShare.md) | Creates `AD-Backup` on the configured DC, copies sample backup files, and saves its UNC path as `BackupShare`. Requires remote administration and share access. |
+| [MDI Triggers](ASP00_MDITriggers.md) | Optional setup for labs with Microsoft Defender for Identity: previews DNS zone-transfer changes and stores a selected honeytoken account. |
 | Quit | Returns from setup. |
 
 Selected phases use `Certify.exe`, `Mimikatz.exe`, `Rubeus.exe`, `NetSess.exe`, and `PsExec.exe`. Archives may be absent from your checkout. See [Tools/README.md](../Tools/README.md) for sources and tested versions. Place required executables in the configured tools folder. Setup offers `$env:PUBLIC\AS2Go\MaliciousTools` as its default destination, separate from the repository's `Tools` folder.
@@ -135,7 +216,7 @@ Coordinate endpoint-protection settings with the lab owner and detection objecti
 
 ## 6. Verify Readiness
 
-Reopen **Verify Config** from the setup menu. Review each result and warning individually.
+Reopen **Verify Config** from the setup menu. Review each result and warning individually. At the end, the **Verification Summary** marks each check as **Existing**, **Missing**, or **Could not be verified**. Details above the summary identify specific missing files and settings where available.
 
 - **Local settings and files** — Checks for expected executables in the configured tools folder and sample files on the backup share. Displays the saved break-glass account and MDI honeytoken separately.
 - **Workstation and directory** — Checks TCP port 5985 on the configured Secure Access Workstation and inventories tiering OUs, groups, and demo accounts in the current domain.
@@ -192,7 +273,7 @@ Default runtime locations below `$env:PUBLIC\AS2Go`:
 
 Configured paths may differ. Archive required evidence securely before resetting. Logs and artifacts can contain sensitive lab information; sanitize them before sharing.
 
-Deleting runtime files does not undo AD, DNS, AD CS, GPO, share, or endpoint-protection changes. Restore coordinated lab snapshots, or review and reverse each change manually. Confirm protection settings and exclusions are restored as intended. Include the execution computer's persisted configuration in the reset plan.
+Deleting runtime files does not undo AD, DNS, AD CS, GPO, share, or endpoint-protection changes. For AS2Go-tagged lab cleanup, see [ASP00 Remove AS2Go Lab](ASP00-Remove-AS2GoLab.md). Restore coordinated lab snapshots, or review and reverse each change manually. Confirm protection settings and exclusions are restored as intended. Include the execution computer's persisted configuration in the reset plan.
 
 ## Troubleshooting
 

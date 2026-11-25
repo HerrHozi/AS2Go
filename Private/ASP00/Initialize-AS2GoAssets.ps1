@@ -425,7 +425,7 @@ Function Initialize-AS2GoAssets {
     $CN = Convert-FromDNToCN -DistinguishedName $Dn 
 
     Write-AS2GoOutput -Type  Header -Message "Move sensitive groups to Tier 0 Assets -T0 Groups"
-    Write-AS2GoOutput -Type Info -Message "Restrict visibility of group membership for AS2Go users (SG-Lotte9-Users)."
+    Write-AS2GoOutput -Type Info -Message "Restrict visibility of group membership for AS2Go users ($CAGroup)." -noExtraLines
 
 
     

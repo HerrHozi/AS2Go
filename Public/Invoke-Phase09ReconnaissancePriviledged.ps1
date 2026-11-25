@@ -12,7 +12,7 @@ Browses descriptions and workflow steps offline without executing actions.
 Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
-Runs extended reconnaissance without the phase prompts and skips the logon server service and process listings.
+Runs domain-controller share checks and extended tasks without prompts unless SafeMode is enabled; skips service and process listings.
 
 .PARAMETER Continue
 Reserved switch for workflow continuation handling.
@@ -51,8 +51,8 @@ Runs Phase 09 without phase visuals and without clearing the host.
 Part of: AS2Go attack phase orchestration
 
 .FUNCTIONALITY
-Shows how elevated privileges can expose services and running processes on the logon server.
-Includes an extended reconnaissance demonstration.
+Checks domain-controller administrative shares and, on request, lists services and processes on the logon server.
+Optional extended tasks enumerate privileged groups, DNS transfer, DC sessions, and honeytoken authentication.
 #>
 function Invoke-ASPhase09ReconnaissancePrivileged {
 

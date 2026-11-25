@@ -366,8 +366,9 @@ if (Test-Path("$ASModulePath\Script")) {
     [VOID]$ScriptDir.Add($ScriptPath)
 }
 
-$Scripts = Get-ChildItem -Path $ScriptDir | Select-Object -ExpandProperty FullName
+$Scripts = Get-ChildItem -Path $ScriptDir -Recurse | Select-Object -ExpandProperty FullName
 
+# -Recurse also picks up functions organized in subfolders, e.g. Private\ASP07\*.ps1 or Private\Shared\*.ps1
 # Load all scripts in the module
 foreach ($Script in $Scripts) {
     . $Script

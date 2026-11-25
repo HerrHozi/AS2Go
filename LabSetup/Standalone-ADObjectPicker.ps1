@@ -1,7 +1,8 @@
 ﻿function Select-ADObject {
     <#
     .SYNOPSIS
-        Displays an interactive GUI dialog to select an Active Directory object from the forest hierarchy.
+        Displays an interactive GUI dialog to select an Active Directory object from the forest hierarchy,
+        uses System.DirectoryServices (LDAP/ADSI).
 
     .DESCRIPTION
         Select-ADObject provides a graphical user interface (GUI) for browsing and selecting Active Directory 
@@ -10,7 +11,8 @@
         across multiple domains and optionally highlights Tier 0 (high-security) objects.
         Disabled user and computer accounts are shown with a small red cross in the bottom-right corner
         of their icon. Tier 0 objects are marked with a red dot in the top-right corner.
-        Right-click a user to enable or disable the account.
+        Right-click a user to enable or disable the account or to reset its password (optionally forcing
+        a password change at next logon).
         Selection of OUs and containers can be blocked (-BlockOUSelection) so that only other object types
         can be picked while OUs remain browsable.
 
@@ -18,13 +20,18 @@
     Category: Sub Function
 
     .FUNCTIONALITY
-    Browses forest objects in a GUI, supports OU creation, optionally blocks OU selection, and highlights Tier 0 entries and disabled accounts.
+    Browses forest objects in a GUI, supports OU creation, user enable/disable and password reset, optionally blocks OU selection, and highlights Tier 0 entries and disabled accounts.
 
     .PARAMETER Title
         The text displayed in the dialog window title. Default is "Select AD Object".
 
+    .PARAMETER DomainController
+        Optional DNS name of a domain controller used to discover the forest and access its own domain.
+        Other forest domains use automatic controller selection. With LocalDomainOnly, only the supplied
+        controller's domain is shown. Omit this parameter to retain automatic discovery.
+
     .PARAMETER LocalDomainOnly
-        If specified, only the current domain and its contents are displayed. By default, all domains 
+        If specified, only the current domain (or the supplied controller's domain) is displayed. By default, all domains
         in the forest are shown.
 
     .PARAMETER DomainSelectionOnly
@@ -32,14 +39,6 @@
 
     .PARAMETER AddOU
         Enables a context menu for creating an organizational unit under a selected domain, OU, or container.
-
-    .PARAMETER TagNewOU
-        Tags any organizational unit created through -AddOU with the AS2Go adminDescription creation tag
-        and leaves it unprotected from accidental deletion, so Remove-AS2GoLab can discover and remove it.
-        Has no effect on an existing OU that is only selected, never created.
-
-    .PARAMETER Scenario
-        Scenario label written into the adminDescription tag when -TagNewOU is used. Defaults to AS2Go.
 
     .PARAMETER BlockOUSelection
         If specified, organizational units and containers can still be browsed (expanded) but cannot be
@@ -69,6 +68,11 @@
         of their icons. This helps identify highly sensitive AD objects. Can be combined with the red
         cross shown for disabled accounts.
 
+    .PARAMETER Close
+        If specified, the dialog shows a single "Close" button instead of OK/Cancel. Clicking it (or
+        closing the window) simply closes the form; no distinguished name is returned. Intended for
+        browsing-only use (e.g. together with -DomainSelectionOnly or just to inspect the tree).
+
     .PARAMETER Tier0Regex
         A regular expression pattern used to identify Tier 0 objects. Default pattern matches:
         - CN=Administrator
@@ -97,6 +101,12 @@
         cannot be confirmed with OK.
 
     .EXAMPLE
+        PS> Select-ADObject -IncludeUsers
+        Description: Right-click a user and choose "Reset Password..." to set a new password (entered twice).
+        The user can optionally be forced to change the password at next logon. Requires the Reset Password
+        permission on the account; the password must satisfy the domain password policy.
+
+    .EXAMPLE
         PS> Select-ADObject -DomainSelectionOnly
         Description: Restricts the selection to domain objects only.
 
@@ -104,24 +114,33 @@
         PS> Select-ADObject -MarkTier0 -IncludeUsers -Title "Select Tier 0 Target"
         Description: Displays all users and OUs, highlighting Tier 0 objects with a red dot.
 
+    .EXAMPLE
+        Select-ADObject -DomainController 'dc01.contoso.com' -LocalDomainOnly -IncludeUsers
+        Uses the supplied controller to browse its domain.
+
+    .EXAMPLE
+        PS> Select-ADObject -Close -IncludeUsers -IncludeGroups -IncludeComputers
+        Description: Shows the forest tree for browsing only. A single "Close" button replaces OK/Cancel;
+        no distinguished name is returned.
+
     .NOTES
         - Author:      zimmermann.holger@live.de
-        - Version:     1.1
-        - Last Update: 2026-11-15
+        - Version:     2026.11.19.900
+        - Last Update: 2026-11-19
 
         - This is a private function and requires a graphical environment (Windows Forms).
-        - The function uses Active Directory modules to query the forest structure.
+        - The function does not need the ActiveDirectory PowerShell module. Everything (forest browsing,
+          OU creation, enabling/disabling accounts, password reset) uses System.DirectoryServices (LDAP/ADSI).
         - All logging is handled through Write-Log.
     #>
 
     [CmdletBinding()]
     param(
         [string]$Title = "Select AD Object",
+		[string]$Version = "2026.11.14.33 | Standalone",
         [switch]$LocalDomainOnly,
         [switch]$DomainSelectionOnly,
         [switch]$AddOU,
-        [switch]$TagNewOU,
-        [string]$Scenario = "AS2Go",
         [switch]$BlockOUSelection,
         [switch]$IncludeLinkedGPOs,
         [switch]$IncludeUsers,
@@ -129,8 +148,12 @@
         [switch]$IncludeComputers,
         [switch]$IncludeGPOs,
         [switch]$MarkTier0,
+        [switch]$Close,
         [Switch]$ShowAdvanced,
-        [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)'
+        [string]$Tier0Regex = '(?i)(^CN=Administrator,|^OU=Domain Controllers,|^OU=Tier\s*0|^OU=T0)',
+        [ValidateNotNullOrEmpty()]
+        [ValidatePattern('^[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?$')]
+        [string]$DomainController
     )
 
     If ($Script:NotStandAlone) {
@@ -145,6 +168,32 @@
     Add-Type -AssemblyName System.Drawing
     Add-Type -AssemblyName System.DirectoryServices
     [System.Windows.Forms.Application]::EnableVisualStyles()
+
+    # Discover the forest before building the UI; an explicit DC must not fall back silently.
+    $controllerDomain = $null
+    $controllerName = $null
+    if ($DomainController) {
+        try {
+            $context = New-Object System.DirectoryServices.ActiveDirectory.DirectoryContext(
+                [System.DirectoryServices.ActiveDirectory.DirectoryContextType]::DirectoryServer,
+                $DomainController
+            )
+            $controller = [System.DirectoryServices.ActiveDirectory.DomainController]::GetDomainController($context)
+            try {
+                $forest = $controller.Forest
+                $controllerDomain = $controller.Domain.Name
+                $controllerName = $controller.Name
+            }
+            finally { $controller.Dispose() }
+        }
+        catch {
+            throw "Unable to discover the forest through domain controller '$DomainController': $($_.Exception.Message)"
+        }
+    }
+    else {
+        $forest = [System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest()
+    }
+
 
     # =========================
     # Modern Icon Creation
@@ -361,13 +410,173 @@
 
     <#
     .SYNOPSIS
+    Escapes a value for use in a relative distinguished name (RFC 4514).
+
+    .FUNCTIONALITY
+    Escapes special LDAP characters so a name like "Sales, EMEA" can be used in an RDN.
+    #>
+    function ConvertTo-EscapedRdnValue([string]$Value) {
+        $escaped = $Value -replace '([,\\+"<>;=])', '\$1'
+        $escaped = $escaped -replace '^([ #])', '\$1'
+        $escaped = $escaped -replace '( )$', '\$1'
+        $escaped
+    }
+
+    <#
+    .SYNOPSIS
+    Creates an organizational unit without the ActiveDirectory module.
+
+    .FUNCTIONALITY
+    Uses System.DirectoryServices to create the OU below the given parent DN on the given domain
+    and protects it from accidental deletion. Returns the distinguished name of the new OU.
+    #>
+    function New-OUViaLdap([string]$Name, [string]$ParentDN, [string]$Server) {
+        $parent = New-Object System.DirectoryServices.DirectoryEntry("LDAP://$Server/$ParentDN")
+        $ou = $parent.Children.Add("OU=$(ConvertTo-EscapedRdnValue $Name)", 'organizationalUnit')
+        $ou.CommitChanges()
+        $ou.RefreshCache(@('distinguishedName'))
+        $newDn = [string]$ou.Properties['distinguishedName'][0]
+
+        # Same default as New-ADOrganizationalUnit: protect from accidental deletion (non-fatal if it fails)
+        try {
+            $everyone = New-Object System.Security.Principal.SecurityIdentifier('S-1-1-0')
+            $rights = [System.DirectoryServices.ActiveDirectoryRights]'Delete,DeleteTree'
+            $rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
+                $everyone, $rights, [System.Security.AccessControl.AccessControlType]::Deny)
+            $ou.ObjectSecurity.AddAccessRule($rule)
+            $ou.CommitChanges()
+        }
+        catch { Write-Verbose "Could not set accidental deletion protection on '$newDn': $_" }
+
+        $newDn
+    }
+
+    <#
+    .SYNOPSIS
+    Enables or disables an account without the ActiveDirectory module.
+
+    .FUNCTIONALITY
+    Sets or clears the ACCOUNTDISABLE flag (0x2) in userAccountControl via System.DirectoryServices.
+    #>
+    function Set-AccountEnabledViaLdap([string]$DistinguishedName, [string]$Server, [bool]$Enabled) {
+        $entry = New-Object System.DirectoryServices.DirectoryEntry("LDAP://$Server/$DistinguishedName")
+        $uac = [int]$entry.Properties['userAccountControl'][0]
+        if ($Enabled) { $uac = $uac -band (-bnot 2) } else { $uac = $uac -bor 2 }
+        $entry.Properties['userAccountControl'].Value = $uac
+        $entry.CommitChanges()
+    }
+
+    <#
+    .SYNOPSIS
+    Resets a user's password without the ActiveDirectory module.
+
+    .FUNCTIONALITY
+    Calls the ADSI SetPassword method (IADsUser) and optionally sets pwdLastSet to 0 so the user must
+    change the password at next logon.
+    #>
+    function Set-PasswordViaLdap([string]$DistinguishedName, [string]$Server, [string]$NewPassword, [bool]$MustChange) {
+        $entry = New-Object System.DirectoryServices.DirectoryEntry("LDAP://$Server/$DistinguishedName")
+        try {
+            $entry.Invoke('SetPassword', @($NewPassword)) | Out-Null
+            if ($MustChange) {
+                $entry.Properties['pwdLastSet'].Value = 0
+                $entry.CommitChanges()
+            }
+        }
+        catch [System.Reflection.TargetInvocationException] {
+            # Unwrap the COM exception so the real reason (e.g. policy violation) is shown
+            throw $_.Exception.InnerException
+        }
+        finally { $entry.Dispose() }
+    }
+
+    <#
+    .SYNOPSIS
+    Prompts for a new password.
+
+    .FUNCTIONALITY
+    Shows a dialog with two masked password fields and a "must change at next logon" option.
+    Returns an object with Password and MustChange, or nothing when cancelled.
+    #>
+    function Show-PasswordPrompt([string]$UserName) {
+        $dialog = New-Object System.Windows.Forms.Form
+        $dialog.Text = "Reset Password"
+        $dialog.Size = '360,230'
+        $dialog.StartPosition = 'CenterParent'
+        $dialog.FormBorderStyle = 'FixedDialog'
+        $dialog.MaximizeBox = $false
+        $dialog.MinimizeBox = $false
+
+        $label = New-Object System.Windows.Forms.Label
+        $label.Text = "New password for ${UserName}:"
+        $label.Location = '12,12'
+        $label.Size = '320,20'
+
+        $pw1 = New-Object System.Windows.Forms.TextBox
+        $pw1.Location = '12,34'
+        $pw1.Size = '320,22'
+        $pw1.UseSystemPasswordChar = $true
+
+        $label2 = New-Object System.Windows.Forms.Label
+        $label2.Text = "Confirm password:"
+        $label2.Location = '12,64'
+        $label2.Size = '320,20'
+
+        $pw2 = New-Object System.Windows.Forms.TextBox
+        $pw2.Location = '12,86'
+        $pw2.Size = '320,22'
+        $pw2.UseSystemPasswordChar = $true
+
+        $chk = New-Object System.Windows.Forms.CheckBox
+        $chk.Text = "User must change password at next logon"
+        $chk.Location = '12,116'
+        $chk.Size = '320,20'
+
+        $okButton = New-Object System.Windows.Forms.Button
+        $okButton.Text = "Reset"
+        $okButton.Location = '172,150'
+        $okButton.Size = '75,26'
+        $okButton.Add_Click({
+                if ([string]::IsNullOrEmpty($pw1.Text)) {
+                    [void][System.Windows.Forms.MessageBox]::Show($dialog, "The password must not be empty.", "Reset Password",
+                        [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+                }
+                elseif ($pw1.Text -cne $pw2.Text) {
+                    [void][System.Windows.Forms.MessageBox]::Show($dialog, "The passwords do not match.", "Reset Password",
+                        [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+                }
+                else {
+                    $dialog.DialogResult = [System.Windows.Forms.DialogResult]::OK
+                }
+            })
+
+        $cancelButton = New-Object System.Windows.Forms.Button
+        $cancelButton.Text = "Cancel"
+        $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+        $cancelButton.Location = '257,150'
+        $cancelButton.Size = '75,26'
+
+        $dialog.AcceptButton = $okButton
+        $dialog.CancelButton = $cancelButton
+        $dialog.Controls.AddRange(@($label, $pw1, $label2, $pw2, $chk, $okButton, $cancelButton))
+
+        if ($dialog.ShowDialog($form) -eq [System.Windows.Forms.DialogResult]::OK) {
+            [PSCustomObject]@{ Password = $pw1.Text; MustChange = $chk.Checked }
+        }
+        $pw1.Text = ''
+        $pw2.Text = ''
+        $dialog.Dispose()
+    }
+
+    <#
+    .SYNOPSIS
     Returns the domain names in the current forest.
 
     .FUNCTIONALITY
     Reads and returns every domain name from the current Active Directory forest.
     #>
     function Get-ForestDomains {
-        ([System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest()).Domains |
+        $forest.Domains |
         Select-Object -ExpandProperty Name
     }
 
@@ -386,7 +595,8 @@
 
             $node.Nodes.Clear()
 
-            $root = [ADSI]"LDAP://$($node.Name)"
+            $ldapPath = if ($DomainController) { "LDAP://$($node.Tag.Server)/$($node.Name)" } else { "LDAP://$($node.Name)" }
+            $root = [ADSI]$ldapPath
             $searcher = New-Object System.DirectoryServices.DirectorySearcher($root)
             $searcher.SearchScope = 'OneLevel'
             
@@ -449,7 +659,7 @@
                 $child = New-Object System.Windows.Forms.TreeNode
                 $child.Text = $name
                 $child.Name = $dn
-                $child.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; ObjectClass = $cls; IsDisabled = $isDisabled }
+                $child.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; Server = $node.Tag.Server; ObjectClass = $cls; IsDisabled = $isDisabled }
                 $child.ImageKey = $iconKey
                 $child.SelectedImageKey = $iconKey
                 $child.Nodes.Add("dummy") | Out-Null
@@ -466,7 +676,8 @@
                 $gpoIndex = 0
                 foreach ($gpoLink in $gpoLinks) {
                     $gpoDn = $gpoLink.Groups['dn'].Value
-                    $gpoRoot = [ADSI]"LDAP://$gpoDn"
+                    $gpoPath = if ($DomainController) { "LDAP://$($node.Tag.Server)/$gpoDn" } else { "LDAP://$gpoDn" }
+                    $gpoRoot = [ADSI]$gpoPath
                     $gpoSearcher = New-Object System.DirectoryServices.DirectorySearcher($gpoRoot)
                     $gpoSearcher.SearchScope = 'Base'
                     $gpoSearcher.Filter = '(objectClass=groupPolicyContainer)'
@@ -483,7 +694,7 @@
                     $gpoNode = New-Object System.Windows.Forms.TreeNode
                     $gpoNode.Text = $gpoDisplayName
                     $gpoNode.Name = $gpoDn
-                    $gpoNode.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; ObjectClass = 'groupPolicyContainer' }
+                    $gpoNode.Tag = [PSCustomObject]@{ Domain = $node.Tag.Domain; Server = $node.Tag.Server; ObjectClass = 'groupPolicyContainer' }
                     $gpoNode.ImageKey = 'GPO'
                     $gpoNode.SelectedImageKey = 'GPO'
                     $node.Nodes.Insert($gpoIndex, $gpoNode)
@@ -566,27 +777,39 @@
     $statusLabel.Text = "Selected: none"
     $statusLabel.Font = $font
 
-    $btnCancel = New-Object System.Windows.Forms.Button
-    $btnCancel.Text = "Cancel"
-    $btnCancel.Location = '310,610'
-    $btnCancel.Size = '80,28'
-    $btnCancel.Font = $font
+    if ($Close) {
+        $btnClose = New-Object System.Windows.Forms.Button
+        $btnClose.Text = "Close"
+        $btnClose.Location = '410,610'
+        $btnClose.Size = '80,28'
+        $btnClose.Font = $font
 
-    $btnOK = New-Object System.Windows.Forms.Button
-    $btnOK.Text = "OK"
-    $btnOK.Location = '410,610'
-    $btnOK.Size = '80,28'
-    $btnOK.Font = $font
-    $btnOK.Enabled = $false
+        $form.AcceptButton = $btnClose
+        $form.CancelButton = $btnClose
+    }
+    else {
+        $btnCancel = New-Object System.Windows.Forms.Button
+        $btnCancel.Text = "Cancel"
+        $btnCancel.Location = '310,610'
+        $btnCancel.Size = '80,28'
+        $btnCancel.Font = $font
 
-    $form.AcceptButton = $btnOK
-    $form.CancelButton = $btnCancel
+        $btnOK = New-Object System.Windows.Forms.Button
+        $btnOK.Text = "OK"
+        $btnOK.Location = '410,610'
+        $btnOK.Size = '80,28'
+        $btnOK.Font = $font
+        $btnOK.Enabled = $false
+
+        $form.AcceptButton = $btnOK
+        $form.CancelButton = $btnCancel
+    }
 
     # =========================
     # Build Forest
     # =========================
 
-    $forestName = ([System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest()).Name
+    $forestName = $forest.Name
 
     $forestNode = New-Object System.Windows.Forms.TreeNode
     $forestNode.Text = $forestName
@@ -595,7 +818,7 @@
     $tree.Nodes.Add($forestNode) | Out-Null
 
     $domains = Get-ForestDomains
-    $currentDomain = ([System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()).Name
+    $currentDomain = if ($DomainController) { $controllerDomain } else { ([System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()).Name }
 
     foreach ($d in $domains) {
 
@@ -606,7 +829,8 @@
         $domainNode = New-Object System.Windows.Forms.TreeNode
         $domainNode.Text = $d
         $domainNode.Name = $dn
-        $domainNode.Tag = [PSCustomObject]@{ Domain = $d; ObjectClass = 'domain' }
+        $server = if ($DomainController -and $d -eq $controllerDomain) { $controllerName } else { $d }
+        $domainNode.Tag = [PSCustomObject]@{ Domain = $d; Server = $server; ObjectClass = 'domain' }
         $domainNode.ImageKey = "Domain"
         $domainNode.SelectedImageKey = "Domain"
         $domainNode.Nodes.Add("dummy") | Out-Null
@@ -631,6 +855,8 @@
         $contextMenu.Items.Add($newMenuItem) | Out-Null
     }
     $contextMenu.Items.Add($accountMenuItem) | Out-Null
+    $resetPwMenuItem = New-Object System.Windows.Forms.ToolStripMenuItem("Reset Password...")
+    $contextMenu.Items.Add($resetPwMenuItem) | Out-Null
     $tree.ContextMenuStrip = $contextMenu
 
     $tree.add_MouseDown({
@@ -646,7 +872,40 @@
             $newMenuItem.Visible = $AddOU -and $objectClass -in @('domain', 'organizationalUnit', 'container', 'builtinDomain')
             $accountMenuItem.Visible = $objectClass -eq 'user'
             $accountMenuItem.Text = if ($node.Tag.IsDisabled) { 'Enable Account' } else { 'Disable Account' }
-            $_.Cancel = -not ($newMenuItem.Available -or $accountMenuItem.Available)
+            $resetPwMenuItem.Visible = $objectClass -eq 'user'
+            $_.Cancel = -not ($newMenuItem.Available -or $accountMenuItem.Available -or $resetPwMenuItem.Available)
+        })
+
+    $resetPwMenuItem.add_Click({
+            $node = $tree.SelectedNode
+            if (-not $node -or $node.Tag.ObjectClass -ne 'user') { return }
+
+            $request = Show-PasswordPrompt -UserName $node.Text
+            if (-not $request) { return }
+
+            try {
+                Set-PasswordViaLdap -DistinguishedName $node.Name -Server $node.Tag.Server `
+                    -NewPassword $request.Password -MustChange ([bool]$request.MustChange)
+                if ($Script:NotStandAlone) {
+                    Write-Log -Message "Password reset for '$($node.Name)'"
+                }
+                [void][System.Windows.Forms.MessageBox]::Show(
+                    $form, "Password for '$($node.Text)' was reset.", "Reset Password",
+                    [System.Windows.Forms.MessageBoxButtons]::OK,
+                    [System.Windows.Forms.MessageBoxIcon]::Information
+                )
+            }
+            catch {
+                if ($Script:NotStandAlone) {
+                    Write-Log -Message "Failed to reset password for '$($node.Name)': $($_.Exception.Message)"
+                }
+                [void][System.Windows.Forms.MessageBox]::Show(
+                    $form, $_.Exception.Message, "Reset Password failed",
+                    [System.Windows.Forms.MessageBoxButtons]::OK,
+                    [System.Windows.Forms.MessageBoxIcon]::Error
+                )
+            }
+            finally { $request = $null }
         })
 
     $accountMenuItem.add_Click({
@@ -657,12 +916,7 @@
             $action = if ($enable) { 'Enable' } else { 'Disable' }
 
             try {
-                if ($enable) {
-                    Enable-ADAccount -Identity $node.Name -Server $node.Tag.Domain -Confirm:$false -ErrorAction Stop
-                }
-                else {
-                    Disable-ADAccount -Identity $node.Name -Server $node.Tag.Domain -Confirm:$false -ErrorAction Stop
-                }
+                Set-AccountEnabledViaLdap -DistinguishedName $node.Name -Server $node.Tag.Server -Enabled ([bool]$enable)
             }
             catch {
                 [void][System.Windows.Forms.MessageBox]::Show(
@@ -693,15 +947,9 @@
                 }
 
                 try {
-                    if ($TagNewOU) {
-                        $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain `
-                            -OtherAttributes @{ 'adminDescription' = "AS2Go|$Scenario|ASP00|Create" } -ProtectedFromAccidentalDeletion:$false -PassThru -ErrorAction Stop
-                    }
-                    else {
-                        $createdOU = New-ADOrganizationalUnit -Name $ouName -Path $parentNode.Name -Server $parentNode.Tag.Domain -PassThru -ErrorAction Stop
-                    }
+                    $createdOuDn = New-OUViaLdap -Name $ouName -ParentDN $parentNode.Name -Server $parentNode.Tag.Server
                     if ($Script:NotStandAlone) {
-                        Write-Log -Message "Created organizational unit '$($createdOU.DistinguishedName)'"
+                        Write-Log -Message "Created organizational unit '$createdOuDn'"
                     }
 
                     # Refresh the parent's child nodes so the new OU is shown immediately
@@ -712,7 +960,7 @@
                         Get-ChildNodes $parentNode
                         $parentNode.Expand()
 
-                        $newNode = $parentNode.Nodes | Where-Object { $_.Name -eq $createdOU.DistinguishedName } | Select-Object -First 1
+                        $newNode = $parentNode.Nodes | Where-Object { $_.Name -eq $createdOuDn } | Select-Object -First 1
                         if ($newNode) {
                             $newNode.EnsureVisible()
                             $tree.SelectedNode = $newNode
@@ -735,6 +983,8 @@
             $node = $_.Node
             $statusLabel.Text = "Selected: $($node.Text)"
 
+            if ($Close) { return }
+
             if ($DomainSelectionOnly) {
                 $btnOK.Enabled = ($node.Parent -and -not $node.Parent.Parent)
                 return
@@ -752,17 +1002,38 @@
             $btnOK.Enabled = $selectable
         })
 
-    $btnOK.add_Click({
-            $form.Tag = $tree.SelectedNode.Name
-            $form.Close()
-        })
+    if ($Close) {
+        $btnClose.add_Click({
+                $form.Tag = $null
+                $form.Close()
+            })
 
-    $btnCancel.add_Click({
-            $form.Tag = $null
-            $form.Close()
-        })
+        $form.Controls.AddRange(@($tree, $statusLabel, $btnClose))
+    }
+    else {
+        $btnOK.add_Click({
+                $form.Tag = $tree.SelectedNode.Name
+                $form.Close()
+            })
 
-    $form.Controls.AddRange(@($tree, $statusLabel, $btnCancel, $btnOK))
+        $btnCancel.add_Click({
+                $form.Tag = $null
+                $form.Close()
+            })
+
+        $form.Controls.AddRange(@($tree, $statusLabel, $btnCancel, $btnOK))
+    }
+
+    # Standalone start: show the version in the bottom-left corner (keep in sync with .NOTES)
+    if (-not $Script:NotStandAlone) {
+        $versionLabel = New-Object System.Windows.Forms.Label
+        $versionLabel.Text = "Version $Version"
+        $versionLabel.Location = '10,617'
+        $versionLabel.Size = '200,18'
+        $versionLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8)
+        $versionLabel.ForeColor = [System.Drawing.Color]::Gray
+        $form.Controls.Add($versionLabel)
+    }
 
     $null = $form.ShowDialog()
     If ($Script:NotStandAlone) {

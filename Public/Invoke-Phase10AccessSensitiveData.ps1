@@ -18,7 +18,7 @@ Browses descriptions and workflow steps offline without executing actions.
 Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
-Runs the phase without interactive confirmation prompts.
+Runs without confirmation prompts; the phase may still launch PsExec and open a remote command prompt.
 
 .PARAMETER Continue
 Reserved switch for workflow continuation handling.
@@ -34,6 +34,9 @@ Prevents clearing the console during phase execution.
 
 .PARAMETER AS2GoDemo
 Runs the phase in AS2Go demo mode and skips selected setup interactions.
+
+.PARAMETER SafeMode
+Skips the phase actions after displaying the overview.
 
 .EXAMPLE
 Invoke-ASPhase10AccessSensitiveData
@@ -57,8 +60,8 @@ Part of: AS2Go attack phase orchestration
 Category: Main Function
 
 .FUNCTIONALITY
-Demonstrates access to sensitive data through network shares and an application-server console using fake data.
-Uses a sample password file to illustrate why passwords should never be stored in plaintext.
+Demonstrates access to simulated backup-share data and a sample plaintext password file on an application server.
+Creates lab-only sample files; no real NTDS database or credentials are used.
 #>
 function Invoke-ASPhase10AccessSensitiveData {
 

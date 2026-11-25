@@ -103,7 +103,7 @@ the local AS2Go data folder, selected by switch and discovered through the ASP00
 #>
 function Remove-AS2GoLab {
 
-    [Alias("Uninstall-AS2GoLab")]
+    [Alias("Uninstall-AS2GoDemo")]
     param(
         [switch]$Preview,
         [switch]$DemoUser,

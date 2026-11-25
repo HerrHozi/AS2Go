@@ -34,6 +34,9 @@ Prevents clearing the console during phase execution.
 .PARAMETER AS2GoDemo
 Runs the phase in AS2Go demo mode and skips selected setup interactions.
 
+.PARAMETER SafeMode
+Skips the phase actions after displaying the overview.
+
 .EXAMPLE
 Invoke-ASPhase11ExfiltrateSensitiveData
 
@@ -56,8 +59,8 @@ Part of: AS2Go attack phase orchestration
 Category: Main Function
 
 .FUNCTIONALITY
-Demonstrates how accessible AD backups can be exfiltrated over SMB using simulated backup data.
-Copies files from the configured backup share to a local folder and lists the copied .dit files.
+Copies files from the configured backup share to the local exfiltration folder and lists copied .dit samples.
+Uses simulated backup data; it does not extract credentials or send files to an external service.
 #>
 function Invoke-ASPhase11ExfiltrateSensitiveData {
 

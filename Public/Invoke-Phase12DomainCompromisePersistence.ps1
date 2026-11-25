@@ -192,7 +192,7 @@ function Invoke-ASPhase12DomainCompromisePersistence {
     Write-AS2GoOutput -Type Bullet -Message "[W] Removing group memberships"
     Write-AS2GoOutput -Type Bullet -Message "[L] Disabling accounts and/or resetting passwords"
     Write-AS2GoOutput -Type Bullet -Message "[T] Modify Group Policy Template (GPT) files"
-    Write-AS2GoOutput -Type Bullet -Message "[G] Dump Kerberos Ticket"   
+    Write-AS2GoOutput -Type Bullet -Message "[G] Create Golden Ticket (/newpac - Privilege Attribute Certificate)"   
     Write-AS2GoOutput -Type Bullet -Message "[D] Export domain DPAPI backup keys"
     Write-AS2GoOutput -Type Bullet -Message "[E] Encrypt backup files"
     Write-AS2GoOutput -Type Bullet -Message "[R] Reboot of all reachable Domain Controller"
@@ -200,8 +200,6 @@ function Invoke-ASPhase12DomainCompromisePersistence {
 
 
     Do {
-
-
 
         #Write-AS2GoOutput -Type H1 -Message "Domain Dominance & Persistence"
         #Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)

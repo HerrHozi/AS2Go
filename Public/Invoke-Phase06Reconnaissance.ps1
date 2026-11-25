@@ -51,8 +51,8 @@ Runs Phase 06 in demo mode without phase visuals and without clearing the host.
 Part of: AS2Go attack phase orchestration
 
 .FUNCTIONALITY
-Shows what a standard domain user can discover 
-about domain administrators, computers, and domain controllers.
+Enumerates forest details, privileged groups, computers, and domain controllers; attempts configured admin-share access.
+Optional extended tasks include DNS zone-transfer, session, and honeytoken activity.
 #>
 function Invoke-ASPhase06Reconnaissance {
 

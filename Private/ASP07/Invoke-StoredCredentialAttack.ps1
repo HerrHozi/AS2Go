@@ -54,15 +54,22 @@ function Invoke-StoredCredentialAttack {
     $gtValid = ($gtParts.Count -eq 5) -and (Test-ADFormat -Type GoldenTicket -Value $gtData)
     $ntValid = Test-ADFormat -Type Hash -Value $ntData
 
-    If (-not ($gtValid -or $ntValid)) {
+
+
+    $forgeTicketFile = get-childitem $Script:AS2GoTicketsDir | sort-object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Fullname  
+
+    If (-not ($forgeTicketFile -or $ntValid)) {
         Write-AS2GoOutput -Type Warning -Message "No stored hash data found. Run the Golden Ticket attack or the Overpass-the-Hash attack first."
         Measure-FunctionRuntime -End -Details $Info
         return
     }
 
+
+
+
     $helpKRBTGT = ""
-    If ($gtValid) {
-        $helpKRBTGT = "Forge a Golden Ticket for '$($gtParts[1])' in '$($gtParts[0])' with the stored KRBTGT hash."
+    If ($forgeTicketFile) {
+        $helpKRBTGT = "Forge a Golden Ticket for $forgeTicketFile."
     }
     $helpNTLM = ""
     If ($ntValid) {
@@ -77,10 +84,10 @@ function Invoke-StoredCredentialAttack {
     Write-AS2GoOutput -Type H1 -Message $((Get-Help (Get-FunctionName)).Functionality)
 
     If ($gtValid) {
-        Write-AS2GoOutput -Type TextMaker -Message "Stored KRBTGT hash data:" -TM "$gtData" -NoExtraLines
+        Write-AS2GoOutput -Type TextMaker -Message "Stored KRBTGT ticket :" -TM "$forgeTicketFile" -NoExtraLines
     }
     If ($ntValid) {
-        Write-AS2GoOutput -Type TextMaker -Message "Stored NTLM   hash data:" -TM "$ntData" -NoExtraLines
+        Write-AS2GoOutput -Type TextMaker -Message "Stored NTLM hash data:" -TM "$ntData" -NoExtraLines
     }
     write-host "`n"
 
@@ -154,7 +161,7 @@ function Invoke-StoredCredentialAttack {
         $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
         Write-AS2GoOutput -Type Info -Message "Last Ticket"
         $tickets | Select-Object -Last 1 | Format-List
-
+                Invoke-ADChanges
         if (-not $unattended) { pause }
 
 
@@ -217,6 +224,7 @@ function Invoke-StoredCredentialAttack {
                 $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
                 Write-AS2GoOutput -Type Info -Message "Last Ticket"
                 $tickets | Select-object -Last 1 | Format-List
+                Invoke-ADChanges
                 if (-not $unattended) { pause }
 
             }

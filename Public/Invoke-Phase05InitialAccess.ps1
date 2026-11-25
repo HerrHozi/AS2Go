@@ -1,47 +1,48 @@
 <#
 .SYNOPSIS
-    Executes a password spray attack against Active Directory users in a specified scope.
+    Reviews the current user's Active Directory account and local security context.
 
 .DESCRIPTION
-    This function performs a password spray attack by attempting to authenticate multiple Active Directory users
-    with one or more passwords. It provides multiple scope options (Forest, Root Domain, Current Domain, or specific OU)
-    and allows the user to configure the attack parameters interactively or in unattended mode.
+    Displays local administrator and token elevation status, then retrieves the current user's Active Directory
+    account, password policy, and group membership information. Safe Mode skips the Active Directory lookup.
 
-    The function performs password spray attacks using both standard authentication methods and Rubeus (if available).
-    It checks domain password policies to calculate maximum safe spray attempts without locking accounts.
+    In the AS2Go lab, privileged groups such as Domain Admins and Enterprise Admins can be moved to the Tier 0
+    Groups OU. The lab applies an inherited deny permission for the configured scenario-user group on that OU.
+    As a result, a newly created AS2Go scenario user may not be able to enumerate those groups or read their
+    memberships. This is an intentional part of the Tier 0 visibility boundary; ASP05 can therefore show only
+    the group information available to the current account.
 
 .PARAMETER Preview
 Browses descriptions and workflow steps offline without executing actions.
 Uses a separate preview menu; runtime selection and skip parameters are not evaluated.
 
 .PARAMETER UnAttended
-    When specified, skips all interactive prompts and uses default values for automated execution.
+    When specified, skips the pause at the end of the AS2Go demo workflow.
 
 .PARAMETER DeveloperMode
-    When specified, displays additional debug information including successful credential matches.
+    Enables developer behavior, including logging and suppressing images and console clearing.
+
+.PARAMETER SafeMode
+    Skips the Active Directory account and group information lookup.
 
 .EXAMPLE
     PS C:\> Invoke-ASPhase05InitialAccess
-    Runs an interactive password spray attack with prompts for scope and password selection.
+    Displays the current user's Active Directory and local security context.
 
 .EXAMPLE
     PS C:\> Invoke-ASPhase05InitialAccess -UnAttended
-    Runs an automated password spray attack using default settings (current domain, last stored password & the samaccount name as password).
+    Displays the phase information and returns without waiting at the end of the AS2Go demo workflow.
 
 .NOTES
-    - Requires the ActiveDirectory PowerShell module
-    - Displays current domain password policies before executing the attack
-    - Logs all activities and execution times
-    - Supports targeting Forest, Root Domain, Current Domain, or specific OUs
-    - Optional Rubeus integration for Kerberos-based attacks
+    Requires a domain-connected Windows session and the ActiveDirectory PowerShell module for the directory lookup.
+    Group enumeration can be limited by Active Directory permissions, including the AS2Go Tier 0 lab ACL.
 
 .LINK
     Invoke-ASPhase05InitialAccess
 
 .FUNCTIONALITY
-Displays the current user's Active Directory account, domain, password policy, and group membership
-information using Get-CurrentADUserInfo, then reports local administrator membership and token
-elevation status using Test-LocalAdministrator.
+Reviews the current user's AD account, password policy, and visible group memberships, then reports local
+administrator and token elevation status. AS2Go Tier 0 permissions may restrict group visibility.
 
 #>
 
