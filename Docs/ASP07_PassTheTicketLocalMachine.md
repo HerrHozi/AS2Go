@@ -20,7 +20,7 @@
 | 3 | Pick the victim | Best candidate by privilege RID priority — **519 (Enterprise Admins), 512 (Domain Admins), 548 (Account Operators)** — requiring a TGT; fallback heuristics use service-ticket availability and TGT validity; confirm or change in the candidate menu (Help shows group RIDs) |
 | 4 | Dump the tickets | `Rubeus.exe dump /luid:<LUID> /service:krbtgt /nowrap` and `/service:cifs` — Base64 blobs decoded into `.kirbi` files in the tickets folder |
 | 5 | Inject | `Rubeus.exe ptt /ticket:<file>` per `.kirbi` file — TGT and service tickets re-enter the current session |
-| 6 | Verify | Filtered ticket cache and [Test-AccessToOneDCPerDomain](../Private/ASP07/Test-AccessToOneDCPerDomain.ps1) for forest-wide DC admin-share access |
+| 6 | Verify | Filtered ticket cache and [Test-AccessToOneDCPerDomain](../Private/Shared/Test-AccessToOneDCPerDomain.ps1) for forest-wide DC admin-share access |
 
 Reach it from the Phase 07 menu option *Pass-the-Ticket (Local Machine)*.
 

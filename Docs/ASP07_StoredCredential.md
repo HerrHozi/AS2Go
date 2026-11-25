@@ -17,7 +17,7 @@
 | 0 | Load stored state | `ASP07KR` (Golden-Ticket data, DPAPI-protected) and `ASP07NT` (NTLM hash, DPAPI-protected) are read from the module configuration; validity is checked with [Test-ADFormat](../Private/ASP07/Test-ADFormat.ps1) (`GoldenTicket` checks FQDN + domain-SID fields, `Hash` the whole three-field format) |
 | 1 | Show what is available | The most recent Golden-Ticket `.kirbi` file in the tickets folder (newest by write time) and/or the stored NTLM hash data are displayed |
 | 2 | Choose the reuse path | `KRBTGT (Golden Ticket)` — re-forge from the saved ticket file, or `NTLM (Pass-the-Hash)` — rerun the OpTH flow with the saved hash; `Skip` exits |
-| 3a | KRBTGT path | [Rubeus golden](../Private/ASP07/Invoke-GoldenTicketAttack.ps1) re-forges a PAC_REQUESTOR-compliant ticket to a `.kirbi` file, then [Import-KirbiFile](../Private/ASP07/Import-KirbiFile.ps1) validates it against the KDC (`asktgs`) before injecting (`ptt`) — on validation failure the cached-ticket inspection is skipped |
+| 3a | KRBTGT path | [Rubeus golden](../Private/ASP12/Invoke-GoldenTicketAttack.ps1) re-forges a PAC_REQUESTOR-compliant ticket to a `.kirbi` file, then [Import-KirbiFile](../Private/Shared/Import-KirbiFile.ps1) validates it against the KDC (`asktgs`) before injecting (`ptt`) — on validation failure the cached-ticket inspection is skipped |
 | 3b | NTLM path | Mimikatz `sekurlsa::pth /run:pwsh.exe` (choose Mimikatz) or `Rubeus asktgt /rc4:<hash> /ptt` (choose Rubeus) — the same two tool paths as the OpTH attack, now with the saved hash |
 | 4 | Repeat loop | After each run, a `REPEAT | Stored Credential` prompt offers another pass until `No` |
 
@@ -29,7 +29,7 @@ Reach it from the Phase 07 menu option *Load Hash* (previously `Invoke-LoadHash`
 
 - **It closes the loop between compromise and persistence of attacker convenience**: every upstream phase saves its loot — `ASP07KR` (Golden Ticket material) and `ASP07NT` (NTLM hash) — under DPAPI. This workflow is the *replay* entry point: what took a whole demonstration in Phase 07/12 becomes a menu pick here.
 - **It mirrors real attacker notebooks**: operators keep captured hashes and ticket material in their tooling for days. The demo makes that state visible and discussable — the *reuse* is the part defenders see weeks later, not the capture.
-- **The re-forge path exercises the hardened-KDC lesson again**: because the KRBTGT branch now runs through Rubeus `golden` + [Import-KirbiFile](../Private/ASP07/Import-KirbiFile.ps1), a rerun shows the PAC_REQUESTOR validation gate a second time — useful right after demonstrating the rotation/`KDC_ERR_TGT_REVOKED` flow in Phase 12.
+- **The re-forge path exercises the hardened-KDC lesson again**: because the KRBTGT branch now runs through Rubeus `golden` + [Import-KirbiFile](../Private/Shared/Import-KirbiFile.ps1), a rerun shows the PAC_REQUESTOR validation gate a second time — useful right after demonstrating the rotation/`KDC_ERR_TGT_REVOKED` flow in Phase 12.
 - **The security lesson in one line**: saved credential state extends a single compromise over time — and for defenders, the *second* run looks different from the first: no Mimikatz dump again, just a request from a stored blob. Session-history analytics matter more than per-event detection.
 
 ---
@@ -46,7 +46,7 @@ In `-SafeMode` the selection menu is reduced to `Skip`. Unattended execution use
 
 | Setting | Format | Producer |
 |---|---|---|
-| `ASP07KR` | `FQDN\|user\|NTLM-hash\|groups\|domain-SID` | [Invoke-GoldenTicketAttack](../Private/ASP07/Invoke-GoldenTicketAttack.ps1) after the DCSync step |
+| `ASP07KR` | `FQDN\|user\|NTLM-hash\|groups\|domain-SID` | [Invoke-GoldenTicketAttack](../Private/ASP12/Invoke-GoldenTicketAttack.ps1) after the DCSync step |
 | `ASP07NT` | `FQDN\|user\|NTLM-hash` | [Invoke-OverPassTheHashAttack](../Private/ASP07/Invoke-OverPassTheHashAttack.ps1) on success |
 
 Both are DPAPI-protected (machine-scoped), so the values leave no plaintext in the configuration file and only decode on the machine that stored them.
@@ -69,7 +69,7 @@ The `REPEAT | Stored Credential` prompt at the bottom re-offers both stored data
 
 - **The re-run looks different from the original**: the first compromise showed a Mimikatz dump, a ticket forge with Event-37-style KDC interaction (old Mimikatz path) or a clean `asktgs` (Rubeus path). The *reuse* shows only the network-visible result — a TGT request or PtH logon without the corresponding harvesting activity. That gap (usage without capture) is the session-history signal.
 - **DPAPI-protected attacker state is an endpoint-forensics artifact**: the module configuration (with DPAPI blobs) lives on the machine running AS2Go — in IR, recovering `ASP07KR`/`ASP07NT` from a compromised host reconstructs exactly which material the attacker had captured, and what they are likely to reuse. It is the lab-scale mirror of an attacker's saved credential vault.
-- **The Golden Ticket re-forge still faces the KDC gate**: rotation demos (Phase 12 Revoke) invalidate the stored material — the re-run fails at `asktgs` with `KDC_ERR_TGT_REVOKED`, visible in [Import-KirbiFile](../Private/ASP07/Import-KirbiFile.ps1)'s validation output. This pair of demos makes the rotation lesson repeatable from the reuse angle.
+- **The Golden Ticket re-forge still faces the KDC gate**: rotation demos (Phase 12 Revoke) invalidate the stored material — the re-run fails at `asktgs` with `KDC_ERR_TGT_REVOKED`, visible in [Import-KirbiFile](../Private/Shared/Import-KirbiFile.ps1)'s validation output. This pair of demos makes the rotation lesson repeatable from the reuse angle.
 - **The hardening lesson**: rotate what the reuse depends on. KRBTGT rotation kills the stored ticket path; account password resets kill the hash path (the stored NTLM stops working at the next AS-REQ); account disablement stops everything. All three recovery actions are exactly what the incident-response plan from the earlier phases should have triggered.
 
 ---
@@ -101,7 +101,7 @@ The workflow itself requires no manual commands — run `Invoke-StoredCredential
 ## 7. Related
 
 - Phase diagram: [ASP07_LoadHash.html](../Phases/ASP07_LoadHash.html)
-- Producers of the stored state: [ASP07 Golden Ticket guide](../Private/ASP07/Invoke-GoldenTicketAttack.ps1), [ASP07 Overpass-the-Hash guide](ASP07_OverPassTheHash.md)
-- Validation helper on the KRBTGT path: [Import-KirbiFile.ps1](../Private/ASP07/Import-KirbiFile.ps1)
+- Producers of the stored state: [ASP07 Golden Ticket guide](../Private/ASP12/Invoke-GoldenTicketAttack.ps1), [ASP07 Overpass-the-Hash guide](ASP07_OverPassTheHash.md)
+- Validation helper on the KRBTGT path: [Import-KirbiFile.ps1](../Private/Shared/Import-KirbiFile.ps1)
 - The rotation demo that invalidates the KRBTGT path: [ASP12 Revoke Tier 0 Access guide](ASP12_RemoveGroupMember.md)
 - MITRE ATT&CK: Pass the Hash [T1550.002](https://attack.mitre.org/techniques/T1550/002/), Steal or Forge Kerberos Tickets [T1558](https://attack.mitre.org/techniques/T1558/)

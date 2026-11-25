@@ -11,17 +11,17 @@
 
 ## 1. What this workflow does
 
-[Invoke-GoldenTicketAttack](../Private/Invoke-GoldenTicketAttack.ps1) walks through the complete Golden Ticket demonstration in three steps:
+[Invoke-GoldenTicketAttack](../Private/ASP12/Invoke-GoldenTicketAttack.ps1) walks through the complete Golden Ticket demonstration in three steps:
 
 | Step | Action | Tool |
 |---|---|---|
 | 0 | Select the ticket identity (real AD user or randomly generated fake user) and target domain | AS2Go GUI picker |
 | 1 | Dump the krbtgt hashes with DCSync (`aes256_hmac` and `Hash NTLM:` extracted from the log) | Mimikatz |
 | 2 | Forge the Golden Ticket to a `.kirbi` file with Rubeus `golden` (PAC_REQUESTOR-compliant) | Rubeus |
-| 2b | Validate against the KDC, then inject: `describe` → `asktgs` → `ptt` | [Import-KirbiFile](../Private/Import-KirbiFile.ps1) |
+| 2b | Validate against the KDC, then inject: `describe` → `asktgs` → `ptt` | [Import-KirbiFile](../Private/Shared/Import-KirbiFile.ps1) |
 | 3 | Test: inspect cached tickets (`klist`), access `\\DC\c$`, stamp the `info` attribute of up to ten users | AS2Go |
 
-The forged ticket is saved in the module tickets folder (`...\AS2Go\Tickets`) using Rubeus' descriptive filename format: `GT_<YYYY>_<MM>_<DD>_<HH>_<MM>_<SS>_<user>_to_<service>@<domain>.kirbi`. For example: `GT_2026_11_24_11_39_19_Master_to_krbtgt@DEMO.AS2GO.LAB.kirbi`. The filename records when the ticket was created, the represented account, and the target service. Stored hash data is kept in the DPAPI-protected `ASP07KR` setting, so [Invoke-StoredCredentialAttack](../Private/Invoke-StoredCredentialAttack.ps1) can re-run the demonstration later.
+The forged ticket is saved in the module tickets folder (`...\AS2Go\Tickets`) using Rubeus' descriptive filename format: `GT_<YYYY>_<MM>_<DD>_<HH>_<MM>_<SS>_<user>_to_<service>@<domain>.kirbi`. For example: `GT_2026_11_24_11_39_19_Master_to_krbtgt@DEMO.AS2GO.LAB.kirbi`. The filename records when the ticket was created, the represented account, and the target service. Stored hash data is kept in the DPAPI-protected `ASP07KR` setting, so [Invoke-StoredCredentialAttack](../Private/ASP07/Invoke-StoredCredentialAttack.ps1) can re-run the demonstration later.
 
 ---
 
@@ -147,7 +147,7 @@ Restart-Service Kdc -Force
 ## 8. Related
 
 - Phase diagram: [ASP12_GT.html](../Phases/ASP12_GT.html)
-- Stored hash reuse (re-run of the same forge): [Invoke-StoredCredentialAttack.ps1](../Private/Invoke-StoredCredentialAttack.ps1)
+- Stored hash reuse (re-run of the same forge): [Invoke-StoredCredentialAttack.ps1](../Private/ASP07/Invoke-StoredCredentialAttack.ps1)
 - MITRE ATT&CK: Golden Ticket [T1558.001](https://attack.mitre.org/techniques/T1558/001/)
 
 

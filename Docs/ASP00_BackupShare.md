@@ -74,5 +74,5 @@ The workflow grants `Domain Admins` NTFS Modify access and SMB Change access to 
 - [Security Policy and authorized use](../SECURITY.md)
 - [Public setup function: `Initialize-AS2GoLab`](../Public/Initialize-AS2GoLab.ps1)
 - [Public cleanup function: `Remove-AS2GoLab`](../Public/Remove-AS2GoLab.ps1)
-- [Share workflow: `Invoke-BackUpShare`](../Private/Invoke-BackUpShare.ps1)
-- [Share creation helper: `New-BackUpShare`](../Private/New-BackUpShare.ps1)
+- [Share workflow: `Invoke-BackUpShare`](../Private/ASP00/Invoke-BackUpShare.ps1)
+- [Share creation helper: `New-BackUpShare`](../Private/ASP00/New-BackUpShare.ps1)

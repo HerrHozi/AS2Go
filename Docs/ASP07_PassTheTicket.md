@@ -21,7 +21,7 @@
 | 4 | Pick the victim | Best candidate = user with **both a TGT and at least one service ticket**, ranked by counts and recency; confirm or change in the candidate menu |
 | 5 | Copy the tickets | All `.kirbi` files for the chosen principal come to the local temp dir; [Get-KirbiBestFiles](../Private/ASP07/Get-KirbiBestFiles.ps1) selects the **best ticket pair** (TGT + service ticket from the same LUID) |
 | 6 | Inject | Mimikatz `kerberos::ptt <tickets-folder>` — both tickets of the pair are injected into the current session |
-| 7 | Verify | Filtered ticket cache (`Get-KlistTicket -Client <candidate>`), then [Test-AccessToOneDCPerDomain](../Private/ASP07/Test-AccessToOneDCPerDomain.ps1) for forest-wide DC admin-share access |
+| 7 | Verify | Filtered ticket cache (`Get-KlistTicket -Client <candidate>`), then [Test-AccessToOneDCPerDomain](../Private/Shared/Test-AccessToOneDCPerDomain.ps1) for forest-wide DC admin-share access |
 
 Reach it from the Phase 07 menu option *Pass-the-Ticket*.
 
@@ -56,9 +56,9 @@ The `PSSession` block disables real-time monitoring *before* Mimikatz runs and r
 
 `Get-KirbiBestFiles` pairs TGT and service ticket from the **same logon session** (LUID). Mixing tickets across sessions can produce caches where the TGT and service ticket disagree about client identity — and Windows validates AP-REQ context coherence. The printed "Best Ticket Pair" (Account, LUID, TGTSPN, ServiceSPN, files) is the demo's explain-the-mechanics moment.
 
-### 4.4 The remote variant runs from a single box
+### 4.4 Remote and local variants
 
-The sibling function [Invoke-PassTheTicketAttackSingleBox](../Private/ASP07/Invoke-PassTheTicketAttackSingleBox.ps1) performs the same chain *on* the admin workstation itself (Rubeus triage/dump instead of Mimikatz-over-WinRM staging), and [Invoke-PassTheTicketAttackLocalMachine](../Private/ASP07/Invoke-PassTheTicketAttackLocalMachine.ps1) runs it entirely on the machine running AS2Go. Three variants, one technique — useful for demonstrating that the injection step is location-independent.
+[Invoke-PassTheTicketAttack](../Private/ASP07/Invoke-PassTheTicketAttack.ps1) works on the configured admin workstation (Mimikatz staged over WinRM), while the sibling function [Invoke-PassTheTicketAttackLocalMachine](../Private/ASP07/Invoke-PassTheTicketAttackLocalMachine.ps1) runs the same chain entirely on the machine running AS2Go (Rubeus triage/dump/ptt). Two variants, one technique — useful for demonstrating that the injection step is location-independent.
 
 ### 4.5 Old tickets are cleared, not appended
 
@@ -112,6 +112,6 @@ The workflow itself requires no manual commands — run `Invoke-PassTheTicketAtt
 
 - Phase diagram: [ASP07_PtT.html](../Phases/ASP07_PtT.html)
 - Ticket analytics feeding the selection: [Get-KirbiTicketInfo.ps1](../Private/ASP07/Get-KirbiTicketInfo.ps1), [Get-KirbiBestFiles.ps1](../Private/ASP07/Get-KirbiBestFiles.ps1)
-- Local-machine and single-box variants: [Invoke-PassTheTicketAttackLocalMachine.ps1](../Private/ASP07/Invoke-PassTheTicketAttackLocalMachine.ps1), [Invoke-PassTheTicketAttackSingleBox.ps1](../Private/ASP07/Invoke-PassTheTicketAttackSingleBox.ps1)
+- Remote and local-machine variants: [Invoke-PassTheTicketAttack.ps1](../Private/ASP07/Invoke-PassTheTicketAttack.ps1), [Invoke-PassTheTicketAttackLocalMachine.ps1](../Private/ASP07/Invoke-PassTheTicketAttackLocalMachine.ps1)
 - The hash-based sibling (converts a hash into a ticket first): [ASP07 Overpass-the-Hash guide](ASP07_OverPassTheHash.md)
 - MITRE ATT&CK: Pass the Ticket [T1550.003](https://attack.mitre.org/techniques/T1550/003/), Steal or Forge Kerberos Tickets [T1558](https://attack.mitre.org/techniques/T1558/)

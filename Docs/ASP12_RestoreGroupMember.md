@@ -19,7 +19,7 @@
 | 2 | Restore memberships | Per group: reads `member` attribute, adds **only missing DNs** via `Set-ADGroup -Add` against the resolved writable DC — `AlreadyMember`, `Skipped` (outside `ShouldProcess`), `Added`, or `Failed` per member, with one result object per member |
 | 3 | Report | Result objects (Domain, Group, GroupSid, MemberDn, Status, Error); a terminating error closes the run when any addition failed |
 
-The backup producer is [Export-ADPrivilegedGroupDirectMember](../Public/Export-ADPrivilegedGroupDirectMember.ps1) — written *before* the purge by the backup gate in [Invoke-PrivilegeGroupPurge](../Private/ASP12/Invoke-PrivilegeGroupPurge.ps1), and also by the ASP12 purge workflow itself. Together with [Invoke-GroupManipulation](../Private/ASP12/Invoke-GroupManipulation.md) this pair forms ASP12's reversible Tier-0 demo.
+The backup producer is [Export-ADPrivilegedGroupDirectMember](../Public/Export-ADPrivilegedGroupDirectMember.ps1) — written *before* the purge by the backup gate in [Invoke-PrivilegeGroupPurge](../Private/ASP12/Invoke-PrivilegeGroupPurge.ps1), and also by the ASP12 purge workflow itself. Together with [Invoke-GroupManipulation](../Private/ASP12/Invoke-GroupManipulation.ps1) this pair forms ASP12's reversible Tier-0 demo.
 
 ---
 

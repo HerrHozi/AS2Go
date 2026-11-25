@@ -56,7 +56,9 @@ function Invoke-Encryption {
 
     if (-not (Test-Path -Path $FolderToEncrypt -PathType Container)) {
         Write-AS2GoOutput -Type Warning -Message "Unable to create folder '$FolderToEncrypt' - aborting simulation."
-        Write-Log -Message "### Exit Function $CurrentFunction ###"
+            Measure-FunctionRuntime -End -Details $info
+            pause
+
         return
     }
 
