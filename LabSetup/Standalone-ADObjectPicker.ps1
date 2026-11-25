@@ -1,4 +1,4 @@
-﻿function Select-ADObject {
+﻿function Select-ADObjectStandalone {
     <#
     .SYNOPSIS
         Displays an interactive GUI dialog to select an Active Directory object from the forest hierarchy,

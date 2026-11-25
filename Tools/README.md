@@ -42,3 +42,17 @@ These are the tested versions, which may differ from the latest available releas
 “Latest” refers to the version currently available from the linked source.
 This README does not specify fixed version numbers.
 The table above records the tested versions; the download links point to the available releases.
+
+## License and distribution notice
+
+Each tool listed above remains the property of its respective author or publisher
+and is subject to its own license, not the AS2Go license (MIT). AS2Go does not
+claim any rights to these tools and bundling them here is not a representation
+that redistribution is permitted under every tool's license.
+
+`PsExec.exe` is part of the Microsoft Sysinternals Suite and is distributed under
+the [Sysinternals Software License Terms](https://learn.microsoft.com/en-us/sysinternals/license-terms),
+which do not grant a general right to redistribute the tool as part of other
+software or packages. Obtain `PsExec.exe` directly from Microsoft Sysinternals
+and verify you are permitted to use it in your environment before relying on
+any bundled copy.

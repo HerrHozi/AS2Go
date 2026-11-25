@@ -11,7 +11,14 @@
             Tags         = @('ActiveDirectory', 'ADCS', 'Killchain', 'RedTeam', 'Offense', 'AttackSimulation', 'AdversaryEmulation', 'PurpleTeam', 'BlueTeam', 'DefensiveSecurity')
             ProjectUri   = 'https://github.com/HerrHozi/AS2Go'
             LicenseUri   = 'https://github.com/HerrHozi/AS2Go/blob/main/LICENSE'
-            ReleaseNotes = '            
+            ReleaseNotes = '
+2026.11.25.711
+        - Forges Golden Tickets that a hardened, modern Domain Controller accepts (Rubeus `golden` with PAC_REQUESTOR), validates them against the KDC before injection, and makes KDC rejection of older-style tickets observable for defender discussions.
+        - Adds a configurable Golden Ticket lifetime (7-day default; custom 8-365 days).
+        - Fixes ConvertFrom-CredentialDump returning the wrong username for an NTLM hash when a session''s msv and kerberos identities differ.
+        - Renames Invoke-LoadHash to Invoke-StoredCredentialAttack for clearer naming
+        - Completes the ASP00-ASP12 documentation set with illustrated phase guides.
+
 2026.11.16.1272
         - Protects sensitive configuration values, including saved password hashes, with Windows DPAPI. Protected values can be decrypted only on the Windows computer that saved them and are omitted from logs.
         - Provides illustrated scenario guides with security lessons and references, so workshop participants can review each scenario before or after the demo.

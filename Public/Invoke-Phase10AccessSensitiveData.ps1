@@ -138,7 +138,7 @@ function Invoke-ASPhase10AccessSensitiveData {
 
         Write-Host ""
         Write-Host      -NoNewline "  Command: "
-        Write-Highlight -Text "net ", "view ", "$server" `
+        Write-Highlight -Text "Get-SmbShare ", "-ComputerName ", "$server" `
             -Color $fgcC, $fgcF, $fgcV
         Write-Host ""
 
@@ -150,7 +150,7 @@ function Invoke-ASPhase10AccessSensitiveData {
         }
 
 
-        Invoke-Command -ScriptBlock { net view $server } | Out-Host
+        Invoke-Command -ScriptBlock { Get-SmbShare -ComputerName $server } | Out-Host
 
         If ($UnAttended) { Start-Sleep 2 } else { Pause }
         Write-AS2GoOutput -Type Header -Message "Starting Enumeration of Share Content"

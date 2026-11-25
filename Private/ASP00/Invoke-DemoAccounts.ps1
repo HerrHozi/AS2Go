@@ -120,7 +120,8 @@ Function Invoke-DemoAccounts {
    $answer = Show-DecisionPrompt -Message $message  -Options $Options -Default 0 -Title $title
 
    If ($answer -eq "O") {
-      $OrganizationalUnit = Select-ADObject -Title "Select Target OU - Domain switching is NOT supported (YET)!" -LocalDomainOnly -AddOU -TagNewOU -Scenario $Scenario
+      $OrganizationalUnit = Select-ADObject -Title "Select Target OU - Domain switching is NOT supported (YET)!" -LocalDomainOnly -AddOU
+      
       if ($OrganizationalUnit -eq $null) {
          Write-AS2GoOutput -Type Warning -Message "No organizational unit was selected. Using the default OU."
          $OrganizationalUnit = "OU=Demo Accounts,OU=$AS2GoOU,$((Get-ADDomain).DistinguishedName)"

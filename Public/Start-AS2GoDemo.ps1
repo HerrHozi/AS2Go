@@ -137,7 +137,7 @@ Function Start-AS2GoDemo {
     if (-not $safeMode) {
         $result = Get-ASConfig -Setting "LastConfig"
         If ($null -eq $result) {
-            Write-AS2GoOutput -Type Warning -M "No previous configuration found. Run 'Initialize-AS2GoLabConfiguration' first."
+            Write-AS2GoOutput -Type Warning -M "No previous configuration found. Run 'Initialize-AS2GoLab' first."
             return
         }
     }

@@ -34,14 +34,14 @@ ASP12 is the final stage in the `Start-AS2GoDemo` workflow. Starting it directly
 | Menu option | Purpose | Guide |
 |---|---|---|
 | Change BGA | Select or change the protected break-glass account | [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md) |
-| Backdoor | Create a persistent domain account | [ASP12 Backdoor Account](../Phases/ASP12_BD.html) |
-| Tamper GPT | Change Group Policy Template files to distribute policy settings | [ASP12 Group Policy Template](../Phases/ASP12_GPT.html) |
-| Wipe Access | Remove privileged group memberships | [ASP12 Revoke Privileged Access](../Phases/ASP12_Revoke.html) |
-| Lock Out | Disable accounts or reset passwords | [ASP12 User Account Disruption](../Phases/ASP12_Disruption.html) |
-| Dump DPAPI Keys | Export domain DPAPI backup keys | [ASP12 DPAPI Backup Keys](../Phases/ASP12_BackupKey.html) |
-| Golden Ticket | Create, validate, and inject a Golden Ticket | [ASP12 Golden Ticket guide](ASP12InvokeGoldenTicket.md) |
-| Encrypt | Encrypt configured backup files | [ASP12 File Encryption](../Phases/ASP12_Encryption.html) |
-| Reboot | Restart reachable Domain Controllers | Check the lab and restart prerequisites in [ASP00 Installation and Setup](ASP00__Setup.md) before selecting this action. |
+| Backdoor | Create a persistent domain account | [ASP12 Backdoor User guide](ASP12_BackDoorUser.md) |
+| Tamper GPT | Change Group Policy Template files to distribute policy settings | [ASP12 GPO Template Modification guide](ASP12_UpdateGPTemplateFile.md) |
+| Wipe Access | Remove privileged group memberships | [ASP12 Revoke Tier 0 Access guide](ASP12_RemoveGroupMember.md) |
+| Lock Out | Disable accounts or reset passwords | [ASP12 User Access Disruption guide](ASP12_UserAccountDisruption.md) |
+| Dump DPAPI Keys | Export domain DPAPI backup keys | [ASP12 DPAPI Backup Keys guide](ASP12_DPAPIBackupKey.md) |
+| Golden Ticket | Create, validate, and inject a Golden Ticket | [ASP12 Golden Ticket guide](ASP12_GoldenTicket.md) |
+| Encrypt | Encrypt configured backup files | [ASP12 File Encryption guide](ASP12_Encryption.md) |
+| Reboot | Restart reachable Domain Controllers | [ASP12 Coordinated Reboot guide](ASP12_Shutdown.md) |
 
 ## Requirements and operational impact
 
@@ -54,4 +54,11 @@ Use the prepared, explicitly authorized lab described in [ASP00 Installation and
 - [ASP00 Installation and Setup](ASP00__Setup.md)
 - [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md)
 - [ASP12 phase overview](../Phases/ASP12.html)
-- [ASP12 Golden Ticket guide](ASP12InvokeGoldenTicket.md)
+- [ASP12 Golden Ticket guide](ASP12_GoldenTicket.md)
+- [ASP12 Backdoor User guide](ASP12_BackDoorUser.md)
+- [ASP12 Revoke Tier 0 Access guide](ASP12_RemoveGroupMember.md)
+- [ASP12 GPO Template Modification guide](ASP12_UpdateGPTemplateFile.md)
+- [ASP12 User Access Disruption guide](ASP12_UserAccountDisruption.md)
+- [ASP12 DPAPI Backup Keys guide](ASP12_DPAPIBackupKey.md)
+- [ASP12 File Encryption guide](ASP12_Encryption.md)
+- [ASP12 Coordinated Reboot guide](ASP12_Shutdown.md)

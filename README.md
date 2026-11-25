@@ -38,7 +38,6 @@ It is designed for:
 
 - [ASP00 Installation and Setup](Docs/ASP00__Setup.md)
 - [What's New](Docs/whatsNew.md)
-- [Changelog](ChangeLog.md)
 
 ## Important Notice
 
@@ -65,10 +64,12 @@ The goal is not stealth, but visibility and learning.
 ## Module Structure
 
 - Public/: Entry points and phase orchestrators
-- Core-Functions/: Internal helper and attack action functions
+- Private/: Internal helper and attack action functions
+- Phases/: HTML phase-overview pages linked from the Docs guides
+- Config/: Module configuration (for example the UI menu definitions)
 - Tools/: External binaries or dependencies used in lab workflows
 - LabSetup/: Optional lab preparation scripts
-- CleanUp/: Runtime output and exported artifacts
+- CleanUp/: Runtime output and exported artifacts (created on first run)
 
 ## Requirements
 
@@ -129,7 +130,7 @@ Start-AS2GoDemo
 
 ```powershell
 # Setup the lab
-Initialize-AS2GoLabConfiguration
+Initialize-AS2GoLab
 
 # Run a Password Spray
 Invoke-ASPhase04BruteForceAttack
