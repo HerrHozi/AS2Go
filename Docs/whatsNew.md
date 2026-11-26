@@ -12,7 +12,7 @@ AS2Go began as a Windows batch demonstration for Microsoft Defender for Identity
 | Apr 2023 | AS2Go v2.8 | 62 | 5,077 | 1 |
 | Oct 2023 | AS2Go v3.x | 75 | 6,490 | 1 |
 | Feb 2026 | AS2Go PowerShell module | 128 | 11,589 | 74 |
-| Nov 2026 | AS2Go PowerShell module | 206 | 17,488 | 171 |
+| Nov 2026 | AS2Go PowerShell module | 211 | 20,359 | 199g |
 
 The August 2021 through November 2026 figures come from the project timeline and represent snapshots.
 
