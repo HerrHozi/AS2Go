@@ -6,6 +6,8 @@ function Get-VulnerableCertificateTemplate {
     #####                                                                      #####
     ################################################################################
 
+
+    [string]$temp = ''
     $Info = Measure-FunctionRuntime -Begin
     
     $CAtemplate = Get-ASConfig -Setting "BadCA"
