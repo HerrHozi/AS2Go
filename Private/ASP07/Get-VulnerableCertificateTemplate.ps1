@@ -104,16 +104,13 @@ function Get-VulnerableCertificateTemplate {
                 $template = $templateResults[$i]
 
                 Write-AS2GoOutput -Type H1 -Message "$($template.Name)" -NoExtraLines
-                #Write-Host " [$($i + 1)] $($template.Name)" -ForegroundColor Yellow 
-                Write-Host "     CA          : $($template.EnrollmentCA)"
-                Write-Host "     Risk        : ESC1 - attacker-controlled subject/SAN"
-                Write-Host "     Enrollments : $($template.EnrollmentPrincipals)"
+                Write-AS2GoOutput -Type Bullet -Message "CA          : $($template.EnrollmentCA)"
+                Write-AS2GoOutput -Type Bullet -Message "Risk        : ESC1 - attacker-controlled subject/SAN"
+                Write-AS2GoOutput -Type Success -Message "Enrollments : $($template.EnrollmentPrincipals)"
 
                 if ($template.AuthenticatedUsersEnrollable) {
-                    Write-AS2GoOutput -Type Success -Message "Authenticated user or Domain Users can request a client-authentication certificate."
-                   # Write-Host "     Impact      : Any authenticated user can request a client-authentication certificate." -ForegroundColor Red
+                    Write-AS2GoOutput -Type Success -Message "Authenticated user or Domain Users can request a client-authentication certificate." -NoExtraLines
                 }
-
                 Write-Host ""
             }
         }
