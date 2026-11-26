@@ -192,7 +192,7 @@ Write-AS2GoOutput {
             } 
             $level = "INFO"
         }
-         "Important" { 
+        "Important" { 
             If ($NoExtraLines) {
                 Write-host "  [!] $Note " -ForegroundColor $Script:FGCTextMaker -NoNewline
                 Write-host "$Message " #-ForegroundColor $Script:FGCSInfo 
@@ -236,8 +236,15 @@ Write-AS2GoOutput {
             Write-Host "`n  [X] ERROR: $Message`n`n"    -ForegroundColor $Script:FGCError
             $level = "ERROR"
         }
-        "H1" { 
-            Write-Host "$Message`n"    -ForegroundColor $Script:FGCH1
+        "H1" {
+            If ($NoExtraLines) {
+                Write-Host "$Message"    -ForegroundColor $Script:FGCH1
+            }
+            else {
+                Write-Host "$Message`n"    -ForegroundColor $Script:FGCH1
+            }
+
+
             $level = "INFO"
         }
         default { 

@@ -67,10 +67,16 @@ function Invoke-PrivilegeEscalationViaESC1 {
     If ($answer -eq $Script:Yes) {
 
         If (-not $SkipClearHost) { Clear-Host }
-        Write-AS2GoOutput -Type Header -Message "Step 1 - Identify Misconfigured and (!) Published Certificate Templates"
+        Write-AS2GoOutput -Type Header -Message "Step 1 - Identify Misconfigured and Published Certificate Templates"
         $Functionality = "Checks for published certificate templates vulnerable to ESC1."
         Write-AS2GoOutput -Type H1 -Message $Functionality  
         $CATemplate = Get-VulnerableCertificateTemplate
+
+        If (-not $CATemplate) {
+            pause
+            Measure-FunctionRuntime -End -Details $Info
+            return
+        }
 
         Do {
             If (-not $SkipClearHost) { Clear-Host }
@@ -81,10 +87,9 @@ function Invoke-PrivilegeEscalationViaESC1 {
             If (-not $UnAttended) { pause }
             If (-not $SkipClearHost) { Clear-Host }
             Write-AS2GoOutput -Type Header -Message "Step 3 - Request Certificate with Certify"
-            $Functionality = "Request a certificate from the vulnerable template by specifying the`n    target account as UPN and SID in the certificate request."
+            $Functionality = "Request a certificate from the vulnerable template by specifying the`ntarget account as UPN and SID in the certificate request."
             Write-AS2GoOutput -Type H1 -Message $Functionality
-            Write-AS2GoOutput -Type  Bullet -Message "Request a certificate from the vulnerable template by specifying the`n    target account as UPN and SID in the certificate request."
-
+            
             $PfxBase64 = Request-PfxWithCertify  -Certificate  $CAtemplate -AlternativeAccount $AlternativeAccount
                 
             $question = "Would you like to repeat this attack phase? Please enter Y or N. Default "

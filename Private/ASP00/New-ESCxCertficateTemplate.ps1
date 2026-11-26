@@ -98,7 +98,7 @@ function New-ESCxCertficateTemplate {
         @{
             Esc         = 'ESC1'
             Name        = "$CTPrefix-ESC1-$NameSuffix"
-            DisplayName = "ESC1 - $TimeStamp"
+            DisplayName = "ESC1 - $NameSuffix"
             AdminDescription = "AS2Go ESC1|$CTPrefix|ASP00|Create"
             Description = "AS2Go ESC1 lab template - ENROLLEE_SUPPLIES_SUBJECT with Client Authentication EKU; enrolled by Authenticated Users."
             EnrollAce   = $true
@@ -127,7 +127,7 @@ function New-ESCxCertficateTemplate {
         @{
             Esc         = 'ESC4'
             Name        = "$CTPrefix-ESC4-$NameSuffix"
-            DisplayName = "ESC4 - $TimeStamp"
+            DisplayName = "ESC4 - $NameSuffix"
             AdminDescription = "AS2Go ESC4|$CTPrefix|ASP00|Create"
             Description = "AS2Go ESC4 lab template - Authenticated Users have write access to the template object; it is not ESC1-vulnerable as created."
             EnrollAce   = $false

@@ -1,137 +1,147 @@
 function Get-VulnerableCertificateTemplate {
 
     ################################################################################
-    #####                                                                      ##### 
-    #####           Finding an Vulnerable Certificate Templates                #####
-    #####                                                                      #####
+    #####                                                                    #####
+    #####          Identify Vulnerable Published Certificate Templates       #####
+    #####                                                                    #####
     ################################################################################
 
-
-    [string]$temp = ''
+    [string]$DomainComputersTemplateList = ''
     $Info = Measure-FunctionRuntime -Begin
-    
+
     $CAtemplate = Get-ASConfig -Setting "BadCA"
+    $CAEnrollment = $null
+    $UseDomainComputers = $false
 
-    Write-AS2GoOutput -Type  CodeSnippet -M "A simple LDAP query is sufficient:"
-    #$code = "`$SearchFilter =  (&(objectClass=pKICertificateTemplate)(cn=`$PublishedTemplate)(msPKI-Certificate-Name-Flag=1)(msPKI-Certificate-Application-Policy=1.3.6.1.5.5.7.3.2))"
-    # Write-HighlightedCode  -code $code
+    Write-AS2GoOutput -Type Important -Note "" -Message "Just a simple LDAP query is sufficient:"
 
-    Write-Highlight -Text ('     $SearchFilter ', '= ', ' "(&(objectClass=pKICertificateTemplate)(cn=', '$PublishedTemplate', ')(msPKI-Certificate-Name-Flag=1)(msPKI-Certificate-Application-Policy=1.3.6.1.5.5.7.3.2))"')`
-        -Color $fgcR, $fgcF, $fgcV, $fgcR, $fgcV, $fgcF
+    Write-Highlight -Text (
+        '     $SearchFilter ',
+        '= ',
+        '"(&(objectClass=pKICertificateTemplate)(cn=',
+        '$PublishedTemplate',
+        ')(msPKI-Certificate-Name-Flag=1)(msPKI-Certificate-Application-Policy=1.3.6.1.5.5.7.3.2))"'
+    ) -Color $fgcR, $fgcF, $fgcV, $fgcR, $fgcV, $fgcF
 
-    Write-Highlight -Text ('     $Template     ', '= ', ' Get-ADObject ', '-SearchBase ', '"CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,', '$forest" ', '-LDAPFilter ', '$SearchFilter ', '-SearchScope ', 'OneLevel')`
-        -Color $fgcR, $fgcF, $fgcC, $fgcS, $fgcV, $fgcR, $fgcS, $fgcR, $fgcS, $fgcF
-    
-    Write-Host ""
-    Write-log -Message "     Only a simple LDAP Query is needed."
-    
-    $question = "Would you like to run this step - Y or N? Default "
-    $answer = Get-Answer -question $question -defaultValue $Script:Yes
+    Write-Highlight -Text (
+        '     $Template     ',
+        '= ',
+        'Get-ADObject ',
+        '-SearchBase ',
+        '"CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,',
+        '$forest" ',
+        '-LDAPFilter ',
+        '$SearchFilter ',
+        '-SearchScope ',
+        'OneLevel'
+    ) -Color $fgcR, $fgcF, $fgcC, $fgcS, $fgcV, $fgcR, $fgcS, $fgcR, $fgcS, $fgcF
 
-    If ($answer -eq $Script:Yes) {
-        #find vulnerable CA templates
+    $answer = $Script:Yes #Show-DecisionPrompt
 
-        Foreach ($RiskyTemplate in $Script:RiskyPublishedTemplates) {
-            Write-host "`n`nIdentified vulnerable certificate template " -NoNewline
-            Write-host "$($RiskyTemplate.Name)" -ForegroundColor Yellow
-            Write-host "on Certification Authority '$($RiskyTemplate.EnrollmentCA)'."
-            Write-Host "The template can be enrolled by:`n"
-   
+    if ($answer -eq $Script:Yes) {
 
-            $DSobject = [adsi]("LDAP://$($RiskyTemplate.DN)")
-            $secd = $DSobject.psbase.get_objectSecurity().getAccessRules($true, $chkInheritedPerm.checked, [System.Security.Principal.NTAccount])
-            $results = $secd | Where-Object { $_.AccessControlType -eq "Allow" -and $_.ObjectType -eq "0e10c968-78fb-11d2-90d4-00c04f79dc55" -and $_.ActiveDirectoryRights -like "*ExtendedRight*" } | Select-Object IdentityReference
+        $templateResults = @()
 
-            foreach ($result in $results) {
-                [string]$t = $result.IdentityReference
+        foreach ($RiskyTemplate in $Script:RiskyPublishedTemplates) {
+
+            $DSobject = [ADSI]("LDAP://$($RiskyTemplate.DN)")
+            $securityDescriptor = $DSobject.psbase.get_objectSecurity().getAccessRules(
+                $true,
+                $chkInheritedPerm.checked,
+                [System.Security.Principal.NTAccount]
+            )
+
+            $enrollmentPrincipals = $securityDescriptor | Where-Object {
+                $_.AccessControlType -eq 'Allow' -and
+                $_.ObjectType -eq '0e10c968-78fb-11d2-90d4-00c04f79dc55' -and
+                $_.ActiveDirectoryRights -like '*ExtendedRight*'
+            } | Select-Object -ExpandProperty IdentityReference
+
+            $isDomainComputerEnrollable = $false
+            $isAuthenticatedUsersEnrollable = $false
+
+            foreach ($principal in $enrollmentPrincipals) {
+
                 try {
-                    $sid = $result.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                    $sid = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
                 }
                 catch {
-                    $sid = "n/a"
+                    $sid = 'n/a'
                 }
-                [string]$displayText = "$($result.IdentityReference)"
 
-                If ($sid -match '(-513|S-1-1-0|S-1-5-11)$') {
-                    write-host ("   - $displayText").PadRight(60, [Char]32) -NoNewline
-                    Write-Host " << Bingo!" -ForegroundColor Red
-                    $CAtemplate = $RiskyTemplate.Name
-                    $CAEnrollment = $RiskyTemplate.EnrollmentCA
+                if ($sid -match '(-513|S-1-1-0|S-1-5-11)$') {
+                    $isAuthenticatedUsersEnrollable = $true
+                }
 
+                if ($sid -match '(-515)$') {
+                    $isDomainComputerEnrollable = $true
                 }
-                elseif ($sid -match '(-515)$' ) {
-                    write-host ("   - $displayText").PadRight(60, [Char]32)  -NoNewline
-                    Write-Host " << Bingo!" -ForegroundColor Red
-                    [string]$temp = ($temp + ' - ' + $($RiskyTemplate.Name).ToUpper())
+            }
+
+            $templateResults += [PSCustomObject]@{
+                Name                         = $RiskyTemplate.Name
+                EnrollmentCA                 = $RiskyTemplate.EnrollmentCA
+                EnrollmentPrincipals         = ($enrollmentPrincipals -join ', ')
+                AuthenticatedUsersEnrollable = $isAuthenticatedUsersEnrollable
+                DomainComputersEnrollable    = $isDomainComputerEnrollable
+            }
+
+            if ($isDomainComputerEnrollable) {
+                $DomainComputersTemplateList = "$DomainComputersTemplateList - $($RiskyTemplate.Name)".ToUpper()
+            }
+        }
+
+        if ($templateResults.Count -eq 0) {
+            write-AS2GoOutput -Type Info -Message "No vulnerable published certificate templates were identified."
+            Measure-FunctionRuntime -End -Details $Info
+            return $null 
+        }
+        else {
+            write-AS2GoOutput -Type Info -Message "Vulnerable published certificate template(s) identified: $($templateResults.Count)"
+
+            for ($i = 0; $i -lt $templateResults.Count; $i++) {
+
+                $template = $templateResults[$i]
+
+                Write-AS2GoOutput -Type H1 -Message "$($template.Name)" -NoExtraLines
+                #Write-Host " [$($i + 1)] $($template.Name)" -ForegroundColor Yellow 
+                Write-Host "     CA          : $($template.EnrollmentCA)"
+                Write-Host "     Risk        : ESC1 - attacker-controlled subject/SAN"
+                Write-Host "     Enrollments : $($template.EnrollmentPrincipals)"
+
+                if ($template.AuthenticatedUsersEnrollable) {
+                    Write-AS2GoOutput -Type Success -Message "Authenticated user or Domain Users can request a client-authentication certificate."
+                   # Write-Host "     Impact      : Any authenticated user can request a client-authentication certificate." -ForegroundColor Red
                 }
-                else {
-                    write-host "   - $displayText"
-                }
+
+                Write-Host ""
             }
         }
     }
 
-
-    Do {
-        $question = "Do you want to use CA template '$CAtemplate' - Y or N? Default "
-        $prompt = Get-Answer -question $question -defaultValue $Script:Yes
-
-        if ($prompt -ne $Script:Yes) {
-            write-host ""
-            [int]$i = 0
-            Foreach ($ca in $Script:RiskyPublishedTemplates) {
-                Write-host "   [" -NoNewline
-                Write-Host $i -ForegroundColor Yellow -NoNewline
-                Write-host "] - $($ca.name)"
-                $i++
-            }
-            write-host ""
-            $max = $i - 1
-            $i = Get-Random -Minimum 0 -Maximum $max
-            [int]$selectedIndex = 0
-            do { 
-
-                $n = Read-Host "Type in the NUMBER for your preferred CA Template, e.g. $i"
-                if ([int]::TryParse($n, [ref]$selectedIndex) -and $selectedIndex -ge 0 -and $selectedIndex -le $max) {
-                    $repeat = $Script:No
-                }
-                else {
-                    $repeat = $Script:Yes
-                    Write-Host $n -NoNewline -ForegroundColor Yellow
-                    Write-Host " is out of scope!"
-                }
-            } Until ($repeat -eq $Script:No)
-            
-            $CAtemplate = $Script:RiskyPublishedTemplates.name[$selectedIndex]
-            $CAEnrollment = $Script:RiskyPublishedTemplates.EnrollmentCA[$selectedIndex]
-   
-      
-            Set-ASConfig -Setting "BadCA" -Value $CAtemplate
-            write-host ""
-            
-
-      
-        }
-    } Until ($prompt -eq $Script:Yes)
+    $title = "Select a vulnerable certificate template to continue with:"
+    $default = 0 #[array]::IndexOf($uniqueAccounts.Principal, $candidate)
+    $options = New-HelpOptions -InputObject $templateResults -Label "Name" -Help "EnrollmentPrincipals" -Value "IndexOf" -AddSkip
+    $index = Show-DecisionPrompt -Options $options -Default $default -Title $title #-Message $message
     
-    #check if this Template can be enrolled by Domain Computers
-    If ($temp.Contains("- $CAtemplate".ToUpper())) {
-        [bool]$UseDomainComputers = $true
+    If ($index -eq $Script:No) {
+        Write-As2GoOutput -Type Info -Message "No certificate template was selected."
+        return $null
     }
-    else {
-        [bool]$UseDomainComputers = $false
+    else {     
+        $CA = [PSCustomObject]@{
+            Name                  = $templateResults[$index].Name
+            EnrollmentCA          = $templateResults[$index].EnrollmentCA
+            AlsoByDomainComputers = $templateResults[$index].DomainComputersEnrollable
+        }
+
+        Write-AS2GoOutput -Type TextMaker -Message "Selected certificate template:" -TextMaker "$($CA.Name)"
+
     }
 
-    $CA = [PSCustomObject]@{
-        Name                  = $CAtemplate
-        EnrollmentCA          = $CAEnrollment
-        AlsoByDomainComputers = $UseDomainComputers
-
-    } 
-
-
-    Write-Log -Message "    >> using $CAtemplate, can be enrolled by Domain Computer - $UseDomainComputers"
     Measure-FunctionRuntime -End -Details $Info
 
-    return $CA 
+    return $CA
 }
+
+

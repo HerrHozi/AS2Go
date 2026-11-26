@@ -161,7 +161,10 @@ function Invoke-StoredCredentialAttack {
         $tickets | Format-Table TicketNumber, Client, Server, EncryptionType, EndTime -AutoSize
         Write-AS2GoOutput -Type Info -Message "Last Ticket"
         $tickets | Select-Object -Last 1 | Format-List
-                Invoke-ADChanges
+        
+        Invoke-ADChanges
+        
+        
         if (-not $unattended) { pause }
 
 
