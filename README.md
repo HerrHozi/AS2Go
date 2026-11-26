@@ -36,8 +36,8 @@ It is designed for:
 
 ## Documentation
 
+- [What's New](Docs/WhatsNew.md)
 - [ASP00 Installation and Setup](Docs/ASP00-Setup.md)
-- [What's New](Docs/whatsNew.md)
 
 ## Important Notice
 
