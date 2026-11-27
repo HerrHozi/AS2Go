@@ -4,7 +4,15 @@ This is the parent document for AS2Go installation, lab preparation, and launch.
 
 ## Quick Start
 
-Run the installation and lab preparation from the Windows Server used for the demonstration. Keep two Windows sign-ins available on that server: use the Enterprise Admin session for setup, and use a separate session for the selected compromised account when running the phase.
+![Two separate logon sessions on the same member server](../Assets/Images/ASP00-Setup.png)
+
+**Two separate logon sessions on the same member server. The Enterprise Admin remains signed in.**
+
+Both users work on the same member server in separate Windows logon sessions. First, the Enterprise Admin signs in and starts the lab setup with `Setup-AS2GoDemo` and `New-AS2GoDemoPrincipalSet`. The Enterprise Admin then completes the applicable preparation tasks listed in the [setup documentation map](#setup-documentation-map) and remains signed in.
+
+Next, the compromised non-Tier 0 user signs in to the same server. This account is also a local administrator on the member server. From that separate session, the user opens PowerShell 7.4 in elevated mode, starts AS2Go with `Start-AS2GoDemo`, and runs the attack scenarios. These cover Initial Access (ASP05), Reconnaissance (ASP06), Privilege Escalation (ASP07), Privileged Reconnaissance (ASP09), Sensitive Data Access (ASP10), Data Exfiltration (ASP11), and Domain Compromise & Persistence (ASP12).
+
+This setup demonstrates how AS2Go prepares the lab with Tier 0 privileges while running the scenarios from a compromised non-Tier 0 account.
 
 ### 1. Prepare the lab as Enterprise Admin
 
@@ -19,24 +27,25 @@ Follow the setup prompts and confirm the intended lab scope. The **Share** setup
 
 ### 2. Start the demonstration as the selected compromised account
 
-Sign in to the same Windows Server in the second session using the account appropriate to the scenario (standard user, Tier 2, or Tier 1), then start the guided workflow:
+Sign in to the same Windows Server in the second session using the account appropriate to the scenario (standard user, Tier 2, or Tier 1). The account must be a local administrator on this server. Open PowerShell 7.4 in elevated mode, then start the guided workflow:
 
 ```powershell
 Start-AS2GoDemo
 ```
 
-From this session, choose the appropriate workflow in the AS2Go menu. Review the documentation for that workflow before starting it.
+From this session, choose the appropriate workflow in the AS2Go menu. See [ASP00 Start the AS2Go Demo](ASP00_Start-AS2GoDemo.md) for the workflow details, and review the documentation for each phase before starting it.
 
-## ASP00 documentation map
+## Setup documentation map
 
+- [ASP00 Verify Config](ASP00_VerifyConfig.md)
+- [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md)
+- [ASP00 Malicious Tools](ASP00_MaliciousTools.md)
+- [ASP00 Secure Access Workstation](ASP00_SecureAccessWorkstation.md)
 - [ASP00 Backup Share](ASP00_BackupShare.md)
 - [ASP00 AS2Go Assets](ASP00_AS2GoAssets.md)
 - [ASP00 Demo Accounts](ASP00_DemoAccounts.md)
-- [ASP00 Malicious Tools](ASP00_MaliciousTools.md)
-- [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md)
-- [ASP00 Secure Access Workstation](ASP00_SecureAccessWorkstation.md)
+- [ASP00 Start the AS2Go Demo](ASP00_Start-AS2GoDemo.md)
 - [ASP00 MDI Triggers](ASP00_MDITriggers.md)
-- [ASP00 Verify Config](ASP00_VerifyConfig.md)
 - [ASP00 AD CS](ASP00_ADCS.md)
 - [ASP00 Remove AS2Go Lab](ASP00_Remove-AS2GoLab.md)
 
@@ -71,15 +80,11 @@ These switch descriptions are maintained here so individual guides can link back
 | `-UnAttended` | Runs the workflow without interactive prompts. Review phase behavior and scope first. |
 | `-Continue` | Continues from the saved stage. |
 | `-EnableLogging` | Enables scenario logging. |
-| `-SkipImages`, `-SkipClearHost`, `-SkipPopup` | Suppress images, console clearing, or popup messages. |
-| `-SkipPasswordSpray`, `-SkipCompromisedAccount`, `-SkipPwSpayWithRubeus` | Skip the corresponding workflow actions. |
-| `-SkipReconnaissance`, `-SkipPrivilegeEscalation`, `-SkipDataExfiltration`, `-SkipForgeAuthCertificates`, `-SkipKerberoastingAttack` | Skip the corresponding workflow actions. |
+| `-SkipImages`, `-SkipClearHost` | Suppress phase images or console clearing. |
 | `-DeveloperMode` | Enables developer/demo output. |
-| `-Simulation` | The workflow forwards this setting to phase logic. Do not assume every phase implements simulation behavior. |
 | `-PrivilegeEscalation` | Selects one of `PtH`, `PtT`, `Kerberoasting`, `ESC1`, `WDigest`, or `PsExec`. |
 | `-DomainPersistence` | Selects one of `Encrypt`, `Reboot`, `BackdoorUser`, `GPT`, `UserManipulation`, or `GroupManipulation`. |
 | `-SafeMode` | Enables the workflow's safe-mode behavior. |
-
 
 ## Scope and Safety
 
@@ -180,7 +185,7 @@ Start-AS2GoDemo -Preview
 Start-AS2GoDemo -Preview -UnAttended
 ```
 
-Preview returns before live function initialization, AD queries, configuration writes, and tool execution. Module-import directory/configuration initialization still occurs. Preview shows source descriptions and planned commands; it does not validate connectivity, permissions, runtime choices, or detection results. `-Simulation` and `-DeveloperMode` are not substitutes for preview.
+Preview returns before live function initialization, AD queries, configuration writes, and tool execution. Module-import directory/configuration initialization still occurs. Preview shows source descriptions and planned commands; it does not validate connectivity, permissions, runtime choices, or detection results. `-DeveloperMode` is not a substitute for preview.
 
 ## 5. Initialize the Lab
 
