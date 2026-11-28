@@ -23,7 +23,7 @@ Setup-AS2GoDemo
 New-AS2GoDemoPrincipalSet
 ```
 
-Follow the setup prompts and confirm the intended lab scope. The **Share** setup option creates the simulated backup share; see [ASP00 Backup Share](ASP00_BackupShare.md) for its behavior and requirements.
+Follow the setup prompts and confirm the intended lab scope. E.g., the **Share** setup option creates the simulated backup share; see [ASP00 Backup Share](ASP00_BackupShare.md) for its behavior and requirements.
 
 ### Start the demonstration as the selected compromised account
 

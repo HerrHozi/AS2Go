@@ -52,7 +52,7 @@ v2026.5.7.1034
     
 
     RootModule        = 'AS2Go.psm1'
-    ModuleVersion     = '2026.11.28.861'
+    ModuleVersion     = '2026.11.28.919'
     GUID              = '74b1e089-b087-4e17-8ce5-311823d72bf5'
 
     Author            = 'Holger Zimmermann | as2go@mrhozi.com'
