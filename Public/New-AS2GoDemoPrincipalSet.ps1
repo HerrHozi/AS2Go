@@ -5,7 +5,7 @@ Creates the AS2Go lab users and a Tier 0 service account.
 .DESCRIPTION
 Creates up to five lab users and one service account in the configured Active Directory OUs.
 Each user joins its configured security group. All accounts share the supplied master password,
-use the lab thumbnail, and expire after seven days. Created accounts keep the initial password, so
+use a role-specific lab thumbnail, and expire after seven days. Created accounts keep the initial password, so
 users are not prompted to change it at first logon. The service account additionally receives a
 random SPN that points to a newly created SPN target computer, making it Kerberoastable.
 
@@ -121,12 +121,12 @@ function New-AS2GoDemoPrincipalSet {
 
 
         $accounts = @(
-            @{ Parameter = 'DAUser'; Name = $DAUser; Prefix = 'DA'; Title = 'Domain Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'DAGroup'; Skip = $SkipDomainAdmin }
-            @{ Parameter = 'EAUser'; Name = $EAUser; Prefix = 'EA'; Title = 'Enterprise Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'EAGroup' }
-            @{ Parameter = 'SAUser'; Name = $SAUser; Prefix = 'SA'; Title = 'Server Administrator'; Tier = 'Tier 1'; OU = 'T1AccountsOU'; Group = 'SAGroup' }
-            @{ Parameter = 'HDUser'; Name = $HDUser; Prefix = 'HD'; Title = 'Help Desk User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'HDGroup'; Skip = $SkipHelpDesk }
-            @{ Parameter = 'CAAccount'; Name = $CAAccount; Prefix = 'CA'; Title = 'Compromised Account'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'CAGroup'; Skip = $SkipCompromisedAccount }
-            @{ Parameter = 'SrvAccount'; Name = $SrvAccount; Prefix = 'SVC'; Title = 'Service Account'; Tier = 'Tier 0'; OU = 'T0ServiceAccountsOU'; Group = 'DAGroup'; Skip = $SkipHelpDesk; SPN = $true }
+            @{ Parameter = 'DAUser'; Name = $DAUser; Prefix = 'DA'; Title = 'Domain Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'DAGroup'; Thumbnail = 'AS2Go-T0-Admin.jpg'; Skip = $SkipDomainAdmin }
+            @{ Parameter = 'EAUser'; Name = $EAUser; Prefix = 'EA'; Title = 'Enterprise Administrator'; Tier = 'Tier 0'; OU = 'T0AccountsOU'; Group = 'EAGroup'; Thumbnail = 'AS2Go-T0-Enterprise-Admin.jpg' }
+            @{ Parameter = 'SAUser'; Name = $SAUser; Prefix = 'SA'; Title = 'Server Administrator'; Tier = 'Tier 1'; OU = 'T1AccountsOU'; Group = 'SAGroup'; Thumbnail = 'AS2Go-T1-Admin.jpg' }
+            @{ Parameter = 'HDUser'; Name = $HDUser; Prefix = 'HD'; Title = 'Help Desk User'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'HDGroup'; Thumbnail = 'AS2Go-T2-Admin.jpg'; Skip = $SkipHelpDesk }
+            @{ Parameter = 'CAAccount'; Name = $CAAccount; Prefix = 'CA'; Title = 'Compromised Account'; Tier = 'Tier 2'; OU = 'T2AccountsOU'; Group = 'CAGroup'; Thumbnail = 'AS2Go-Compromised-Account.jpg'; Skip = $SkipCompromisedAccount }
+            @{ Parameter = 'SrvAccount'; Name = $SrvAccount; Prefix = 'SVC'; Title = 'Service Account'; Tier = 'Tier 0'; OU = 'T0ServiceAccountsOU'; Group = 'DAGroup'; Thumbnail = 'AS2Go-T0-Service-Account.jpg'; Skip = $SkipHelpDesk; SPN = $true }
         ) | Where-Object { -not $_.Skip }
 
         $now = Get-Date
@@ -165,8 +165,6 @@ function New-AS2GoDemoPrincipalSet {
             }
         }
 
-        $thumbnailPhoto = [System.IO.File]::ReadAllBytes((Join-Path -Path $Script:ASSetup -ChildPath 'AS2Go-Admin.jpg'))
-
         Import-Module ActiveDirectory -ErrorAction Stop
         if (-not $Server) {
             $Server = (Get-ADDomainController -Discover -Writable -ErrorAction Stop).HostName
@@ -180,6 +178,11 @@ function New-AS2GoDemoPrincipalSet {
         $password = $null
 
         foreach ($account in $accounts) {
+            $thumbnailPath = Join-Path -Path (Join-Path -Path $Script:ASSetup -ChildPath 'thumbnailPhotos') -ChildPath $account.Thumbnail
+            if (-not (Test-Path -LiteralPath $thumbnailPath -PathType Leaf)) {
+                throw "Thumbnail file '$thumbnailPath' for '$($account.Title)' was not found."
+            }
+            $account.ThumbnailPhoto = [System.IO.File]::ReadAllBytes($thumbnailPath)
             $account.Path = (Get-ADOrganizationalUnit -Identity $settings[$account.OU] @adParameters).DistinguishedName
             if ($account.Group) {
                 $account.GroupDN = (Get-ADGroup -Identity $settings[$account.Group] @adParameters).DistinguishedName
@@ -211,7 +214,7 @@ function New-AS2GoDemoPrincipalSet {
                 Description           = 'AS2Go Lab Account'
                 Path                  = $account.Path
                 AccountExpirationDate = $now.AddDays(7)
-                OtherAttributes       = @{ thumbnailPhoto = $thumbnailPhoto; adminDescription = "AS2Go|$Scenario|ASP00|Create" }
+                OtherAttributes       = @{ thumbnailPhoto = $account.ThumbnailPhoto; adminDescription = "AS2Go|$Scenario|ASP00|Create" }
                 Enabled               = $false
             }
             if (-not $password) {

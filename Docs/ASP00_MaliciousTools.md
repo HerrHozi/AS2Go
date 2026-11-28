@@ -27,7 +27,7 @@ The selected folder will contain credential-access and other security assessment
 Initialize-AS2GoLab
 ```
 
-Complete the setup prompts and select **Malicious Tools**. Confirm the displayed destination or choose another folder. AS2Go copies `AS2Go-Tools_v3.zip` into that confirmed folder. You must extract the ZIP there manually, then confirm in the console that extraction is complete. The default destination is `$env:PUBLIC\AS2Go\MaliciousTools`. The shared setup switches are documented in [ASP00 Installation and Setup](ASP00-Setup.md#shared-command-switches).
+Complete the setup prompts and select **Malicious Tools**. Confirm the displayed destination or choose another folder. AS2Go copies `AS2Go-Tools_v3.zip` into that confirmed folder. You must extract the ZIP there manually, then confirm in the console that extraction is complete. The default destination is `$env:PUBLIC\AS2Go\MaliciousTools`. The setup command switches are documented in [ASP00 Installation and Setup](ASP00-Setup.md#command-switch-reference).
 
 ## What the workflow prepares
 

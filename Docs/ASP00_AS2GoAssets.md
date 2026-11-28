@@ -56,7 +56,7 @@ Initialize-AS2GoLab
 
 ## Parameters
 
-There are no parameters specific to the **AS2Go Assets** menu choice. The public initializer accepts general setup parameters; their shared behavior is documented in [ASP00 Installation and Setup](ASP00-Setup.md#shared-command-switches).
+There are no parameters specific to the **AS2Go Assets** menu choice. The public initializer accepts general setup parameters; their shared behavior is documented in [ASP00 Installation and Setup](ASP00-Setup.md#command-switch-reference).
 
 | Public setup parameter | Default | Effect on AS2Go Assets |
 |---|---|---|

@@ -8,13 +8,13 @@ This is the parent document for AS2Go installation, lab preparation, and launch.
 
 **Two separate logon sessions on the same member server. The Enterprise Admin remains signed in.**
 
-Both users work on the same member server in separate Windows logon sessions. First, the Enterprise Admin signs in and starts the lab setup with `Setup-AS2GoDemo` and `New-AS2GoDemoPrincipalSet`. The Enterprise Admin then completes the applicable preparation tasks listed in the [setup documentation map](#setup-documentation-map) and remains signed in.
+Both users work on the same member server in separate Windows logon sessions. First, the Enterprise Admin signs in and starts the lab setup with `Setup-AS2GoDemo` and `New-AS2GoDemoPrincipalSet`. The Enterprise Admin then completes the applicable preparation tasks listed in the [ASP00 documentation map](#asp00-documentation-map) and remains signed in.
 
 Next, the compromised non-Tier 0 user signs in to the same server. This account is also a local administrator on the member server. From that separate session, the user opens PowerShell 7.4 in elevated mode, starts AS2Go with `Start-AS2GoDemo`, and runs the attack scenarios. These cover Initial Access (ASP05), Reconnaissance (ASP06), Privilege Escalation (ASP07), Privileged Reconnaissance (ASP09), Sensitive Data Access (ASP10), Data Exfiltration (ASP11), and Domain Compromise & Persistence (ASP12).
 
 This setup demonstrates how AS2Go prepares the lab with Tier 0 privileges while running the scenarios from a compromised non-Tier 0 account.
 
-### 1. Prepare the lab as Enterprise Admin
+### Prepare the lab as Enterprise Admin
 
 After completing the installation and prerequisites below, open PowerShell 7.4 in the Enterprise Admin session and run:
 
@@ -25,7 +25,7 @@ New-AS2GoDemoPrincipalSet
 
 Follow the setup prompts and confirm the intended lab scope. The **Share** setup option creates the simulated backup share; see [ASP00 Backup Share](ASP00_BackupShare.md) for its behavior and requirements.
 
-### 2. Start the demonstration as the selected compromised account
+### Start the demonstration as the selected compromised account
 
 Sign in to the same Windows Server in the second session using the account appropriate to the scenario (standard user, Tier 2, or Tier 1). The account must be a local administrator on this server. Open PowerShell 7.4 in elevated mode, then start the guided workflow:
 
@@ -34,57 +34,6 @@ Start-AS2GoDemo
 ```
 
 From this session, choose the appropriate workflow in the AS2Go menu. See [ASP00 Start the AS2Go Demo](ASP00_Start-AS2GoDemo.md) for the workflow details, and review the documentation for each phase before starting it.
-
-## Setup documentation map
-
-- [ASP00 Verify Config](ASP00_VerifyConfig.md)
-- [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md)
-- [ASP00 Malicious Tools](ASP00_MaliciousTools.md)
-- [ASP00 Secure Access Workstation](ASP00_SecureAccessWorkstation.md)
-- [ASP00 Backup Share](ASP00_BackupShare.md)
-- [ASP00 AS2Go Assets](ASP00_AS2GoAssets.md)
-- [ASP00 Demo Accounts](ASP00_DemoAccounts.md)
-- [ASP00 Start the AS2Go Demo](ASP00_Start-AS2GoDemo.md)
-- [ASP00 MDI Triggers](ASP00_MDITriggers.md)
-- [ASP00 AD CS](ASP00_ADCS.md)
-- [ASP00 Remove AS2Go Lab](ASP00_Remove-AS2GoLab.md)
-
-## Shared command switches
-
-These switch descriptions are maintained here so individual guides can link back instead of repeating shared setup and launch guidance.
-
-### `Initialize-AS2GoLab` / `Setup-AS2GoDemo`
-
-| Switch | Effect |
-|---|---|
-| `-Preview` | Displays the setup workflow without performing the live setup. |
-| `-EnableLogging` | Enables setup logging. |
-| `-DeveloperMode` | Enables developer behavior and logging as implemented by the setup command. |
-| `-SafeMode` | Accepted by the command; no behavior is currently implemented for this switch in `Initialize-AS2GoLab`. |
-
-### `New-AS2GoDemoPrincipalSet`
-
-| Switch | Effect |
-|---|---|
-| `-SkipDomainAdmin` | Omits the demo domain administrator. |
-| `-SkipHelpDesk` | Omits the help desk account and the service account. |
-| `-SkipCompromisedAccount` | Omits the configured compromised account. |
-| `-EnableLogging` | Accepted by the command; the principal-set function does not currently read this switch. |
-| `-WhatIf` | Previews the account creation actions supported by `ShouldProcess`. |
-
-### `Start-AS2GoDemo`
-
-| Switch | Effect |
-|---|---|
-| `-Preview` | Displays the guided workflow without executing it. |
-| `-UnAttended` | Runs the workflow without interactive prompts. Review phase behavior and scope first. |
-| `-Continue` | Continues from the saved stage. |
-| `-EnableLogging` | Enables scenario logging. |
-| `-SkipImages`, `-SkipClearHost` | Suppress phase images or console clearing. |
-| `-DeveloperMode` | Enables developer/demo output. |
-| `-PrivilegeEscalation` | Selects one of `PtH`, `PtT`, `Kerberoasting`, `ESC1`, `WDigest`, or `PsExec`. |
-| `-DomainPersistence` | Selects one of `Encrypt`, `Reboot`, `BackdoorUser`, `GPT`, `UserManipulation`, or `GroupManipulation`. |
-| `-SafeMode` | Enables the workflow's safe-mode behavior. |
 
 ## Scope and Safety
 
@@ -296,3 +245,54 @@ Deleting runtime files does not undo AD, DNS, AD CS, GPO, share, or endpoint-pro
 | PKINIT returns `KDC_ERR_PADATA_TYPE_NOSUPP` | See [Troubleshooting PKINIT and KDC_ERR_PADATA_TYPE_NOSUPP](https://herrhozi.com/2026/11/10/troubleshooting-pkinit-kdc-err-padata-type-nosupp/). |
 
 For more detail, use setup's `-EnableLogging` switch and review the runtime logs. Report issues through [AS2Go on GitHub](https://github.com/HerrHozi/AS2Go) with sanitized reproduction steps, module version, and relevant errors.
+
+## ASP00 documentation map
+
+- [ASP00 Verify Config](ASP00_VerifyConfig.md)
+- [ASP00 Break-Glass Account](ASP00_BreakGlassAccount.md)
+- [ASP00 Malicious Tools](ASP00_MaliciousTools.md)
+- [ASP00 Secure Access Workstation](ASP00_SecureAccessWorkstation.md)
+- [ASP00 Backup Share](ASP00_BackupShare.md)
+- [ASP00 AS2Go Assets](ASP00_AS2GoAssets.md)
+- [ASP00 Demo Accounts](ASP00_DemoAccounts.md)
+- [ASP00 Start the AS2Go Demo](ASP00_Start-AS2GoDemo.md)
+- [ASP00 MDI Triggers](ASP00_MDITriggers.md)
+- [ASP00 AD CS](ASP00_ADCS.md)
+- [ASP00 Remove AS2Go Lab](ASP00_Remove-AS2GoLab.md)
+
+## Command switch reference
+
+Use this reference for the parameters of the public setup and demo commands. Individual guides can link here instead of repeating parameter details.
+
+### `Initialize-AS2GoLab` / `Setup-AS2GoDemo`
+
+| Switch | Effect |
+|---|---|
+| `-Preview` | Displays the setup workflow without performing the live setup. |
+| `-EnableLogging` | Enables setup logging. |
+| `-DeveloperMode` | Enables developer behavior and logging as implemented by the setup command. |
+| `-SafeMode` | Accepted by the command; no behavior is currently implemented for this switch in `Initialize-AS2GoLab`. |
+
+### `New-AS2GoDemoPrincipalSet`
+
+| Switch | Effect |
+|---|---|
+| `-SkipDomainAdmin` | Omits the demo domain administrator. |
+| `-SkipHelpDesk` | Omits the help desk account and the service account. |
+| `-SkipCompromisedAccount` | Omits the configured compromised account. |
+| `-EnableLogging` | Accepted by the command; the principal-set function does not currently read this switch. |
+| `-WhatIf` | Previews the account creation actions supported by `ShouldProcess`. |
+
+### `Start-AS2GoDemo`
+
+| Switch | Effect |
+|---|---|
+| `-Preview` | Displays the guided workflow without executing it. |
+| `-UnAttended` | Runs the workflow without interactive prompts. Review phase behavior and scope first. |
+| `-Continue` | Continues from the saved stage. |
+| `-EnableLogging` | Enables scenario logging. |
+| `-SkipImages`, `-SkipClearHost` | Suppress phase images or console clearing. |
+| `-DeveloperMode` | Enables developer/demo output. |
+| `-PrivilegeEscalation` | Selects one of `PtH`, `PtT`, `Kerberoasting`, `ESC1`, `WDigest`, or `PsExec`. |
+| `-DomainPersistence` | Selects one of `Encrypt`, `Reboot`, `BackdoorUser`, `GPT`, `UserManipulation`, or `GroupManipulation`. |
+| `-SafeMode` | Enables the workflow's safe-mode behavior. |

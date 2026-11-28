@@ -68,7 +68,7 @@ function Invoke-BackdoorUserCreation {
     $UPNSuffix = "@" + (Get-ADForest).RootDomain
     $title = "Backdoor"
     $UPN = ($samaccountname + $UPNSuffix)
-    $bthumbnailPhoto = Join-Path -Path $Script:ASSetup -ChildPath "thumbnailPhotos\AS2Go_BD-User.jpg"
+    $bthumbnailPhoto = Join-Path -Path $Script:ASSetup -ChildPath "thumbnailPhotos\AS2Go-BD-Account.jpg"
     $Description = "Backdoor Account (AS2Go Demo)"
 
     $BDUserPW = Get-RandomPassword

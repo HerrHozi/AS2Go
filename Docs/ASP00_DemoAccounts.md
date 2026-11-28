@@ -42,7 +42,7 @@ The workflow requires the Active Directory management tools, access to the curre
 Initialize-AS2GoLab
 ```
 
-After the prerequisite checks, select **Demo Users** in the setup menu. `Setup-AS2GoDemo` and `ASP00` are aliases of `Initialize-AS2GoLab`. The setup command's shared switches are documented in [ASP00 Installation and Setup](ASP00-Setup.md#shared-command-switches).
+After the prerequisite checks, select **Demo Users** in the setup menu. `Setup-AS2GoDemo` and `ASP00` are aliases of `Initialize-AS2GoLab`. The setup command's shared switches are documented in [ASP00 Installation and Setup](ASP00-Setup.md#command-switch-reference).
 
 ## Parameters
 

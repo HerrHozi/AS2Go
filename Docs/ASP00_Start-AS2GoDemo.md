@@ -4,7 +4,7 @@
 
 ## Before you start
 
-- Complete the required lab preparation in [ASP00 Installation and Setup](ASP00-Setup.md), including the applicable items in its setup documentation map.
+- Complete the required lab preparation in [ASP00 Installation and Setup](ASP00-Setup.md), including applicable items in its [ASP00 documentation map](ASP00-Setup.md#asp00-documentation-map).
 - Sign in to the member server in the separate Windows session for the compromised non-Tier 0 account. This account must also be a local administrator on the member server.
 - Open PowerShell 7.4 in elevated mode. AS2Go records the current logon account as the compromised account for the workflow.
 - Ensure the lab configuration and tools are ready for the phases you plan to run. The workflow checks for the ActiveDirectory and GroupPolicy modules and configured AS2Go tools. Missing dependencies produce a warning; phases that require them may not work.

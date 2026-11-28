@@ -31,7 +31,7 @@ Initialize-AS2GoLab
 
 The command opens the AS2Go environment configuration menu after its prerequisite checks. `Setup-AS2GoDemo` is an alias. Select **Share** in the menu to run the backup-share workflow.
 
-The command's switches are documented once in [ASP00 Installation and Setup - Shared command switches](ASP00-Setup.md#shared-command-switches). There is no public command or share-specific parameter that directly invokes `New-BackUpShare`.
+The command's switches are documented once in [ASP00 Installation and Setup - Command switch reference](ASP00-Setup.md#command-switch-reference). There is no public command or share-specific parameter that directly invokes `New-BackUpShare`.
 
 ## Parameters
 
